@@ -801,7 +801,7 @@ force_inline id properlyHighlightingTableTitleOfNote(NotesTableView *tv, NoteObj
 		[self updateLabelConnections];
 		
 		[self makeNoteDirtyUpdateTime:YES updateFile:NO];
-		//[self registerModificationWithOwnedServices]; //not until we have a service that knows about labels
+		[self registerModificationWithOwnedServices];
 		
 		[delegate note:self attributeChanged:NoteLabelsColumnString];
 	}
@@ -1434,6 +1434,12 @@ BOOL noteTitleMatchesUTF8String(NoteObject *note, const char* fullString) {
 - (NSSet*)labelSet {
     return labelSet;
 }
+
+- (NSArray*)labelArray {
+	NSCharacterSet *ws = [NSCharacterSet whitespaceCharacterSet];
+	return [labelString componentsSeparatedByCharactersInSet:ws];
+}
+
 /*
 - (CFArrayRef)rangesForWords:(NSString*)string inRange:(NSRange)rangeLimit {
 	//use cstring caches if note is all 7-bit, as we [REALLY OUGHT TO] be able to assume a 1-to-1 character mapping

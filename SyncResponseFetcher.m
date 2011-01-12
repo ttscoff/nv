@@ -43,13 +43,25 @@
 	return [self initWithURL:aURL POSTData:B64Data delegate:aDelegate];
 }
 
+- (id)initWithURL:(NSURL*)aURL bodyString:(NSString*)body delegate:(id)aDelegate {
+	return [self initWithURL:aURL POSTData:[body dataUsingEncoding:NSUTF8StringEncoding] delegate:aDelegate];
+}
+
 - (id)initWithURL:(NSURL*)aURL POSTData:(NSData*)POSTData delegate:(id)aDelegate {
-	
+	if ((self = [self initWithURL:aURL method:(POSTData ? @"POST" : nil) delegate:aDelegate])) {
+		dataToSend = [POSTData retain];
+	}
+	return self;
+}
+
+- (id)initWithURL:(NSURL*)aURL method:(NSString*)httpMethod delegate:(id)aDelegate {
 	if ([self init]) {
 		receivedData = [[NSMutableData alloc] init];
 		requestURL = [aURL retain];
+		requestMethod = httpMethod
+			? [httpMethod copy]
+			: [@"GET" copy];
 		delegate = aDelegate;
-		dataToSend = [POSTData retain];
 	}
 	return self;
 }
@@ -82,14 +94,14 @@
 		NSLog(@"%s: Couldn't create HTTP request with URL %@", _cmd, requestURL);
 		return NO;
 	}
-	
+		
+	[request setHTTPMethod:requestMethod];
 	[request setHTTPShouldHandleCookies:NO];
 	[request addValue:@"Sinus cardinalis NV 2.0B3" forHTTPHeaderField:@"User-agent"];
 	
 	//if POSTData is nil, do a plain GET request
 	if (dataToSend) {
 		[request setHTTPBody:dataToSend];
-		[request setHTTPMethod:@"POST"];
 	}
 	
 	[self retain];
@@ -131,6 +143,7 @@
 - (void)dealloc {
 	
 	[dataToSend release];
+	[requestMethod release];
 	[requestURL release];
 	[receivedData release];
 	[urlConnection release];

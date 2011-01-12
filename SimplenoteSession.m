@@ -703,6 +703,7 @@ static void SNReachabilityCallback(SCNetworkReachabilityRef	target, SCNetworkCon
 			NSNumber *modNum = [info objectForKey:@"modify"];
 			[note setDateAdded:[[info objectForKey:@"create"] doubleValue]];
 			[note setDateModified:[modNum doubleValue]];
+			[note setLabelString:[[info objectForKey:@"tags"] componentsJoinedByString:@" "]];
 			//also set mod time, key, and sepWCtx for this note's syncServicesMD
 			[note setSyncObjectAndKeyMD:[NSDictionary dictionaryWithObjectsAndKeys:modNum, @"modify", 
 										 [info objectForKey:@"key"], @"key", separator, SimplenoteSeparatorKey, nil] 

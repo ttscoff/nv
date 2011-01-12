@@ -135,6 +135,7 @@ NSInteger compareFileSize(id *a, id *b);
 - (id)initWithCatalogEntry:(NoteCatalogEntry*)entry delegate:(id)aDelegate;
 
 - (NSSet*)labelSet;
+- (NSArray*)labelArray;
 - (void)replaceMatchingLabelSet:(NSSet*)aLabelSet;
 - (void)replaceMatchingLabel:(LabelObject*)label;
 - (void)updateLabelConnectionsAfterDecoding;
