@@ -61,6 +61,13 @@ static void SNReachabilityCallback(SCNetworkReachabilityRef	target, SCNetworkCon
 	return [NSURL URLWithString:[NSString stringWithFormat:@"https://simple-note.appspot.com%@%@", path, queryStr]];
 }
 
++ (NSURL*)urlForNoteWithKey:(NSString*)key parameters:(NSDictionary*)params {
+	NSString *path = key == nil
+		? @"/api2/data"
+		: [NSString stringWithFormat:@"/api2/data/%@", key];
+	return [self servletURLWithPath:path parameters:params];
+}
+
 #if 0
 + (NSString*)localizedNetworkDiagnosticMessage {
 	

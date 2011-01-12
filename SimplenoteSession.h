@@ -64,6 +64,7 @@ extern NSString *SimplenoteSeparatorKey;
 + (NSString*)serviceName;
 + (NSString*)nameOfKeyElement;
 + (NSURL*)servletURLWithPath:(NSString*)path parameters:(NSDictionary*)params;
++ (NSURL*)urlForNoteWithKey:(NSString*)key parameters:(NSDictionary*)params;
 + (SCNetworkReachabilityRef)createReachabilityRefWithCallback:(SCNetworkReachabilityCallBack)callout target:(id)aTarget;
 //+ (NSString*)localizedNetworkDiagnosticMessage;
 - (void)invalidateReachabilityRefs;

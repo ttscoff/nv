@@ -113,8 +113,7 @@
 		originalNote = entry;
 		entry = [[entry syncServicesMD] objectForKey:SimplenoteServiceName];
 	}
-	NSString *path = [NSString stringWithFormat:@"/api2/data/%@", [entry objectForKey:@"key"]];
-	NSURL *noteURL = [SimplenoteSession servletURLWithPath:path parameters:
+	NSURL *noteURL = [SimplenoteSession urlForNoteWithKey:[entry objectForKey:@"key"] parameters:
 					  [NSDictionary dictionaryWithObjectsAndKeys: email, @"email", 
 					   authToken, @"auth", nil]];
 	SyncResponseFetcher *fetcher = [[SyncResponseFetcher alloc] initWithURL:noteURL POSTData:nil delegate:self];
@@ -143,8 +142,8 @@
 	NSMutableDictionary *entry = [NSMutableDictionary dictionaryWithCapacity:5];
 	[entry setObject:[body objectForKey:@"key"] forKey:@"key"];
 	[entry setObject:[NSNumber numberWithInt:[[body objectForKey:@"deleted"] intValue]] forKey:@"deleted"];
-	[entry setObject:[NSNumber numberWithDouble:[[body objectForKey:@"createdate"] absoluteTimeFromSimplenoteDate]] forKey:@"create"];
-	[entry setObject:[NSNumber numberWithDouble:[[body objectForKey:@"modifydate"] absoluteTimeFromSimplenoteDate]] forKey:@"modify"];
+	[entry setObject:[NSNumber numberWithDouble:[[body objectForKey:@"createdate"] doubleValue] - kCFAbsoluteTimeIntervalSince1970] forKey:@"create"];
+	[entry setObject:[NSNumber numberWithDouble:[[body objectForKey:@"modifydate"] doubleValue] - kCFAbsoluteTimeIntervalSince1970] forKey:@"modify"];
 	if ([[fetcher representedObject] conformsToProtocol:@protocol(SynchronizedNote)]) [entry setObject:[fetcher representedObject] forKey:@"NoteObject"];
 	[entry setObject:[body objectForKey:@"content"] forKey:@"content"];
 	[entry setObject:[body objectForKey:@"tags"] forKey:@"tags"];
@@ -157,7 +156,7 @@
 - (void)syncResponseFetcher:(SyncResponseFetcher*)fetcher receivedData:(NSData*)data returningError:(NSString*)errString {
 	
 	if (errString) {
-		NSLog(@"collector-%@ returned %@", fetcher, errString);
+		NSLog(@"collector-%@ returned %@\n------------%@\n------------", fetcher, errString, [fetcher receivedBody]);
 		id obj = [fetcher representedObject];
 		if (obj) {
 			[entriesInError addObject:[NSDictionary dictionaryWithObjectsAndKeys: obj, @"NoteObject", 
@@ -239,14 +238,16 @@
 	[params setObject:noteBody forKey:@"content"];
 	[params setObject:[aNote labelArray] forKey:@"tags"];
 	
-	NSString *notePath = doesCreate
-		? @"/api2/data"
-		: [NSString stringWithFormat:@"/api2/data/%@", [info objectForKey:@"key"]];
-	NSURL *noteURL = [SimplenoteSession servletURLWithPath:notePath parameters:urlParams];
-	//NSLog(@"Fetcher dispatching to %@\n------------\n%@\n------------", noteURL, [params jsonStringValue]);
-	SyncResponseFetcher *fetcher = [[SyncResponseFetcher alloc] initWithURL:noteURL bodyString:[params jsonStringValue] delegate:self];
+	NSURL *noteURL = [SimplenoteSession urlForNoteWithKey:[info objectForKey:@"key"] parameters:urlParams];
+	SyncResponseFetcher *fetcher = [self _fetcherForUrl:noteURL body:params delegate:self];
 	[fetcher setRepresentedObject:aNote];
-	return [fetcher autorelease];
+	return fetcher;
+}
+
+- (SyncResponseFetcher*)_fetcherForUrl:(NSURL*)noteURL body:(NSDictionary*)params delegate:(id)delegate {
+	NSString* jsonBody = [params jsonStringValue];
+	//NSLog(@"Fetcher dispatching to %@\n------------\n%@\n------------", noteURL, jsonBody);
+	return [[[SyncResponseFetcher alloc] initWithURL:noteURL bodyString:jsonBody delegate:delegate] autorelease];
 }
 
 - (SyncResponseFetcher*)fetcherForCreatingNote:(NoteObject*)aNote {
@@ -261,6 +262,20 @@
 	NSAssert([aDeletedNote isKindOfClass:[DeletedNoteObject class]], @"can't delete a note until you delete it yourself");
 	
 	NSDictionary *info = [[aDeletedNote syncServicesMD] objectForKey:SimplenoteServiceName];
+	NSMutableDictionary *params = [NSMutableDictionary dictionary];
+	[params setObject:@"1" forKey:@"deleted"];
+
+	NSURL *noteURL = [SimplenoteSession urlForNoteWithKey:[info objectForKey:@"key"] parameters:
+					  [NSDictionary dictionaryWithObjectsAndKeys: email, @"email", authToken, @"auth", nil]];
+	SyncResponseFetcher *fetcher = [self _fetcherForUrl:noteURL body:params delegate:self];
+	[fetcher setRepresentedObject:aDeletedNote];
+	return fetcher;
+}
+
+- (SyncResponseFetcher*)fetcherForPermanentlyDeletingNote:(DeletedNoteObject*)aDeletedNote {
+	NSAssert([aDeletedNote isKindOfClass:[DeletedNoteObject class]], @"can't delete a note until you delete it yourself");
+	
+	NSDictionary *info = [[aDeletedNote syncServicesMD] objectForKey:SimplenoteServiceName];
 	
 	if (![info objectForKey:@"key"]) {
 		//the deleted note lacks a key, so look up its created-equivalent and use _its_ metadata
@@ -271,14 +286,11 @@
 	}
 	NSAssert([info objectForKey:@"key"], @"fetcherForDeletingNote: got deleted note and couldn't find a key anywhere!");
 	
-	NSString *notePath = [NSString stringWithFormat:@"/api2/data/%@", [aDeletedNote key]];
-	NSURL *noteURL = [SimplenoteSession servletURLWithPath:notePath parameters:
+	NSURL *noteURL = [SimplenoteSession urlForNoteWithKey:[info objectForKey:@"key"] parameters:
 					  [NSDictionary dictionaryWithObjectsAndKeys: email, @"email", authToken, @"auth", nil]];
 	SyncResponseFetcher *fetcher = [[SyncResponseFetcher alloc] initWithURL:noteURL method:@"DELETE" delegate:self];
 	[fetcher setRepresentedObject:aDeletedNote];
 	return [fetcher autorelease];
-	
-	return nil;
 }
 
 - (NSString*)localizedActionDescription {

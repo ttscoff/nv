@@ -173,6 +173,14 @@
 	return lastErrorMessage;
 }
 
+- (NSData*)receivedData {
+	return receivedData;
+}
+
+- (NSString*)receivedBody {
+	return [[[NSString alloc] initWithData:[self receivedData] encoding:NSUTF8StringEncoding] autorelease];
+}
+
 - (NSString*)description {
 	return [NSString stringWithFormat:@"Fetcher(%X, %@)", self, requestURL];
 }

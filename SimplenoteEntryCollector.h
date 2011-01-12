@@ -69,6 +69,7 @@
 - (id)initWithEntries:(NSArray*)wantedEntries operation:(SEL)opSEL authToken:(NSString*)anAuthToken email:(NSString*)anEmail;
 
 - (SyncResponseFetcher*)_fetcherForNote:(NoteObject*)aNote creator:(BOOL)doesCreate;
+- (SyncResponseFetcher*)_fetcherForUrl:(NSURL*)noteURL body:(NSDictionary*)params delegate:(id)delegate;
 - (SyncResponseFetcher*)fetcherForCreatingNote:(NoteObject*)aNote;
 - (SyncResponseFetcher*)fetcherForUpdatingNote:(NoteObject*)aNote;
 - (SyncResponseFetcher*)fetcherForDeletingNote:(DeletedNoteObject*)aDeletedNote;

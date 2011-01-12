@@ -50,6 +50,8 @@
 - (NSDictionary*)headers;
 - (NSInteger)statusCode;
 - (NSString*)errorMessage;
+- (NSData*)receivedData;
+- (NSString*)receivedBody;
 - (void)_fetchDidFinishWithError:(NSString*)anErrString;
 - (id)delegate;
 - (BOOL)start;
