@@ -1714,43 +1714,51 @@ static long (*GetGetScriptManagerVariablePointer())(short) {
 		NSScanner *previousLineScanner = [[NSScanner alloc] initWithString:[[self string] substringWithRange:previousLineRange]];
 		[previousLineScanner setCharactersToBeSkipped:nil];
 		
-		if ([previousLineScanner scanCharactersFromSet:[NSCharacterSet whitespaceCharacterSet] intoString:&previousLineWhitespaceString]) {
-			//for propagating list-element, look for bullet-type-character + 1charWS + at-least-one-nonWSChar
-			
-			NSUInteger loc = [previousLineScanner scanLocation];
-			NSString *str = [previousLineScanner string];
-			unichar bulletChar, wsChar;
-			NSRange realBulletRange = NSMakeRange(loc + previousLineRange.location, 2), carriedBulletRange = NSMakeRange(NSNotFound, 0);
-			BOOL shouldDeleteLastBullet = NO;
-			
-			if ([prefsController autoFormatsListBullets]) {
-				if (loc + 2 < [str length] && ![previousLineScanner isAtEnd] &&
-					[[NSCharacterSet listBulletsCharacterSet] characterIsMember:(bulletChar = [str characterAtIndex:loc])] && 
-					[[NSCharacterSet whitespaceCharacterSet] characterIsMember:(wsChar = [str characterAtIndex:loc + 1])] &&
-					[[[NSCharacterSet whitespaceAndNewlineCharacterSet] invertedSet] characterIsMember:[str characterAtIndex:loc + 2]]) {
-					
-					carriedBulletRange = NSMakeRange(NSMaxRange(previousLineRange) + [previousLineWhitespaceString length], 2);
-					previousLineWhitespaceString = [previousLineWhitespaceString stringByAppendingFormat:@"%C%C", bulletChar, wsChar];
-					
-				} else if (NSMaxRange(realBulletRange) < [[self string] length] && [self _rangeIsAutoIdentedBullet:realBulletRange]) {
-					//should not carry a bullet; also check if one is here that we should delete
-					shouldDeleteLastBullet = YES;
-				}
-			}
-			
-			if (shouldDeleteLastBullet) {
-				//we had carried a bullet, but now it is no carried no more
-				//so instead of inserting the extra space, delete both that previously-carried-bullet and the newline added by -super up there
-				[[self textStorage] deleteCharactersInRange:NSMakeRange(realBulletRange.location, realBulletRange.length + 1)];
-			} else {
-				[self insertText:previousLineWhitespaceString];
-				if (carriedBulletRange.length) {
-					[[self layoutManager] addTemporaryAttributes:[NSDictionary dictionaryWithObject:[NSNull null] forKey:NVHiddenBulletIndentAttributeName] 
-											   forCharacterRange:carriedBulletRange];
-					//[[self layoutManager] addTemporaryAttributes:[prefsController searchTermHighlightAttributes] forCharacterRange:carriedBulletRange];
-				}
-			}
-		}
+		if (![previousLineScanner scanCharactersFromSet:[NSCharacterSet whitespaceCharacterSet] intoString:&previousLineWhitespaceString]) {
+            previousLineWhitespaceString = @"";
+        }
+        //for propagating list-element, look for bullet-type-character + 1charWS + at-least-one-nonWSChar
+        
+        NSUInteger loc = [previousLineScanner scanLocation];
+        NSString *str = [previousLineScanner string];
+        unichar bulletChar, wsChar;
+        NSRange realBulletRange = NSMakeRange(loc + previousLineRange.location, 2), carriedBulletRange = NSMakeRange(NSNotFound, 0);
+        BOOL shouldDeleteLastBullet = NO;
+        
+        if ([prefsController autoFormatsListBullets]) {
+            if (loc + 2 < [str length] && ![previousLineScanner isAtEnd] &&
+                [[NSCharacterSet listBulletsCharacterSet] characterIsMember:(bulletChar = [str characterAtIndex:loc])] && 
+                [[NSCharacterSet whitespaceCharacterSet] characterIsMember:(wsChar = [str characterAtIndex:loc + 1])] &&
+                [[[NSCharacterSet whitespaceAndNewlineCharacterSet] invertedSet] characterIsMember:[str characterAtIndex:loc + 2]]) {
+                
+                carriedBulletRange = NSMakeRange(NSMaxRange(previousLineRange) + [previousLineWhitespaceString length], 2);
+                previousLineWhitespaceString = [previousLineWhitespaceString stringByAppendingFormat:@"%C%C", bulletChar, wsChar];
+                
+            } else if (NSMaxRange(realBulletRange) < [[self string] length] && [self _rangeIsAutoIdentedBullet:realBulletRange]) {
+                //should not carry a bullet; also check if one is here that we should delete
+                shouldDeleteLastBullet = YES;
+            }
+        }
+        
+        if (shouldDeleteLastBullet) {
+            //we had carried a bullet, but now it is no carried no more
+            //so instead of inserting the extra space, delete both that previously-carried-bullet and the newline added by -super up there
+            if ([self shouldChangeTextInRange:NSMakeRange(realBulletRange.location, realBulletRange.length + 1) replacementString:@""]) { // Do it this way to mark it as an Undo
+                [self replaceCharactersInRange:NSMakeRange(realBulletRange.location, realBulletRange.length + 1) withString:@""];
+                [self didChangeText];
+            }
+        } else {
+            if ([self shouldChangeTextInRange:NSMakeRange(NSMaxRange(previousLineRange), 0) replacementString:previousLineWhitespaceString]) {
+                [self replaceCharactersInRange:NSMakeRange(NSMaxRange(previousLineRange), 0) withString:previousLineWhitespaceString];
+                if (carriedBulletRange.length) {
+                    [[self layoutManager] addTemporaryAttributes:[NSDictionary dictionaryWithObject:[NSNull null] forKey:NVHiddenBulletIndentAttributeName] 
+                                               forCharacterRange:carriedBulletRange];
+                    //[[self layoutManager] addTemporaryAttributes:[prefsController searchTermHighlightAttributes] forCharacterRange:carriedBulletRange];
+                }
+                [self didChangeText];
+            }
+        }
+
 		[previousLineScanner release];
 	}
 }
@@ -2046,19 +2054,19 @@ static long (*GetGetScriptManagerVariablePointer())(short) {
 
 
 - (NSString *)pairedCharacterForString:(NSString *)pairString{
-    if ([pairString isEqualToString:@"]"]) {
+    if ([@"]" isEqualToString:pairString]) {
         return @"n";
-    }else if ([pairString isEqualToString:@")"]) {
+    }else if ([@")" isEqualToString:pairString]) {
         return @"n";
-    }else if ([pairString isEqualToString:@"}"]) {
+    }else if ([@"}" isEqualToString:pairString]) {
         return @"n";
-    }else if ([pairString isEqualToString:@"["]) {
+    }else if ([@"[" isEqualToString:pairString]) {
         return @"]";
-    }else if ([pairString isEqualToString:@"("]) {
+    }else if ([@"(" isEqualToString:pairString]) {
         return @")";
-    }else if ([pairString isEqualToString:@"{"]) {
+    }else if ([@"{" isEqualToString:pairString]) {
         return @"}";
-    }else if ([pairString isEqualToString:@"\""]) {
+    }else if ([@"\"" isEqualToString:pairString]) {
         return @"\"";
     }
     return @"";
