@@ -306,15 +306,17 @@ static BOOL _StringWithRangeIsProbablyObjC(NSString *string, NSRange blockRange)
 			
 			NSRange thisLineRange = NSMakeRange(scanRange.location, lineEndRange.location - scanRange.location);
 			
-			//this detection is not good enough; it can't handle the case of @done(date)
-			if ([[[self string] substringWithRange:thisLineRange] hasSuffix:doneTag]) {
-				
-				//add strikethrough and NVHiddenDoneTagAttributeName attributes, because this line ends in @done
-				[self addAttributes:[NSDictionary dictionaryWithObjectsAndKeys:[NSNumber numberWithInt:NSUnderlineStyleSingle], 
-									 NSStrikethroughStyleAttributeName, [NSNull null], NVHiddenDoneTagAttributeName, nil] 
-							  range:NSMakeRange(thisLineRange.location, thisLineRange.length - [doneTag length])];
+			//this detection is improved. Handles @done mid line, allowing @done(date) or @done - date
+            NSRange doneTagFound = [[[self string] substringWithRange:thisLineRange] rangeOfString:doneTag];
+			if (doneTagFound.location != NSNotFound) {
+                
+				//add strikethrough and NVHiddenDoneTagAttributeName attributes, because this line contains @done
+				[self addAttributes:[NSDictionary dictionaryWithObjectsAndKeys:[NSNumber numberWithInt:NSUnderlineStyleSingle],
+									 NSStrikethroughStyleAttributeName, [NSNull null], NVHiddenDoneTagAttributeName, nil]
+							  range:NSMakeRange(thisLineRange.location, doneTagFound.location)];
+                
 				//and the done tag itself should never be struck-through; remove that just in case typing attributes had carried over from elsewhere
-				[self removeAttribute:NSStrikethroughStyleAttributeName range:NSMakeRange(NSMaxRange(thisLineRange) - [doneTag length], [doneTag length])];
+				[self removeAttribute:NSStrikethroughStyleAttributeName range:NSMakeRange(thisLineRange.location + doneTagFound.location, NSMaxRange(thisLineRange) - (thisLineRange.location + doneTagFound.location)) ];
 				
 			} else if ([self attribute:NVHiddenDoneTagAttributeName existsInRange:thisLineRange]) {
 				
