@@ -195,7 +195,7 @@
 			<key>NSMenuItem</key>
 			<dict>
 				<key>default</key>
-				<string>nvALT: New Note With Selection</string>
+				<string>nvALT: New Note from Selection</string>
 			</dict>
 			<key>NSMessage</key>
 			<string>createFromSelection</string>
@@ -203,13 +203,16 @@
 			<string>nvALT</string>
 			<key>NSSendTypes</key>
 			<array>
-				<string>NSRTFDPboardType</string>
-				<string>NSRTFPboardType</string>
-				<string>NSStringPboardType</string>
-				<string>NSURLPboardType</string>
-				<string>NSFilenamesPboardType</string>
-				<string>Apple Web Archive pasteboard type</string>
+				<string>com.apple.flat-rtfd</string>
+				<string>public.rtf</string>
+				<string>public.plain-text</string>
+			</array>
+			<key>NSSendFileTypes</key>
+			<array>
+				<string>public.text</string>
+				<string>com.apple.rtfd</string>
 				<string>com.apple.webarchive</string>
+				<string>com.adobe.pdf</string>
 			</array>
 		</dict>
 	</array>
