@@ -362,7 +362,7 @@ force_inline id unifiedCellForNote(NotesTableView *tv, NoteObject *note, NSInteg
 			
 			titleString = [[decoder decodeObjectForKey:VAR_STR(titleString)] retain];
 			labelString = [[decoder decodeObjectForKey:VAR_STR(labelString)] retain];
-			contentString = [[decoder decodeObjectForKey:VAR_STR(contentString)] retain];
+			contentString = [[NSMutableAttributedString alloc] initWithAttributedString: [decoder decodeObjectForKey:VAR_STR(contentString)]];
 			filename = [[decoder decodeObjectForKey:VAR_STR(filename)] retain];
 			
 		} else {
@@ -411,7 +411,7 @@ force_inline id unifiedCellForNote(NotesTableView *tv, NoteObject *note, NSInteg
 			
 			titleString = [[decoder decodeObject] retain];
 			labelString = [[decoder decodeObject] retain];
-			contentString = [[decoder decodeObject] retain];
+			contentString = [[[decoder decodeObject] mutableCopy] retain];
 			filename = [[decoder decodeObject] retain];
 #else 
 			[decoder decodeValuesOfObjCTypes: "dd{NSRange=ii}fIiI{UTCDateTime=SIS}I[16C]I@@@@", &modifiedDate, &createdDate, &range32, 
