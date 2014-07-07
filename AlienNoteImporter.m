@@ -531,7 +531,7 @@ NSString *ShouldImportCreationDates = @"ShouldImportCreationDates";
 {
     NSBundle *bundle = [NSBundle mainBundle];
     NSString *readabilityPath;
-    readabilityPath = [bundle pathForAuxiliaryExecutable: @"html2text.py"];
+    readabilityPath = [bundle pathForAuxiliaryExecutable: @"html2text"];
 	
     NSTask *task = [[NSTask alloc] init];
     [task setLaunchPath: readabilityPath];
@@ -563,7 +563,7 @@ NSString *ShouldImportCreationDates = @"ShouldImportCreationDates";
 {
     NSBundle *bundle = [NSBundle mainBundle];
     NSString *readabilityPath;
-    readabilityPath = [bundle pathForAuxiliaryExecutable: @"html2text.py"];
+    readabilityPath = [bundle pathForAuxiliaryExecutable: @"html2text"];
 	
     NSTask *task = [[NSTask alloc] init];
     [task setLaunchPath: readabilityPath];

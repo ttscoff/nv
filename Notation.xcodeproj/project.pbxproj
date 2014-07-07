@@ -145,15 +145,6 @@
 		5C96F4FF131C2F9500A2E4AC /* TabClose_Front_Pressed.tif in Resources */ = {isa = PBXBuildFile; fileRef = 5C96F4FC131C2F9500A2E4AC /* TabClose_Front_Pressed.tif */; };
 		5C96F501131C2F9500A2E4AC /* TabClose_Front.tif in Resources */ = {isa = PBXBuildFile; fileRef = 5C96F4FE131C2F9500A2E4AC /* TabClose_Front.tif */; };
 		5C96F504131C2FA800A2E4AC /* BTTransparentScroller.m in Sources */ = {isa = PBXBuildFile; fileRef = 5C96F502131C2FA800A2E4AC /* BTTransparentScroller.m */; };
-		5C96F566131C35AB00A2E4AC /* __init__.py in CopyFiles */ = {isa = PBXBuildFile; fileRef = 5CA10FFB131C2A7600DE1F91 /* __init__.py */; };
-		5C96F567131C35AB00A2E4AC /* BeautifulSoup.py in CopyFiles */ = {isa = PBXBuildFile; fileRef = 5CA10FFC131C2A7600DE1F91 /* BeautifulSoup.py */; };
-		5C96F568131C35AB00A2E4AC /* BeautifulSoup.pyc in CopyFiles */ = {isa = PBXBuildFile; fileRef = 5CA10FFD131C2A7600DE1F91 /* BeautifulSoup.pyc */; };
-		5C96F569131C35AB00A2E4AC /* html2text.py in CopyFiles */ = {isa = PBXBuildFile; fileRef = 5CA10FFE131C2A7600DE1F91 /* html2text.py */; };
-		5C96F56A131C35AB00A2E4AC /* page_parser.py in CopyFiles */ = {isa = PBXBuildFile; fileRef = 5CA10FFF131C2A7600DE1F91 /* page_parser.py */; };
-		5C96F56B131C35AB00A2E4AC /* page_parser.pyc in CopyFiles */ = {isa = PBXBuildFile; fileRef = 5CA11000131C2A7600DE1F91 /* page_parser.pyc */; };
-		5C96F56C131C35AB00A2E4AC /* readability.py in CopyFiles */ = {isa = PBXBuildFile; fileRef = 5CA11001131C2A7600DE1F91 /* readability.py */; };
-		5C96F56D131C35AB00A2E4AC /* url_helpers.py in CopyFiles */ = {isa = PBXBuildFile; fileRef = 5CA11002131C2A7600DE1F91 /* url_helpers.py */; };
-		5C96F56E131C35AB00A2E4AC /* url_helpers.pyc in CopyFiles */ = {isa = PBXBuildFile; fileRef = 5CA11003131C2A7600DE1F91 /* url_helpers.pyc */; };
 		5C96F5AF131C37DF00A2E4AC /* NSString_MultiMarkdown.m in Sources */ = {isa = PBXBuildFile; fileRef = 5C96F5AA131C37DF00A2E4AC /* NSString_MultiMarkdown.m */; };
 		5C96F5B0131C37DF00A2E4AC /* NSString_Markdown.m in Sources */ = {isa = PBXBuildFile; fileRef = 5C96F5AC131C37DF00A2E4AC /* NSString_Markdown.m */; };
 		5C96F5B1131C37DF00A2E4AC /* NSString_Textile.m in Sources */ = {isa = PBXBuildFile; fileRef = 5C96F5AE131C37DF00A2E4AC /* NSString_Textile.m */; };
@@ -169,15 +160,6 @@
 		5CA10F1A131C297000DE1F91 /* PreviewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 5CA10F19131C297000DE1F91 /* PreviewController.m */; };
 		5CA10F32131C29E900DE1F91 /* AppController_Preview.m in Sources */ = {isa = PBXBuildFile; fileRef = 5CA10F31131C29E900DE1F91 /* AppController_Preview.m */; };
 		5CA10F3B131C2A3F00DE1F91 /* MAAttachedWindow.m in Sources */ = {isa = PBXBuildFile; fileRef = 5CA10F3A131C2A3F00DE1F91 /* MAAttachedWindow.m */; };
-		5CA11004131C2A7600DE1F91 /* __init__.py in Resources */ = {isa = PBXBuildFile; fileRef = 5CA10FFB131C2A7600DE1F91 /* __init__.py */; };
-		5CA11005131C2A7600DE1F91 /* BeautifulSoup.py in Resources */ = {isa = PBXBuildFile; fileRef = 5CA10FFC131C2A7600DE1F91 /* BeautifulSoup.py */; };
-		5CA11006131C2A7600DE1F91 /* BeautifulSoup.pyc in Resources */ = {isa = PBXBuildFile; fileRef = 5CA10FFD131C2A7600DE1F91 /* BeautifulSoup.pyc */; };
-		5CA11007131C2A7600DE1F91 /* html2text.py in Resources */ = {isa = PBXBuildFile; fileRef = 5CA10FFE131C2A7600DE1F91 /* html2text.py */; };
-		5CA11008131C2A7600DE1F91 /* page_parser.py in Resources */ = {isa = PBXBuildFile; fileRef = 5CA10FFF131C2A7600DE1F91 /* page_parser.py */; };
-		5CA11009131C2A7600DE1F91 /* page_parser.pyc in Resources */ = {isa = PBXBuildFile; fileRef = 5CA11000131C2A7600DE1F91 /* page_parser.pyc */; };
-		5CA1100A131C2A7600DE1F91 /* readability.py in Resources */ = {isa = PBXBuildFile; fileRef = 5CA11001131C2A7600DE1F91 /* readability.py */; };
-		5CA1100B131C2A7600DE1F91 /* url_helpers.py in Resources */ = {isa = PBXBuildFile; fileRef = 5CA11002131C2A7600DE1F91 /* url_helpers.py */; };
-		5CA1100C131C2A7600DE1F91 /* url_helpers.pyc in Resources */ = {isa = PBXBuildFile; fileRef = 5CA11003131C2A7600DE1F91 /* url_helpers.pyc */; };
 		5CBA7A911305E2DF004ADEBB /* TagEditingManager.xib in Resources */ = {isa = PBXBuildFile; fileRef = 5CBA7A8F1305E2DF004ADEBB /* TagEditingManager.xib */; };
 		5CBA7A981305E38C004ADEBB /* TagEditingManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 5CBA7A971305E38C004ADEBB /* TagEditingManager.m */; };
 		5CC2DF0B13083BCF006772D9 /* StatusItemView.m in Sources */ = {isa = PBXBuildFile; fileRef = 5CC2DF0A13083BCF006772D9 /* StatusItemView.m */; };
@@ -252,6 +234,53 @@
 		8D11072B0486CEB800E47090 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 089C165CFE840E0CC02AAC07 /* InfoPlist.strings */; };
 		8D11072D0486CEB800E47090 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 29B97316FDCFA39411CA2CEA /* main.m */; settings = {ATTRIBUTES = (); }; };
 		8D11072F0486CEB800E47090 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1058C7A1FEA54F0111CA2CBB /* Cocoa.framework */; };
+		93083AAC18F8880F00F56834 /* html2text in Resources */ = {isa = PBXBuildFile; fileRef = 93083A7D18F8880F00F56834 /* html2text */; };
+		93083AAD18F8880F00F56834 /* BeautifulSoup in Resources */ = {isa = PBXBuildFile; fileRef = 93083A7E18F8880F00F56834 /* BeautifulSoup */; };
+		93083AAE18F8880F00F56834 /* _codecs_tw.so in Resources */ = {isa = PBXBuildFile; fileRef = 93083A7F18F8880F00F56834 /* _codecs_tw.so */; };
+		93083AAF18F8880F00F56834 /* _functools.so in Resources */ = {isa = PBXBuildFile; fileRef = 93083A8018F8880F00F56834 /* _functools.so */; };
+		93083AB018F8880F00F56834 /* _hashlib.so in Resources */ = {isa = PBXBuildFile; fileRef = 93083A8118F8880F00F56834 /* _hashlib.so */; };
+		93083AB118F8880F00F56834 /* _heapq.so in Resources */ = {isa = PBXBuildFile; fileRef = 93083A8218F8880F00F56834 /* _heapq.so */; };
+		93083AB218F8880F00F56834 /* _io.so in Resources */ = {isa = PBXBuildFile; fileRef = 93083A8318F8880F00F56834 /* _io.so */; };
+		93083AB318F8880F00F56834 /* _locale.so in Resources */ = {isa = PBXBuildFile; fileRef = 93083A8418F8880F00F56834 /* _locale.so */; };
+		93083AB418F8880F00F56834 /* _multibytecodec.so in Resources */ = {isa = PBXBuildFile; fileRef = 93083A8518F8880F00F56834 /* _multibytecodec.so */; };
+		93083AB518F8880F00F56834 /* _random.so in Resources */ = {isa = PBXBuildFile; fileRef = 93083A8618F8880F00F56834 /* _random.so */; };
+		93083AB618F8880F00F56834 /* _scproxy.so in Resources */ = {isa = PBXBuildFile; fileRef = 93083A8718F8880F00F56834 /* _scproxy.so */; };
+		93083AB718F8880F00F56834 /* _socket.so in Resources */ = {isa = PBXBuildFile; fileRef = 93083A8818F8880F00F56834 /* _socket.so */; };
+		93083AB818F8880F00F56834 /* _ssl.so in Resources */ = {isa = PBXBuildFile; fileRef = 93083A8918F8880F00F56834 /* _ssl.so */; };
+		93083AB918F8880F00F56834 /* _struct.so in Resources */ = {isa = PBXBuildFile; fileRef = 93083A8A18F8880F00F56834 /* _struct.so */; };
+		93083ABA18F8880F00F56834 /* array.so in Resources */ = {isa = PBXBuildFile; fileRef = 93083A8B18F8880F00F56834 /* array.so */; };
+		93083ABB18F8880F00F56834 /* binascii.so in Resources */ = {isa = PBXBuildFile; fileRef = 93083A8C18F8880F00F56834 /* binascii.so */; };
+		93083ABC18F8880F00F56834 /* bz2.so in Resources */ = {isa = PBXBuildFile; fileRef = 93083A8D18F8880F00F56834 /* bz2.so */; };
+		93083ABD18F8880F00F56834 /* cPickle.so in Resources */ = {isa = PBXBuildFile; fileRef = 93083A8E18F8880F00F56834 /* cPickle.so */; };
+		93083ABE18F8880F00F56834 /* cStringIO.so in Resources */ = {isa = PBXBuildFile; fileRef = 93083A8F18F8880F00F56834 /* cStringIO.so */; };
+		93083ABF18F8880F00F56834 /* datetime.so in Resources */ = {isa = PBXBuildFile; fileRef = 93083A9018F8880F00F56834 /* datetime.so */; };
+		93083AC018F8880F00F56834 /* fcntl.so in Resources */ = {isa = PBXBuildFile; fileRef = 93083A9118F8880F00F56834 /* fcntl.so */; };
+		93083AC118F8880F00F56834 /* itertools.so in Resources */ = {isa = PBXBuildFile; fileRef = 93083A9218F8880F00F56834 /* itertools.so */; };
+		93083AC218F8880F00F56834 /* math.so in Resources */ = {isa = PBXBuildFile; fileRef = 93083A9318F8880F00F56834 /* math.so */; };
+		93083AC318F8880F00F56834 /* operator.so in Resources */ = {isa = PBXBuildFile; fileRef = 93083A9418F8880F00F56834 /* operator.so */; };
+		93083AC418F8880F00F56834 /* readline.so in Resources */ = {isa = PBXBuildFile; fileRef = 93083A9518F8880F00F56834 /* readline.so */; };
+		93083AC518F8880F00F56834 /* strop.so in Resources */ = {isa = PBXBuildFile; fileRef = 93083A9618F8880F00F56834 /* strop.so */; };
+		93083AC618F8880F00F56834 /* termios.so in Resources */ = {isa = PBXBuildFile; fileRef = 93083A9718F8880F00F56834 /* termios.so */; };
+		93083AC718F8880F00F56834 /* time.so in Resources */ = {isa = PBXBuildFile; fileRef = 93083A9818F8880F00F56834 /* time.so */; };
+		93083AC818F8880F00F56834 /* unicodedata.so in Resources */ = {isa = PBXBuildFile; fileRef = 93083A9918F8880F00F56834 /* unicodedata.so */; };
+		93083AC918F8880F00F56834 /* zlib.so in Resources */ = {isa = PBXBuildFile; fileRef = 93083A9A18F8880F00F56834 /* zlib.so */; };
+		93083ACA18F8880F00F56834 /* _AE.so in Resources */ = {isa = PBXBuildFile; fileRef = 93083A9B18F8880F00F56834 /* _AE.so */; };
+		93083ACB18F8880F00F56834 /* _codecs_cn.so in Resources */ = {isa = PBXBuildFile; fileRef = 93083A9C18F8880F00F56834 /* _codecs_cn.so */; };
+		93083ACC18F8880F00F56834 /* _codecs_hk.so in Resources */ = {isa = PBXBuildFile; fileRef = 93083A9D18F8880F00F56834 /* _codecs_hk.so */; };
+		93083ACD18F8880F00F56834 /* _codecs_iso2022.so in Resources */ = {isa = PBXBuildFile; fileRef = 93083A9E18F8880F00F56834 /* _codecs_iso2022.so */; };
+		93083ACE18F8880F00F56834 /* _codecs_jp.so in Resources */ = {isa = PBXBuildFile; fileRef = 93083A9F18F8880F00F56834 /* _codecs_jp.so */; };
+		93083ACF18F8880F00F56834 /* _codecs_kr.so in Resources */ = {isa = PBXBuildFile; fileRef = 93083AA018F8880F00F56834 /* _codecs_kr.so */; };
+		93083AD018F8880F00F56834 /* _collections.so in Resources */ = {isa = PBXBuildFile; fileRef = 93083AA118F8880F00F56834 /* _collections.so */; };
+		93083AD118F8880F00F56834 /* _Ctl.so in Resources */ = {isa = PBXBuildFile; fileRef = 93083AA218F8880F00F56834 /* _Ctl.so */; };
+		93083AD218F8880F00F56834 /* _Dlg.so in Resources */ = {isa = PBXBuildFile; fileRef = 93083AA318F8880F00F56834 /* _Dlg.so */; };
+		93083AD318F8880F00F56834 /* _Evt.so in Resources */ = {isa = PBXBuildFile; fileRef = 93083AA418F8880F00F56834 /* _Evt.so */; };
+		93083AD418F8880F00F56834 /* _File.so in Resources */ = {isa = PBXBuildFile; fileRef = 93083AA518F8880F00F56834 /* _File.so */; };
+		93083AD518F8880F00F56834 /* _Menu.so in Resources */ = {isa = PBXBuildFile; fileRef = 93083AA618F8880F00F56834 /* _Menu.so */; };
+		93083AD618F8880F00F56834 /* _Qd.so in Resources */ = {isa = PBXBuildFile; fileRef = 93083AA718F8880F00F56834 /* _Qd.so */; };
+		93083AD718F8880F00F56834 /* _Res.so in Resources */ = {isa = PBXBuildFile; fileRef = 93083AA818F8880F00F56834 /* _Res.so */; };
+		93083AD818F8880F00F56834 /* _Win.so in Resources */ = {isa = PBXBuildFile; fileRef = 93083AA918F8880F00F56834 /* _Win.so */; };
+		93083AD918F8880F00F56834 /* MacOS.so in Resources */ = {isa = PBXBuildFile; fileRef = 93083AAA18F8880F00F56834 /* MacOS.so */; };
+		93083ADA18F8880F00F56834 /* Nav.so in Resources */ = {isa = PBXBuildFile; fileRef = 93083AAB18F8880F00F56834 /* Nav.so */; };
 		93099628138BD61000368C45 /* tp2md.rb in Resources */ = {isa = PBXBuildFile; fileRef = 93099627138BD61000368C45 /* tp2md.rb */; };
 		9335C40D148EC7AC009CE623 /* multimarkdown in Resources */ = {isa = PBXBuildFile; fileRef = 9335C40C148EC7AC009CE623 /* multimarkdown */; };
 		934C3FB214FDA069000D14BA /* custom.css in Resources */ = {isa = PBXBuildFile; fileRef = 934C3FAE14FDA069000D14BA /* custom.css */; };
@@ -312,15 +341,6 @@
 			dstPath = "";
 			dstSubfolderSpec = 6;
 			files = (
-				5C96F566131C35AB00A2E4AC /* __init__.py in CopyFiles */,
-				5C96F567131C35AB00A2E4AC /* BeautifulSoup.py in CopyFiles */,
-				5C96F568131C35AB00A2E4AC /* BeautifulSoup.pyc in CopyFiles */,
-				5C96F569131C35AB00A2E4AC /* html2text.py in CopyFiles */,
-				5C96F56A131C35AB00A2E4AC /* page_parser.py in CopyFiles */,
-				5C96F56B131C35AB00A2E4AC /* page_parser.pyc in CopyFiles */,
-				5C96F56C131C35AB00A2E4AC /* readability.py in CopyFiles */,
-				5C96F56D131C35AB00A2E4AC /* url_helpers.py in CopyFiles */,
-				5C96F56E131C35AB00A2E4AC /* url_helpers.pyc in CopyFiles */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -669,15 +689,6 @@
 		5CA10F31131C29E900DE1F91 /* AppController_Preview.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AppController_Preview.m; sourceTree = SOURCE_ROOT; };
 		5CA10F39131C2A3F00DE1F91 /* MAAttachedWindow.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MAAttachedWindow.h; sourceTree = "<group>"; };
 		5CA10F3A131C2A3F00DE1F91 /* MAAttachedWindow.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MAAttachedWindow.m; sourceTree = "<group>"; };
-		5CA10FFB131C2A7600DE1F91 /* __init__.py */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.python; path = __init__.py; sourceTree = "<group>"; };
-		5CA10FFC131C2A7600DE1F91 /* BeautifulSoup.py */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.python; path = BeautifulSoup.py; sourceTree = "<group>"; };
-		5CA10FFD131C2A7600DE1F91 /* BeautifulSoup.pyc */ = {isa = PBXFileReference; lastKnownFileType = file; path = BeautifulSoup.pyc; sourceTree = "<group>"; };
-		5CA10FFE131C2A7600DE1F91 /* html2text.py */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.python; path = html2text.py; sourceTree = "<group>"; };
-		5CA10FFF131C2A7600DE1F91 /* page_parser.py */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.python; path = page_parser.py; sourceTree = "<group>"; };
-		5CA11000131C2A7600DE1F91 /* page_parser.pyc */ = {isa = PBXFileReference; lastKnownFileType = file; path = page_parser.pyc; sourceTree = "<group>"; };
-		5CA11001131C2A7600DE1F91 /* readability.py */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.python; path = readability.py; sourceTree = "<group>"; };
-		5CA11002131C2A7600DE1F91 /* url_helpers.py */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.python; path = url_helpers.py; sourceTree = "<group>"; };
-		5CA11003131C2A7600DE1F91 /* url_helpers.pyc */ = {isa = PBXFileReference; lastKnownFileType = file; path = url_helpers.pyc; sourceTree = "<group>"; };
 		5CBA7A901305E2DF004ADEBB /* English */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = English; path = English.lproj/TagEditingManager.xib; sourceTree = "<group>"; };
 		5CBA7A961305E38C004ADEBB /* TagEditingManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TagEditingManager.h; sourceTree = "<group>"; };
 		5CBA7A971305E38C004ADEBB /* TagEditingManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TagEditingManager.m; sourceTree = "<group>"; };
@@ -780,6 +791,54 @@
 		5CFF810913A536F7008A93A3 /* it */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = it; path = it.lproj/Preferences.xib; sourceTree = "<group>"; };
 		8D1107310486CEB800E47090 /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
 		8D1107320486CEB800E47090 /* nvALT.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = nvALT.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		93083A7B18F8743E00F56834 /* SimperiumConfig.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SimperiumConfig.h; path = ../SimperiumConfig.h; sourceTree = "<group>"; };
+		93083A7D18F8880F00F56834 /* html2text */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.executable"; name = html2text; path = dist/html2text; sourceTree = "<group>"; };
+		93083A7E18F8880F00F56834 /* BeautifulSoup */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.executable"; name = BeautifulSoup; path = dist/BeautifulSoup; sourceTree = "<group>"; };
+		93083A7F18F8880F00F56834 /* _codecs_tw.so */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.bundle"; name = _codecs_tw.so; path = dist/_codecs_tw.so; sourceTree = "<group>"; };
+		93083A8018F8880F00F56834 /* _functools.so */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.bundle"; name = _functools.so; path = dist/_functools.so; sourceTree = "<group>"; };
+		93083A8118F8880F00F56834 /* _hashlib.so */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.bundle"; name = _hashlib.so; path = dist/_hashlib.so; sourceTree = "<group>"; };
+		93083A8218F8880F00F56834 /* _heapq.so */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.bundle"; name = _heapq.so; path = dist/_heapq.so; sourceTree = "<group>"; };
+		93083A8318F8880F00F56834 /* _io.so */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.bundle"; name = _io.so; path = dist/_io.so; sourceTree = "<group>"; };
+		93083A8418F8880F00F56834 /* _locale.so */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.bundle"; name = _locale.so; path = dist/_locale.so; sourceTree = "<group>"; };
+		93083A8518F8880F00F56834 /* _multibytecodec.so */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.bundle"; name = _multibytecodec.so; path = dist/_multibytecodec.so; sourceTree = "<group>"; };
+		93083A8618F8880F00F56834 /* _random.so */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.bundle"; name = _random.so; path = dist/_random.so; sourceTree = "<group>"; };
+		93083A8718F8880F00F56834 /* _scproxy.so */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.bundle"; name = _scproxy.so; path = dist/_scproxy.so; sourceTree = "<group>"; };
+		93083A8818F8880F00F56834 /* _socket.so */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.bundle"; name = _socket.so; path = dist/_socket.so; sourceTree = "<group>"; };
+		93083A8918F8880F00F56834 /* _ssl.so */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.bundle"; name = _ssl.so; path = dist/_ssl.so; sourceTree = "<group>"; };
+		93083A8A18F8880F00F56834 /* _struct.so */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.bundle"; name = _struct.so; path = dist/_struct.so; sourceTree = "<group>"; };
+		93083A8B18F8880F00F56834 /* array.so */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.bundle"; name = array.so; path = dist/array.so; sourceTree = "<group>"; };
+		93083A8C18F8880F00F56834 /* binascii.so */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.bundle"; name = binascii.so; path = dist/binascii.so; sourceTree = "<group>"; };
+		93083A8D18F8880F00F56834 /* bz2.so */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.bundle"; name = bz2.so; path = dist/bz2.so; sourceTree = "<group>"; };
+		93083A8E18F8880F00F56834 /* cPickle.so */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.bundle"; name = cPickle.so; path = dist/cPickle.so; sourceTree = "<group>"; };
+		93083A8F18F8880F00F56834 /* cStringIO.so */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.bundle"; name = cStringIO.so; path = dist/cStringIO.so; sourceTree = "<group>"; };
+		93083A9018F8880F00F56834 /* datetime.so */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.bundle"; name = datetime.so; path = dist/datetime.so; sourceTree = "<group>"; };
+		93083A9118F8880F00F56834 /* fcntl.so */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.bundle"; name = fcntl.so; path = dist/fcntl.so; sourceTree = "<group>"; };
+		93083A9218F8880F00F56834 /* itertools.so */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.bundle"; name = itertools.so; path = dist/itertools.so; sourceTree = "<group>"; };
+		93083A9318F8880F00F56834 /* math.so */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.bundle"; name = math.so; path = dist/math.so; sourceTree = "<group>"; };
+		93083A9418F8880F00F56834 /* operator.so */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.bundle"; name = operator.so; path = dist/operator.so; sourceTree = "<group>"; };
+		93083A9518F8880F00F56834 /* readline.so */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.bundle"; name = readline.so; path = dist/readline.so; sourceTree = "<group>"; };
+		93083A9618F8880F00F56834 /* strop.so */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.bundle"; name = strop.so; path = dist/strop.so; sourceTree = "<group>"; };
+		93083A9718F8880F00F56834 /* termios.so */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.bundle"; name = termios.so; path = dist/termios.so; sourceTree = "<group>"; };
+		93083A9818F8880F00F56834 /* time.so */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.bundle"; name = time.so; path = dist/time.so; sourceTree = "<group>"; };
+		93083A9918F8880F00F56834 /* unicodedata.so */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.bundle"; name = unicodedata.so; path = dist/unicodedata.so; sourceTree = "<group>"; };
+		93083A9A18F8880F00F56834 /* zlib.so */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.bundle"; name = zlib.so; path = dist/zlib.so; sourceTree = "<group>"; };
+		93083A9B18F8880F00F56834 /* _AE.so */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.bundle"; name = _AE.so; path = dist/_AE.so; sourceTree = "<group>"; };
+		93083A9C18F8880F00F56834 /* _codecs_cn.so */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.bundle"; name = _codecs_cn.so; path = dist/_codecs_cn.so; sourceTree = "<group>"; };
+		93083A9D18F8880F00F56834 /* _codecs_hk.so */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.bundle"; name = _codecs_hk.so; path = dist/_codecs_hk.so; sourceTree = "<group>"; };
+		93083A9E18F8880F00F56834 /* _codecs_iso2022.so */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.bundle"; name = _codecs_iso2022.so; path = dist/_codecs_iso2022.so; sourceTree = "<group>"; };
+		93083A9F18F8880F00F56834 /* _codecs_jp.so */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.bundle"; name = _codecs_jp.so; path = dist/_codecs_jp.so; sourceTree = "<group>"; };
+		93083AA018F8880F00F56834 /* _codecs_kr.so */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.bundle"; name = _codecs_kr.so; path = dist/_codecs_kr.so; sourceTree = "<group>"; };
+		93083AA118F8880F00F56834 /* _collections.so */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.bundle"; name = _collections.so; path = dist/_collections.so; sourceTree = "<group>"; };
+		93083AA218F8880F00F56834 /* _Ctl.so */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.bundle"; name = _Ctl.so; path = dist/_Ctl.so; sourceTree = "<group>"; };
+		93083AA318F8880F00F56834 /* _Dlg.so */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.bundle"; name = _Dlg.so; path = dist/_Dlg.so; sourceTree = "<group>"; };
+		93083AA418F8880F00F56834 /* _Evt.so */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.bundle"; name = _Evt.so; path = dist/_Evt.so; sourceTree = "<group>"; };
+		93083AA518F8880F00F56834 /* _File.so */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.bundle"; name = _File.so; path = dist/_File.so; sourceTree = "<group>"; };
+		93083AA618F8880F00F56834 /* _Menu.so */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.bundle"; name = _Menu.so; path = dist/_Menu.so; sourceTree = "<group>"; };
+		93083AA718F8880F00F56834 /* _Qd.so */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.bundle"; name = _Qd.so; path = dist/_Qd.so; sourceTree = "<group>"; };
+		93083AA818F8880F00F56834 /* _Res.so */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.bundle"; name = _Res.so; path = dist/_Res.so; sourceTree = "<group>"; };
+		93083AA918F8880F00F56834 /* _Win.so */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.bundle"; name = _Win.so; path = dist/_Win.so; sourceTree = "<group>"; };
+		93083AAA18F8880F00F56834 /* MacOS.so */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.bundle"; name = MacOS.so; path = dist/MacOS.so; sourceTree = "<group>"; };
+		93083AAB18F8880F00F56834 /* Nav.so */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.bundle"; name = Nav.so; path = dist/Nav.so; sourceTree = "<group>"; };
 		93099627138BD61000368C45 /* tp2md.rb */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.ruby; path = tp2md.rb; sourceTree = "<group>"; };
 		9335C40C148EC7AC009CE623 /* multimarkdown */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.executable"; path = multimarkdown; sourceTree = "<group>"; };
 		934C3FAE14FDA069000D14BA /* custom.css */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.css; path = custom.css; sourceTree = "<group>"; };
@@ -855,6 +914,7 @@
 		080E96DDFE201D6D7F000001 /* Classes */ = {
 			isa = PBXGroup;
 			children = (
+				93083A7B18F8743E00F56834 /* SimperiumConfig.h */,
 				2114C11409575BD400614E74 /* AppController.h */,
 				2114C11509575BD400614E74 /* AppController.m */,
 				5CA10F30131C29E900DE1F91 /* AppController_Preview.h */,
@@ -1405,15 +1465,53 @@
 		5CA10FFA131C2A7600DE1F91 /* readability */ = {
 			isa = PBXGroup;
 			children = (
-				5CA10FFB131C2A7600DE1F91 /* __init__.py */,
-				5CA10FFC131C2A7600DE1F91 /* BeautifulSoup.py */,
-				5CA10FFD131C2A7600DE1F91 /* BeautifulSoup.pyc */,
-				5CA10FFE131C2A7600DE1F91 /* html2text.py */,
-				5CA10FFF131C2A7600DE1F91 /* page_parser.py */,
-				5CA11000131C2A7600DE1F91 /* page_parser.pyc */,
-				5CA11001131C2A7600DE1F91 /* readability.py */,
-				5CA11002131C2A7600DE1F91 /* url_helpers.py */,
-				5CA11003131C2A7600DE1F91 /* url_helpers.pyc */,
+				93083A7D18F8880F00F56834 /* html2text */,
+				93083A7E18F8880F00F56834 /* BeautifulSoup */,
+				93083A7F18F8880F00F56834 /* _codecs_tw.so */,
+				93083A8018F8880F00F56834 /* _functools.so */,
+				93083A8118F8880F00F56834 /* _hashlib.so */,
+				93083A8218F8880F00F56834 /* _heapq.so */,
+				93083A8318F8880F00F56834 /* _io.so */,
+				93083A8418F8880F00F56834 /* _locale.so */,
+				93083A8518F8880F00F56834 /* _multibytecodec.so */,
+				93083A8618F8880F00F56834 /* _random.so */,
+				93083A8718F8880F00F56834 /* _scproxy.so */,
+				93083A8818F8880F00F56834 /* _socket.so */,
+				93083A8918F8880F00F56834 /* _ssl.so */,
+				93083A8A18F8880F00F56834 /* _struct.so */,
+				93083A8B18F8880F00F56834 /* array.so */,
+				93083A8C18F8880F00F56834 /* binascii.so */,
+				93083A8D18F8880F00F56834 /* bz2.so */,
+				93083A8E18F8880F00F56834 /* cPickle.so */,
+				93083A8F18F8880F00F56834 /* cStringIO.so */,
+				93083A9018F8880F00F56834 /* datetime.so */,
+				93083A9118F8880F00F56834 /* fcntl.so */,
+				93083A9218F8880F00F56834 /* itertools.so */,
+				93083A9318F8880F00F56834 /* math.so */,
+				93083A9418F8880F00F56834 /* operator.so */,
+				93083A9518F8880F00F56834 /* readline.so */,
+				93083A9618F8880F00F56834 /* strop.so */,
+				93083A9718F8880F00F56834 /* termios.so */,
+				93083A9818F8880F00F56834 /* time.so */,
+				93083A9918F8880F00F56834 /* unicodedata.so */,
+				93083A9A18F8880F00F56834 /* zlib.so */,
+				93083A9B18F8880F00F56834 /* _AE.so */,
+				93083A9C18F8880F00F56834 /* _codecs_cn.so */,
+				93083A9D18F8880F00F56834 /* _codecs_hk.so */,
+				93083A9E18F8880F00F56834 /* _codecs_iso2022.so */,
+				93083A9F18F8880F00F56834 /* _codecs_jp.so */,
+				93083AA018F8880F00F56834 /* _codecs_kr.so */,
+				93083AA118F8880F00F56834 /* _collections.so */,
+				93083AA218F8880F00F56834 /* _Ctl.so */,
+				93083AA318F8880F00F56834 /* _Dlg.so */,
+				93083AA418F8880F00F56834 /* _Evt.so */,
+				93083AA518F8880F00F56834 /* _File.so */,
+				93083AA618F8880F00F56834 /* _Menu.so */,
+				93083AA718F8880F00F56834 /* _Qd.so */,
+				93083AA818F8880F00F56834 /* _Res.so */,
+				93083AA918F8880F00F56834 /* _Win.so */,
+				93083AAA18F8880F00F56834 /* MacOS.so */,
+				93083AAB18F8880F00F56834 /* Nav.so */,
 			);
 			path = readability;
 			sourceTree = "<group>";
@@ -1442,6 +1540,7 @@
 				8D11072C0486CEB800E47090 /* Sources */,
 				8D11072E0486CEB800E47090 /* Frameworks */,
 				213FB6AD0B52E1B2004C74BD /* CopyFiles */,
+				93083A7C18F883E200F56834 /* ShellScript */,
 				5C96F565131C35A300A2E4AC /* CopyFiles */,
 			);
 			buildRules = (
@@ -1460,8 +1559,13 @@
 		29B97313FDCFA39411CA2CEA /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
-				LastUpgradeCheck = 0460;
+				LastUpgradeCheck = 0510;
 				ORGANIZATIONNAME = elasticthreads;
+				TargetAttributes = {
+					8D1107260486CEB800E47090 = {
+						DevelopmentTeam = 47TRS7H4BH;
+					};
+				};
 			};
 			buildConfigurationList = 212B842709780B5000F3597F /* Build configuration list for PBXProject "Notation" */;
 			compatibilityVersion = "Xcode 3.2";
@@ -1495,6 +1599,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				8D11072B0486CEB800E47090 /* InfoPlist.strings in Resources */,
+				93083AAC18F8880F00F56834 /* html2text in Resources */,
 				21973A290AFE447A0046683E /* PassphraseRetriever.nib in Resources */,
 				21544FBE0B06331800C0D1D5 /* KeyDerivationManager.nib in Resources */,
 				211344C00B3551BD0081B064 /* BlorPasswordRetriever.nib in Resources */,
@@ -1505,11 +1610,16 @@
 				21E6B09B0B6E6D0C001ABEDC /* URLGetter.nib in Resources */,
 				213621ED0B92413F008C0830 /* FindPanel.nib in Resources */,
 				216BA24310746E3900F62D93 /* ImporterAccessory.nib in Resources */,
+				93083AAF18F8880F00F56834 /* _functools.so in Resources */,
 				21DF19B410D172F600543C35 /* DFCapLeftRoundedInactive.png in Resources */,
 				21BD2F3610DAF61700BA3DF6 /* SplitViewDimple.tif in Resources */,
+				93083ACA18F8880F00F56834 /* _AE.so in Resources */,
 				2143D2F410E953F500127EA6 /* SnapBackPressed.tif in Resources */,
+				93083AD518F8880F00F56834 /* _Menu.so in Resources */,
+				93083AAE18F8880F00F56834 /* _codecs_tw.so in Resources */,
 				2143D3D910E987B100127EA6 /* Pencil.png in Resources */,
 				21B1C172110764570004A7D0 /* statusError.png in Resources */,
+				93083AC918F8880F00F56834 /* zlib.so in Resources */,
 				21AD292D110C188800B7A985 /* TinyAlert.tif in Resources */,
 				212C6A2A110E371B004DD82C /* TBSynchronizingWhite.png in Resources */,
 				212C6A2C110E371B004DD82C /* TBDownArrowWhite.png in Resources */,
@@ -1522,33 +1632,30 @@
 				2128651E1278AF220013820A /* ServicesMenu.strings in Resources */,
 				21C0F8A212C7E7160068693F /* Fonts & Colors.tiff in Resources */,
 				216D9C2E12CFEF2A0004B9CE /* LinkBackPressed.tif in Resources */,
+				93083AC018F8880F00F56834 /* fcntl.so in Resources */,
 				21A38EE412EA864400CEB5F0 /* MakeDefault_Pressed.tiff in Resources */,
 				5CBA7A911305E2DF004ADEBB /* TagEditingManager.xib in Resources */,
 				5C4B353E1307220E00014119 /* TransparentScrollerKnobTop.tif in Resources */,
 				5C4B35401307220E00014119 /* TransparentScrollerSlotBottom.tif in Resources */,
 				5C4B35421307220E00014119 /* TransparentScrollerSlotVerticalFill.tif in Resources */,
-				5CA11004131C2A7600DE1F91 /* __init__.py in Resources */,
-				5CA11005131C2A7600DE1F91 /* BeautifulSoup.py in Resources */,
-				5CA11006131C2A7600DE1F91 /* BeautifulSoup.pyc in Resources */,
-				5CA11007131C2A7600DE1F91 /* html2text.py in Resources */,
-				5CA11008131C2A7600DE1F91 /* page_parser.py in Resources */,
-				5CA11009131C2A7600DE1F91 /* page_parser.pyc in Resources */,
-				5CA1100A131C2A7600DE1F91 /* readability.py in Resources */,
-				5CA1100B131C2A7600DE1F91 /* url_helpers.py in Resources */,
-				5CA1100C131C2A7600DE1F91 /* url_helpers.pyc in Resources */,
 				5C96F4FF131C2F9500A2E4AC /* TabClose_Front_Pressed.tif in Resources */,
 				5C96F501131C2F9500A2E4AC /* TabClose_Front.tif in Resources */,
+				93083AD618F8880F00F56834 /* _Qd.so in Resources */,
+				93083ACD18F8880F00F56834 /* _codecs_iso2022.so in Resources */,
 				5C96F616131C380100A2E4AC /* Textile_2.12 in Resources */,
 				5C96F61C131C380C00A2E4AC /* Markdown_1.0.1 in Resources */,
 				5C96F709131C49D400A2E4AC /* TransparentButtonFillN.tiff in Resources */,
 				5C96F70B131C49D400A2E4AC /* TransparentButtonLeftN.tiff in Resources */,
 				5C96F70D131C49D400A2E4AC /* TransparentButtonRightN.tiff in Resources */,
 				5C49E365131C5CC500696B68 /* Credits.html in Resources */,
+				93083AB118F8880F00F56834 /* _heapq.so in Resources */,
 				5CF01B08132975910083D66E /* greyscrollervertbottom.tiff in Resources */,
 				5CF01B0C132975910083D66E /* greyscrollerverttop.tiff in Resources */,
 				5CF01B22132975DB0083D66E /* BTransparentScrollerSlotBottom.tif in Resources */,
 				5C94376F132A0C9E00B08B80 /* greyscrollervertbottom3.tif in Resources */,
 				5C943771132A0C9E00B08B80 /* greyscrollerverttop3.tif in Resources */,
+				93083AC818F8880F00F56834 /* unicodedata.so in Resources */,
+				93083AB618F8880F00F56834 /* _scproxy.so in Resources */,
 				5CF96C43132EA1890079B3FD /* Ceci est le titre d'une note.nvhelp in Resources */,
 				5CF96C45132EA1890079B3FD /* Contact.nvhelp in Resources */,
 				5CF96CBD132EA1890079B3FD /* PassphrasePicker.nib in Resources */,
@@ -1558,12 +1665,17 @@
 				5CF96D98132EA29D0079B3FD /* Este é o título de uma nota.nvhelp in Resources */,
 				5CF96D9B132EA29D0079B3FD /* Informações de Contato.nvhelp in Resources */,
 				5CF96DA8132EA29D0079B3FD /* MainMenu.xib in Resources */,
+				93083AD018F8880F00F56834 /* _collections.so in Resources */,
+				93083AD818F8880F00F56834 /* _Win.so in Resources */,
 				5CF96DA9132EA29D0079B3FD /* dsa_pub.pem in Resources */,
 				5CF96DAA132EA29D0079B3FD /* Acknowledgments.txt in Resources */,
 				5CF96DAB132EA29D0079B3FD /* Dies ist der Titel einer Notiz.nvhelp in Resources */,
+				93083AAD18F8880F00F56834 /* BeautifulSoup in Resources */,
 				5CF96DAD132EA29D0079B3FD /* Moglicherweise nutzliche Tastenkurzel.nvhelp in Resources */,
 				5CF96DAE132EA29D0079B3FD /* Wie funktioniert dieses Programm?.nvhelp in Resources */,
+				93083AB218F8880F00F56834 /* _io.so in Resources */,
 				5CF96DB0132EA29D0079B3FD /* Comment ça marche.nvhelp in Resources */,
+				93083ACF18F8880F00F56834 /* _codecs_kr.so in Resources */,
 				5CF96DB2132EA29D0079B3FD /* Raccourcis incroyablement utiles.nvhelp in Resources */,
 				5CF96DB8132EA29D0079B3FD /* Contact Information.nvhelp in Resources */,
 				5CF96DBA132EA29D0079B3FD /* How does this thing work?.nvhelp in Resources */,
@@ -1573,37 +1685,50 @@
 				5CF96DC2132EA29D0079B3FD /* greyscrollervertfill.tiff in Resources */,
 				5CF96DC5132EA29D0079B3FD /* TransparentButtonFillP.tiff in Resources */,
 				5CF96DC7132EA29D0079B3FD /* TransparentButtonLeftP.tiff in Resources */,
+				93083ADA18F8880F00F56834 /* Nav.so in Resources */,
 				5CF96DC9132EA29D0079B3FD /* TransparentButtonRightP.tiff in Resources */,
 				5CF96DCB132EA29D0079B3FD /* TabClose_Front_Rollover.tif in Resources */,
+				93083ABA18F8880F00F56834 /* array.so in Resources */,
 				5CF96DCD132EA29D0079B3FD /* TransparentScrollerKnobBottom.tif in Resources */,
 				5CF96DCF132EA29D0079B3FD /* TransparentScrollerKnobVerticalFill.tif in Resources */,
 				5CF96DD1132EA29D0079B3FD /* TransparentScrollerSlotTop.tif in Resources */,
 				5CF96DD6132EA29D0079B3FD /* IBeamInverted.png in Resources */,
 				5CF96DD7132EA29D0079B3FD /* ListDividerDrag.png in Resources */,
+				93083AB918F8880F00F56834 /* _struct.so in Resources */,
+				93083ABE18F8880F00F56834 /* cStringIO.so in Resources */,
 				5CF96DD9132EA29D0079B3FD /* TBDownArrow.png in Resources */,
 				5CF96DDA132EA29D0079B3FD /* TBAlertWhite.png in Resources */,
+				93083AB018F8880F00F56834 /* _hashlib.so in Resources */,
 				5CF96DDC132EA29D0079B3FD /* TBSynchronizing.png in Resources */,
 				5CF96DDE132EA29D0079B3FD /* TBRolloverBG.png in Resources */,
 				5CF96DE1132EA29D0079B3FD /* PTKeyboardIcon.tiff in Resources */,
 				5CF96DE2132EA29D0079B3FD /* PasswordAssistantButton.tif in Resources */,
 				5CF96DE3132EA29D0079B3FD /* PasswordAssistantButtonPressed.tif in Resources */,
 				5CF96DE5132EA29D0079B3FD /* SplitViewDimple2.tif in Resources */,
+				93083AB418F8880F00F56834 /* _multibytecodec.so in Resources */,
 				5CF96DE6132EA29D0079B3FD /* Editing.tiff in Resources */,
+				93083ABB18F8880F00F56834 /* binascii.so in Resources */,
+				93083AC518F8880F00F56834 /* strop.so in Resources */,
 				5CF96DE7132EA29D0079B3FD /* Notes.tiff in Resources */,
+				93083AB818F8880F00F56834 /* _ssl.so in Resources */,
 				5CF96DE8132EA29D0079B3FD /* General.tiff in Resources */,
 				5CF96DEA132EA29D0079B3FD /* Add_Pressed.tiff in Resources */,
 				5CF96DEC132EA29D0079B3FD /* Remove_Pressed.tiff in Resources */,
 				5CF96DED132EA29D0079B3FD /* Remove.tiff in Resources */,
+				93083ACB18F8880F00F56834 /* _codecs_cn.so in Resources */,
 				5CF96DEF132EA29D0079B3FD /* MakeDefault.tiff in Resources */,
 				5CF96DF0132EA29D0079B3FD /* DFCapRightInactive.png in Resources */,
 				5CF96DF1132EA29D0079B3FD /* DFCapRight.png in Resources */,
 				5CF96DF3132EA29D0079B3FD /* DFCapLeftRounded.png in Resources */,
+				93083AC718F8880F00F56834 /* time.so in Resources */,
 				5CF96DF4132EA29D0079B3FD /* Search.png in Resources */,
 				5CF96DF7132EA29D0079B3FD /* ClearPressed.tif in Resources */,
 				5CF96DF8132EA29D0079B3FD /* LinkBack.tif in Resources */,
+				93083AC318F8880F00F56834 /* operator.so in Resources */,
 				5CF96DFA132EA29D0079B3FD /* SnapBack.tif in Resources */,
 				5CF96DFC132EA29D0079B3FD /* statusValidated.png in Resources */,
 				5CF96DFE132EA29D0079B3FD /* statusInProgress.png in Resources */,
+				93083AC118F8880F00F56834 /* itertools.so in Resources */,
 				5CF96DFF132EA29D0079B3FD /* Localizable.strings in Resources */,
 				5CF96E04132EA29D0079B3FD /* CarbonErrorStrings.plist in Resources */,
 				5C1830CA132EA675005E2210 /* MarkupPreview.xib in Resources */,
@@ -1612,31 +1737,47 @@
 				5CF96E0A132EA29D0079B3FD /* EncodingsManager.nib in Resources */,
 				5CF96E0B132EA29D0079B3FD /* Preferences.xib in Resources */,
 				5CF96E0C132EA29D0079B3FD /* NotationPrefsView.nib in Resources */,
+				93083ABC18F8880F00F56834 /* bz2.so in Resources */,
 				93A158BC133C304D00E1E7DA /* Markdownify.nvhelp in Resources */,
 				93A158BE133C497400E1E7DA /* Notality.icns in Resources */,
+				93083AD318F8880F00F56834 /* _Evt.so in Resources */,
 				5C2CC186134989A8006FFE56 /* nvMenuC.png in Resources */,
+				93083AC218F8880F00F56834 /* math.so in Resources */,
 				5C2CC18A134989D7006FFE56 /* nvMenuDark.png in Resources */,
+				93083AB318F8880F00F56834 /* _locale.so in Resources */,
 				93B348281371547800658F98 /* HUDIconLock.png in Resources */,
 				93B348291371547800658F98 /* HUDIconPrint.png in Resources */,
+				93083ACE18F8880F00F56834 /* _codecs_jp.so in Resources */,
 				93B3482A1371547800658F98 /* HUDIconSave.png in Resources */,
 				93B3482B1371547800658F98 /* HUDIconShare.png in Resources */,
 				93B90E84138601C100BEC5FB /* LICENSE.txt in Resources */,
+				93083AD418F8880F00F56834 /* _File.so in Resources */,
 				93099628138BD61000368C45 /* tp2md.rb in Resources */,
+				93083ACC18F8880F00F56834 /* _codecs_hk.so in Resources */,
+				93083AC418F8880F00F56834 /* readline.so in Resources */,
+				93083AC618F8880F00F56834 /* termios.so in Resources */,
+				93083ABD18F8880F00F56834 /* cPickle.so in Resources */,
 				5C48A28213A54FBD006B73DD /* PassphraseChanger.nib in Resources */,
 				5C84319114229D810020E5A7 /* PassphraseRetriever.xib in Resources */,
 				5CE5B0081422795300FB554C /* PTKeyComboPanel.xib in Resources */,
 				9335C40D148EC7AC009CE623 /* multimarkdown in Resources */,
 				5CD1B00714F4593900AC948E /* Add.tiff in Resources */,
 				934C3FB214FDA069000D14BA /* custom.css in Resources */,
+				93083AB718F8880F00F56834 /* _socket.so in Resources */,
 				934C3FB314FDA06A000D14BA /* customclean.css in Resources */,
 				934C3FB414FDA06A000D14BA /* template.html in Resources */,
 				934C3FB514FDA06A000D14BA /* templateclean.html in Resources */,
+				93083AD118F8880F00F56834 /* _Ctl.so in Resources */,
 				B69E26F016F0B523001C6E4B /* Clear@2x.tif in Resources */,
 				B69E26F116F0B523001C6E4B /* ClearPressed@2x.tif in Resources */,
 				B69E26F216F0B523001C6E4B /* DFCapLeftRounded@2x.png in Resources */,
+				93083AD918F8880F00F56834 /* MacOS.so in Resources */,
+				93083AD718F8880F00F56834 /* _Res.so in Resources */,
 				B69E26F316F0B523001C6E4B /* DFCapLeftRoundedInactive@2x.png in Resources */,
 				B69E26F416F0B523001C6E4B /* DFCapRight@2x.png in Resources */,
+				93083AD218F8880F00F56834 /* _Dlg.so in Resources */,
 				B69E26F516F0B523001C6E4B /* DFCapRightInactive@2x.png in Resources */,
+				93083ABF18F8880F00F56834 /* datetime.so in Resources */,
 				B69E26F616F0B523001C6E4B /* Pencil@2x.png in Resources */,
 				B69E26F716F0B523001C6E4B /* Search@2x.png in Resources */,
 				B683A0D316F1CDA600564A1D /* LinkBack@2x.tif in Resources */,
@@ -1648,6 +1789,7 @@
 				B683A0D916F1CDA600564A1D /* TBDownArrow@2x.png in Resources */,
 				B683A0DA16F1CDA600564A1D /* TBDownArrowWhite@2x.png in Resources */,
 				B683A0DB16F1CDA600564A1D /* TBMousedownBG@2x.png in Resources */,
+				93083AB518F8880F00F56834 /* _random.so in Resources */,
 				B683A0DC16F1CDA600564A1D /* TBRolloverBG@2x.png in Resources */,
 				B683A0DD16F1CDA600564A1D /* TBSynchronizing@2x.png in Resources */,
 				B683A0DE16F1CDA600564A1D /* TBSynchronizingWhite@2x.png in Resources */,
@@ -1656,6 +1798,22 @@
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXResourcesBuildPhase section */
+
+/* Begin PBXShellScriptBuildPhase section */
+		93083A7C18F883E200F56834 /* ShellScript */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "LOCATION=\"${BUILT_PRODUCTS_DIR}\"/\"${FRAMEWORKS_FOLDER_PATH}\"\nIDENTITY=\"Developer ID Application: Brett Terpstra\"\ncodesign --verbose --force --sign \"$IDENTITY\" \"$LOCATION/AutoHyperlinks.framework/Versions/A\"\ncodesign --verbose --force --sign \"$IDENTITY\" \"$LOCATION/Sparkle.framework/Versions/A\"\n";
+		};
+/* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
 		8D11072C0486CEB800E47090 /* Sources */ = {
@@ -2212,18 +2370,19 @@
 		212B842409780B5000F3597F /* Development */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				CODE_SIGN_IDENTITY = "3rd Party Mac Developer Application";
+				CODE_SIGN_IDENTITY = "Developer ID Application";
+				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Mac Developer";
 				COMBINE_HIDPI_IMAGES = YES;
-				MACOSX_DEPLOYMENT_TARGET = 10.6;
+				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
+				MACOSX_DEPLOYMENT_TARGET = 10.7;
 				PROVISIONING_PROFILE = "";
-				SDKROOT = macosx10.7;
+				SDKROOT = macosx10.8;
 			};
 			name = Development;
 		};
 		212B842809780B5000F3597F /* Development */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ARCHS = "$(ARCHS_STANDARD_32_64_BIT)";
 				CODE_SIGN_IDENTITY = "Mac Developer: Brett Terpstra (95JCYSRQDU)";
 				COPY_PHASE_STRIP = NO;
 				DEAD_CODE_STRIPPING = NO;
@@ -2248,7 +2407,7 @@
 				GCC_THREADSAFE_STATICS = NO;
 				GCC_TREAT_NONCONFORMANT_CODE_ERRORS_AS_WARNINGS = YES;
 				GCC_TREAT_WARNINGS_AS_ERRORS = NO;
-				GCC_VERSION = com.apple.compilers.llvmgcc42;
+				GCC_VERSION = "";
 				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
 				GCC_WARN_ABOUT_MISSING_FIELD_INITIALIZERS = YES;
 				GCC_WARN_ABOUT_MISSING_NEWLINE = YES;
@@ -2281,7 +2440,7 @@
 				IBC_STRIP_NIBS = NO;
 				INFOPLIST_FILE = Info.plist;
 				LD_GENERATE_MAP_FILE = YES;
-				MACOSX_DEPLOYMENT_TARGET = 10.6;
+				MACOSX_DEPLOYMENT_TARGET = 10.7;
 				ONLY_ACTIVE_ARCH = YES;
 				OTHER_CFLAGS = (
 					"-pg",
@@ -2291,7 +2450,7 @@
 				PRODUCT_NAME = nvALT;
 				PROVISIONING_PROFILE = "5C02B60F-CC46-4089-8BD9-FF6E1382772B";
 				RUN_CLANG_STATIC_ANALYZER = YES;
-				SDKROOT = macosx10.7;
+				SDKROOT = macosx;
 				STRIP_INSTALLED_PRODUCT = NO;
 				VERSION_INFO_BUILDER = ElasticThreads;
 				WARNING_LDFLAGS = "-pg";
@@ -2303,7 +2462,6 @@
 		5C9CB58B134A7F0400073277 /* ForBuilding */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ARCHS = "$(ARCHS_STANDARD_32_64_BIT)";
 				CODE_SIGN_IDENTITY = "Mac Developer: Brett Terpstra (95JCYSRQDU)";
 				DEAD_CODE_STRIPPING = YES;
 				DEPLOYMENT_POSTPROCESSING = YES;
@@ -2326,7 +2484,7 @@
 				GCC_THREADSAFE_STATICS = NO;
 				GCC_TREAT_NONCONFORMANT_CODE_ERRORS_AS_WARNINGS = YES;
 				GCC_TREAT_WARNINGS_AS_ERRORS = NO;
-				GCC_VERSION = com.apple.compilers.llvmgcc42;
+				GCC_VERSION = "";
 				GCC_WARN_64_TO_32_BIT_CONVERSION = NO;
 				GCC_WARN_ABOUT_GLOBAL_CONSTRUCTORS = NO;
 				GCC_WARN_ABOUT_MISSING_FIELD_INITIALIZERS = YES;
@@ -2355,11 +2513,11 @@
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				HEADER_SEARCH_PATHS = ICU/icu;
 				INFOPLIST_FILE = Info.plist;
-				MACOSX_DEPLOYMENT_TARGET = 10.6;
+				MACOSX_DEPLOYMENT_TARGET = 10.7;
 				PRIVATE_HEADERS_FOLDER_PATH = "$(CONTENTS_FOLDER_PATH)/PrivateHeaders";
 				PRODUCT_NAME = nvALT;
 				PROVISIONING_PROFILE = "5C02B60F-CC46-4089-8BD9-FF6E1382772B";
-				SDKROOT = macosx10.7;
+				SDKROOT = macosx;
 				SECTORDER_FLAGS = (
 					"-sectorder",
 					__TEXT,
@@ -2377,11 +2535,13 @@
 		5C9CB58C134A7F0400073277 /* ForBuilding */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				CODE_SIGN_IDENTITY = "Mac Developer";
+				CODE_SIGN_IDENTITY = "Developer ID Application";
+				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Mac Developer";
 				COMBINE_HIDPI_IMAGES = YES;
-				MACOSX_DEPLOYMENT_TARGET = 10.6;
+				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
+				MACOSX_DEPLOYMENT_TARGET = 10.7;
 				PROVISIONING_PROFILE = "";
-				SDKROOT = macosx10.7;
+				SDKROOT = macosx10.8;
 			};
 			name = ForBuilding;
 		};

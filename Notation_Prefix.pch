@@ -87,7 +87,6 @@ typedef char _COMPILE_ASSERT_SYMBOL(__LINE__, msg) [ ((test) ? 1 : -1) ]
 #define IsSnowLeopardOrLater (floor(NSFoundationVersionNumber) >= NSFoundationVersionNumber10_6)
 #define IsLionOrLater (floor(NSFoundationVersionNumber) >= NSFoundationVersionNumber10_7)
 
-
 #define NOTES_MENU_ID 89
 #define VIEW_MENU_ID 99
 

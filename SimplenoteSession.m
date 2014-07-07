@@ -826,15 +826,15 @@ static void SNReachabilityCallback(SCNetworkReachabilityRef	target, SCNetworkCon
 	}
 		
 	if ([downloadedNotesToKeep count]) {
-		NSLog(@"%s: found %u genuinely new notes on the server",_cmd, [downloadedNotesToKeep count]);
+		NSLog(@"%s: found %lu genuinely new notes on the server",_cmd, (unsigned long)[downloadedNotesToKeep count]);
 		[delegate syncSession:self receivedAddedNotes:downloadedNotesToKeep];
 	}
 	if ([notesToReportModified count]) {
-		NSLog(@"%s: found %u duplicate notes on the server",_cmd, [notesToReportModified count]);
+		NSLog(@"%s: found %lu duplicate notes on the server",_cmd, (unsigned long)[notesToReportModified count]);
 		[delegate syncSession:self didModifyNotes:notesToReportModified];
 	}
 	if ([localNotesToUpload count] && ![collector collectionStoppedPrematurely]) {
-		NSLog(@"%s: found %u locally unique notes",_cmd, [localNotesToUpload count]);
+		NSLog(@"%s: found %lu locally unique notes",_cmd, (unsigned long)[localNotesToUpload count]);
 		//automatically upload the rest of the unique notes using -startCreatingNotes:
 		[self startCreatingNotes:[localNotesToUpload allObjects]];
 	}
