@@ -239,7 +239,7 @@
                 }
                 [[[[AlienNoteImporter alloc] init] autorelease] importURLInBackground:theURL linkTitle:linkTitle receptionDelegate:self];
             }
-            return;
+            return YES;
         }else{
             if (title && (txtBody || htmlBody)) {
                 NSMutableAttributedString *attributedContents = nil;
