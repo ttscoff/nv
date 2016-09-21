@@ -1108,8 +1108,8 @@ copyRTFType:
 		method_setImplementation(defaultIBeamCursorMethod, shouldBeWhite ? whiteIBeamCursorIMP : defaultIBeamCursorIMP);
 		
 		NSCursor *currentCursor = [NSCursor currentCursor];
-		NSCursor *whiteCursor = whiteIBeamCursorIMP(class, @selector(whiteIBeamCursor));
-		NSCursor *defaultCursor = defaultIBeamCursorIMP(class, @selector(IBeamCursor));
+		NSCursor *whiteCursor = whiteIBeamCursorIMP;
+		NSCursor *defaultCursor = defaultIBeamCursorIMP;
       
 		//if the current cursor is set incorrectly, and and it's not a non-IBeam cursor, then update it (IBeamCursor points to our recently-set implementation)
 		if ((currentCursor == whiteCursor) != shouldBeWhite && (currentCursor == whiteCursor || currentCursor == defaultCursor)) {

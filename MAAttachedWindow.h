@@ -61,8 +61,8 @@ typedef enum _MAWindowPosition {
     
     @private
     NSColor *_MABackgroundColor;
-    __weak NSView *_view;
-    __weak NSWindow *_window;
+    NSView *_view;
+    NSWindow *_window;
     NSPoint _point;
     MAWindowPosition _side;
     float _distance;
