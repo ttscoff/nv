@@ -530,8 +530,8 @@ NSString *ShouldImportCreationDates = @"ShouldImportCreationDates";
 - (NSString *) contentUsingReadability: (NSString *)htmlFile
 {
     NSBundle *bundle = [NSBundle mainBundle];
-    NSString *readabilityPath;
-    readabilityPath = [bundle pathForAuxiliaryExecutable: @"readability.py"];
+    NSString *readabilityPath = [bundle pathForResource:@"readability" ofType:@"py"];
+//    readabilityPath = [bundle pathForAuxiliaryExecutable: @"readability.py"];
 	
     NSTask *task = [[NSTask alloc] init];
     [task setLaunchPath: readabilityPath];
@@ -562,8 +562,8 @@ NSString *ShouldImportCreationDates = @"ShouldImportCreationDates";
 - (NSString *) markdownFromHTMLFile: (NSString *)htmlFile
 {
     NSBundle *bundle = [NSBundle mainBundle];
-    NSString *readabilityPath;
-    readabilityPath = [bundle pathForAuxiliaryExecutable: @"html2text.py"];
+    NSString *readabilityPath = [bundle pathForResource:@"html2text" ofType:@"py"];
+//    readabilityPath = [bundle pathForAuxiliaryExecutable: @"html2text.py"];
 	
     NSTask *task = [[NSTask alloc] init];
     [task setLaunchPath: readabilityPath];
@@ -594,8 +594,9 @@ NSString *ShouldImportCreationDates = @"ShouldImportCreationDates";
 - (NSString *) markdownFromSource: (NSString *)htmlString
 {
     NSBundle *bundle = [NSBundle mainBundle];
-    NSString *readabilityPath;
-    readabilityPath = [bundle pathForAuxiliaryExecutable: @"html2text.py"];
+    NSString *readabilityPath = [bundle pathForResource:@"html2text" ofType:@"py"];
+//    readabilityPath = [bundle pathForAuxiliaryExecutable: @"html2text.py"];
+
 	
     NSTask *task = [[NSTask alloc] init];
     [task setLaunchPath: readabilityPath];

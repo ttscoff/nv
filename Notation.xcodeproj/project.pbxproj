@@ -143,15 +143,15 @@
 		5C96F4FF131C2F9500A2E4AC /* TabClose_Front_Pressed.tif in Resources */ = {isa = PBXBuildFile; fileRef = 5C96F4FC131C2F9500A2E4AC /* TabClose_Front_Pressed.tif */; };
 		5C96F501131C2F9500A2E4AC /* TabClose_Front.tif in Resources */ = {isa = PBXBuildFile; fileRef = 5C96F4FE131C2F9500A2E4AC /* TabClose_Front.tif */; };
 		5C96F504131C2FA800A2E4AC /* BTTransparentScroller.m in Sources */ = {isa = PBXBuildFile; fileRef = 5C96F502131C2FA800A2E4AC /* BTTransparentScroller.m */; };
-		5C96F566131C35AB00A2E4AC /* __init__.py in CopyFiles */ = {isa = PBXBuildFile; fileRef = 5CA10FFB131C2A7600DE1F91 /* __init__.py */; };
-		5C96F567131C35AB00A2E4AC /* BeautifulSoup.py in CopyFiles */ = {isa = PBXBuildFile; fileRef = 5CA10FFC131C2A7600DE1F91 /* BeautifulSoup.py */; };
-		5C96F568131C35AB00A2E4AC /* BeautifulSoup.pyc in CopyFiles */ = {isa = PBXBuildFile; fileRef = 5CA10FFD131C2A7600DE1F91 /* BeautifulSoup.pyc */; };
-		5C96F569131C35AB00A2E4AC /* html2text.py in CopyFiles */ = {isa = PBXBuildFile; fileRef = 5CA10FFE131C2A7600DE1F91 /* html2text.py */; };
-		5C96F56A131C35AB00A2E4AC /* page_parser.py in CopyFiles */ = {isa = PBXBuildFile; fileRef = 5CA10FFF131C2A7600DE1F91 /* page_parser.py */; };
-		5C96F56B131C35AB00A2E4AC /* page_parser.pyc in CopyFiles */ = {isa = PBXBuildFile; fileRef = 5CA11000131C2A7600DE1F91 /* page_parser.pyc */; };
-		5C96F56C131C35AB00A2E4AC /* readability.py in CopyFiles */ = {isa = PBXBuildFile; fileRef = 5CA11001131C2A7600DE1F91 /* readability.py */; };
-		5C96F56D131C35AB00A2E4AC /* url_helpers.py in CopyFiles */ = {isa = PBXBuildFile; fileRef = 5CA11002131C2A7600DE1F91 /* url_helpers.py */; };
-		5C96F56E131C35AB00A2E4AC /* url_helpers.pyc in CopyFiles */ = {isa = PBXBuildFile; fileRef = 5CA11003131C2A7600DE1F91 /* url_helpers.pyc */; };
+		5C96F566131C35AB00A2E4AC /* __init__.py in CopyFiles */ = {isa = PBXBuildFile; fileRef = 5CA10FFB131C2A7600DE1F91 /* __init__.py */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
+		5C96F567131C35AB00A2E4AC /* BeautifulSoup.py in CopyFiles */ = {isa = PBXBuildFile; fileRef = 5CA10FFC131C2A7600DE1F91 /* BeautifulSoup.py */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
+		5C96F568131C35AB00A2E4AC /* BeautifulSoup.pyc in CopyFiles */ = {isa = PBXBuildFile; fileRef = 5CA10FFD131C2A7600DE1F91 /* BeautifulSoup.pyc */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
+		5C96F569131C35AB00A2E4AC /* html2text.py in CopyFiles */ = {isa = PBXBuildFile; fileRef = 5CA10FFE131C2A7600DE1F91 /* html2text.py */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
+		5C96F56A131C35AB00A2E4AC /* page_parser.py in CopyFiles */ = {isa = PBXBuildFile; fileRef = 5CA10FFF131C2A7600DE1F91 /* page_parser.py */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
+		5C96F56B131C35AB00A2E4AC /* page_parser.pyc in CopyFiles */ = {isa = PBXBuildFile; fileRef = 5CA11000131C2A7600DE1F91 /* page_parser.pyc */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
+		5C96F56C131C35AB00A2E4AC /* readability.py in CopyFiles */ = {isa = PBXBuildFile; fileRef = 5CA11001131C2A7600DE1F91 /* readability.py */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
+		5C96F56D131C35AB00A2E4AC /* url_helpers.py in CopyFiles */ = {isa = PBXBuildFile; fileRef = 5CA11002131C2A7600DE1F91 /* url_helpers.py */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
+		5C96F56E131C35AB00A2E4AC /* url_helpers.pyc in CopyFiles */ = {isa = PBXBuildFile; fileRef = 5CA11003131C2A7600DE1F91 /* url_helpers.pyc */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
 		5C96F5AF131C37DF00A2E4AC /* NSString_MultiMarkdown.m in Sources */ = {isa = PBXBuildFile; fileRef = 5C96F5AA131C37DF00A2E4AC /* NSString_MultiMarkdown.m */; };
 		5C96F5B0131C37DF00A2E4AC /* NSString_Markdown.m in Sources */ = {isa = PBXBuildFile; fileRef = 5C96F5AC131C37DF00A2E4AC /* NSString_Markdown.m */; };
 		5C96F5B1131C37DF00A2E4AC /* NSString_Textile.m in Sources */ = {isa = PBXBuildFile; fileRef = 5C96F5AE131C37DF00A2E4AC /* NSString_Textile.m */; };
@@ -167,15 +167,6 @@
 		5CA10F1A131C297000DE1F91 /* PreviewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 5CA10F19131C297000DE1F91 /* PreviewController.m */; };
 		5CA10F32131C29E900DE1F91 /* AppController_Preview.m in Sources */ = {isa = PBXBuildFile; fileRef = 5CA10F31131C29E900DE1F91 /* AppController_Preview.m */; };
 		5CA10F3B131C2A3F00DE1F91 /* MAAttachedWindow.m in Sources */ = {isa = PBXBuildFile; fileRef = 5CA10F3A131C2A3F00DE1F91 /* MAAttachedWindow.m */; };
-		5CA11004131C2A7600DE1F91 /* __init__.py in Resources */ = {isa = PBXBuildFile; fileRef = 5CA10FFB131C2A7600DE1F91 /* __init__.py */; };
-		5CA11005131C2A7600DE1F91 /* BeautifulSoup.py in Resources */ = {isa = PBXBuildFile; fileRef = 5CA10FFC131C2A7600DE1F91 /* BeautifulSoup.py */; };
-		5CA11006131C2A7600DE1F91 /* BeautifulSoup.pyc in Resources */ = {isa = PBXBuildFile; fileRef = 5CA10FFD131C2A7600DE1F91 /* BeautifulSoup.pyc */; };
-		5CA11007131C2A7600DE1F91 /* html2text.py in Resources */ = {isa = PBXBuildFile; fileRef = 5CA10FFE131C2A7600DE1F91 /* html2text.py */; };
-		5CA11008131C2A7600DE1F91 /* page_parser.py in Resources */ = {isa = PBXBuildFile; fileRef = 5CA10FFF131C2A7600DE1F91 /* page_parser.py */; };
-		5CA11009131C2A7600DE1F91 /* page_parser.pyc in Resources */ = {isa = PBXBuildFile; fileRef = 5CA11000131C2A7600DE1F91 /* page_parser.pyc */; };
-		5CA1100A131C2A7600DE1F91 /* readability.py in Resources */ = {isa = PBXBuildFile; fileRef = 5CA11001131C2A7600DE1F91 /* readability.py */; };
-		5CA1100B131C2A7600DE1F91 /* url_helpers.py in Resources */ = {isa = PBXBuildFile; fileRef = 5CA11002131C2A7600DE1F91 /* url_helpers.py */; };
-		5CA1100C131C2A7600DE1F91 /* url_helpers.pyc in Resources */ = {isa = PBXBuildFile; fileRef = 5CA11003131C2A7600DE1F91 /* url_helpers.pyc */; };
 		5CBA7A911305E2DF004ADEBB /* TagEditingManager.xib in Resources */ = {isa = PBXBuildFile; fileRef = 5CBA7A8F1305E2DF004ADEBB /* TagEditingManager.xib */; };
 		5CBA7A981305E38C004ADEBB /* TagEditingManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 5CBA7A971305E38C004ADEBB /* TagEditingManager.m */; };
 		5CC2DF0B13083BCF006772D9 /* StatusItemView.m in Sources */ = {isa = PBXBuildFile; fileRef = 5CC2DF0A13083BCF006772D9 /* StatusItemView.m */; };
@@ -308,7 +299,7 @@
 			isa = PBXCopyFilesBuildPhase;
 			buildActionMask = 2147483647;
 			dstPath = "";
-			dstSubfolderSpec = 6;
+			dstSubfolderSpec = 7;
 			files = (
 				5C96F566131C35AB00A2E4AC /* __init__.py in CopyFiles */,
 				5C96F567131C35AB00A2E4AC /* BeautifulSoup.py in CopyFiles */,
@@ -1437,10 +1428,10 @@
 			buildConfigurationList = 212B842309780B5000F3597F /* Build configuration list for PBXNativeTarget "Notation" */;
 			buildPhases = (
 				8D1107290486CEB800E47090 /* Resources */,
+				5C96F565131C35A300A2E4AC /* CopyFiles */,
 				8D11072C0486CEB800E47090 /* Sources */,
 				8D11072E0486CEB800E47090 /* Frameworks */,
 				213FB6AD0B52E1B2004C74BD /* CopyFiles */,
-				5C96F565131C35A300A2E4AC /* CopyFiles */,
 			);
 			buildRules = (
 			);
@@ -1523,15 +1514,6 @@
 				5C4B353E1307220E00014119 /* TransparentScrollerKnobTop.tif in Resources */,
 				5C4B35401307220E00014119 /* TransparentScrollerSlotBottom.tif in Resources */,
 				5C4B35421307220E00014119 /* TransparentScrollerSlotVerticalFill.tif in Resources */,
-				5CA11004131C2A7600DE1F91 /* __init__.py in Resources */,
-				5CA11005131C2A7600DE1F91 /* BeautifulSoup.py in Resources */,
-				5CA11006131C2A7600DE1F91 /* BeautifulSoup.pyc in Resources */,
-				5CA11007131C2A7600DE1F91 /* html2text.py in Resources */,
-				5CA11008131C2A7600DE1F91 /* page_parser.py in Resources */,
-				5CA11009131C2A7600DE1F91 /* page_parser.pyc in Resources */,
-				5CA1100A131C2A7600DE1F91 /* readability.py in Resources */,
-				5CA1100B131C2A7600DE1F91 /* url_helpers.py in Resources */,
-				5CA1100C131C2A7600DE1F91 /* url_helpers.pyc in Resources */,
 				5C96F4FF131C2F9500A2E4AC /* TabClose_Front_Pressed.tif in Resources */,
 				5C96F501131C2F9500A2E4AC /* TabClose_Front.tif in Resources */,
 				5C96F616131C380100A2E4AC /* Textile_2.12 in Resources */,
@@ -2192,8 +2174,12 @@
 		212B842409780B5000F3597F /* Development */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				ARCHS = "$(ARCHS_STANDARD_32_64_BIT)";
 				COMBINE_HIDPI_IMAGES = YES;
+				ENABLE_STRICT_OBJC_MSGSEND = NO;
+				MACOSX_DEPLOYMENT_TARGET = 10.9;
 				PRODUCT_BUNDLE_IDENTIFIER = net.elasticthreads.nv;
+				VALID_ARCHS = x86_64;
 			};
 			name = Development;
 		};
@@ -2273,7 +2259,7 @@
 				INFOPLIST_FILE = Info.plist;
 				LD_GENERATE_MAP_FILE = YES;
 				LIBRARY_SEARCH_PATHS = /usr/local/Cellar/openssl/1.0.2/lib/;
-				MACOSX_DEPLOYMENT_TARGET = 10.10;
+				MACOSX_DEPLOYMENT_TARGET = 10.9;
 				ONLY_ACTIVE_ARCH = YES;
 				OTHER_CFLAGS = (
 					"-pg",
@@ -2361,7 +2347,7 @@
 				);
 				INFOPLIST_FILE = Info.plist;
 				LIBRARY_SEARCH_PATHS = /usr/local/Cellar/openssl/1.0.2/lib/;
-				MACOSX_DEPLOYMENT_TARGET = 10.10;
+				MACOSX_DEPLOYMENT_TARGET = 10.9;
 				PRIVATE_HEADERS_FOLDER_PATH = "$(CONTENTS_FOLDER_PATH)/PrivateHeaders";
 				PRODUCT_NAME = nvALT;
 				SDKROOT = macosx;
@@ -2383,8 +2369,12 @@
 		5C45D997196C95A9004C55F8 /* ForBuilding 10.6 */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				ARCHS = "$(ARCHS_STANDARD_32_64_BIT)";
 				COMBINE_HIDPI_IMAGES = YES;
+				ENABLE_STRICT_OBJC_MSGSEND = NO;
+				MACOSX_DEPLOYMENT_TARGET = 10.9;
 				PRODUCT_BUNDLE_IDENTIFIER = net.elasticthreads.nv;
+				VALID_ARCHS = x86_64;
 			};
 			name = "ForBuilding 10.6";
 		};
@@ -2457,7 +2447,7 @@
 				);
 				INFOPLIST_FILE = Info.plist;
 				LIBRARY_SEARCH_PATHS = /usr/local/Cellar/openssl/1.0.2/lib/;
-				MACOSX_DEPLOYMENT_TARGET = 10.10;
+				MACOSX_DEPLOYMENT_TARGET = 10.9;
 				PRIVATE_HEADERS_FOLDER_PATH = "$(CONTENTS_FOLDER_PATH)/PrivateHeaders";
 				PRODUCT_NAME = nvALT;
 				SDKROOT = macosx;
@@ -2479,9 +2469,12 @@
 		5C9CB58C134A7F0400073277 /* ForBuilding */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				ARCHS = "$(ARCHS_STANDARD_32_64_BIT)";
 				COMBINE_HIDPI_IMAGES = YES;
-				MACOSX_DEPLOYMENT_TARGET = 10.6;
+				ENABLE_STRICT_OBJC_MSGSEND = NO;
+				MACOSX_DEPLOYMENT_TARGET = 10.9;
 				PRODUCT_BUNDLE_IDENTIFIER = net.elasticthreads.nv;
+				VALID_ARCHS = x86_64;
 			};
 			name = ForBuilding;
 		};

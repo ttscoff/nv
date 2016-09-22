@@ -130,9 +130,9 @@
 		</dict>
 	</array>
 	<key>CFBundleExecutable</key>
-	<string>nvALT</string>
+	<string>${EXECUTABLE_NAME}</string>
 	<key>CFBundleGetInfoString</key>
-	<string>nvALT by ElasticThreads and Brett Terpstra, based on NV 2.0 β5 Copyright © 2010 Zachary Schneirov, All Rights Reserved.</string>
+	<string>nvALT by David Halter and Brett Terpstra, based on NV 2.0 β5 Copyright © 2010 Zachary Schneirov, All Rights Reserved.</string>
 	<key>CFBundleIconFile</key>
 	<string>Notality.icns</string>
 	<key>CFBundleIdentifier</key>
@@ -140,13 +140,17 @@
 	<key>CFBundleInfoDictionaryVersion</key>
 	<string>6.0</string>
 	<key>CFBundleName</key>
-	<string></string>
+	<string>${PRODUCT_NAME}</string>
 	<key>CFBundlePackageType</key>
 	<string>APPL</string>
 	<key>CFBundleShortVersionString</key>
-	<string>2.2b</string>
+	<string>2.2</string>
 	<key>CFBundleSignature</key>
 	<string>N†l√</string>
+	<key>CFBundleSupportedPlatforms</key>
+	<array>
+		<string>MacOSX</string>
+	</array>
 	<key>CFBundleURLTypes</key>
 	<array>
 		<dict>
@@ -162,18 +166,23 @@
 		</dict>
 	</array>
 	<key>CFBundleVersion</key>
-	<string>113</string>
+	<string>119</string>
 	<key>LSApplicationCategoryType</key>
 	<string>public.app-category.productivity</string>
-	<key>LSArchitecturePriority</key>
-	<array>
-		<string>x86_64</string>
-		<string>i386</string>
-	</array>
 	<key>LSMinimumSystemVersion</key>
-	<string>10.6.8</string>
+	<string>${MACOSX_DEPLOYMENT_TARGET}</string>
+	<key>LSMinimumSystemVersionByArchitecture</key>
+	<dict>
+		<key>x86_64</key>
+		<string>${MACOSX_DEPLOYMENT_TARGET}</string>
+	</dict>
 	<key>LSUIElement</key>
-	<true/>
+	<false/>
+	<key>NSAppTransportSecurity</key>
+	<dict>
+		<key>NSAllowsArbitraryLoads</key>
+		<true/>
+	</dict>
 	<key>NSAppleScriptEnabled</key>
 	<true/>
 	<key>NSMainNibFile</key>
