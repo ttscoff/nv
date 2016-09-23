@@ -61,7 +61,6 @@
 		218D43330AA2ABC600F36CCA /* NotesTableView.m in Sources */ = {isa = PBXBuildFile; fileRef = 2191930209CFBEBD00586B15 /* NotesTableView.m */; };
 		21918FD009C49B2500586B15 /* EmptyView.m in Sources */ = {isa = PBXBuildFile; fileRef = 21918FCE09C49B2400586B15 /* EmptyView.m */; };
 		219190F109C4A60700586B15 /* DualField.m in Sources */ = {isa = PBXBuildFile; fileRef = 219190F009C4A60700586B15 /* DualField.m */; };
-		2191926409C52A9200586B15 /* libcrypto.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 2191926309C52A9100586B15 /* libcrypto.dylib */; };
 		2191926709C52AA600586B15 /* libz.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 2191926609C52AA600586B15 /* libz.dylib */; };
 		219192D409CFBC8800586B15 /* NoteAttributeColumn.m in Sources */ = {isa = PBXBuildFile; fileRef = 219192D309CFBC8700586B15 /* NoteAttributeColumn.m */; };
 		2191982209D607C600586B15 /* PrefsWindowController.m in Sources */ = {isa = PBXBuildFile; fileRef = 2191982109D607C600586B15 /* PrefsWindowController.m */; };
@@ -249,6 +248,8 @@
 		934C3FB514FDA06A000D14BA /* templateclean.html in Resources */ = {isa = PBXBuildFile; fileRef = 934C3FB114FDA069000D14BA /* templateclean.html */; };
 		934C3FB914FDA74F000D14BA /* NSFileManager+DirectoryLocations.m in Sources */ = {isa = PBXBuildFile; fileRef = 934C3FB814FDA74F000D14BA /* NSFileManager+DirectoryLocations.m */; };
 		937E6783138C250E0099DF47 /* AutoHyperlinks.framework in CopyFiles */ = {isa = PBXBuildFile; fileRef = 937E6781138C24980099DF47 /* AutoHyperlinks.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
+		93862A2A1D9553F500E67D13 /* libcrypto.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 93862A281D9553F500E67D13 /* libcrypto.a */; };
+		93862A2B1D9553F500E67D13 /* libssl.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 93862A291D9553F500E67D13 /* libssl.a */; };
 		93A158BC133C304D00E1E7DA /* Markdownify.nvhelp in Resources */ = {isa = PBXBuildFile; fileRef = 93A158BB133C304D00E1E7DA /* Markdownify.nvhelp */; };
 		93A158BE133C497400E1E7DA /* Notality.icns in Resources */ = {isa = PBXBuildFile; fileRef = 93A158BD133C497400E1E7DA /* Notality.icns */; };
 		93B348281371547800658F98 /* HUDIconLock.png in Resources */ = {isa = PBXBuildFile; fileRef = 93B348241371547800658F98 /* HUDIconLock.png */; };
@@ -436,7 +437,6 @@
 		21918FCF09C49B2500586B15 /* EmptyView.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = EmptyView.h; sourceTree = SOURCE_ROOT; };
 		219190EF09C4A60600586B15 /* DualField.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = DualField.h; sourceTree = "<group>"; };
 		219190F009C4A60700586B15 /* DualField.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; path = DualField.m; sourceTree = "<group>"; };
-		2191926309C52A9100586B15 /* libcrypto.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libcrypto.dylib; path = /usr/lib/libcrypto.dylib; sourceTree = "<absolute>"; };
 		2191926609C52AA600586B15 /* libz.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libz.dylib; path = /usr/lib/libz.dylib; sourceTree = "<absolute>"; };
 		219192D209CFBC8700586B15 /* NoteAttributeColumn.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = NoteAttributeColumn.h; sourceTree = "<group>"; };
 		219192D309CFBC8700586B15 /* NoteAttributeColumn.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; path = NoteAttributeColumn.m; sourceTree = "<group>"; };
@@ -778,6 +778,8 @@
 		934C3FB714FDA74F000D14BA /* NSFileManager+DirectoryLocations.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSFileManager+DirectoryLocations.h"; sourceTree = "<group>"; };
 		934C3FB814FDA74F000D14BA /* NSFileManager+DirectoryLocations.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSFileManager+DirectoryLocations.m"; sourceTree = "<group>"; };
 		937E6781138C24980099DF47 /* AutoHyperlinks.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = AutoHyperlinks.framework; sourceTree = "<group>"; };
+		93862A281D9553F500E67D13 /* libcrypto.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = libcrypto.a; sourceTree = "<group>"; };
+		93862A291D9553F500E67D13 /* libssl.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = libssl.a; sourceTree = "<group>"; };
 		93A158BB133C304D00E1E7DA /* Markdownify.nvhelp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = Markdownify.nvhelp; sourceTree = "<group>"; };
 		93A158BD133C497400E1E7DA /* Notality.icns */ = {isa = PBXFileReference; lastKnownFileType = image.icns; path = Notality.icns; sourceTree = "<group>"; };
 		93B348241371547800658F98 /* HUDIconLock.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = HUDIconLock.png; path = Images/HUDIconLock.png; sourceTree = "<group>"; };
@@ -825,13 +827,14 @@
 			buildActionMask = 2147483647;
 			files = (
 				8D11072F0486CEB800E47090 /* Cocoa.framework in Frameworks */,
-				2191926409C52A9200586B15 /* libcrypto.dylib in Frameworks */,
 				2191926709C52AA600586B15 /* libz.dylib in Frameworks */,
 				21F459AD0A92E01D00FB6FFE /* Carbon.framework in Frameworks */,
 				214493F60ADB892C00E2A2B6 /* CoreServices.framework in Frameworks */,
 				214495030ADC7C8D00E2A2B6 /* SecurityInterface.framework in Frameworks */,
 				21973FF10B0060C80046683E /* Security.framework in Frameworks */,
+				93862A2A1D9553F500E67D13 /* libcrypto.a in Frameworks */,
 				210C07530B6BF0A2005D23A8 /* WebKit.framework in Frameworks */,
+				93862A2B1D9553F500E67D13 /* libssl.a in Frameworks */,
 				21D583620B78F0CC00245E29 /* ApplicationServices.framework in Frameworks */,
 				219D254A1113FE34005E7DF5 /* SystemConfiguration.framework in Frameworks */,
 				21B54C021134F2E800E163A1 /* IOKit.framework in Frameworks */,
@@ -940,6 +943,8 @@
 		1058C7A2FEA54F0111CA2CBB /* Other Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				93862A281D9553F500E67D13 /* libcrypto.a */,
+				93862A291D9553F500E67D13 /* libssl.a */,
 				937E6781138C24980099DF47 /* AutoHyperlinks.framework */,
 				21B54C011134F2E800E163A1 /* IOKit.framework */,
 				213623E50B92AA4E008C0830 /* Sparkle.framework */,
@@ -950,7 +955,6 @@
 				21F4599B0A92E01C00FB6FFE /* Carbon.framework */,
 				21D5834D0B78F0CC00245E29 /* ApplicationServices.framework */,
 				2191926609C52AA600586B15 /* libz.dylib */,
-				2191926309C52A9100586B15 /* libcrypto.dylib */,
 				29B97324FDCFA39411CA2CEA /* AppKit.framework */,
 				29B97325FDCFA39411CA2CEA /* Foundation.framework */,
 				219D25491113FE34005E7DF5 /* SystemConfiguration.framework */,
@@ -2177,7 +2181,15 @@
 				ARCHS = "$(ARCHS_STANDARD_32_64_BIT)";
 				COMBINE_HIDPI_IMAGES = YES;
 				ENABLE_STRICT_OBJC_MSGSEND = NO;
+				HEADER_SEARCH_PATHS = (
+					ICU/icu,
+					"/usr/local/Cellar/openssl098/0.9.8zf/include/**",
+					"/usr/local/Cellar/openssl/1.0.2/include/**",
+				);
+				LD_RUNPATH_SEARCH_PATHS = "";
+				LIBRARY_SEARCH_PATHS = "$(PROJECT_DIR)";
 				MACOSX_DEPLOYMENT_TARGET = 10.9;
+				OTHER_LDFLAGS = "";
 				PRODUCT_BUNDLE_IDENTIFIER = net.elasticthreads.nv;
 				VALID_ARCHS = x86_64;
 			};
@@ -2372,7 +2384,15 @@
 				ARCHS = "$(ARCHS_STANDARD_32_64_BIT)";
 				COMBINE_HIDPI_IMAGES = YES;
 				ENABLE_STRICT_OBJC_MSGSEND = NO;
+				HEADER_SEARCH_PATHS = (
+					ICU/icu,
+					"/usr/local/Cellar/openssl098/0.9.8zf/include/**",
+					"/usr/local/Cellar/openssl/1.0.2/include/**",
+				);
+				LD_RUNPATH_SEARCH_PATHS = "";
+				LIBRARY_SEARCH_PATHS = "$(PROJECT_DIR)";
 				MACOSX_DEPLOYMENT_TARGET = 10.9;
+				OTHER_LDFLAGS = "";
 				PRODUCT_BUNDLE_IDENTIFIER = net.elasticthreads.nv;
 				VALID_ARCHS = x86_64;
 			};
@@ -2472,7 +2492,15 @@
 				ARCHS = "$(ARCHS_STANDARD_32_64_BIT)";
 				COMBINE_HIDPI_IMAGES = YES;
 				ENABLE_STRICT_OBJC_MSGSEND = NO;
+				HEADER_SEARCH_PATHS = (
+					ICU/icu,
+					"/usr/local/Cellar/openssl098/0.9.8zf/include/**",
+					"/usr/local/Cellar/openssl/1.0.2/include/**",
+				);
+				LD_RUNPATH_SEARCH_PATHS = "";
+				LIBRARY_SEARCH_PATHS = "$(PROJECT_DIR)";
 				MACOSX_DEPLOYMENT_TARGET = 10.9;
+				OTHER_LDFLAGS = "";
 				PRODUCT_BUNDLE_IDENTIFIER = net.elasticthreads.nv;
 				VALID_ARCHS = x86_64;
 			};

@@ -95,7 +95,10 @@ BOOL splitViewAwoke;
 - (id)init {
     self = [super init];
     if (self) {
-        
+
+        if (floor(NSAppKitVersionNumber) > NSAppKitVersionNumber10_11) {
+            [NSWindow setAllowsAutomaticWindowTabbing:NO];
+        }
 #if k_FinderTaggingReset
         [[NSUserDefaults standardUserDefaults]removeObjectForKey:@"UseFinderTags"];
 #endif
