@@ -241,15 +241,18 @@
 		8D11072D0486CEB800E47090 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 29B97316FDCFA39411CA2CEA /* main.m */; settings = {ATTRIBUTES = (); }; };
 		8D11072F0486CEB800E47090 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1058C7A1FEA54F0111CA2CBB /* Cocoa.framework */; };
 		93099628138BD61000368C45 /* tp2md.rb in Resources */ = {isa = PBXBuildFile; fileRef = 93099627138BD61000368C45 /* tp2md.rb */; };
-		9335C40D148EC7AC009CE623 /* multimarkdown in Resources */ = {isa = PBXBuildFile; fileRef = 9335C40C148EC7AC009CE623 /* multimarkdown */; };
+		93365DD21D9AAC15005A230B /* libcrypto.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 93365DD01D9AAC15005A230B /* libcrypto.a */; };
+		93365DD31D9AAC15005A230B /* libssl.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 93365DD11D9AAC15005A230B /* libssl.a */; };
+		93365DDC1D9ACC0D005A230B /* libcrypto.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 93365DDA1D9ACC0D005A230B /* libcrypto.a */; };
+		93365DDD1D9ACC0D005A230B /* libssl.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 93365DDB1D9ACC0D005A230B /* libssl.a */; };
+		93365DDF1D9AD651005A230B /* AutoHyperlinks.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 93365DDE1D9AD651005A230B /* AutoHyperlinks.framework */; };
+		93365DE01D9AD6AA005A230B /* AutoHyperlinks.framework in CopyFiles */ = {isa = PBXBuildFile; fileRef = 93365DDE1D9AD651005A230B /* AutoHyperlinks.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		93365DE11D9AD97B005A230B /* multimarkdown in CopyFiles */ = {isa = PBXBuildFile; fileRef = 9335C40C148EC7AC009CE623 /* multimarkdown */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
 		934C3FB214FDA069000D14BA /* custom.css in Resources */ = {isa = PBXBuildFile; fileRef = 934C3FAE14FDA069000D14BA /* custom.css */; };
 		934C3FB314FDA06A000D14BA /* customclean.css in Resources */ = {isa = PBXBuildFile; fileRef = 934C3FAF14FDA069000D14BA /* customclean.css */; };
 		934C3FB414FDA06A000D14BA /* template.html in Resources */ = {isa = PBXBuildFile; fileRef = 934C3FB014FDA069000D14BA /* template.html */; };
 		934C3FB514FDA06A000D14BA /* templateclean.html in Resources */ = {isa = PBXBuildFile; fileRef = 934C3FB114FDA069000D14BA /* templateclean.html */; };
 		934C3FB914FDA74F000D14BA /* NSFileManager+DirectoryLocations.m in Sources */ = {isa = PBXBuildFile; fileRef = 934C3FB814FDA74F000D14BA /* NSFileManager+DirectoryLocations.m */; };
-		937E6783138C250E0099DF47 /* AutoHyperlinks.framework in CopyFiles */ = {isa = PBXBuildFile; fileRef = 937E6781138C24980099DF47 /* AutoHyperlinks.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
-		93862A2A1D9553F500E67D13 /* libcrypto.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 93862A281D9553F500E67D13 /* libcrypto.a */; };
-		93862A2B1D9553F500E67D13 /* libssl.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 93862A291D9553F500E67D13 /* libssl.a */; };
 		93A158BC133C304D00E1E7DA /* Markdownify.nvhelp in Resources */ = {isa = PBXBuildFile; fileRef = 93A158BB133C304D00E1E7DA /* Markdownify.nvhelp */; };
 		93A158BE133C497400E1E7DA /* Notality.icns in Resources */ = {isa = PBXBuildFile; fileRef = 93A158BD133C497400E1E7DA /* Notality.icns */; };
 		93B348281371547800658F98 /* HUDIconLock.png in Resources */ = {isa = PBXBuildFile; fileRef = 93B348241371547800658F98 /* HUDIconLock.png */; };
@@ -291,8 +294,8 @@
 			dstPath = "";
 			dstSubfolderSpec = 10;
 			files = (
+				93365DE01D9AD6AA005A230B /* AutoHyperlinks.framework in CopyFiles */,
 				213623FC0B92AA6E008C0830 /* Sparkle.framework in CopyFiles */,
-				937E6783138C250E0099DF47 /* AutoHyperlinks.framework in CopyFiles */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -302,6 +305,7 @@
 			dstPath = "";
 			dstSubfolderSpec = 7;
 			files = (
+				93365DE11D9AD97B005A230B /* multimarkdown in CopyFiles */,
 				5C96F566131C35AB00A2E4AC /* __init__.py in CopyFiles */,
 				5C96F567131C35AB00A2E4AC /* BeautifulSoup.py in CopyFiles */,
 				5C96F568131C35AB00A2E4AC /* BeautifulSoup.pyc in CopyFiles */,
@@ -771,15 +775,17 @@
 		8D1107320486CEB800E47090 /* nvALT.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = nvALT.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		93099627138BD61000368C45 /* tp2md.rb */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.ruby; path = tp2md.rb; sourceTree = "<group>"; };
 		9335C40C148EC7AC009CE623 /* multimarkdown */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.executable"; path = multimarkdown; sourceTree = "<group>"; };
+		93365DD01D9AAC15005A230B /* libcrypto.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libcrypto.a; path = library/openssl/Build/Products/Debug/libcrypto.a; sourceTree = "<group>"; };
+		93365DD11D9AAC15005A230B /* libssl.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libssl.a; path = library/openssl/Build/Products/Debug/libssl.a; sourceTree = "<group>"; };
+		93365DDA1D9ACC0D005A230B /* libcrypto.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libcrypto.a; path = library/openssl/Build/Products/Debug/libcrypto.a; sourceTree = "<group>"; };
+		93365DDB1D9ACC0D005A230B /* libssl.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libssl.a; path = library/openssl/Build/Products/Debug/libssl.a; sourceTree = "<group>"; };
+		93365DDE1D9AD651005A230B /* AutoHyperlinks.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = AutoHyperlinks.framework; sourceTree = "<group>"; };
 		934C3FAE14FDA069000D14BA /* custom.css */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.css; path = custom.css; sourceTree = "<group>"; };
 		934C3FAF14FDA069000D14BA /* customclean.css */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.css; path = customclean.css; sourceTree = "<group>"; };
 		934C3FB014FDA069000D14BA /* template.html */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.html; path = template.html; sourceTree = "<group>"; };
 		934C3FB114FDA069000D14BA /* templateclean.html */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.html; path = templateclean.html; sourceTree = "<group>"; };
 		934C3FB714FDA74F000D14BA /* NSFileManager+DirectoryLocations.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSFileManager+DirectoryLocations.h"; sourceTree = "<group>"; };
 		934C3FB814FDA74F000D14BA /* NSFileManager+DirectoryLocations.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSFileManager+DirectoryLocations.m"; sourceTree = "<group>"; };
-		937E6781138C24980099DF47 /* AutoHyperlinks.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = AutoHyperlinks.framework; sourceTree = "<group>"; };
-		93862A281D9553F500E67D13 /* libcrypto.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = libcrypto.a; sourceTree = "<group>"; };
-		93862A291D9553F500E67D13 /* libssl.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = libssl.a; sourceTree = "<group>"; };
 		93A158BB133C304D00E1E7DA /* Markdownify.nvhelp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = Markdownify.nvhelp; sourceTree = "<group>"; };
 		93A158BD133C497400E1E7DA /* Notality.icns */ = {isa = PBXFileReference; lastKnownFileType = image.icns; path = Notality.icns; sourceTree = "<group>"; };
 		93B348241371547800658F98 /* HUDIconLock.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = HUDIconLock.png; path = Images/HUDIconLock.png; sourceTree = "<group>"; };
@@ -828,14 +834,17 @@
 			files = (
 				8D11072F0486CEB800E47090 /* Cocoa.framework in Frameworks */,
 				2191926709C52AA600586B15 /* libz.dylib in Frameworks */,
+				93365DDD1D9ACC0D005A230B /* libssl.a in Frameworks */,
+				93365DD31D9AAC15005A230B /* libssl.a in Frameworks */,
+				93365DDF1D9AD651005A230B /* AutoHyperlinks.framework in Frameworks */,
 				21F459AD0A92E01D00FB6FFE /* Carbon.framework in Frameworks */,
 				214493F60ADB892C00E2A2B6 /* CoreServices.framework in Frameworks */,
 				214495030ADC7C8D00E2A2B6 /* SecurityInterface.framework in Frameworks */,
 				21973FF10B0060C80046683E /* Security.framework in Frameworks */,
-				93862A2A1D9553F500E67D13 /* libcrypto.a in Frameworks */,
 				210C07530B6BF0A2005D23A8 /* WebKit.framework in Frameworks */,
-				93862A2B1D9553F500E67D13 /* libssl.a in Frameworks */,
 				21D583620B78F0CC00245E29 /* ApplicationServices.framework in Frameworks */,
+				93365DD21D9AAC15005A230B /* libcrypto.a in Frameworks */,
+				93365DDC1D9ACC0D005A230B /* libcrypto.a in Frameworks */,
 				219D254A1113FE34005E7DF5 /* SystemConfiguration.framework in Frameworks */,
 				21B54C021134F2E800E163A1 /* IOKit.framework in Frameworks */,
 			);
@@ -943,9 +952,9 @@
 		1058C7A2FEA54F0111CA2CBB /* Other Frameworks */ = {
 			isa = PBXGroup;
 			children = (
-				93862A281D9553F500E67D13 /* libcrypto.a */,
-				93862A291D9553F500E67D13 /* libssl.a */,
-				937E6781138C24980099DF47 /* AutoHyperlinks.framework */,
+				93365DDE1D9AD651005A230B /* AutoHyperlinks.framework */,
+				93365DDA1D9ACC0D005A230B /* libcrypto.a */,
+				93365DDB1D9ACC0D005A230B /* libssl.a */,
 				21B54C011134F2E800E163A1 /* IOKit.framework */,
 				213623E50B92AA4E008C0830 /* Sparkle.framework */,
 				210C07230B6BF0A1005D23A8 /* WebKit.framework */,
@@ -973,6 +982,8 @@
 		211345A10B35D8340081B064 /* Crypto */ = {
 			isa = PBXGroup;
 			children = (
+				93365DD01D9AAC15005A230B /* libcrypto.a */,
+				93365DD11D9AAC15005A230B /* libssl.a */,
 				2114C2860958CC9100614E74 /* pbkdf2.h */,
 				2114C2870958CC9100614E74 /* pbkdf2.c */,
 				2114C2A60958D24800614E74 /* hmacsha1.h */,
@@ -1455,6 +1466,12 @@
 			attributes = {
 				LastUpgradeCheck = 0800;
 				ORGANIZATIONNAME = elasticthreads;
+				TargetAttributes = {
+					8D1107260486CEB800E47090 = {
+						DevelopmentTeam = 47TRS7H4BH;
+						ProvisioningStyle = Automatic;
+					};
+				};
 			};
 			buildConfigurationList = 212B842709780B5000F3597F /* Build configuration list for PBXProject "Notation" */;
 			compatibilityVersion = "Xcode 3.2";
@@ -1607,7 +1624,6 @@
 				5C48A28213A54FBD006B73DD /* PassphraseChanger.nib in Resources */,
 				5C84319114229D810020E5A7 /* PassphraseRetriever.xib in Resources */,
 				5CE5B0081422795300FB554C /* PTKeyComboPanel.xib in Resources */,
-				9335C40D148EC7AC009CE623 /* multimarkdown in Resources */,
 				5CD1B00714F4593900AC948E /* Add.tiff in Resources */,
 				934C3FB214FDA069000D14BA /* custom.css in Resources */,
 				934C3FB314FDA06A000D14BA /* customclean.css in Resources */,
@@ -2179,15 +2195,25 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ARCHS = "$(ARCHS_STANDARD_32_64_BIT)";
+				CODE_SIGN_IDENTITY = "Mac Developer";
 				COMBINE_HIDPI_IMAGES = YES;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				DEVELOPMENT_TEAM = 47TRS7H4BH;
 				ENABLE_STRICT_OBJC_MSGSEND = NO;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)",
+				);
 				HEADER_SEARCH_PATHS = (
+					"$(SRCROOT)/library/openssl/openssl-1.0.2j/**",
 					ICU/icu,
-					"/usr/local/Cellar/openssl098/0.9.8zf/include/**",
-					"/usr/local/Cellar/openssl/1.0.2/include/**",
+					"$(SRCROOT)/library/openssl/Build/Intermediates/openssl.build/openssl/include/**",
 				);
 				LD_RUNPATH_SEARCH_PATHS = "";
-				LIBRARY_SEARCH_PATHS = "$(PROJECT_DIR)";
+				LIBRARY_SEARCH_PATHS = (
+					"$(PROJECT_DIR)",
+					"$(PROJECT_DIR)/library/openssl/Build/Products/Debug",
+				);
 				MACOSX_DEPLOYMENT_TARGET = 10.9;
 				OTHER_LDFLAGS = "";
 				PRODUCT_BUNDLE_IDENTIFIER = net.elasticthreads.nv;
@@ -2382,15 +2408,25 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ARCHS = "$(ARCHS_STANDARD_32_64_BIT)";
+				CODE_SIGN_IDENTITY = "Mac Developer";
 				COMBINE_HIDPI_IMAGES = YES;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				DEVELOPMENT_TEAM = 47TRS7H4BH;
 				ENABLE_STRICT_OBJC_MSGSEND = NO;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)",
+				);
 				HEADER_SEARCH_PATHS = (
+					"$(SRCROOT)/library/openssl/openssl-1.0.2j/**",
 					ICU/icu,
-					"/usr/local/Cellar/openssl098/0.9.8zf/include/**",
-					"/usr/local/Cellar/openssl/1.0.2/include/**",
+					"$(SRCROOT)/library/openssl/Build/Intermediates/openssl.build/openssl/include/**",
 				);
 				LD_RUNPATH_SEARCH_PATHS = "";
-				LIBRARY_SEARCH_PATHS = "$(PROJECT_DIR)";
+				LIBRARY_SEARCH_PATHS = (
+					"$(PROJECT_DIR)",
+					"$(PROJECT_DIR)/library/openssl/Build/Products/Debug",
+				);
 				MACOSX_DEPLOYMENT_TARGET = 10.9;
 				OTHER_LDFLAGS = "";
 				PRODUCT_BUNDLE_IDENTIFIER = net.elasticthreads.nv;
@@ -2490,15 +2526,25 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ARCHS = "$(ARCHS_STANDARD_32_64_BIT)";
+				CODE_SIGN_IDENTITY = "Mac Developer";
 				COMBINE_HIDPI_IMAGES = YES;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				DEVELOPMENT_TEAM = 47TRS7H4BH;
 				ENABLE_STRICT_OBJC_MSGSEND = NO;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)",
+				);
 				HEADER_SEARCH_PATHS = (
+					"$(SRCROOT)/library/openssl/openssl-1.0.2j/**",
 					ICU/icu,
-					"/usr/local/Cellar/openssl098/0.9.8zf/include/**",
-					"/usr/local/Cellar/openssl/1.0.2/include/**",
+					"$(SRCROOT)/library/openssl/Build/Intermediates/openssl.build/openssl/include/**",
 				);
 				LD_RUNPATH_SEARCH_PATHS = "";
-				LIBRARY_SEARCH_PATHS = "$(PROJECT_DIR)";
+				LIBRARY_SEARCH_PATHS = (
+					"$(PROJECT_DIR)",
+					"$(PROJECT_DIR)/library/openssl/Build/Products/Debug",
+				);
 				MACOSX_DEPLOYMENT_TARGET = 10.9;
 				OTHER_LDFLAGS = "";
 				PRODUCT_BUNDLE_IDENTIFIER = net.elasticthreads.nv;

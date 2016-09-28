@@ -36,34 +36,48 @@
 
 +(NSString*)processTaskPaper:(NSString*)inputString
 {
-	NSString* mdScriptPath = [[self class] tp2mdDirectory];
+    if (inputString)
+    {
+        NSString *taskPaperScriptPath = @"/System/Library/Frameworks/Ruby.framework/Versions/Current/usr/bin/ruby";
 
-	NSTask* task = [[[NSTask alloc] init] autorelease];
-	NSMutableArray* args = [NSMutableArray array];
-	
-	[task setArguments:args];
-	
-	NSPipe* stdinPipe = [NSPipe pipe];
-	NSPipe* stdoutPipe = [NSPipe pipe];
-	NSFileHandle* stdinFileHandle = [stdinPipe fileHandleForWriting];
-	NSFileHandle* stdoutFileHandle = [stdoutPipe fileHandleForReading];
-	
-	[task setStandardInput:stdinPipe];
-	[task setStandardOutput:stdoutPipe];
-	
-	[task setLaunchPath: [mdScriptPath stringByExpandingTildeInPath]];
-	[task launch];
-	
-	[stdinFileHandle writeData:[inputString dataUsingEncoding:NSUTF8StringEncoding]];
-	[stdinFileHandle closeFile];
-	
-	NSData* outputData = [stdoutFileHandle readDataToEndOfFile];
-	NSString* outputString = [[[NSString alloc] initWithData:outputData encoding:NSUTF8StringEncoding] autorelease];
-	[stdoutFileHandle closeFile];
-	
-	[task waitUntilExit];
-	
-	return outputString;
+
+        NSString *argPath = [[NSBundle mainBundle] pathForResource:@"tp2md"
+                                                            ofType:@"rb"
+                                                       inDirectory:NULL];
+
+        NSTask *taskPaperTask = [[[NSTask alloc] init] autorelease];
+        NSPipe *stdinPipe = [NSPipe pipe];
+        NSPipe *stdoutPipe = [NSPipe pipe];
+        NSFileHandle *stdinFileHandle = [stdinPipe fileHandleForWriting];
+        NSFileHandle *stdoutFileHandle = [stdoutPipe fileHandleForReading];
+
+        [taskPaperTask setStandardInput:stdinPipe];
+        [taskPaperTask setStandardOutput:stdoutPipe];
+
+        [taskPaperTask setLaunchPath:taskPaperScriptPath];
+        NSArray *argArray = [NSArray arrayWithObject:argPath];
+        [taskPaperTask setArguments:argArray];
+
+        [taskPaperTask launch];
+
+        NSString *blech = [NSString stringWithUTF8String:[inputString UTF8String]];
+
+        [stdinFileHandle writeData:[blech dataUsingEncoding:NSUTF8StringEncoding]];
+        [stdinFileHandle closeFile];
+
+        NSData *outputData = [stdoutFileHandle readDataToEndOfFile];
+        inputString = [[[NSString alloc] initWithData:outputData
+                                            encoding:NSUTF8StringEncoding] autorelease];
+
+        [stdoutFileHandle closeFile];
+
+
+        [taskPaperTask waitUntilExit];
+
+        [taskPaperTask terminate];
+    }
+
+	return inputString;
 	
 }
 

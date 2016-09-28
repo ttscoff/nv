@@ -1,10 +1,18 @@
-#!/usr/bin/env ruby -wU
+#!/System/Library/Frameworks/Ruby.framework/Versions/Current/usr/bin/ruby
+# encoding: utf-8
 # Usage: tp2md.rb filename.taskpaper > output.md
 require 'fileutils'
 
-if RUBY_VERSION.to_f > 1.9
-  Encoding.default_external = Encoding::UTF_8
-  Encoding.default_internal = Encoding::UTF_8
+def class_exists?(class_name)
+  klass = Module.const_get(class_name)
+  return klass.is_a?(Class)
+rescue NameError
+  return false
+end
+
+if class_exists? 'Encoding'
+  Encoding.default_external = Encoding::UTF_8 if Encoding.respond_to?('default_external')
+  Encoding.default_internal = Encoding::UTF_8 if Encoding.respond_to?('default_internal')
   input = STDIN.read.force_encoding('utf-8')
 else
   input = STDIN.read

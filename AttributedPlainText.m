@@ -202,7 +202,7 @@ static BOOL _StringWithRangeIsProbablyObjC(NSString *string, NSRange blockRange)
 }
 
 - (void)addLinkAttributesForRange:(NSRange)changedRange {
-	
+//    return;
 	if (!changedRange.length)
 		return;
 	
