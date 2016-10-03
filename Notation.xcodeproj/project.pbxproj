@@ -125,6 +125,10 @@
 		5C2CC186134989A8006FFE56 /* nvMenuC.png in Resources */ = {isa = PBXBuildFile; fileRef = 5C2CC183134989A8006FFE56 /* nvMenuC.png */; };
 		5C2CC18A134989D7006FFE56 /* nvMenuDark.png in Resources */ = {isa = PBXBuildFile; fileRef = 5C2CC189134989D7006FFE56 /* nvMenuDark.png */; };
 		5C2FAD2B1333970200FBFD34 /* ETScrollView.m in Sources */ = {isa = PBXBuildFile; fileRef = 5C2CD036132ED47900CA0D7C /* ETScrollView.m */; };
+		5C367EE91DA2C06F0043C8EC /* libcrypto.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 5C367EE81DA2C06F0043C8EC /* libcrypto.a */; };
+		5C367F3B1DA2C1470043C8EC /* libcrypto.a in CopyFiles */ = {isa = PBXBuildFile; fileRef = 5C367EE81DA2C06F0043C8EC /* libcrypto.a */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
+		5C367F3D1DA2C2B20043C8EC /* libssl.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 5C367F3C1DA2C2B20043C8EC /* libssl.a */; };
+		5C367F3E1DA2C2C30043C8EC /* libssl.a in CopyFiles */ = {isa = PBXBuildFile; fileRef = 5C367F3C1DA2C2B20043C8EC /* libssl.a */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
 		5C38E2C414223D6900131682 /* ETOverlayScroller.m in Sources */ = {isa = PBXBuildFile; fileRef = 5C38E2C314223D6900131682 /* ETOverlayScroller.m */; };
 		5C43669B1DA268500086FF84 /* Excruciatingly Useful Shortcuts.nvhelp in Resources */ = {isa = PBXBuildFile; fileRef = 5C4366951DA268500086FF84 /* Excruciatingly Useful Shortcuts.nvhelp */; };
 		5C43669C1DA268500086FF84 /* How does this thing work?.nvhelp in Resources */ = {isa = PBXBuildFile; fileRef = 5C4366971DA268500086FF84 /* How does this thing work?.nvhelp */; };
@@ -179,8 +183,6 @@
 		5CC2DF0B13083BCF006772D9 /* StatusItemView.m in Sources */ = {isa = PBXBuildFile; fileRef = 5CC2DF0A13083BCF006772D9 /* StatusItemView.m */; };
 		5CCEEF1D130B599B00E15B77 /* DFView.m in Sources */ = {isa = PBXBuildFile; fileRef = 5CCEEF1C130B599B00E15B77 /* DFView.m */; };
 		5CD1B00714F4593900AC948E /* Add.tiff in Resources */ = {isa = PBXBuildFile; fileRef = 219196BC09D4F20000586B15 /* Add.tiff */; };
-		5CD58D791D9DA4860004E1B8 /* libcrypto.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 5CD58D781D9DA4860004E1B8 /* libcrypto.a */; };
-		5CD58D7A1D9DA4A60004E1B8 /* libcrypto.a in CopyFiles */ = {isa = PBXBuildFile; fileRef = 5CD58D781D9DA4860004E1B8 /* libcrypto.a */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
 		5CE5B0081422795300FB554C /* PTKeyComboPanel.xib in Resources */ = {isa = PBXBuildFile; fileRef = 5CE5B00A1422795300FB554C /* PTKeyComboPanel.xib */; };
 		5CF01B08132975910083D66E /* greyscrollervertbottom.tiff in Resources */ = {isa = PBXBuildFile; fileRef = 5CF01B02132975910083D66E /* greyscrollervertbottom.tiff */; };
 		5CF01B0C132975910083D66E /* greyscrollerverttop.tiff in Resources */ = {isa = PBXBuildFile; fileRef = 5CF01B06132975910083D66E /* greyscrollerverttop.tiff */; };
@@ -294,7 +296,8 @@
 			dstPath = "";
 			dstSubfolderSpec = 10;
 			files = (
-				5CD58D7A1D9DA4A60004E1B8 /* libcrypto.a in CopyFiles */,
+				5C367F3E1DA2C2C30043C8EC /* libssl.a in CopyFiles */,
+				5C367F3B1DA2C1470043C8EC /* libcrypto.a in CopyFiles */,
 				93365DE01D9AD6AA005A230B /* AutoHyperlinks.framework in CopyFiles */,
 				213623FC0B92AA6E008C0830 /* Sparkle.framework in CopyFiles */,
 			);
@@ -560,6 +563,8 @@
 		5C2CC189134989D7006FFE56 /* nvMenuDark.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = nvMenuDark.png; path = Images/nvMenuDark.png; sourceTree = "<group>"; };
 		5C2CD035132ED47900CA0D7C /* ETScrollView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ETScrollView.h; sourceTree = "<group>"; };
 		5C2CD036132ED47900CA0D7C /* ETScrollView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ETScrollView.m; sourceTree = "<group>"; };
+		5C367EE81DA2C06F0043C8EC /* libcrypto.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = libcrypto.a; sourceTree = "<group>"; };
+		5C367F3C1DA2C2B20043C8EC /* libssl.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = libssl.a; sourceTree = "<group>"; };
 		5C38E2C214223D6900131682 /* ETOverlayScroller.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ETOverlayScroller.h; sourceTree = "<group>"; };
 		5C38E2C314223D6900131682 /* ETOverlayScroller.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ETOverlayScroller.m; sourceTree = "<group>"; };
 		5C43665C1DA267130086FF84 /* en */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = en; path = en.lproj/MainMenu.xib; sourceTree = "<group>"; };
@@ -741,7 +746,6 @@
 		5CCEEF1B130B599B00E15B77 /* DFView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DFView.h; sourceTree = "<group>"; };
 		5CCEEF1C130B599B00E15B77 /* DFView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DFView.m; sourceTree = "<group>"; };
 		5CD58D771D9DA3C70004E1B8 /* SimperiumConfig.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = SimperiumConfig.h; sourceTree = "<group>"; };
-		5CD58D781D9DA4860004E1B8 /* libcrypto.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = libcrypto.a; sourceTree = "<group>"; };
 		5CDBA8E413A5449900E7494E /* it */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = it; path = it.lproj/MarkupPreview.xib; sourceTree = "<group>"; };
 		5CDBA8E713A5449900E7494E /* de */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = de; path = de.lproj/MarkupPreview.xib; sourceTree = "<group>"; };
 		5CDBA8EA13A5450200E7494E /* zh */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = zh; path = zh.lproj/MainMenu.xib; sourceTree = "<group>"; };
@@ -789,8 +793,6 @@
 		8D1107320486CEB800E47090 /* nvALT.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = nvALT.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		93099627138BD61000368C45 /* tp2md.rb */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.ruby; path = tp2md.rb; sourceTree = "<group>"; };
 		9335C40C148EC7AC009CE623 /* multimarkdown */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.executable"; path = multimarkdown; sourceTree = "<group>"; };
-		93365DD01D9AAC15005A230B /* libcrypto.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libcrypto.a; path = library/openssl/Build/Products/Debug/libcrypto.a; sourceTree = "<group>"; };
-		93365DD11D9AAC15005A230B /* libssl.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libssl.a; path = library/openssl/Build/Products/Debug/libssl.a; sourceTree = "<group>"; };
 		93365DDE1D9AD651005A230B /* AutoHyperlinks.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = AutoHyperlinks.framework; sourceTree = "<group>"; };
 		934C3FAE14FDA069000D14BA /* custom.css */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.css; path = custom.css; sourceTree = "<group>"; };
 		934C3FAF14FDA069000D14BA /* customclean.css */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.css; path = customclean.css; sourceTree = "<group>"; };
@@ -853,9 +855,10 @@
 				219D254A1113FE34005E7DF5 /* SystemConfiguration.framework in Frameworks */,
 				21B54C021134F2E800E163A1 /* IOKit.framework in Frameworks */,
 				93365DDF1D9AD651005A230B /* AutoHyperlinks.framework in Frameworks */,
+				5C367EE91DA2C06F0043C8EC /* libcrypto.a in Frameworks */,
+				5C367F3D1DA2C2B20043C8EC /* libssl.a in Frameworks */,
 				5C8BCF6A1DA25C810036FA7E /* Sparkle.framework in Frameworks */,
 				2191926709C52AA600586B15 /* libz.dylib in Frameworks */,
-				5CD58D791D9DA4860004E1B8 /* libcrypto.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -961,7 +964,8 @@
 		1058C7A2FEA54F0111CA2CBB /* Other Frameworks */ = {
 			isa = PBXGroup;
 			children = (
-				5CD58D781D9DA4860004E1B8 /* libcrypto.a */,
+				5C367F3C1DA2C2B20043C8EC /* libssl.a */,
+				5C367EE81DA2C06F0043C8EC /* libcrypto.a */,
 				93365DDE1D9AD651005A230B /* AutoHyperlinks.framework */,
 				21B54C011134F2E800E163A1 /* IOKit.framework */,
 				213623E50B92AA4E008C0830 /* Sparkle.framework */,
@@ -990,8 +994,6 @@
 		211345A10B35D8340081B064 /* Crypto */ = {
 			isa = PBXGroup;
 			children = (
-				93365DD01D9AAC15005A230B /* libcrypto.a */,
-				93365DD11D9AAC15005A230B /* libssl.a */,
 				2114C2860958CC9100614E74 /* pbkdf2.h */,
 				2114C2870958CC9100614E74 /* pbkdf2.c */,
 				2114C2A60958D24800614E74 /* hmacsha1.h */,
@@ -2219,20 +2221,8 @@
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				DEVELOPMENT_TEAM = HGL36W2TP6;
 				ENABLE_STRICT_OBJC_MSGSEND = NO;
-				FRAMEWORK_SEARCH_PATHS = (
-					"$(inherited)",
-					"$(PROJECT_DIR)",
-				);
-				HEADER_SEARCH_PATHS = (
-					"$(SRCROOT)/library/openssl/openssl-1.0.2j/**",
-					ICU/icu,
-					"$(SRCROOT)/library/openssl/Build/Intermediates/openssl.build/openssl/include/**",
-				);
 				LD_RUNPATH_SEARCH_PATHS = "";
-				LIBRARY_SEARCH_PATHS = (
-					"$(PROJECT_DIR)",
-					"$(PROJECT_DIR)/library/openssl/Build/Products/Debug",
-				);
+				LIBRARY_SEARCH_PATHS = "$(PROJECT_DIR)";
 				MACOSX_DEPLOYMENT_TARGET = 10.9;
 				OTHER_LDFLAGS = "";
 				PRODUCT_BUNDLE_IDENTIFIER = net.elasticthreads.nv;
@@ -2261,7 +2251,7 @@
 					"$(inherited)",
 					"$(FRAMEWORK_SEARCH_PATHS_QUOTED_1)",
 					"$(FRAMEWORK_SEARCH_PATHS_QUOTED_2)",
-					"$(DEVELOPER_FRAMEWORKS_DIR)\"",
+					"$(DEVELOPER_FRAMEWORKS_DIR)",
 				);
 				FRAMEWORK_SEARCH_PATHS_QUOTED_1 = "\"$(SYSTEM_LIBRARY_DIR)/Frameworks/Quartz.framework/Versions/A/Frameworks\"";
 				FRAMEWORK_SEARCH_PATHS_QUOTED_2 = "\"$(SRCROOT)\"";
@@ -2310,7 +2300,7 @@
 				GENERATE_PROFILING_CODE = YES;
 				HEADER_SEARCH_PATHS = (
 					ICU/icu,
-					"/usr/local/Cellar/openssl/1.0.2/include/**",
+					"$(PROJECT_DIR)/library/**",
 				);
 				IBC_STRIP_NIBS = NO;
 				INFOPLIST_FILE = Info.plist;
@@ -2352,7 +2342,7 @@
 					"$(inherited)",
 					"$(FRAMEWORK_SEARCH_PATHS_QUOTED_1)",
 					"$(FRAMEWORK_SEARCH_PATHS_QUOTED_2)",
-					"$(DEVELOPER_FRAMEWORKS_DIR)\"",
+					"$(DEVELOPER_FRAMEWORKS_DIR)",
 				);
 				FRAMEWORK_SEARCH_PATHS_QUOTED_1 = "\"$(SYSTEM_LIBRARY_DIR)/Frameworks/Quartz.framework/Versions/A/Frameworks\"";
 				FRAMEWORK_SEARCH_PATHS_QUOTED_2 = "\"$(SRCROOT)\"";
@@ -2397,7 +2387,7 @@
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				HEADER_SEARCH_PATHS = (
 					ICU/icu,
-					"/usr/local/Cellar/openssl/1.0.2/include/**",
+					"$(PROJECT_DIR)/library/**",
 				);
 				INFOPLIST_FILE = Info.plist;
 				LIBRARY_SEARCH_PATHS = /usr/local/Cellar/openssl/1.0.2/lib/;
@@ -2428,20 +2418,8 @@
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				DEVELOPMENT_TEAM = HGL36W2TP6;
 				ENABLE_STRICT_OBJC_MSGSEND = NO;
-				FRAMEWORK_SEARCH_PATHS = (
-					"$(inherited)",
-					"$(PROJECT_DIR)",
-				);
-				HEADER_SEARCH_PATHS = (
-					"$(SRCROOT)/library/openssl/openssl-1.0.2j/**",
-					ICU/icu,
-					"$(SRCROOT)/library/openssl/Build/Intermediates/openssl.build/openssl/include/**",
-				);
 				LD_RUNPATH_SEARCH_PATHS = "";
-				LIBRARY_SEARCH_PATHS = (
-					"$(PROJECT_DIR)",
-					"$(PROJECT_DIR)/library/openssl/Build/Products/Debug",
-				);
+				LIBRARY_SEARCH_PATHS = "$(PROJECT_DIR)";
 				MACOSX_DEPLOYMENT_TARGET = 10.9;
 				OTHER_LDFLAGS = "";
 				PRODUCT_BUNDLE_IDENTIFIER = net.elasticthreads.nv;
@@ -2469,7 +2447,7 @@
 					"$(inherited)",
 					"$(FRAMEWORK_SEARCH_PATHS_QUOTED_1)",
 					"$(FRAMEWORK_SEARCH_PATHS_QUOTED_2)",
-					"$(DEVELOPER_FRAMEWORKS_DIR)\"",
+					"$(DEVELOPER_FRAMEWORKS_DIR)",
 				);
 				FRAMEWORK_SEARCH_PATHS_QUOTED_1 = "\"$(SYSTEM_LIBRARY_DIR)/Frameworks/Quartz.framework/Versions/A/Frameworks\"";
 				FRAMEWORK_SEARCH_PATHS_QUOTED_2 = "\"$(SRCROOT)\"";
@@ -2514,7 +2492,7 @@
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				HEADER_SEARCH_PATHS = (
 					ICU/icu,
-					"/usr/local/Cellar/openssl/1.0.2/include/**",
+					"$(PROJECT_DIR)/library/**",
 				);
 				INFOPLIST_FILE = Info.plist;
 				LIBRARY_SEARCH_PATHS = /usr/local/Cellar/openssl/1.0.2/lib/;
@@ -2545,20 +2523,8 @@
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				DEVELOPMENT_TEAM = HGL36W2TP6;
 				ENABLE_STRICT_OBJC_MSGSEND = NO;
-				FRAMEWORK_SEARCH_PATHS = (
-					"$(inherited)",
-					"$(PROJECT_DIR)",
-				);
-				HEADER_SEARCH_PATHS = (
-					"$(SRCROOT)/library/openssl/openssl-1.0.2j/**",
-					ICU/icu,
-					"$(SRCROOT)/library/openssl/Build/Intermediates/openssl.build/openssl/include/**",
-				);
 				LD_RUNPATH_SEARCH_PATHS = "";
-				LIBRARY_SEARCH_PATHS = (
-					"$(PROJECT_DIR)",
-					"$(PROJECT_DIR)/library/openssl/Build/Products/Debug",
-				);
+				LIBRARY_SEARCH_PATHS = "$(PROJECT_DIR)";
 				MACOSX_DEPLOYMENT_TARGET = 10.9;
 				OTHER_LDFLAGS = "";
 				PRODUCT_BUNDLE_IDENTIFIER = net.elasticthreads.nv;
