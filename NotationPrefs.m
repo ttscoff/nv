@@ -708,7 +708,7 @@ NSMutableDictionary *ServiceAccountDictInit(NotationPrefs *prefs, NSString* serv
 	INIT_DICT_ACCT();
 	
 	if ([self syncFrequencyInMinutesForServiceName:serviceName] != frequencyInMinutes) {
-		[accountDict setObject:[NSNumber numberWithUnsignedInt:frequencyInMinutes] forKey:@"frequency"];
+		[accountDict setObject:[NSNumber numberWithUnsignedInteger:frequencyInMinutes] forKey:@"frequency"];
 		preferencesChanged = YES;
 		[delegate syncSettingsChangedForService:serviceName];
 	}

@@ -36,6 +36,7 @@
 //@class AugmentedScrollView;
 @class ETContentView;
 @class ETScrollView;
+@class ETNoteScrollView;
 
 #ifndef MarkdownPreview
 #define MarkdownPreview 13371
@@ -79,7 +80,7 @@
 	RBSplitSubview *notesSubview;
 	RBSplitView *splitView;
     IBOutlet ETScrollView *notesScrollView;
-    IBOutlet ETScrollView *textScrollView;
+    IBOutlet ETNoteScrollView *textScrollView;
     IBOutlet NotesTableView *notesTableView;
     IBOutlet LinkingEditor *textView;
 	IBOutlet EmptyView *editorStatusView;

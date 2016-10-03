@@ -1,0 +1,661 @@
+/* title/description delimiter */
+" option-shift-dash " = " — ";
+
+/* No comment provided by engineer. */
+"%.0lf KB of %.0lf KB" = "%.0lf KB of %.0lf KB";
+
+/* No comment provided by engineer. */
+"%.0lf KB received" = "%.0lf KB received";
+
+/* No comment provided by engineer. */
+"A file named quotemark%@quotemark already exists." = "A file named “%@” already exists.";
+
+/* name of cancel button */
+"Cancel" = "Cancel";
+
+/* No comment provided by engineer. */
+"Choose a folder into which %d notes will be exported" = "Choose a folder into which %d notes will be exported";
+
+/* no comment */
+"Continue" = "Continue";
+
+/* alert title for exporter interruption */
+"Continue exporting?" = "Continue exporting?";
+
+/* No comment provided by engineer. */
+"Could not find the application TextEdit." = "Could not find the application TextEdit.";
+
+/* No comment provided by engineer. */
+"Could not locate the note file." = "Could not locate the note file.";
+
+/* name of delete button */
+"Delete" = "Delete";
+
+/* alert title when asked to delete multiple notes */
+"Delete %d notes?" = "Delete %d notes?";
+
+/* alert title when asked to delete a note */
+"Delete the note titled quotemark%@quotemark?" = "Delete the note titled “%@”?";
+
+/* name of undo-creating-a-note button */
+"Undo Note" = "Undo Note";
+
+/* alert title when asked to undo creating multiple notes */
+"Undo adding %d notes?" = "Undo adding %d notes?";
+
+/* alert title when asked to undo the creation of a note */
+"Undo adding the note quotemark%@quotemark?" = "Undo adding the note “%@”?";
+
+/* informational undo-this-note? text */
+"Undoing a note has the effect of deleting it. Use quotemarkRedoquotemark to re-add it." = "Undoing a note has the effect of deleting it. Use “Redo” to re-add it.";
+
+/* No comment provided by engineer. */
+"Does it still exist?" = "Does it still exist?";
+
+/* No comment provided by engineer. */
+"Don't Replace" = "Don't Replace";
+
+/* don't update the note from its file on disk */
+"Don't Update" = "Don't Update";
+
+/* download dialog status message */
+"Download: waiting to begin." = "Download: waiting to begin.";
+
+/* ellipsis character */
+"..." = "…";
+
+/* No comment provided by engineer. */
+"Error: the modification date of the file quotemark%@quotemark could not be compared because %@" = "Error: the modification date of the file “%@” could not be compared because %@";
+
+/* No comment provided by engineer. */
+"Error: the modification date of the file quotemark%@quotemark could not be determined because %@" = "Error: the modification date of the file “%@” could not be determined because %@";
+
+/* No comment provided by engineer. */
+"Error: unable to read the contents of the file quotemark%@.quotemark" = "Error: unable to read the contents of the file “%@.”";
+
+/* title of button to export notes from folder selection dialog */
+"Export" = "Export";
+
+/* title of export notes dialog */
+"Export Notes" = "Export Notes";
+
+/* ... if it exists */
+"I'll Go See" = "I'll Go See";
+
+/* No comment provided by engineer. */
+"If you update this note with re-interpreted data from the file, you may overwrite your changes." = "If you update this note with re-interpreted data from the file, you may overwrite your changes.";
+
+/* alert description when converting from unicode */
+"If you wish to convert it, you must open and re-save the file in an external editor." = "If you wish to convert it, you must open and re-save the file in an external editor.";
+
+/* No comment provided by engineer. */
+"No notes were selected for exporting." = "No notes were selected for exporting.";
+
+/* No comment provided by engineer. */
+"nvALT should assume the file quotemark%@quotemark was saved with the encoding:" = "nvALT should assume the file “%@” was saved with the encoding:";
+
+/* No comment provided by engineer. */
+"Note Importing Cancelled" = "Note Importing Cancelled";
+
+/* Error string returned to indicate that the user cancelled a syncing service operation */
+"Operation cancelled" = "Operation cancelled";
+
+/* the ubiquitous OK button */
+"OK" = "OK";
+
+/* title of button for opening the current note in text edit */
+"Open in TextEdit" = "Open in TextEdit";
+
+/* title of menu item for selecting a different notes folder */
+"Other..." = "Other…";
+
+/* ...from file on disk */
+"Overwrite Note" = "Overwrite Note";
+
+/* No comment provided by engineer. */
+"Please try again." = "Please try again.";
+
+/* prompt for choosing an incompatible text encoding */
+"Please try another encoding." = "Please try another encoding.";
+
+/* alert title when converting from unicode */
+"quotemark%@quotemark is a Unicode file and not directly interpretable using plain text encodings." = "“%@” is a Unicode file and not directly interpretable using plain text encodings.";
+
+/* No comment provided by engineer. */
+"Replace" = "Replace";
+
+/* No comment provided by engineer. */
+"Replace All" = "Replace All";
+
+/* replace the file's contents? */
+"Replace its current contents with that of the note?" = "Replace its current contents with that of the note?";
+
+/* No comment provided by engineer. */
+"Sorry, you entered an incorrect passphrase." = "Sorry, you entered an incorrect passphrase.";
+
+/* (notes?) */
+"Stop Exporting" = "Stop Exporting";
+
+/* No comment provided by engineer. */
+"The file may no longer exist or has incorrect permissions." = "The file may no longer exist or has incorrect permissions.";
+
+/* No comment provided by engineer. */
+"The note quotemark%@quotemark couldn't be exported because %@." = "The note “%@” couldn't be exported because %@.";
+
+/* No comment provided by engineer. */
+"The note quotemark%@quotemark is newer than its file on disk." = "The note “%@” is newer than its file on disk.";
+
+/* No comment provided by engineer. */
+"The notes couldn't be exported because the directory quotemark%@quotemark couldn't be accessed." = "The notes couldn't be exported because the directory “%@” couldn't be accessed.";
+
+/* No comment provided by engineer. */
+"The URL quotemark%@quotemark could not be accessed: %@." = "The URL “%@” could not be accessed: %@.";
+
+/* No comment provided by engineer. */
+"This may be due to an error in the program or operating system." = "This may be due to an error in the program or operating system.";
+
+/* error description of last resort for why a URL couldn't be accessed */
+"unknown error." = "unknown error.";
+
+/* string of last resort for errors not found in CarbonErrorStrings */
+"an error of type %d occurred" = "an error of type %d occurred";
+
+/* Title of a nameless note */
+"Untitled Note" = "Untitled Note";
+
+/* placeholder text in search/create field */
+"Search or Create" = "Search or Create";
+
+/* No comment provided by engineer. */
+"You can import your old notes at any time by choosing quotemarkImport...quotemark from the quotemarkNotequotemark menu and selecting your NotationalDatabase.blor file." = "You can import your old notes at any time by choosing “Import…” from the “Note” menu and selecting your NotationalDatabase.blor file.";
+
+/* No comment provided by engineer. */
+"You may need to re-run the Mac OS X installer." = "You may need to re-run the Mac OS X installer.";
+
+/* No comment provided by engineer. */
+"You must select at least one note to export." = "You must select at least one note to export.";
+
+/* title of Editing preference pane */
+"Editing" = "Editing";
+
+/* title of General preference pane */
+"General" = "General";
+
+/* title of Notes preference pane */
+"Notes" = "Notes";
+
+/* title of Fonts & Colors preference pane */
+"Fonts & Colors" = "Fonts & Colors";
+
+/* No comment */
+"<Directory unknown>" = "<Directory unknown>";
+
+/* title of open panel for selecting a notes folder */
+"Select a folder" = "Select a folder";
+
+/* title of open panel button to select a folder */
+"Select" = "Select";
+
+/* No Comment */
+"Select the folder that nvALT should use for reading and storing notes." = "Select the folder that nvALT should use for reading and storing notes.";
+
+/* description for no key combination */
+"(None)" = "(None)";
+
+/* no comment */
+"PBKDF2 iterations: %d" = "PBKDF2 iterations: %d";
+
+/* no comment */
+"Please choose a different folder in which to store your notes." = "Please choose a different folder in which to store your notes.";
+
+/* no comment */
+"Please choose a folder in which your notes will be stored." = "Please choose a folder in which your notes will be stored.";
+
+/* no comment */
+"your Application Support directory" = "your Application Support directory";
+
+/* no comment */
+"its current location" = "its current location";
+
+/* no comment */
+"Unable to initialize notes database in \n%@ because %@." = "Unable to initialize notes database in \n%@ because %@.";
+
+/* no comment */
+"Choose another folder" = "Choose another folder";
+
+/* no comment */
+"Quit" = "Quit";
+
+/* no comment */
+"Reverting to current location of %@." = "Reverting to current location of %@.";
+
+/* no comment */
+"Warning: this database was created by a newer version of Notational Velocity. Continue anyway?" = "Warning: this database was created by a newer version of Notational Velocity. Continue anyway?";
+
+/* no comment */
+"If you make changes, some settings and metadata could be lost." = "If you make changes, some settings and metadata could be lost.";
+
+/* menu item title in dock menu */
+"Add New Note from Clipboard" = "Add New Note from Clipboard";
+
+/* error message to set during a Service call when adding a note failed */
+"Error: Couldn't create a note from the selection." = "Error: Couldn't create a note from the selection.";
+
+/* title of button in import dialog */
+"Import" = "Import";
+
+/* title of import dialog */
+"Import Notes" = "Import Notes";
+
+/* No comment provided by engineer. */
+"None of the selected files could be imported." = "None of the selected files could be imported.";
+
+/* No comment provided by engineer. */
+"Please choose other files." = "Please choose other files.";
+
+/* import dialog message */
+"Select files and folders from which to import notes." = "Select files and folders from which to import notes.";
+
+/* No comment provided by engineer. */
+"More Security Options" = "More Security Options";
+
+/* No comment provided by engineer. */
+"Your entered passphrase does not match your verify passphrase." = "Your entered passphrase does not match your verify passphrase.";
+
+/* No comment provided by engineer. */
+"Your entered current passphrase is incorrect." = "Your entered current passphrase is incorrect.";
+
+/* No comment provided by engineer. */
+"Your entered new passphrase does not match your verification passphrase." = "Your entered new passphrase does not match your verification passphrase.";
+
+/* No comment provided by engineer. */
+"Please enter the passphrase to access notes in %@." = "Please enter the passphrase to access notes in %@.";
+
+/* No comment provided by engineer. */
+"the current notes directory" = "the current notes directory";
+
+/* No comment provided by engineer. */
+"Today" = "Today";
+
+/* No comment provided by engineer. */
+"Tomorrow" = "Tomorrow";
+
+/* No comment provided by engineer. */
+"Yesterday" = "Yesterday";
+
+
+/* No comment provided by engineer. */
+"%d Notes Selected" = "%d Notes Selected";
+
+/* No comment provided by engineer. */
+"(Unknown Note) [%@]" = "(Unknown Note) [%@]";
+
+/* user shouldn't see this */
+"(WHAT??)" = "(WHAT??)";
+
+/* undo action name for creating multiple notes */
+"Add %d Notes" = "Add %d Notes";
+
+/* menu item title for bookmarking a note */
+"Add to Bookmarks" = "Add to Bookmarks";
+
+/* menu item title */
+"Show Bookmarks" = "Show Bookmarks";
+
+/* menu item title */
+"Hide Bookmarks" = "Hide Bookmarks";
+
+/* No comment provided by engineer. */
+"Bold" = "Bold";
+
+/* alert title appearing when notes couldn't be written */
+"Changed notes could not be saved because %@." = "Changed notes could not be saved because %@.";
+
+/* copy menu item title */
+"Copy" = "Copy";
+
+/* menu item prefix to copy a URL */
+"Copy " = "Copy ";
+
+/* contextual menu item title to copy urls */
+"Copy URL" = "Copy URL";
+
+/* No comment provided by engineer. */
+"Couldn't move notes into the chosen folder because %@" = "Couldn't move notes into the chosen folder because %@";
+
+/* undo action name for creating a single note */
+"Create Note quotemark%@quotemark" = "Create Note “%@”";
+
+/* cut menu item title */
+"Cut" = "Cut";
+
+/* informational delete-this-note? text */
+"Press Command-Z to undo this action later." = "Press ⌘-Z to undo this action later.";
+
+/* undo action name for deleting notes */
+"Delete %d Notes" = "Delete %d Notes";
+
+/* undo action name for deleting a single note */
+"Delete quotemark%@quotemark" = "Delete “%@”";
+
+/* button title for disabling note encryption */
+"Disable Encryption" = "Disable Encryption";
+
+/* No comment provided by engineer. */
+"Disable note encryption now?" = "Disable note encryption now?";
+
+/* No comment provided by engineer. */
+"Encryption is currently on, but storing notes individually requires it to be off. Disable encryption?" = "Encryption is currently on, but storing notes individually requires it to be off. Disable encryption?";
+
+/* format submenu title */
+"Format" = "Format";
+
+/* No comment provided by engineer. */
+"HTML" = "HTML";
+
+/* No comment provided by engineer. */
+"If you empty the Trash now, you could lose your notes. Relocate the notes to a less volatile folder?" = "If you empty the Trash now, you could lose your notes. Relocate the notes to a less volatile folder?";
+
+/* No comment provided by engineer. */
+"Individual files remain in the notes directory. Leave them alone or move them to the Trash?" = "Individual files remain in the notes directory. Leave them alone or move them to the Trash?";
+
+/* no comment */
+"<Feedback loop warning title>" = "Warning: this notes folder is being synchronized with both %@ and %@. If multiple copies of Notational Velocity use this folder, then a feedback loop will be created.";
+
+/* no comment */
+"<Feedback loop warning message>" = "To avoid this problem, choose a different location for the notes folder on this computer, or turn off %@ synchronization.";
+
+/* No comment provided by engineer. */
+"The %@ server holds a different set of notes. Replace all %u notes in nvALT with the %u notes on the server, or merge both sets together?" = "The %@ server holds a different set of notes. Replace all %u notes in nvALT with the %u notes on the server, or merge both sets together?";
+
+/* No comment provided by engineer. */
+"The %@ server reports that no notes exist. Delete all %u notes in nvALT to match it, or re-upload them now?" = "The %@ server reports that no notes exist. Delete all %u notes in nvALT to match it, or re-upload them now?";
+
+/* No comment provided by engineer. */
+"Replacing will remove all %u notes from nvALT. Merging will upload all notes to %@, omitting duplicates." = "Replacing will remove all %u notes from nvALT. Merging will upload all notes to %@, omitting duplicates.";
+
+/* No comment provided by engineer. */
+"If your %@ account is different, you may prefer to create a new database in nvALT instead." = "If your %@ account is different, you may prefer to create a new database in nvALT instead.";
+
+/* default button in the dialog above */
+"Turn Off Syncing" = "Turn Off Syncing";
+
+/* dialog button for deleting all notes */
+"Replace All Notes" = "Replace All Notes";
+
+/* dialog button for deleting all notes when none exist remotely */
+"Remove All Notes" = "Remove All Notes";
+
+/* dialog button for uploading local notes */
+"Merge Notes" = "Merge Notes";
+
+/* dialog button for uploading local notes when none exist remotely */
+"Re-upload Notes" = "Re-upload Notes";
+
+/* No comment provided by engineer. */
+"Add %u existing notes in the database to %@?" = "Add %u existing notes in the database to %@?";
+
+/* No comment provided by engineer. */
+"Notes will be merged, omitting entries duplicated on the server." = "Notes will be merged, omitting entries duplicated on the server.";
+
+/* No comment provided by engineer. */
+"Upload Notes" = "Upload Notes";
+
+/* human-readable name for the Simplenote service */
+"Simplenote" = "Simplenote";
+
+/* human-readable name for the SimpleText service */
+"SimpleText" = "SimpleText";
+
+/* human-readable name for Dropbox */
+"Dropbox" = "Dropbox";
+
+/* status text when downloading a note from the remote sync server */
+"Downloading %u of %u notes" = "Downloading %u of %u notes";
+
+/* no comment */
+"Logging in..." = "Logging in…";
+
+/* no comment */
+"Getting the list of notes..." = "Getting the list of notes…";
+
+/* No comment provided by engineer. */
+"Downloading" = "Downloading";
+
+/* No comment provided by engineer. */
+"Creating" = "Creating";
+
+/* No comment provided by engineer. */
+"Updating" = "Updating";
+
+/* No comment provided by engineer. */
+"Deleting" = "Deleting";
+
+/* No comment provided by engineer. */
+"Processing" = "Processing";
+
+/* e.g., 'Deleting a note...' */
+"%@ a note..." = "%@ a note…";
+
+/* example: Updating 'joe shmoe note' */
+"%@ quot%@quot..." = "%@ “%@”…";
+
+/* Downloading/Creating/Updating/Deleting 5 of 10 notes */
+"%@ %u of %u notes" = "%@ %u of %u notes";
+
+/* e.g., Downloading 2 note(s) failed */
+"%@ %u note(s) failed" = "%@ %u note(s) failed";
+
+/* <Sync Service Name>: Disabled */
+"%@: Disabled" = "%@: Disabled";
+
+/* label to prefix last sync time in the status menu */
+"Last sync: " = "Last sync: ";
+
+/* no comment */
+"Synchronize Now" = "Synchronize Now";
+
+/* no comment */
+"Stop Synchronizing" = "Stop Synchronizing";
+
+/* no comment */
+"%u update(s) in progress" = "%u update(s) in progress";
+
+/* no comment */
+"Not synchronized yet" = "Not synchronized yet";
+
+/* sync status menu msg */
+"Incorrect login and password" = "Incorrect login and password";
+
+/* message to report when sync service is not reachable over internet */
+"Internet unavailable." = "Internet unavailable.";
+
+/* no comment */
+"Session could not be created" = "Session could not be created";
+
+/* Simplenote-specific error */
+"No authorization token" = "No authorization token";
+
+/* Simplenote-specific error */
+"The index of notes could not be parsed." = "The index of notes could not be parsed.";
+
+/* string to prefix a sync service error */
+"Error: " = "Error: ";
+
+/* no comment */
+"Changes could not be uploaded." = "Changes could not be uploaded.";
+
+/* No comment provided by engineer. */
+"Italic" = "Italic";
+
+/* button title for not discarding note files */
+"Keep Files" = "Keep Files";
+
+/* No comment provided by engineer. */
+"Loading Notes..." = "Loading Notes…";
+
+/* button title for trashing notes */
+"Move to Trash" = "Move to Trash";
+
+/* No comment provided by engineer. */
+"No Note Selected" = "No Note Selected";
+
+/* alert title when bookmarking no note. */
+"No note selected." = "No note selected.";
+
+/* No comment provided by engineer. */
+"nvALT supports encryption only for notes stored in a database file." = "nvALT supports encryption only for notes stored in a database file.";
+
+/* No comment provided by engineer. */
+"Open Console in /Applications/Utilities/ for more information." = "Open Console in /Applications/Utilities/ for more information.";
+
+/* paste menu item title */
+"Paste" = "Paste";
+
+/* No comment provided by engineer. */
+"plain text" = "plain text";
+
+/* No comment provided by engineer. */
+"Plain Text Style" = "Plain Text Style";
+
+/* use-text-replacement command in the edit menu */
+"Use Automatic Text Replacement" = "Use Automatic Text Replacement";
+
+/* new-password command in the edit menu (shows generated passwords window) */
+"New Password..." = "New Password…";
+
+/* insert new password command in the edit menu */
+"Insert New Password" = "Insert New Password";
+
+/* menu item in the View menu to turn on note-body previews in the Title column */
+"Show Note Previews in Title" = "Show Note Previews in Title";
+
+/* menu item in the View menu to turn off note-body previews in the Title column  */
+"Hide Note Previews in Title" = "Hide Note Previews in Title";
+
+/* No comment provided by engineer. */
+"Relocate Notes" = "Relocate Notes";
+
+/* No comment provided by engineer. */
+"Remove All Bookmarks" = "Remove All Bookmarks";
+
+/* alert title when clearing bookmarks */
+"Remove all bookmarks?" = "Remove all bookmarks?";
+
+/* No comment provided by engineer. */
+"rich text" = "rich text";
+
+/* No comment provided by engineer. */
+"Select a new location for your nvALT notes." = "Select a new location for your nvALT notes.";
+
+/* menu item title for showing bookmarks */
+"Show Bookmarks" = "Show Bookmarks";
+
+/* No comment provided by engineer. */
+"Too many bookmarks." = "Too many bookmarks.";
+
+/* No comment provided by engineer. */
+"Turn Off Note Encryption..." = "Turn Off Note Encryption…";
+
+/* No comment provided by engineer. */
+"Turn On Note Encryption..." = "Turn On Note Encryption…";
+
+/* No comment provided by engineer. */
+"Unable to create an FSRef from the chosen directory." = "Unable to create an FSRef from the chosen directory.";
+
+/* No comment provided by engineer. */
+"Unable to create or access the Interim Note-Changes file. Is another copy of Notational Velocity currently running?" = "Unable to create or access the Interim Note-Changes file. Is another copy of Notational Velocity currently running?";
+
+/* No comment provided by engineer. */
+"Strikethrough" = "Strikethrough";
+
+/* No comment provided by engineer. */
+"Use a single database file" = "Use a single database file";
+
+/* No comment provided by engineer. */
+"Warning: Your notes will be written to disk in clear text." = "Warning: Your notes will be written to disk in clear text.";
+
+/* No comment provided by engineer. */
+"When notes are stored in a single database individual files become redundant." = "When notes are stored in a single database individual files become redundant.";
+
+/* No comment provided by engineer. */
+"You cannot create more than 26 bookmarks. Try removing some first." = "You cannot create more than 26 bookmarks. Try removing some first.";
+
+/* No comment provided by engineer. */
+"You cannot undo this action." = "You cannot undo this action.";
+
+/* No comment provided by engineer. */
+"You must select a note before it can be added as a bookmark." = "You must select a note before it can be added as a bookmark.";
+
+/* No comment provided by engineer. */
+"Your notes are currently stored as %@ files on disk, but encryption requires a single database. Switch to a database format?" = "Your notes are currently stored as %@ files on disk, but encryption requires a single database. Switch to a database format?";
+
+/* No comment provided by engineer. */
+"Your notes directory (%@) appears to be in the Trash." = "Your notes directory (%@) appears to be in the Trash.";
+
+/* No comment provided by engineer. */
+"Your notes were not moved." = "Your notes were not moved.";
+
+/* title column name */
+"Title" = "Title";
+
+/* tags/labels column name */
+"Tags" = "Tags";
+
+/* date modified column name */
+"Date Modified" = "Date Modified";
+
+/* date added/created column name */
+"Date Added" = "Date Added";
+
+/* tooltip string for search/title field */
+"Go back to search; press %@-D to deselect" = "Go back to search; press %@-D to deselect";
+
+/* tooltip string for search/title field */
+"Now searching for this text" = "Now searching for this text";
+
+/* tooltip string for search/title field */
+"Clear the search; press ESC" = "Clear the search; press ESC";
+
+/* tooltip string for search/title field */
+"Type any text to search; press Return to create a note" = "Type any text to search; press Return to create a note";
+
+/* tooltip string for search/title field */
+"Now editing this note; rename it with %@-R" = "Now editing this note; rename it with %@-R";
+
+
+/* default files name */
+"Excruciatingly Useful Shortcuts" = "Excruciatingly Useful Shortcuts";
+"Contact Information" = "Contact Information";
+"This is the title of a note" = "This is the title of a note";
+"How does this thing work?" = "How does this thing work?";
+
+"SiteURL" = "http://notational.net/";
+
+/* title of alternate view layout menu item */
+"Switch to Vertical Layout" = "Switch to Vertical Layout";
+
+/* title of view layout menu item */
+"Switch to Horizontal Layout" = "Switch to Horizontal Layout";
+
+/* for warning about incompatibility with TextExpander, Typinator, etc. */
+"Secure Text Entry will prevent %@, which is currently installed on this computer, from working in nvALT." = "Secure Text Entry will prevent %@, which is currently installed on this computer, from working in nvALT.";
+
+/* Status message after downloading a URL */
+"Importing content..." = "Importing content…";
+
+/* prefix for source-URLs inserted into imported notes; e.g., "From <http://www.apple.com>: ..." */
+"From" = "From";
+
+/* Menu Item for entering  Full Screen mode */
+"Enter Full Screen" = "Enter Full Screen";
+
+/* menu item title for exiting fullscreen */
+"Exit Full Screen" = "Exit Full Screen";
+
+/* Menu Item for Insert Link */
+"Insert Link" = "Insert Link";
+
+/* Menu Item for Use Selection for Find */
+"Use Selection for Find" = "Use Selection for Find";
+
