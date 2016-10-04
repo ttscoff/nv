@@ -55,7 +55,7 @@
       <CommandLineArguments>
          <CommandLineArgument
             argument = "-NSShowNonLocalizedStrings YES"
-            isEnabled = "YES">
+            isEnabled = "NO">
          </CommandLineArgument>
       </CommandLineArguments>
       <AdditionalOptions>

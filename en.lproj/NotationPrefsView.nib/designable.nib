@@ -40,14 +40,14 @@
             <rect key="frame" x="0.0" y="0.0" width="374" height="375"/>
             <autoresizingMask key="autoresizingMask"/>
             <subviews>
-                <tabView id="6">
-                    <rect key="frame" x="-7" y="-12" width="393" height="382"/>
+                <tabView misplaced="YES" id="6">
+                    <rect key="frame" x="-7" y="-12" width="393" height="385"/>
                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                     <font key="font" metaFont="system"/>
                     <tabViewItems>
                         <tabViewItem label="Synchronization" identifier="sync" id="36">
                             <view key="view" id="37">
-                                <rect key="frame" x="10" y="33" width="373" height="336"/>
+                                <rect key="frame" x="10" y="33" width="373" height="339"/>
                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                 <subviews>
                                     <textField verticalHuggingPriority="750" id="42">
@@ -111,12 +111,12 @@
                                         </textFieldCell>
                                     </textField>
                                     <imageView hidden="YES" id="179">
-                                        <rect key="frame" x="330" y="284" width="16" height="16"/>
+                                        <rect key="frame" x="330" y="287" width="16" height="16"/>
                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                         <imageCell key="cell" refusesFirstResponder="YES" alignment="left" image="statusError" id="242"/>
                                     </imageView>
                                     <textField verticalHuggingPriority="750" id="184">
-                                        <rect key="frame" x="14" y="228" width="311" height="14"/>
+                                        <rect key="frame" x="14" y="231" width="311" height="14"/>
                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                         <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="right" id="243">
                                             <font key="font" metaFont="smallSystem"/>
@@ -125,7 +125,7 @@
                                         </textFieldCell>
                                     </textField>
                                     <popUpButton verticalHuggingPriority="750" id="188">
-                                        <rect key="frame" x="238" y="194" width="111" height="26"/>
+                                        <rect key="frame" x="238" y="197" width="111" height="26"/>
                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                         <popUpButtonCell key="cell" type="push" title="5 minutes" bezelStyle="rounded" alignment="left" lineBreakMode="truncatingTail" state="on" borderStyle="borderAndBezel" tag="5" inset="2" selectedItem="192" id="244">
                                             <behavior key="behavior" lightByBackground="YES" lightByGray="YES"/>
@@ -144,7 +144,7 @@
                                         </connections>
                                     </popUpButton>
                                     <textField verticalHuggingPriority="750" id="194">
-                                        <rect key="frame" x="24" y="200" width="212" height="17"/>
+                                        <rect key="frame" x="24" y="203" width="212" height="17"/>
                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                         <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="Check for remote changes every:" id="245">
                                             <font key="font" metaFont="system"/>
@@ -153,7 +153,7 @@
                                         </textFieldCell>
                                     </textField>
                                     <button id="199">
-                                        <rect key="frame" x="25" y="315" width="208" height="18"/>
+                                        <rect key="frame" x="25" y="318" width="208" height="18"/>
                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                         <buttonCell key="cell" type="check" title="Synchronize with Simplenote:" bezelStyle="regularSquare" imagePosition="left" alignment="left" inset="2" id="246">
                                             <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
@@ -164,12 +164,12 @@
                                         </connections>
                                     </button>
                                     <imageView id="275">
-                                        <rect key="frame" x="11" y="101" width="18" height="18"/>
+                                        <rect key="frame" x="11" y="104" width="18" height="18"/>
                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                         <imageCell key="cell" refusesFirstResponder="YES" alignment="left" image="TinyAlert" id="278"/>
                                     </imageView>
                                     <textField verticalHuggingPriority="750" id="276">
-                                        <rect key="frame" x="34" y="55" width="156" height="64"/>
+                                        <rect key="frame" x="34" y="58" width="156" height="64"/>
                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                         <textFieldCell key="cell" controlSize="small" sendsActionOnEndEditing="YES" title="Warning: Note contents will be delivered as clear text. Notes &gt;400k in size may have issues with sync." id="277">
                                             <font key="font" metaFont="smallSystem"/>
