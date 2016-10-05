@@ -34,7 +34,7 @@
     [[NSColorPanel sharedColorPanel] setShowsAlpha:NO];
 		[prefsController registerWithTarget:self forChangesInSettings:
 		 @selector(resolveNoteBodyFontFromNotationPrefsFromSender:), 
-		 @selector(setCheckSpellingAsYouType:sender:), 
+//		 @selector(setCheckSpellingAsYouType:sender:), 
 		 @selector(setConfirmNoteDeletion:sender:), nil];
     }
     return self;
@@ -47,7 +47,7 @@
 			return;
 		}
 	}
-	
+	[checkSpellingButton setState:[prefsController checkSpellingAsYouType]];
 	if (![window isVisible])
 		[window center];
 	
@@ -247,8 +247,8 @@
 - (void)settingChangedForSelectorString:(NSString*)selectorString {
     if ([selectorString isEqualToString:SEL_STR(resolveNoteBodyFontFromNotationPrefsFromSender:)]) {
 		[self previewNoteBodyFont];
-	} else if ([selectorString isEqualToString:SEL_STR(setCheckSpellingAsYouType:sender:)]) {
-		[checkSpellingButton setState:[prefsController checkSpellingAsYouType]];
+//	} else if ([selectorString isEqualToString:SEL_STR(setCheckSpellingAsYouType:sender:)]) {
+//		[checkSpellingButton setState:[prefsController checkSpellingAsYouType]];
 	} else if ([selectorString isEqualToString:SEL_STR(setConfirmNoteDeletion:sender:)]) {
 		[confirmDeletionButton setState:[prefsController confirmNoteDeletion]];
 	}
@@ -419,7 +419,7 @@
                            name:ExternalEditorsChangedNotification object:nil];
     
     [completeNoteTitlesButton setState:[prefsController autoCompleteSearches]];
-    [checkSpellingButton setState:[prefsController checkSpellingAsYouType]];
+//    [checkSpellingButton setState:[prefsController checkSpellingAsYouType]];
     [confirmDeletionButton setState:[prefsController confirmNoteDeletion]];
     [quitWhenClosingButton setState:[prefsController quitWhenClosingWindow]];
     [styledTextButton setState:[prefsController pastePreservesStyle]];

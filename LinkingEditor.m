@@ -67,26 +67,21 @@ static long (*GetGetScriptManagerVariablePointer())(short);
 
 CGFloat _perceptualDarkness(NSColor*a);
 
+//+ (BOOL)stronglyReferencesTextStorage{
+//    return NO;
+//}
+
 - (void)awakeFromNib {
 	
     prefsController = [GlobalPrefs defaultPrefs];
-	
-    [self setContinuousSpellCheckingEnabled:[prefsController checkSpellingAsYouType]];
-	if (IsSnowLeopardOrLater) {
-		[self setAutomaticTextReplacementEnabled:[prefsController useTextReplacement]];
-	}
-
-    
+	 
     [prefsController registerWithTarget:self forChangesInSettings:
-	 @selector(setCheckSpellingAsYouType:sender:),
-	 @selector(setUseTextReplacement:sender:),
 	 @selector(setNoteBodyFont:sender:),
 	 @selector(setMakeURLsClickable:sender:),
 	 @selector(setSearchTermHighlightColor:sender:),
 	 @selector(setShouldHighlightSearchTerms:sender:), nil];
 	
     self.managesTextWidth=[prefsController managesTextWidthInWindow];
-	[self setSmartInsertDeleteEnabled:NO];
 	[self setUsesRuler:NO];
 	[self setUsesFontPanel:NO];
 	[self setDrawsBackground:YES];
@@ -102,8 +97,16 @@ CGFloat _perceptualDarkness(NSColor*a);
 	
 	didRenderFully = NO;
 	[[self layoutManager] setDelegate:self];
-	
-//	NSNotificationCenter *center = [NSNotificationCenter defaultCenter];
+
+
+    [self bind:@"automaticQuoteSubstitutionEnabled" toObject:[NSUserDefaultsController sharedUserDefaultsController] withKeyPath:@"values.NSAutomaticQuoteSubstitutionEnabled" options:@{@"NSContinuouslyUpdatesValue":@YES}];
+    [self bind:@"automaticDashSubstitutionEnabled" toObject:[NSUserDefaultsController sharedUserDefaultsController] withKeyPath:@"values.NSAutomaticDashSubstitutionEnabled" options:@{@"NSContinuouslyUpdatesValue":@YES}];
+    [self bind:@"automaticTextReplacementEnabled" toObject:[NSUserDefaultsController sharedUserDefaultsController] withKeyPath:@"values.TextReplacementInNoteBody" options:@{@"NSContinuouslyUpdatesValue":@YES}];
+    [self bind:@"continuousSpellCheckingEnabled" toObject:[NSUserDefaultsController sharedUserDefaultsController] withKeyPath:@"values.CheckSpellingInNoteBody" options:@{@"NSContinuouslyUpdatesValue":@YES}];
+    [self bind:@"smartInsertDeleteEnabled" toObject:[NSUserDefaultsController sharedUserDefaultsController] withKeyPath:@"values.UseSmartInsertDelete" options:@{@"NSContinuouslyUpdatesValue":@YES}];
+
+
+    //	NSNotificationCenter *center = [NSNotificationCenter defaultCenter];
 //	[center addObserver:self selector:@selector(windowBecameOrResignedMain:) name:NSWindowDidBecomeMainNotification object:[self window]];
 //	[center addObserver:self selector:@selector(windowBecameOrResignedMain:) name:NSWindowDidResignMainNotification object:[self window]];
     
@@ -115,16 +118,17 @@ CGFloat _perceptualDarkness(NSColor*a);
 
 - (void)settingChangedForSelectorString:(NSString*)selectorString {
     
-    if ([selectorString isEqualToString:SEL_STR(setCheckSpellingAsYouType:sender:)]) {
-	
-		[self setContinuousSpellCheckingEnabled:[prefsController checkSpellingAsYouType]];
-		
-	} else if ([selectorString isEqualToString:SEL_STR(setUseTextReplacement:sender:)]) {
-		
-		if (IsSnowLeopardOrLater) {
-			[self setAutomaticTextReplacementEnabled:[prefsController useTextReplacement]];
-		}
-    } else if ([selectorString isEqualToString:SEL_STR(setNoteBodyFont:sender:)]) {
+//    if ([selectorString isEqualToString:SEL_STR(setCheckSpellingAsYouType:sender:)]) {
+
+//		[self setContinuousSpellCheckingEnabled:[prefsController checkSpellingAsYouType]];
+
+//	} else if ([selectorString isEqualToString:SEL_STR(setUseTextReplacement:sender:)]) {
+
+//		if (IsSnowLeopardOrLater) {
+////			[self setAutomaticTextReplacementEnabled:[prefsController useTextReplacement]];
+//		}
+//    } else
+if ([selectorString isEqualToString:SEL_STR(setNoteBodyFont:sender:)]) {
 
 		[self setTypingAttributes:[prefsController noteBodyAttributes]];
 		//[textView setFont:[prefsController noteBodyFont]];
@@ -342,19 +346,19 @@ CGFloat _perceptualColorDifference(NSColor*a, NSColor*b) {
     return ([[controlField stringValue] length] > 0);
 }*/
 
-- (void)toggleAutomaticTextReplacement:(id)sender {
-	
-	[super toggleAutomaticTextReplacement:sender];
-	
-	[prefsController setUseTextReplacement:[self isAutomaticTextReplacementEnabled] sender:self];
-}
-
-- (void)toggleContinuousSpellChecking:(id)sender {
-
-	[super toggleContinuousSpellChecking:sender];
-	
-	[prefsController setCheckSpellingAsYouType:[self isContinuousSpellCheckingEnabled] sender:self];
-}
+//- (void)toggleAutomaticTextReplacement:(id)sender {
+//	
+//	[super toggleAutomaticTextReplacement:sender];
+//	
+//	[prefsController setUseTextReplacement:[self isAutomaticTextReplacementEnabled] sender:self];
+//}
+//
+//- (void)toggleContinuousSpellChecking:(id)sender {
+//
+//	[super toggleContinuousSpellChecking:sender];
+//	
+//	[prefsController setCheckSpellingAsYouType:[self isContinuousSpellCheckingEnabled] sender:self];
+//}
 
 - (BOOL)isContinuousSpellCheckingEnabled {
 	//optimization so that we don't spell-check while scrolling through notes that don't have focus

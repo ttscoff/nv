@@ -12,7 +12,7 @@
         </customObject>
         <customObject id="-1" userLabel="First Responder" customClass="FirstResponder"/>
         <customObject id="-3" userLabel="Application" customClass="NSObject"/>
-        <window title="nvALT" allowsToolTipsWhenApplicationIsInactive="NO" autorecalculatesKeyViewLoop="NO" oneShot="NO" releasedWhenClosed="NO" visibleAtLaunch="NO" frameAutosaveName="NotationWindow" animationBehavior="default" id="21" userLabel="notation">
+        <window title="nvALT" allowsToolTipsWhenApplicationIsInactive="NO" autorecalculatesKeyViewLoop="NO" restorable="NO" oneShot="NO" releasedWhenClosed="NO" showsToolbarButton="NO" visibleAtLaunch="NO" frameAutosaveName="NotationWindow" animationBehavior="default" id="21" userLabel="notation">
             <windowStyleMask key="styleMask" titled="YES" closable="YES" miniaturizable="YES" resizable="YES" unifiedTitleAndToolbar="YES"/>
             <windowPositionMask key="initialPositionMask" leftStrut="YES" rightStrut="YES" topStrut="YES" bottomStrut="YES"/>
             <rect key="contentRect" x="280" y="392" width="397" height="464"/>
@@ -273,7 +273,12 @@ CA
                                         </menuItem>
                                         <menuItem title="键入时检查拼写" id="191">
                                             <connections>
-                                                <action selector="toggleContinuousSpellChecking:" target="-1" id="192"/>
+                                                <binding destination="1258" name="value" keyPath="values.CheckSpellingInNoteBody" id="PLv-DK-JJu">
+                                                    <dictionary key="options">
+                                                        <bool key="NSAllowsEditingMultipleValuesSelection" value="NO"/>
+                                                        <bool key="NSValidatesImmediately" value="YES"/>
+                                                    </dictionary>
+                                                </binding>
                                             </connections>
                                         </menuItem>
                                     </items>
@@ -281,25 +286,61 @@ CA
                             </menuItem>
                             <menuItem title="Substitutions" id="1315">
                                 <modifierMask key="keyEquivalentModifierMask"/>
-                                <menu key="submenu" title="Substitutions" id="1316">
+                                <menu key="submenu" title="Substitutions" id="vZZ-zq-9Wz">
                                     <items>
-                                        <menuItem title="Show Substitutions" id="1317">
+                                        <menuItem title="Show Substitutions" hidden="YES" enabled="NO" id="F8I-fy-hOL">
                                             <modifierMask key="keyEquivalentModifierMask"/>
                                             <connections>
-                                                <action selector="orderFrontSubstitutionsPanel:" target="-1" id="1321"/>
+                                                <action selector="orderFrontSubstitutionsPanel:" target="-1" id="4Bo-tz-VNh"/>
                                             </connections>
                                         </menuItem>
-                                        <menuItem isSeparatorItem="YES" id="1318"/>
-                                        <menuItem title="Smart Dashes" id="1319">
-                                            <modifierMask key="keyEquivalentModifierMask"/>
+                                        <menuItem isSeparatorItem="YES" hidden="YES" id="tv4-fV-GZT"/>
+                                        <menuItem title="Smart Copy/Paste" tag="1" keyEquivalent="f" id="wZm-NZ-FU4">
                                             <connections>
-                                                <action selector="toggleAutomaticDashSubstitution:" target="-1" id="1322"/>
+                                                <binding destination="1258" name="value" keyPath="values.UseSmartInsertDelete" id="mwm-mB-b9P">
+                                                    <dictionary key="options">
+                                                        <bool key="NSAllowsEditingMultipleValuesSelection" value="NO"/>
+                                                        <bool key="NSValidatesImmediately" value="YES"/>
+                                                    </dictionary>
+                                                </binding>
                                             </connections>
                                         </menuItem>
-                                        <menuItem title="Text Replacement" id="1320">
+                                        <menuItem title="Smart Quotes" tag="2" keyEquivalent="g" id="Nav-D3-4JK">
+                                            <connections>
+                                                <binding destination="1258" name="value" keyPath="values.NSAutomaticQuoteSubstitutionEnabled" id="szn-tp-BRT">
+                                                    <dictionary key="options">
+                                                        <bool key="NSAllowsEditingMultipleValuesSelection" value="NO"/>
+                                                        <bool key="NSValidatesImmediately" value="YES"/>
+                                                    </dictionary>
+                                                </binding>
+                                            </connections>
+                                        </menuItem>
+                                        <menuItem title="Smart Dashes" id="ctE-Xa-9Jw">
                                             <modifierMask key="keyEquivalentModifierMask"/>
                                             <connections>
-                                                <action selector="toggleAutomaticTextReplacement:" target="-1" id="1323"/>
+                                                <binding destination="1258" name="value" keyPath="values.NSAutomaticDashSubstitutionEnabled" id="Vhb-kz-ypM">
+                                                    <dictionary key="options">
+                                                        <bool key="NSAllowsEditingMultipleValuesSelection" value="NO"/>
+                                                        <bool key="NSValidatesImmediately" value="YES"/>
+                                                    </dictionary>
+                                                </binding>
+                                            </connections>
+                                        </menuItem>
+                                        <menuItem title="Smart Links" tag="3" hidden="YES" enabled="NO" keyEquivalent="G" id="Whw-qk-tdH">
+                                            <modifierMask key="keyEquivalentModifierMask" shift="YES" command="YES"/>
+                                            <connections>
+                                                <action selector="toggleAutomaticLinkDetection:" target="-1" id="YX9-2y-h2w"/>
+                                            </connections>
+                                        </menuItem>
+                                        <menuItem title="Text Replacement" id="dZd-aE-6v9">
+                                            <modifierMask key="keyEquivalentModifierMask"/>
+                                            <connections>
+                                                <binding destination="1258" name="value" keyPath="values.TextReplacementInNoteBody" id="PND-le-3Pm">
+                                                    <dictionary key="options">
+                                                        <bool key="NSAllowsEditingMultipleValuesSelection" value="NO"/>
+                                                        <bool key="NSValidatesImmediately" value="YES"/>
+                                                    </dictionary>
+                                                </binding>
                                             </connections>
                                         </menuItem>
                                     </items>
@@ -994,7 +1035,7 @@ CA
             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
             <clipView key="contentView" drawsBackground="NO" id="Bb6-GB-bTg">
                 <rect key="frame" x="0.0" y="0.0" width="399" height="304"/>
-                <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                <autoresizingMask key="autoresizingMask"/>
                 <subviews>
                     <textView drawsBackground="NO" importsGraphics="NO" richText="NO" usesFontPanel="YES" findStyle="panel" allowsUndo="YES" spellingCorrection="YES" id="1017" userLabel="Linking Editor" customClass="LinkingEditor">
                         <rect key="frame" x="0.0" y="0.0" width="399" height="304"/>
@@ -1030,7 +1071,7 @@ CA
             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
             <clipView key="contentView" drawsBackground="NO" id="bxZ-Bp-cax">
                 <rect key="frame" x="0.0" y="0.0" width="399" height="153"/>
-                <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                <autoresizingMask key="autoresizingMask"/>
                 <subviews>
                     <tableView focusRingType="none" verticalHuggingPriority="750" allowsExpansionToolTips="YES" autosaveColumns="NO" rowHeight="14" headerView="1108" id="1014" customClass="NotesTableView">
                         <rect key="frame" x="0.0" y="0.0" width="399" height="136"/>

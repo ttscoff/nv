@@ -12,7 +12,7 @@
         </customObject>
         <customObject id="-1" userLabel="First Responder" customClass="FirstResponder"/>
         <customObject id="-3" userLabel="Application" customClass="NSObject"/>
-        <window title="nvALT" allowsToolTipsWhenApplicationIsInactive="NO" autorecalculatesKeyViewLoop="NO" oneShot="NO" releasedWhenClosed="NO" showsToolbarButton="NO" visibleAtLaunch="NO" frameAutosaveName="NotationWindow" animationBehavior="default" id="21" userLabel="notation">
+        <window title="nvALT" allowsToolTipsWhenApplicationIsInactive="NO" autorecalculatesKeyViewLoop="NO" restorable="NO" oneShot="NO" releasedWhenClosed="NO" showsToolbarButton="NO" visibleAtLaunch="NO" frameAutosaveName="NotationWindow" animationBehavior="default" id="21" userLabel="notation">
             <windowStyleMask key="styleMask" titled="YES" closable="YES" miniaturizable="YES" resizable="YES"/>
             <windowPositionMask key="initialPositionMask" leftStrut="YES" rightStrut="YES" topStrut="YES" bottomStrut="YES"/>
             <rect key="contentRect" x="280" y="392" width="397" height="464"/>
@@ -274,33 +274,73 @@ CA
                                         </menuItem>
                                         <menuItem title="Check Spelling as You Type" id="191">
                                             <connections>
-                                                <action selector="toggleContinuousSpellChecking:" target="-1" id="192"/>
+                                                <binding destination="1258" name="value" keyPath="values.CheckSpellingInNoteBody" id="dIw-Fz-bvH">
+                                                    <dictionary key="options">
+                                                        <bool key="NSAllowsEditingMultipleValuesSelection" value="NO"/>
+                                                        <bool key="NSValidatesImmediately" value="YES"/>
+                                                    </dictionary>
+                                                </binding>
                                             </connections>
                                         </menuItem>
                                     </items>
                                 </menu>
                             </menuItem>
-                            <menuItem title="Substitutions" id="1361">
-                                <modifierMask key="keyEquivalentModifierMask"/>
-                                <menu key="submenu" title="Substitutions" id="1362">
+                            <menuItem title="Substitutions" id="6US-dg-5QR">
+                                <menu key="submenu" title="Substitutions" id="afc-c3-Drk">
                                     <items>
-                                        <menuItem title="Show Substitutions" id="1366">
+                                        <menuItem title="Show Substitutions" hidden="YES" enabled="NO" id="0dL-ep-79y">
                                             <modifierMask key="keyEquivalentModifierMask"/>
                                             <connections>
-                                                <action selector="orderFrontSubstitutionsPanel:" target="-1" id="1374"/>
+                                                <action selector="orderFrontSubstitutionsPanel:" target="-1" id="8fh-wT-nlG"/>
                                             </connections>
                                         </menuItem>
-                                        <menuItem isSeparatorItem="YES" id="1365"/>
-                                        <menuItem title="Smart Dashes" id="1364">
-                                            <modifierMask key="keyEquivalentModifierMask"/>
+                                        <menuItem isSeparatorItem="YES" hidden="YES" id="lJq-4S-LCn"/>
+                                        <menuItem title="Smart Copy/Paste" tag="1" keyEquivalent="f" id="Lmp-SZ-7ho">
                                             <connections>
-                                                <action selector="toggleAutomaticDashSubstitution:" target="-1" id="1375"/>
+                                                <binding destination="1258" name="value" keyPath="values.UseSmartInsertDelete" id="Zma-Xx-Glc">
+                                                    <dictionary key="options">
+                                                        <bool key="NSAllowsEditingMultipleValuesSelection" value="NO"/>
+                                                        <bool key="NSValidatesImmediately" value="YES"/>
+                                                    </dictionary>
+                                                </binding>
                                             </connections>
                                         </menuItem>
-                                        <menuItem title="Text Replacement" id="1363">
+                                        <menuItem title="Smart Quotes" tag="2" keyEquivalent="g" id="BGn-gq-p5e">
+                                            <connections>
+                                                <binding destination="1258" name="value" keyPath="values.NSAutomaticQuoteSubstitutionEnabled" id="yrj-re-lVE">
+                                                    <dictionary key="options">
+                                                        <bool key="NSAllowsEditingMultipleValuesSelection" value="NO"/>
+                                                        <bool key="NSValidatesImmediately" value="YES"/>
+                                                    </dictionary>
+                                                </binding>
+                                            </connections>
+                                        </menuItem>
+                                        <menuItem title="Smart Dashes" id="HU1-It-8nh">
                                             <modifierMask key="keyEquivalentModifierMask"/>
                                             <connections>
-                                                <action selector="toggleAutomaticTextReplacement:" target="1017" id="1377"/>
+                                                <binding destination="1258" name="value" keyPath="values.NSAutomaticDashSubstitutionEnabled" id="duf-JB-kuK">
+                                                    <dictionary key="options">
+                                                        <bool key="NSAllowsEditingMultipleValuesSelection" value="NO"/>
+                                                        <bool key="NSValidatesImmediately" value="YES"/>
+                                                    </dictionary>
+                                                </binding>
+                                            </connections>
+                                        </menuItem>
+                                        <menuItem title="Smart Links" tag="3" hidden="YES" enabled="NO" keyEquivalent="G" id="9a3-u6-tg6">
+                                            <modifierMask key="keyEquivalentModifierMask" shift="YES" command="YES"/>
+                                            <connections>
+                                                <action selector="toggleAutomaticLinkDetection:" target="-1" id="8xu-Yt-4i0"/>
+                                            </connections>
+                                        </menuItem>
+                                        <menuItem title="Text Replacement" id="8Fu-jQ-aaE">
+                                            <modifierMask key="keyEquivalentModifierMask"/>
+                                            <connections>
+                                                <binding destination="1258" name="value" keyPath="values.TextReplacementInNoteBody" id="BGd-W8-i0j">
+                                                    <dictionary key="options">
+                                                        <bool key="NSAllowsEditingMultipleValuesSelection" value="NO"/>
+                                                        <bool key="NSValidatesImmediately" value="YES"/>
+                                                    </dictionary>
+                                                </binding>
                                             </connections>
                                         </menuItem>
                                     </items>
@@ -1070,6 +1110,7 @@ CA
             <connections>
                 <outlet property="nextKeyView" destination="1014" id="1381"/>
             </connections>
+            <point key="canvasLocation" x="156" y="200"/>
         </scrollView>
     </objects>
 </document>

@@ -415,12 +415,8 @@ void outletObjectAwoke(id sender) {
         [statBarMenu insertItem:theMenuItem atIndex:14];
         [theMenuItem release];
     }
-    
-	if (![prefsController showWordCount]) {
-		[wordCounter setHidden:NO];
-	}else {
-		[wordCounter setHidden:YES];
-	}
+    [wordCounter setHidden:[prefsController showWordCount]];
+
 	//
 	[NSApp setServicesProvider:self];
     if (!hasLaunched) {
@@ -1174,24 +1170,24 @@ terminateApp:
 	[NSApp replyToOpenOrPrint:[filenames count] ? NSApplicationDelegateReplySuccess : NSApplicationDelegateReplyFailure];
 }
 
-- (void)applicationWillBecomeActive:(NSNotification *)aNotification {
-	
-	if (IsLeopardOrLater) {
-		SpaceSwitchingContext thisSpaceSwitchCtx;
-        if ([window windowNumber]!=-1) {
-            CurrentContextForWindowNumber([window windowNumber], &thisSpaceSwitchCtx);
-            
-        }
-		//what if the app is switched-to in another way? then the last-stored spaceSwitchCtx will cause us to return to the wrong app
-		//unfortunately this notification occurs only after NV has become the front process, but we can still verify the space number
-		
-		if ((thisSpaceSwitchCtx.userSpace != spaceSwitchCtx.userSpace) ||
-			(thisSpaceSwitchCtx.windowSpace != spaceSwitchCtx.windowSpace)) {
-			//forget the last space-switch info if it's effectively different from how we're switching into the app now
-			bzero(&spaceSwitchCtx, sizeof(SpaceSwitchingContext));
-		}
-	}
-}
+//- (void)applicationWillBecomeActive:(NSNotification *)aNotification {
+//	
+//	if (IsLeopardOrLater) {
+//		SpaceSwitchingContext thisSpaceSwitchCtx;
+//        if ([window windowNumber]!=-1) {
+//            CurrentContextForWindowNumber([window windowNumber], &thisSpaceSwitchCtx);
+//            
+//        }
+//		//what if the app is switched-to in another way? then the last-stored spaceSwitchCtx will cause us to return to the wrong app
+//		//unfortunately this notification occurs only after NV has become the front process, but we can still verify the space number
+//		
+//		if ((thisSpaceSwitchCtx.userSpace != spaceSwitchCtx.userSpace) ||
+//			(thisSpaceSwitchCtx.windowSpace != spaceSwitchCtx.windowSpace)) {
+//			//forget the last space-switch info if it's effectively different from how we're switching into the app now
+//			bzero(&spaceSwitchCtx, sizeof(SpaceSwitchingContext));
+//		}
+//	}
+//}
 
 - (void)applicationDidBecomeActive:(NSNotification *)aNotification {
 	[notationController checkJournalExistence];
@@ -1686,7 +1682,7 @@ terminateApp:
 	//BOOL enable = /*numberSelected != 1;*/ state;
     
 	[self postTextUpdate];
-    [self updateWordCount:(![prefsController showWordCount])];
+    [self updateWordCount:![prefsController showWordCount]];
 	[textView setHidden:state];
 	[editorStatusView setHidden:!state];
 	
@@ -1924,7 +1920,7 @@ terminateApp:
 			//for external url-handling, often the app will already have been brought to the foreground
 			if (![NSApp isActive]) {
 				if (IsLeopardOrLater)
-					CurrentContextForWindowNumber([window windowNumber], &spaceSwitchCtx);
+//                CurrentContextForWindowNumber([window windowNumber], &spaceSwitchCtx);
 				[NSApp activateIgnoringOtherApps:YES];
 			}
 			if (![window isKeyWindow])
@@ -2249,24 +2245,23 @@ terminateApp:
     
 	if ([NSApp isActive] && [window isMainWindow]&&[window isVisible]) {
         
-		SpaceSwitchingContext laterSpaceSwitchCtx;
-		if (IsLeopardOrLater){
-			CurrentContextForWindowNumber([window windowNumber], &laterSpaceSwitchCtx);
-            
-        }
-		if (!IsLeopardOrLater || !CompareContextsAndSwitch(&spaceSwitchCtx, &laterSpaceSwitchCtx)) {
+//		SpaceSwitchingContext laterSpaceSwitchCtx;
+//		if (IsLeopardOrLater){
+//			CurrentContextForWindowNumber([window windowNumber], &laterSpaceSwitchCtx);
+//            
+//        }
+        if (!IsLeopardOrLater){// || !CompareContextsAndSwitch(&spaceSwitchCtx, &laterSpaceSwitchCtx)) {
 			//hide only if we didn't need to or weren't able to switch spaces
 			[NSApp hide:sender];
 		}
 		//clear the space-switch context that we just looked at, to ensure it's not reused inadvertently
-		bzero(&spaceSwitchCtx, sizeof(SpaceSwitchingContext));
+//		bzero(&spaceSwitchCtx, sizeof(SpaceSwitchingContext));
 		return;
 	}
 	[self bringFocusToControlField:sender];
 }
 
 - (void)focusControlField:(id)sender activate:(BOOL)shouldActivate{
-//        [[NSNotificationCenter defaultCenter] postNotificationName:@"TextFinderShouldHide" object:sender];
 
 	if ([notesSubview isCollapsed]) {
 		[self toggleCollapse:self];
@@ -2279,18 +2274,20 @@ terminateApp:
     
 	if (!shouldActivate) {
         [window makeKeyAndOrderFront:sender];
-        [window makeMainWindow];
-        if (![NSApp isActive]) {
-            CurrentContextForWindowNumber([window windowNumber], &spaceSwitchCtx);
+        if ([window canBecomeMainWindow]) {
+            [window makeMainWindow];
         }
+//        if (![NSApp isActive]) {
+//            CurrentContextForWindowNumber([window windowNumber], &spaceSwitchCtx);
+//        }
     }else{
         if (![NSApp isActive]) {
-            CurrentContextForWindowNumber([window windowNumber], &spaceSwitchCtx);
+//            CurrentContextForWindowNumber([window windowNumber], &spaceSwitchCtx);
             [NSApp activateIgnoringOtherApps:YES];
         }
-        if (![window isMainWindow]||![window isVisible]){
-            [window makeKeyAndOrderFront:sender];
-        }
+//        if (![window isMainWindow]||![window isVisible]){
+//            [window makeKeyAndOrderFront:sender];
+//        }
 	}
 	[self setEmptyViewState:currentNote == nil];
     self.isEditing = NO;
@@ -2788,7 +2785,7 @@ terminateApp:
         if (([[NSUserDefaults standardUserDefaults] boolForKey:@"ShowDockIcon"])&&(IsSnowLeopardOrLater)) {
             options = [NSDictionary dictionaryWithObjectsAndKeys:[NSNumber numberWithInt:(NSApplicationPresentationAutoHideMenuBar | NSApplicationPresentationHideDock)],@"NSFullScreenModeApplicationPresentationOptions", nil];
         }else {
-            options = [NSDictionary dictionaryWithObjectsAndKeys:nil];
+            options = nil;
         }
         CGFloat colW = [notesSubview dimension];
         
@@ -3074,7 +3071,6 @@ terminateApp:
         if ([prefsController showWordCount]) {
             [self updateWordCount:YES];
             [wordCounter setHidden:NO];
-            
             popped=1;
         }else {
             [wordCounter setHidden:YES];
