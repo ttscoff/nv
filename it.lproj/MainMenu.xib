@@ -644,6 +644,11 @@ CA
                             <menuItem isSeparatorItem="YES" id="92">
                                 <modifierMask key="keyEquivalentModifierMask" command="YES"/>
                             </menuItem>
+                            <menuItem title="Show Main Window" keyEquivalent="N" id="tKT-L8-YDs">
+                                <connections>
+                                    <action selector="makeActiveAndShowWindow:" target="213" id="7HF-Tj-oEw"/>
+                                </connections>
+                            </menuItem>
                             <menuItem title="Porta tutto in primo piano" id="5">
                                 <connections>
                                     <action selector="arrangeInFront:" target="-1" id="39"/>

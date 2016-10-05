@@ -74,7 +74,7 @@ CGFloat _perceptualDarkness(NSColor*a);
 - (void)awakeFromNib {
 	
     prefsController = [GlobalPrefs defaultPrefs];
-	 
+
     [prefsController registerWithTarget:self forChangesInSettings:
 	 @selector(setNoteBodyFont:sender:),
 	 @selector(setMakeURLsClickable:sender:),

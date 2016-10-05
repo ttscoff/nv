@@ -420,11 +420,9 @@ void outletObjectAwoke(id sender) {
 	//
 	[NSApp setServicesProvider:self];
     if (!hasLaunched) {
-        
         hasLaunched=YES;
         [self focusControlField:self activate:NO];
-        
-        
+
     }
     
 //    self.isEditing=NO;
@@ -2242,23 +2240,45 @@ terminateApp:
 }
 
 - (IBAction)toggleNVActivation:(id)sender {
-    
-	if ([NSApp isActive] && [window isMainWindow]&&[window isVisible]) {
+    if ([NSApp isActive]) {
         
 //		SpaceSwitchingContext laterSpaceSwitchCtx;
 //		if (IsLeopardOrLater){
 //			CurrentContextForWindowNumber([window windowNumber], &laterSpaceSwitchCtx);
 //            
 //        }
-        if (!IsLeopardOrLater){// || !CompareContextsAndSwitch(&spaceSwitchCtx, &laterSpaceSwitchCtx)) {
+//        if (!IsLeopardOrLater){// || !CompareContextsAndSwitch(&spaceSwitchCtx, &laterSpaceSwitchCtx)) {
 			//hide only if we didn't need to or weren't able to switch spaces
+        if (!window.isMainWindow||!window.isVisible) {
+            [window makeKeyAndOrderFront:sender];
+        }else{
 			[NSApp hide:sender];
-		}
+        }
+//		}
 		//clear the space-switch context that we just looked at, to ensure it's not reused inadvertently
 //		bzero(&spaceSwitchCtx, sizeof(SpaceSwitchingContext));
-		return;
-	}
-	[self bringFocusToControlField:sender];
+    }else{
+        [NSApp activateIgnoringOtherApps:YES];
+        dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.03 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+            if (!window.isMainWindow||!window.isVisible) {
+                [window makeKeyAndOrderFront:sender];
+            }
+        });
+    }
+}
+
+- (IBAction)makeActiveAndShowWindow:(id)sender{
+    if (![NSApp isActive]) {
+        [NSApp activateIgnoringOtherApps:YES];
+        dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.03 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+            if (!window.isMainWindow||!window.isVisible) {
+                [window makeKeyAndOrderFront:sender];
+            }
+        });
+    }else if (!window.isMainWindow||!window.isVisible) {
+        [window makeKeyAndOrderFront:sender];
+    }
+
 }
 
 - (void)focusControlField:(id)sender activate:(BOOL)shouldActivate{
@@ -2274,9 +2294,12 @@ terminateApp:
     
 	if (!shouldActivate) {
         [window makeKeyAndOrderFront:sender];
-        if ([window canBecomeMainWindow]) {
-            [window makeMainWindow];
-        }
+
+//        if ([window canBecomeMainWindow]) {
+//            [window makeMainWindow];
+//        }else{
+//            NSLog(@"main window can't become main for some reason");
+//        }
 //        if (![NSApp isActive]) {
 //            CurrentContextForWindowNumber([window windowNumber], &spaceSwitchCtx);
 //        }
@@ -2285,13 +2308,14 @@ terminateApp:
 //            CurrentContextForWindowNumber([window windowNumber], &spaceSwitchCtx);
             [NSApp activateIgnoringOtherApps:YES];
         }
-//        if (![window isMainWindow]||![window isVisible]){
-//            [window makeKeyAndOrderFront:sender];
-//        }
+        dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.03 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+            if (!window.isMainWindow||!window.isVisible) {
+                [window makeKeyAndOrderFront:sender];
+            }
+        });
 	}
 	[self setEmptyViewState:currentNote == nil];
     self.isEditing = NO;
-    
     
 }
 
@@ -3338,8 +3362,8 @@ terminateApp:
         }else{
 //            NSLog(@"hiding dock incon in snow leopard");
             id fullPath = [[NSBundle mainBundle] executablePath];
-            NSArray *arg = [NSArray arrayWithObjects:nil];
-            [NSTask launchedTaskWithLaunchPath:fullPath arguments:arg];
+//            NSArray *arg = [NSArray arrayWithObjects:nil];
+            [NSTask launchedTaskWithLaunchPath:fullPath arguments:@[]];
             [NSApp terminate:self];
         }
         

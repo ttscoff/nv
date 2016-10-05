@@ -640,6 +640,11 @@ CA
                             <menuItem isSeparatorItem="YES" id="92">
                                 <modifierMask key="keyEquivalentModifierMask" command="YES"/>
                             </menuItem>
+                            <menuItem title="Show Main Window" keyEquivalent="N" id="Kb9-qd-YET">
+                                <connections>
+                                    <action selector="makeActiveAndShowWindow:" target="213" id="WSA-Ug-wOj"/>
+                                </connections>
+                            </menuItem>
                             <menuItem title="Alle nach vorne bringen" id="5">
                                 <connections>
                                     <action selector="arrangeInFront:" target="-1" id="39"/>

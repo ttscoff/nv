@@ -641,6 +641,11 @@ CA
                             <menuItem isSeparatorItem="YES" id="92">
                                 <modifierMask key="keyEquivalentModifierMask" command="YES"/>
                             </menuItem>
+                            <menuItem title="Show Main Window" keyEquivalent="N" id="Cr7-ZE-Npg">
+                                <connections>
+                                    <action selector="makeActiveAndShowWindow:" target="213" id="Ioq-tt-qA6"/>
+                                </connections>
+                            </menuItem>
                             <menuItem title="前置全部窗口" id="5">
                                 <connections>
                                     <action selector="arrangeInFront:" target="-1" id="39"/>

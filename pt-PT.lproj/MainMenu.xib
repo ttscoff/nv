@@ -637,6 +637,11 @@ CA
                             <menuItem isSeparatorItem="YES" id="92">
                                 <modifierMask key="keyEquivalentModifierMask" command="YES"/>
                             </menuItem>
+                            <menuItem title="Show Main Window" keyEquivalent="N" id="abV-4P-Iin">
+                                <connections>
+                                    <action selector="makeActiveAndShowWindow:" target="213" id="U0z-BD-UI2"/>
+                                </connections>
+                            </menuItem>
                             <menuItem title="Trazer Todas Para Frente" id="5">
                                 <connections>
                                     <action selector="arrangeInFront:" target="-1" id="39"/>

@@ -647,6 +647,11 @@ CA
                             <menuItem isSeparatorItem="YES" id="92">
                                 <modifierMask key="keyEquivalentModifierMask" command="YES"/>
                             </menuItem>
+                            <menuItem title="Show Main Window" keyEquivalent="N" id="Dli-og-imj">
+                                <connections>
+                                    <action selector="makeActiveAndShowWindow:" target="213" id="Cdl-hU-u1O"/>
+                                </connections>
+                            </menuItem>
                             <menuItem title="Bring All to Front" id="5">
                                 <connections>
                                     <action selector="arrangeInFront:" target="-1" id="39"/>
