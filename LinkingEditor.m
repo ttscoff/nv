@@ -360,12 +360,22 @@ CGFloat _perceptualColorDifference(NSColor*a, NSColor*b) {
 //	[prefsController setCheckSpellingAsYouType:[self isContinuousSpellCheckingEnabled] sender:self];
 //}
 
-- (BOOL)isContinuousSpellCheckingEnabled {
-	//optimization so that we don't spell-check while scrolling through notes that don't have focus
-    NSView *responder = (NSView*)[[self window] firstResponder];
-    
-    return (responder == self && [super isContinuousSpellCheckingEnabled]);
+//- (BOOL)isContinuousSpellCheckingEnabled {
+//	//optimization so that we don't spell-check while scrolling through notes that don't have focus
+//
+//    NSView *responder = (NSView*)[[self window] firstResponder];
+//    return (responder == self && [super isContinuousSpellCheckingEnabled]);
+//}
+
+- (void)checkTextInRange:(NSRange)range types:(NSTextCheckingTypes)checkingTypes options:(NSDictionary *)options{
+    //	//optimization so that we don't spell-check while scrolling through notes that don't have focus
+    if ([[self window] firstResponder]!=self) {
+        return;
+    }
+
+    [super checkTextInRange:range types:checkingTypes options:options];
 }
+
 
 - (BOOL)didRenderFully {
 	return didRenderFully;
@@ -1731,6 +1741,12 @@ static long (*GetGetScriptManagerVariablePointer())(short) {
 }
 
 - (void)dealloc {
+    NSLog(@"dealloc linkinged");
+    [self unbind:@"automaticQuoteSubstitutionEnabled"];
+    [self unbind:@"automaticDashSubstitutionEnabled"];
+    [self unbind:@"automaticTextReplacementEnabled"];
+    [self unbind:@"continuousSpellCheckingEnabled"];
+    [self unbind:@"smartInsertDeleteEnabled"];
 	[[NSNotificationCenter defaultCenter] removeObserver: self];
     if (IsLionOrLater) {
         [textFinder release];
