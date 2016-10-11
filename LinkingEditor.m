@@ -1694,17 +1694,17 @@ static long (*GetGetScriptManagerVariablePointer())(short) {
         [theMenuItem release];
 #endif
         
-        theMenuItem = [[NSMenuItem alloc] initWithTitle:NSLocalizedString(@"Insert New Password", "insert new password command in the edit menu")
-												 action:@selector(insertGeneratedPassword:) keyEquivalent:@"\\"];
-#if PASSWORD_SUGGESTIONS
-        [theMenuItem setAlternate:YES];
-#endif
-        [theMenuItem setKeyEquivalentModifierMask:NSCommandKeyMask|NSAlternateKeyMask];
-        [theMenuItem setTarget:nil]; // First Responder being the current Link Editor
-        [editMenu addItem:theMenuItem];
-        [theMenuItem release];
+//        theMenuItem = [[NSMenuItem alloc] initWithTitle:NSLocalizedString(@"Insert New Password", "insert new password command in the edit menu")
+//												 action:@selector(insertGeneratedPassword:) keyEquivalent:@"\\"];
+//#if PASSWORD_SUGGESTIONS
+//        [theMenuItem setAlternate:YES];
+//#endif
+//        [theMenuItem setKeyEquivalentModifierMask:NSCommandKeyMask|NSAlternateKeyMask];
+//        [theMenuItem setTarget:nil]; // First Responder being the current Link Editor
+//        [editMenu addItem:theMenuItem];
+//        [theMenuItem release];
     }
-	
+
 }
 
 - (void)insertPassword:(NSString*)password
