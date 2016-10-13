@@ -463,7 +463,14 @@
 
     [printInfo setHorizontallyCentered:YES];
     [printInfo setVerticallyCentered:NO];
-    [[[[preview mainFrame] frameView] documentView] print:nil];
+
+    NSPrintOperation * printOp;
+
+    printOp = [NSPrintOperation printOperationWithView:[[[preview mainFrame] frameView] documentView]
+                                             printInfo:printInfo];
+//    [printOp runOperation];
+    [printOp runOperationModalForWindow:preview.window delegate:self didRunSelector:nil contextInfo:nil];
+//    [[[[preview mainFrame] frameView] documentView] print:nil];
 }
 
 -(IBAction)shareNote:(id)sender
