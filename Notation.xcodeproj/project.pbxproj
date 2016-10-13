@@ -241,13 +241,11 @@
 		8D11072D0486CEB800E47090 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 29B97316FDCFA39411CA2CEA /* main.m */; settings = {ATTRIBUTES = (); }; };
 		8D11072F0486CEB800E47090 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1058C7A1FEA54F0111CA2CBB /* Cocoa.framework */; };
 		93099628138BD61000368C45 /* tp2md.rb in Resources */ = {isa = PBXBuildFile; fileRef = 93099627138BD61000368C45 /* tp2md.rb */; };
-		93365DD21D9AAC15005A230B /* libcrypto.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 93365DD01D9AAC15005A230B /* libcrypto.a */; };
-		93365DD31D9AAC15005A230B /* libssl.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 93365DD11D9AAC15005A230B /* libssl.a */; };
-		93365DDC1D9ACC0D005A230B /* libcrypto.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 93365DDA1D9ACC0D005A230B /* libcrypto.a */; };
-		93365DDD1D9ACC0D005A230B /* libssl.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 93365DDB1D9ACC0D005A230B /* libssl.a */; };
 		93365DDF1D9AD651005A230B /* AutoHyperlinks.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 93365DDE1D9AD651005A230B /* AutoHyperlinks.framework */; };
 		93365DE01D9AD6AA005A230B /* AutoHyperlinks.framework in CopyFiles */ = {isa = PBXBuildFile; fileRef = 93365DDE1D9AD651005A230B /* AutoHyperlinks.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		93365DE11D9AD97B005A230B /* multimarkdown in CopyFiles */ = {isa = PBXBuildFile; fileRef = 9335C40C148EC7AC009CE623 /* multimarkdown */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
+		93458F2D1D9ECAE800F80B29 /* libcrypto.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 93365DD01D9AAC15005A230B /* libcrypto.a */; };
+		93458F2E1D9ECAED00F80B29 /* libcrypto.a in CopyFiles */ = {isa = PBXBuildFile; fileRef = 93365DD01D9AAC15005A230B /* libcrypto.a */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
 		934C3FB214FDA069000D14BA /* custom.css in Resources */ = {isa = PBXBuildFile; fileRef = 934C3FAE14FDA069000D14BA /* custom.css */; };
 		934C3FB314FDA06A000D14BA /* customclean.css in Resources */ = {isa = PBXBuildFile; fileRef = 934C3FAF14FDA069000D14BA /* customclean.css */; };
 		934C3FB414FDA06A000D14BA /* template.html in Resources */ = {isa = PBXBuildFile; fileRef = 934C3FB014FDA069000D14BA /* template.html */; };
@@ -294,6 +292,7 @@
 			dstPath = "";
 			dstSubfolderSpec = 10;
 			files = (
+				93458F2E1D9ECAED00F80B29 /* libcrypto.a in CopyFiles */,
 				93365DE01D9AD6AA005A230B /* AutoHyperlinks.framework in CopyFiles */,
 				213623FC0B92AA6E008C0830 /* Sparkle.framework in CopyFiles */,
 			);
@@ -777,8 +776,6 @@
 		9335C40C148EC7AC009CE623 /* multimarkdown */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.executable"; path = multimarkdown; sourceTree = "<group>"; };
 		93365DD01D9AAC15005A230B /* libcrypto.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libcrypto.a; path = library/openssl/Build/Products/Debug/libcrypto.a; sourceTree = "<group>"; };
 		93365DD11D9AAC15005A230B /* libssl.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libssl.a; path = library/openssl/Build/Products/Debug/libssl.a; sourceTree = "<group>"; };
-		93365DDA1D9ACC0D005A230B /* libcrypto.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libcrypto.a; path = library/openssl/Build/Products/Debug/libcrypto.a; sourceTree = "<group>"; };
-		93365DDB1D9ACC0D005A230B /* libssl.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libssl.a; path = library/openssl/Build/Products/Debug/libssl.a; sourceTree = "<group>"; };
 		93365DDE1D9AD651005A230B /* AutoHyperlinks.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = AutoHyperlinks.framework; sourceTree = "<group>"; };
 		934C3FAE14FDA069000D14BA /* custom.css */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.css; path = custom.css; sourceTree = "<group>"; };
 		934C3FAF14FDA069000D14BA /* customclean.css */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.css; path = customclean.css; sourceTree = "<group>"; };
@@ -833,9 +830,8 @@
 			buildActionMask = 2147483647;
 			files = (
 				8D11072F0486CEB800E47090 /* Cocoa.framework in Frameworks */,
+				93458F2D1D9ECAE800F80B29 /* libcrypto.a in Frameworks */,
 				2191926709C52AA600586B15 /* libz.dylib in Frameworks */,
-				93365DDD1D9ACC0D005A230B /* libssl.a in Frameworks */,
-				93365DD31D9AAC15005A230B /* libssl.a in Frameworks */,
 				93365DDF1D9AD651005A230B /* AutoHyperlinks.framework in Frameworks */,
 				21F459AD0A92E01D00FB6FFE /* Carbon.framework in Frameworks */,
 				214493F60ADB892C00E2A2B6 /* CoreServices.framework in Frameworks */,
@@ -843,8 +839,6 @@
 				21973FF10B0060C80046683E /* Security.framework in Frameworks */,
 				210C07530B6BF0A2005D23A8 /* WebKit.framework in Frameworks */,
 				21D583620B78F0CC00245E29 /* ApplicationServices.framework in Frameworks */,
-				93365DD21D9AAC15005A230B /* libcrypto.a in Frameworks */,
-				93365DDC1D9ACC0D005A230B /* libcrypto.a in Frameworks */,
 				219D254A1113FE34005E7DF5 /* SystemConfiguration.framework in Frameworks */,
 				21B54C021134F2E800E163A1 /* IOKit.framework in Frameworks */,
 			);
@@ -952,9 +946,8 @@
 		1058C7A2FEA54F0111CA2CBB /* Other Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				93365DD01D9AAC15005A230B /* libcrypto.a */,
 				93365DDE1D9AD651005A230B /* AutoHyperlinks.framework */,
-				93365DDA1D9ACC0D005A230B /* libcrypto.a */,
-				93365DDB1D9ACC0D005A230B /* libssl.a */,
 				21B54C011134F2E800E163A1 /* IOKit.framework */,
 				213623E50B92AA4E008C0830 /* Sparkle.framework */,
 				210C07230B6BF0A1005D23A8 /* WebKit.framework */,
@@ -982,7 +975,6 @@
 		211345A10B35D8340081B064 /* Crypto */ = {
 			isa = PBXGroup;
 			children = (
-				93365DD01D9AAC15005A230B /* libcrypto.a */,
 				93365DD11D9AAC15005A230B /* libssl.a */,
 				2114C2860958CC9100614E74 /* pbkdf2.h */,
 				2114C2870958CC9100614E74 /* pbkdf2.c */,
