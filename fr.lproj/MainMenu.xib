@@ -1015,14 +1015,7 @@ CA
                     </connections>
                 </menuItem>
             </items>
-            <connections>
-                <outlet property="delegate" destination="1126" id="1159"/>
-            </connections>
         </menu>
-        <customView id="1126" customClass="StatusItemView">
-            <rect key="frame" x="0.0" y="0.0" width="163" height="96"/>
-            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-        </customView>
         <scrollView borderType="none" horizontalLineScroll="16" horizontalPageScroll="10" verticalLineScroll="16" verticalPageScroll="10" hasHorizontalScroller="NO" usesPredominantAxisScrolling="NO" id="1223" userLabel="Scroll View - Notes Table View" customClass="ETScrollView">
             <rect key="frame" x="0.0" y="0.0" width="399" height="153"/>
             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>

@@ -39,8 +39,8 @@ CFDateFormatterRef simplenoteDateFormatter(int lowPrecision);
 - (NSString*)syntheticTitleAndSeparatorWithContext:(NSString**)sepStr bodyLoc:(NSUInteger*)bodyLoc 
 										  oldTitle:(NSString*)oldTitle maxTitleLen:(NSUInteger)maxTitleLen;
 - (NSString*)syntheticTitleAndTrimmedBody:(NSString**)newBody;
-+ (NSString *)tabbifiedStringWithNumberOfSpaces:(unsigned)origNumSpaces tabWidth:(unsigned)tabWidth usesTabs:(BOOL)usesTabs;
-- (unsigned)numberOfLeadingSpacesFromRange:(NSRange*)range tabWidth:(unsigned)tabWidth;
++ (NSString *)tabbifiedStringWithNumberOfSpaces:(NSInteger)origNumSpaces tabWidth:(NSInteger)tabWidth usesTabs:(BOOL)usesTabs;
+- (NSInteger)numberOfLeadingSpacesFromRange:(NSRange*)range tabWidth:(NSInteger)tabWidth;
 
 	BOOL IsHardLineBreakUnichar(unichar uchar, NSString *str, unsigned charIndex);
 

@@ -84,26 +84,29 @@ static const char nvSymbolSet[] = "!@#$%^&*()-+=?/<>";
     return ([self passwordWithOptions:knvPasswordNumeric|knvPasswordAlpha|knvPasswordMixedCase|knvPasswordSymbol length:10]);
 }
 
+//this doesn't work and probably won't ever. commented out because static analyzer
 + (NSArray*)suggestions
 {
-    enum {numSuggestions = 4};
-    const SEL methods[numSuggestions] = {@selector(strong), @selector(medium), @selector(light), @selector(lightNumeric)};
-    
-    NSString* suggest[numSuggestions];
-    #if MAC_OS_X_VERSION_MIN_REQUIRED >= MAC_OS_X_VERSION_10_6
-    dispatch_apply(numSuggestions, dispatch_get_global_queue(0, 0), ^(size_t i) {
-    #else
-    __block size_t i;
-    for (i = 0; i < numSuggestions; ++i) {
-    #endif
-        //   suggest[i] = [self performSelector:methods[i]];  //BUILD ISSUE
-    }
-    #if MAC_OS_X_VERSION_MIN_REQUIRED >= MAC_OS_X_VERSION_10_6
-    );
-    #endif
-    
-    NSArray *a = [NSArray arrayWithObjects:suggest[0], suggest[1], suggest[2], suggest[3], nil];
-    return (a);
+    return @[];
+//    enum {numSuggestions = 4};
+//    const SEL methods[numSuggestions] = {@selector(strong), @selector(medium), @selector(light), @selector(lightNumeric)};
+//    
+//    NSString* suggest[numSuggestions];
+//
+//    #if MAC_OS_X_VERSION_MIN_REQUIRED >= MAC_OS_X_VERSION_10_6
+//    dispatch_apply(numSuggestions, dispatch_get_global_queue(0, 0), ^(size_t i) {
+//    #else
+//    __block size_t i;
+//    for (i = 0; i < numSuggestions; ++i) {
+//    #endif
+////           suggest[i] = [self performSelector:methods[i]];  //BUILD ISSUE
+//    }
+//    #if MAC_OS_X_VERSION_MIN_REQUIRED >= MAC_OS_X_VERSION_10_6
+//    );
+//    #endif
+//    
+//    NSArray *a = [NSArray arrayWithObjects:suggest[0], suggest[1], suggest[2], suggest[3], nil];
+//    return (a);
 }
 
 @end

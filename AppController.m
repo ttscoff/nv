@@ -43,7 +43,6 @@
 #import "TagEditingManager.h"
 #import "NotesTableHeaderCell.h"
 #import "DFView.h"
-#import "StatusItemView.h"
 #import "ETContentView.h"
 #import "PreviewController.h"
 #import "ETClipView.h"
@@ -143,8 +142,6 @@ BOOL splitViewAwoke;
         
         NSNotificationCenter *nc=[NSNotificationCenter defaultCenter];
         [nc addObserver:previewController selector:@selector(requestPreviewUpdate:) name:@"TextViewHasChangedContents" object:self];
-        [nc addObserver:self selector:@selector(toggleAttachedWindow:) name:@"NVShouldActivate" object:nil];
-        [nc addObserver:self selector:@selector(toggleAttachedMenu:) name:@"StatusItemMenuShouldDrop" object:nil];
         [nc addObserver:self selector:@selector(togDockIcon:) name:@"AppShouldToggleDockIcon" object:nil];
         [nc addObserver:self selector:@selector(toggleStatusItem:) name:@"AppShouldToggleStatusItem" object:nil];
         
@@ -344,65 +341,54 @@ void outletObjectAwoke(id sender) {
 	[[prefsController bookmarksController] setAppController:self];
 	[[prefsController bookmarksController] restoreWindowFromSave];
 	[[prefsController bookmarksController] updateBookmarksUI];
-	[self updateNoteMenus];
-	[textView setupFontMenu];
-	[prefsController registerAppActivationKeystrokeWithTarget:self selector:@selector(toggleNVActivation:)];
-	[notationController updateLabelConnectionsAfterDecoding];
-	[notationController checkIfNotationIsTrashed];
-	[[SecureTextEntryManager sharedInstance] checkForIncompatibleApps];
+    [self updateNoteMenus];
+    [textView setupFontMenu];
+    [prefsController registerAppActivationKeystrokeWithTarget:self selector:@selector(toggleNVActivation:)];
+    [notationController updateLabelConnectionsAfterDecoding];
+    [notationController checkIfNotationIsTrashed];
+    [[SecureTextEntryManager sharedInstance] checkForIncompatibleApps];
 
-	//connect sparkle programmatically to avoid loading its framework at nib awake;
-	
-	if (!NSClassFromString(@"SUUpdater")) {
-		NSString *frameworkPath = [[[NSBundle bundleForClass:[self class]] privateFrameworksPath] stringByAppendingPathComponent:@"Sparkle.framework"];
-		if ([[NSBundle bundleWithPath:frameworkPath] load]) {
-			SUUpdater *updater =[NSClassFromString(@"SUUpdater") performSelector:@selector(sharedUpdater)];
-            if (IsLionOrLater) {
-                [updater setFeedURL:[NSURL URLWithString:kSparkleUpdateFeedForLions]];
-            }else{
-                [updater setFeedURL:[NSURL URLWithString:kSparkleUpdateFeedForSnowLeopard]];
-            }
-			[sparkleUpdateItem setTarget:updater];
-			[sparkleUpdateItem setAction:@selector(checkForUpdates:)];
-			NSMenuItem *siSparkle = [statBarMenu itemWithTag:902];
-			[siSparkle setTarget:updater];
-			[siSparkle setAction:@selector(checkForUpdates:)];
-			if (![[prefsController notationPrefs] firstTimeUsed]) {
-				//don't do anything automatically on the first launch; afterwards, check every 4 days, as specified in Info.plist
-//				SEL checksSEL = @selector(setAutomaticallyChecksForUpdates:);
-                [updater setAutomaticallyChecksForUpdates:YES];
-//				[updater methodForSelector:checksSEL](updater, checksSEL, YES);
-			}
-		} else {
-			NSLog(@"Could not load %@!", frameworkPath);
-		}
-	}else{
-        NSLog(@"su");
+    //connect sparkle programmatically to avoid loading its framework at nib awake;
+    //    if (!NSClassFromString(@"SUUpdater")) {
+    //        NSLog(@"su:%@ SEL:%@",sparkleUpdateItem.target,sparkleUpdateItem.action);
+    //    }else{
+    NSString *frameworkPath = [[[NSBundle bundleForClass:[self class]] privateFrameworksPath] stringByAppendingPathComponent:@"Sparkle.framework"];
+    if ([[NSBundle bundleWithPath:frameworkPath] load]) {
+        SUUpdater *updater =[SUUpdater sharedUpdater];
+        if (IsLionOrLater) {
+            [updater setFeedURL:[NSURL URLWithString:kSparkleUpdateFeedForLions]];
+        }else{
+            [updater setFeedURL:[NSURL URLWithString:kSparkleUpdateFeedForSnowLeopard]];
+        }
+        [sparkleUpdateItem setTarget:updater];
+        [sparkleUpdateItem setAction:@selector(checkForUpdates:)];
+        NSMenuItem *siSparkle = [statBarMenu itemWithTag:902];
+        [siSparkle setTarget:updater];
+        [siSparkle setAction:@selector(checkForUpdates:)];
+        if (![[prefsController notationPrefs] firstTimeUsed]) {
+            //don't do anything automatically on the first launch; afterwards, check every 4 days, as specified in Info.plist
+            //				SEL checksSEL = @selector(setAutomaticallyChecksForUpdates:);
+            [updater setAutomaticallyChecksForUpdates:YES];
+            //				[updater methodForSelector:checksSEL](updater, checksSEL, YES);
+        }
+    } else {
+        NSLog(@"Could not load %@!", frameworkPath);
     }
-	// add elasticthreads' menuitems
-	NSMenuItem *theMenuItem = [[[NSMenuItem alloc] init] autorelease];
-	[theMenuItem setTarget:self];
-    //	NSMenu *notesMenu = [[[NSApp mainMenu] itemWithTag:NOTES_MENU_ID] submenu];
-	theMenuItem = [theMenuItem copy];
-    //	[statBarMenu insertItem:theMenuItem atIndex:4];
-	[theMenuItem release];
-    //theMenuItem = [[viewMenu itemWithTag:801] copy];
-	//[statBarMenu insertItem:theMenuItem atIndex:11];
-    //[theMenuItem release];
+    //    }
+    // add elasticthreads' menuitems
     if(IsLeopardOrLater){
-        //theMenuItem =[viewMenu itemWithTag:314];
         [fsMenuItem setEnabled:YES];
         [fsMenuItem setHidden:NO];
-		
+
 #if MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_7
         if (IsLionOrLater) {
             //  [window setCollectionBehavior:NSWindowCollectionBehaviorTransient|NSWindowCollectionBehaviorMoveToActiveSpace];
             //
             [window setCollectionBehavior:NSWindowCollectionBehaviorFullScreenPrimary];
             //            [window setCollectionBehavior:NSWindowCollectionBehaviorFullScreenAuxiliary];
-//            [NSApp setPresentationOptions:[NSApp currentSystemPresentationOptions]|NSApplicationPresentationFullScreen];
-            
-            
+            //            [NSApp setPresentationOptions:[NSApp currentSystemPresentationOptions]|NSApplicationPresentationFullScreen];
+
+
         }else{
 #endif
             [fsMenuItem setTarget:self];
@@ -411,7 +397,8 @@ void outletObjectAwoke(id sender) {
 #if MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_7
         }
 #endif
-        theMenuItem = [fsMenuItem copy];
+
+        NSMenuItem *theMenuItem = [fsMenuItem copy];
         [statBarMenu insertItem:theMenuItem atIndex:14];
         [theMenuItem release];
     }
@@ -2228,7 +2215,6 @@ terminateApp:
 	[dividerShader release];
 	[[NSStatusBar systemStatusBar] removeStatusItem:statusItem];
     [statusItem release];
-    [cView release];
     [statBarMenu release];
 	[self postTextUpdate];
 	
@@ -2467,15 +2453,7 @@ terminateApp:
 	return statBarMenu;
 }
 
-- (void)toggleAttachedWindow:(NSNotification *)aNotification
-{
-	[self toggleNVActivation:[aNotification object]];
-}
 
-- (void)toggleAttachedMenu:(NSNotification *)aNotification
-{
-	[statusItem popUpStatusItemMenu:statBarMenu];
-}
 
 #pragma mark multitagging
 
@@ -2807,7 +2785,7 @@ terminateApp:
         NSResponder *currentResponder = [window firstResponder];
         NSDictionary* options;
         if (([[NSUserDefaults standardUserDefaults] boolForKey:@"ShowDockIcon"])&&(IsSnowLeopardOrLater)) {
-            options = [NSDictionary dictionaryWithObjectsAndKeys:[NSNumber numberWithInt:(NSApplicationPresentationAutoHideMenuBar | NSApplicationPresentationHideDock)],@"NSFullScreenModeApplicationPresentationOptions", nil];
+            options = @{@"NSFullScreenModeApplicationPresentationOptions":@(NSApplicationPresentationAutoHideMenuBar | NSApplicationPresentationHideDock)};
         }else {
             options = nil;
         }
@@ -3377,14 +3355,42 @@ terminateApp:
         
         [self performSelector:@selector(hideDockIcon) withObject:nil afterDelay:0.22];
     }
-    
+
+
+
+- (IBAction)statusItemAction:(id)sender{
+
+    NSEvent *curEv=[NSApp currentEvent];
+    if ((curEv.type==NSEventTypeRightMouseUp)||((NSEventModifierFlagControl&curEv.modifierFlags)!=0)) {
+        [statusItem popUpStatusItemMenu:statBarMenu];
+        //        NSPoint og=NSMakePoint(statusItem.button.frame.origin.x, 27.f);//NSMaxY(statusItem.button.frame));
+        //        [self.statusMenu popUpMenuPositioningItem:nil atLocation:og inView:statusItem.button];
+    }else{
+        [self toggleNVActivation:sender];
+    }
+}
+
+
 - (void)setUpStatusBarItem{
-    NSRect viewFrame = NSMakeRect(0.0f, 0.0f, 24.0f,[[NSStatusBar systemStatusBar] thickness]);
-    statusItem = [[[NSStatusBar systemStatusBar] statusItemWithLength:24.0f] retain];
-    cView = [[[StatusItemView alloc] initWithFrame:viewFrame] autorelease];
-    [statusItem setView:cView];
-    
-    [[NSNotificationCenter defaultCenter]postNotificationName:@"StatusBarMenuIsAwake" object:statBarMenu];
+
+    NSImage *statusIcon=[NSImage imageNamed:@"nvMenuDark"];
+    [statusIcon setSize:NSMakeSize(16.0, 16.0)];
+    [statusIcon setTemplate:YES];
+    statusItem =[[NSStatusBar systemStatusBar] statusItemWithLength:24.f];
+    if (!IsYosemiteOrLater) {
+        statusItem.button.image=statusIcon;
+        statusItem.button.target=self;
+        statusItem.button.action=@selector(statusItemAction:);
+        [statusItem.button sendActionOn:NSEventMaskLeftMouseUp|NSEventMaskRightMouseUp];
+    }else{
+        statusItem.image=statusIcon;
+        statusItem.target=self;
+        statusItem.action=@selector(statusItemAction:);
+         [statusItem sendActionOn:NSEventMaskLeftMouseUp|NSEventMaskRightMouseUp];
+        statusItem.highlightMode=YES;
+    }
+    [statusItem retain];
+
 }
 
     - (void)toggleStatusItem:(NSNotification *)notification{
@@ -3392,7 +3398,6 @@ terminateApp:
             [self setUpStatusBarItem];
         }else{
             [[NSStatusBar systemStatusBar]removeStatusItem:statusItem];
-            cView=nil;
             statusItem=nil;
         }
     }
