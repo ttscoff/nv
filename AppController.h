@@ -16,7 +16,7 @@
 
 #import "NotationController.h"
 #import "NotesTableView.h"
-#import "Spaces.h"
+//#import "Spaces.h"
 
 @class LinkingEditor;
 @class EmptyView;
@@ -36,6 +36,7 @@
 //@class AugmentedScrollView;
 @class ETContentView;
 @class ETScrollView;
+@class ETNoteScrollView;
 
 #ifndef MarkdownPreview
 #define MarkdownPreview 13371
@@ -79,7 +80,7 @@
 	RBSplitSubview *notesSubview;
 	RBSplitView *splitView;
     IBOutlet ETScrollView *notesScrollView;
-    IBOutlet ETScrollView *textScrollView;
+    IBOutlet ETNoteScrollView *textScrollView;
     IBOutlet NotesTableView *notesTableView;
     IBOutlet LinkingEditor *textView;
 	IBOutlet EmptyView *editorStatusView;
@@ -104,7 +105,7 @@
     GlobalPrefs *prefsController;
     NotationController *notationController;
 	
-	SpaceSwitchingContext spaceSwitchCtx;
+//	SpaceSwitchingContext spaceSwitchCtx;
 	ViewLocationContext listUpdateViewCtx;
 	BOOL isFilteringFromTyping, typedStringIsCached;
 	BOOL isCreatingANote;
@@ -137,6 +138,7 @@ void outletObjectAwoke(id sender);
 - (void)runDelayedUIActionsAfterLaunch;
 - (void)updateNoteMenus;
 
+- (IBAction)makeActiveAndShowWindow:(id)sender;
 - (IBAction)renameNote:(id)sender;
 - (IBAction)deleteNote:(id)sender;
 - (IBAction)copyNoteLink:(id)sender;

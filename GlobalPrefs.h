@@ -103,8 +103,8 @@ BOOL ColorsEqualWith8BitChannels(NSColor *c1, NSColor *c2);
 - (void)setTabIndenting:(BOOL)value sender:(id)sender;
 - (BOOL)tabKeyIndents;
 
-- (void)setUseTextReplacement:(BOOL)value sender:(id)sender;
-- (BOOL)useTextReplacement;	
+//- (void)setUseTextReplacement:(BOOL)value sender:(id)sender;
+//- (BOOL)useTextReplacement;
 
 - (void)setCheckSpellingAsYouType:(BOOL)value sender:(id)sender;
 - (BOOL)checkSpellingAsYouType;
@@ -183,9 +183,7 @@ BOOL ColorsEqualWith8BitChannels(NSColor *c1, NSColor *c2);
 - (BOOL)triedToImportBlor;
 
 - (void)synchronize;
-//
-- (NSString *)textEditor;
-- (void)setTextEditor:(NSString *)inApp;
+
 - (void)setRTL:(BOOL)value sender:(id)sender;
 - (BOOL)rtl;
 - (BOOL)showWordCount;

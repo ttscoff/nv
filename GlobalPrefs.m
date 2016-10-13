@@ -87,6 +87,7 @@ static NSString *UseAutoPairing = @"UseAutoPairing";
 static NSString *UseETScrollbarsOnLion = @"UseETScrollbarsOnLion";
 static NSString *UsesMarkdownCompletions = @"UsesMarkdownCompletions";
 static NSString *UseFinderTagsKey = @"UseFinderTags";
+static NSString *UseSmartInsertDeleteKey = @"UseSmartInsertDelete";
 //static NSString *PasteClipboardOnNewNoteKey = @"PasteClipboardOnNewNote";
 
 //these 4 strings manually localized
@@ -135,8 +136,9 @@ static void sendCallbacksForGlobalPrefs(GlobalPrefs* self, SEL selector, id orig
 			[NSNumber numberWithBool:YES], TabKeyIndentsKey,
 			[NSNumber numberWithBool:YES], ConfirmNoteDeletionKey,
 			[NSNumber numberWithBool:YES], CheckSpellingInNoteBodyKey, 
-			[NSNumber numberWithBool:NO], TextReplacementInNoteBodyKey, 
-			[NSNumber numberWithBool:YES], AutoCompleteSearchesKey, 
+            [NSNumber numberWithBool:NO], TextReplacementInNoteBodyKey,
+            [NSNumber numberWithBool:NO], UseSmartInsertDeleteKey,
+			[NSNumber numberWithBool:YES], AutoCompleteSearchesKey,
 			[NSNumber numberWithBool:YES], QuitWhenClosingMainWindowKey, 
 			[NSNumber numberWithBool:NO], TriedToImportBlorKey,
 			[NSNumber numberWithBool:NO], HorizontalLayoutKey,
@@ -160,7 +162,7 @@ static void sendCallbacksForGlobalPrefs(GlobalPrefs* self, SEL selector, id orig
             [NSNumber numberWithBool:NO], UseAutoPairing,
             [NSNumber numberWithBool:NO], UseETScrollbarsOnLion,
             [NSNumber numberWithBool:NO], UsesMarkdownCompletions,
-			
+
 			[NSArchiver archivedDataWithRootObject:
 			 [NSFont fontWithName:@"Helvetica" size:12.0f]], NoteBodyFontKey,
 			
@@ -287,20 +289,20 @@ static void sendCallbacksForGlobalPrefs(GlobalPrefs* self, SEL selector, id orig
     return [defaults boolForKey:TabKeyIndentsKey];
 }
 
-- (void)setUseTextReplacement:(BOOL)value sender:(id)sender {
-    [defaults setBool:value forKey:TextReplacementInNoteBodyKey];
-    
-    SEND_CALLBACKS();
-}
-
-- (BOOL)useTextReplacement {
-    return [defaults boolForKey:TextReplacementInNoteBodyKey];
-}
+//- (void)setUseTextReplacement:(BOOL)value sender:(id)sender {
+//    [defaults setBool:value forKey:TextReplacementInNoteBodyKey];
+//    
+//    SEND_CALLBACKS();
+//}
+//
+//- (BOOL)useTextReplacement {
+//    return [defaults boolForKey:TextReplacementInNoteBodyKey];
+//}
 
 - (void)setCheckSpellingAsYouType:(BOOL)value sender:(id)sender {
     [defaults setBool:value forKey:CheckSpellingInNoteBodyKey];
     
-    SEND_CALLBACKS();
+//    SEND_CALLBACKS();
 }
 
 - (BOOL)checkSpellingAsYouType {

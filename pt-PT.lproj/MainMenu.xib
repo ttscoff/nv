@@ -1,0 +1,1100 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="11201" systemVersion="16A323" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none">
+    <dependencies>
+        <deployment version="1060" identifier="macosx"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="11201"/>
+    </dependencies>
+    <objects>
+        <customObject id="-2" userLabel="File's Owner" customClass="NSApplication">
+            <connections>
+                <outlet property="delegate" destination="213" id="1041"/>
+            </connections>
+        </customObject>
+        <customObject id="-1" userLabel="First Responder" customClass="FirstResponder"/>
+        <customObject id="-3" userLabel="Application" customClass="NSObject"/>
+        <window title="nvALT" allowsToolTipsWhenApplicationIsInactive="NO" autorecalculatesKeyViewLoop="NO" restorable="NO" oneShot="NO" releasedWhenClosed="NO" showsToolbarButton="NO" visibleAtLaunch="NO" frameAutosaveName="NotationWindow" animationBehavior="default" id="1212" userLabel="notation">
+            <windowStyleMask key="styleMask" titled="YES" closable="YES" miniaturizable="YES" resizable="YES" unifiedTitleAndToolbar="YES"/>
+            <windowPositionMask key="initialPositionMask" leftStrut="YES" rightStrut="YES" topStrut="YES" bottomStrut="YES"/>
+            <rect key="contentRect" x="280" y="392" width="397" height="464"/>
+            <rect key="screenRect" x="0.0" y="0.0" width="1440" height="878"/>
+            <value key="minSize" type="size" width="213" height="107"/>
+            <view key="contentView" id="1213" customClass="ETContentView">
+                <rect key="frame" x="0.0" y="0.0" width="397" height="464"/>
+                <autoresizingMask key="autoresizingMask"/>
+            </view>
+            <connections>
+                <outlet property="delegate" destination="213" id="1251"/>
+                <outlet property="initialFirstResponder" destination="1067" id="1252"/>
+            </connections>
+        </window>
+        <menu title="MainMenu" systemMenu="main" id="29" userLabel="MainMenu">
+            <items>
+                <menuItem title="nvALT" id="56">
+                    <menu key="submenu" title="nvALT" systemMenu="apple" id="57">
+                        <items>
+                            <menuItem title="Sobre o nvALT" id="58">
+                                <modifierMask key="keyEquivalentModifierMask"/>
+                                <connections>
+                                    <action selector="orderFrontStandardAboutPanel:" target="-2" id="142"/>
+                                </connections>
+                            </menuItem>
+                            <menuItem isSeparatorItem="YES" id="196">
+                                <modifierMask key="keyEquivalentModifierMask" command="YES"/>
+                            </menuItem>
+                            <menuItem title="Preferências…" keyEquivalent="," id="129">
+                                <connections>
+                                    <action selector="showPreferencesWindow:" target="213" id="381"/>
+                                </connections>
+                            </menuItem>
+                            <menuItem isSeparatorItem="YES" id="991">
+                                <modifierMask key="keyEquivalentModifierMask" command="YES"/>
+                            </menuItem>
+                            <menuItem title="Verificar Atualizações…" tag="88" id="990"/>
+                            <menuItem isSeparatorItem="YES" id="143">
+                                <modifierMask key="keyEquivalentModifierMask" command="YES"/>
+                            </menuItem>
+                            <menuItem title="Serviços" id="131">
+                                <menu key="submenu" title="Serviços" systemMenu="services" id="130"/>
+                            </menuItem>
+                            <menuItem isSeparatorItem="YES" id="144">
+                                <modifierMask key="keyEquivalentModifierMask" command="YES"/>
+                            </menuItem>
+                            <menuItem title="Ocultar nvALT" keyEquivalent="h" id="134">
+                                <connections>
+                                    <action selector="hide:" target="-2" id="152"/>
+                                </connections>
+                            </menuItem>
+                            <menuItem title="Ocultar Outros" keyEquivalent="h" id="145">
+                                <modifierMask key="keyEquivalentModifierMask" option="YES" command="YES"/>
+                                <connections>
+                                    <action selector="hideOtherApplications:" target="-2" id="146"/>
+                                </connections>
+                            </menuItem>
+                            <menuItem title="Mostrar Todos" id="150">
+                                <connections>
+                                    <action selector="unhideAllApplications:" target="-2" id="153"/>
+                                </connections>
+                            </menuItem>
+                            <menuItem isSeparatorItem="YES" id="149">
+                                <modifierMask key="keyEquivalentModifierMask" command="YES"/>
+                            </menuItem>
+                            <menuItem title="Encerrar nvALT" keyEquivalent="q" id="136">
+                                <connections>
+                                    <action selector="terminate:" target="-2" id="139"/>
+                                </connections>
+                            </menuItem>
+                        </items>
+                    </menu>
+                </menuItem>
+                <menuItem title="Nota" tag="89" id="83">
+                    <menu key="submenu" title="Nota" id="81">
+                        <items>
+                            <menuItem title="Renomear" tag="90" keyEquivalent="r" id="392">
+                                <connections>
+                                    <action selector="renameNote:" target="213" id="526"/>
+                                </connections>
+                            </menuItem>
+                            <menuItem title="Etiquetar" tag="92" keyEquivalent="T" id="994">
+                                <connections>
+                                    <action selector="tagNote:" target="213" id="995"/>
+                                </connections>
+                            </menuItem>
+                            <menuItem title="Apagar" tag="91" id="393">
+                                <string key="keyEquivalent" base64-UTF8="YES">
+CA
+</string>
+                                <connections>
+                                    <action selector="deleteNote:" target="213" id="491"/>
+                                </connections>
+                            </menuItem>
+                            <menuItem isSeparatorItem="YES" id="394">
+                                <modifierMask key="keyEquivalentModifierMask" command="YES"/>
+                            </menuItem>
+                            <menuItem title="Buscar ou Criar…" keyEquivalent="l" id="554">
+                                <connections>
+                                    <action selector="bringFocusToControlField:" target="213" id="555"/>
+                                </connections>
+                            </menuItem>
+                            <menuItem isSeparatorItem="YES" id="79">
+                                <modifierMask key="keyEquivalentModifierMask" command="YES"/>
+                            </menuItem>
+                            <menuItem title="Importar…" tag="93" id="395">
+                                <connections>
+                                    <action selector="importNotes:" target="213" id="986"/>
+                                </connections>
+                            </menuItem>
+                            <menuItem title="Exportar…" tag="94" keyEquivalent="e" id="396">
+                                <connections>
+                                    <action selector="exportNote:" target="213" id="988"/>
+                                </connections>
+                            </menuItem>
+                            <menuItem title="Mostrar no Finder" keyEquivalent="R" id="1118">
+                                <connections>
+                                    <action selector="revealNote:" target="213" id="1119"/>
+                                </connections>
+                            </menuItem>
+                            <menuItem title="Edit With" tag="88" id="1292">
+                                <modifierMask key="keyEquivalentModifierMask"/>
+                            </menuItem>
+                            <menuItem isSeparatorItem="YES" id="553">
+                                <modifierMask key="keyEquivalentModifierMask" command="YES"/>
+                            </menuItem>
+                            <menuItem title="Configuração de Página…" tag="95" keyEquivalent="P" id="77">
+                                <connections>
+                                    <action selector="runPageLayout:" target="-1" id="87"/>
+                                </connections>
+                            </menuItem>
+                            <menuItem title="Imprimir…" tag="96" keyEquivalent="p" id="78">
+                                <connections>
+                                    <action selector="printNote:" target="213" id="987"/>
+                                </connections>
+                            </menuItem>
+                        </items>
+                    </menu>
+                </menuItem>
+                <menuItem title="Editar" id="163">
+                    <menu key="submenu" title="Editar" id="169">
+                        <items>
+                            <menuItem title="Desfazer" keyEquivalent="z" id="158">
+                                <connections>
+                                    <action selector="undo:" target="-1" id="180"/>
+                                </connections>
+                            </menuItem>
+                            <menuItem title="Refazer" keyEquivalent="Z" id="173">
+                                <connections>
+                                    <action selector="redo:" target="-1" id="178"/>
+                                </connections>
+                            </menuItem>
+                            <menuItem isSeparatorItem="YES" id="156">
+                                <modifierMask key="keyEquivalentModifierMask" command="YES"/>
+                            </menuItem>
+                            <menuItem title="Recortar" keyEquivalent="x" id="160">
+                                <connections>
+                                    <action selector="cut:" target="-1" id="175"/>
+                                </connections>
+                            </menuItem>
+                            <menuItem title="Copiar" keyEquivalent="c" id="157">
+                                <connections>
+                                    <action selector="copy:" target="-1" id="181"/>
+                                </connections>
+                            </menuItem>
+                            <menuItem title="Copiar URL" keyEquivalent="c" id="1116">
+                                <modifierMask key="keyEquivalentModifierMask" option="YES" command="YES"/>
+                                <connections>
+                                    <action selector="copyNoteLink:" target="213" id="1117"/>
+                                </connections>
+                            </menuItem>
+                            <menuItem title="Colar" keyEquivalent="v" id="171">
+                                <connections>
+                                    <action selector="paste:" target="-1" id="176"/>
+                                </connections>
+                            </menuItem>
+                            <menuItem title="Colar como Nova Nota" keyEquivalent="V" id="1000">
+                                <connections>
+                                    <action selector="paste:" target="1222" id="1246"/>
+                                </connections>
+                            </menuItem>
+                            <menuItem title="Colar Markdown Link" keyEquivalent="v" id="1335">
+                                <modifierMask key="keyEquivalentModifierMask" option="YES" command="YES"/>
+                                <connections>
+                                    <action selector="pasteMarkdownLink:" target="1218" id="1336"/>
+                                </connections>
+                            </menuItem>
+                            <menuItem title="Limpar" id="771">
+                                <connections>
+                                    <action selector="delete:" target="-1" id="773"/>
+                                </connections>
+                            </menuItem>
+                            <menuItem isSeparatorItem="YES" id="557">
+                                <modifierMask key="keyEquivalentModifierMask" command="YES"/>
+                            </menuItem>
+                            <menuItem title="Selecionar Tudo" keyEquivalent="a" id="172">
+                                <connections>
+                                    <action selector="selectAll:" target="-1" id="179"/>
+                                </connections>
+                            </menuItem>
+                            <menuItem isSeparatorItem="YES" id="550">
+                                <modifierMask key="keyEquivalentModifierMask" command="YES"/>
+                            </menuItem>
+                            <menuItem title="Procurar" id="168">
+                                <menu key="submenu" title="Procurar" id="159">
+                                    <items>
+                                        <menuItem title="Procurar…" tag="1" keyEquivalent="f" id="154">
+                                            <connections>
+                                                <action selector="performFindPanelAction:" target="1218" id="1241"/>
+                                            </connections>
+                                        </menuItem>
+                                        <menuItem title="Find and Replace…" tag="12" keyEquivalent="f" id="1304">
+                                            <modifierMask key="keyEquivalentModifierMask" option="YES" command="YES"/>
+                                            <connections>
+                                                <action selector="performFindPanelAction:" target="1218" id="1327"/>
+                                            </connections>
+                                        </menuItem>
+                                        <menuItem title="Procurar Próxima" tag="2" keyEquivalent="g" id="167">
+                                            <connections>
+                                                <action selector="performFindPanelAction:" target="1218" id="1242"/>
+                                            </connections>
+                                        </menuItem>
+                                        <menuItem title="Procurar Anterior" tag="3" keyEquivalent="G" id="162">
+                                            <connections>
+                                                <action selector="performFindPanelAction:" target="1218" id="1243"/>
+                                            </connections>
+                                        </menuItem>
+                                        <menuItem title="Procurar utilizando texto selecionado" tag="7" keyEquivalent="e" id="161">
+                                            <modifierMask key="keyEquivalentModifierMask" option="YES" command="YES"/>
+                                            <connections>
+                                                <action selector="performFindPanelAction:" target="1218" id="1328"/>
+                                            </connections>
+                                        </menuItem>
+                                        <menuItem title="Jump to Selection" keyEquivalent="j" id="1345">
+                                            <modifierMask key="keyEquivalentModifierMask" option="YES" command="YES"/>
+                                            <connections>
+                                                <action selector="centerSelectionInVisibleArea:" target="-1" id="1349"/>
+                                            </connections>
+                                        </menuItem>
+                                    </items>
+                                </menu>
+                            </menuItem>
+                            <menuItem title="Ortografia" id="184">
+                                <menu key="submenu" title="Ortografia" id="185">
+                                    <items>
+                                        <menuItem title="Ortografia…" keyEquivalent=":" id="187">
+                                            <connections>
+                                                <action selector="showGuessPanel:" target="-1" id="188"/>
+                                            </connections>
+                                        </menuItem>
+                                        <menuItem title="Verificar Ortografia" keyEquivalent=";" id="189">
+                                            <connections>
+                                                <action selector="checkSpelling:" target="-1" id="190"/>
+                                            </connections>
+                                        </menuItem>
+                                        <menuItem title="Verificar Ortografia ao Digitar" id="191">
+                                            <connections>
+                                                <binding destination="1281" name="value" keyPath="values.CheckSpellingInNoteBody" id="3Qd-Ab-hxy">
+                                                    <dictionary key="options">
+                                                        <bool key="NSAllowsEditingMultipleValuesSelection" value="NO"/>
+                                                        <bool key="NSValidatesImmediately" value="YES"/>
+                                                    </dictionary>
+                                                </binding>
+                                            </connections>
+                                        </menuItem>
+                                    </items>
+                                </menu>
+                            </menuItem>
+                            <menuItem title="Substitutions" id="1317">
+                                <modifierMask key="keyEquivalentModifierMask"/>
+                                <menu key="submenu" title="Substitutions" id="DF8-zH-zeJ">
+                                    <items>
+                                        <menuItem title="Show Substitutions" hidden="YES" enabled="NO" id="X9D-YG-Obe">
+                                            <modifierMask key="keyEquivalentModifierMask"/>
+                                            <connections>
+                                                <action selector="orderFrontSubstitutionsPanel:" target="-1" id="Qzf-Z7-9lp"/>
+                                            </connections>
+                                        </menuItem>
+                                        <menuItem isSeparatorItem="YES" hidden="YES" id="DzG-x2-3gy"/>
+                                        <menuItem title="Smart Copy/Paste" tag="1" keyEquivalent="f" id="1ue-9v-TWQ">
+                                            <connections>
+                                                <binding destination="1281" name="value" keyPath="values.UseSmartInsertDelete" id="l4J-WZ-1S9">
+                                                    <dictionary key="options">
+                                                        <bool key="NSAllowsEditingMultipleValuesSelection" value="NO"/>
+                                                        <bool key="NSValidatesImmediately" value="YES"/>
+                                                    </dictionary>
+                                                </binding>
+                                            </connections>
+                                        </menuItem>
+                                        <menuItem title="Smart Quotes" tag="2" keyEquivalent="g" id="l4M-HK-wj2">
+                                            <connections>
+                                                <binding destination="1281" name="value" keyPath="values.NSAutomaticQuoteSubstitutionEnabled" id="oEN-7c-dnE">
+                                                    <dictionary key="options">
+                                                        <bool key="NSAllowsEditingMultipleValuesSelection" value="NO"/>
+                                                        <bool key="NSValidatesImmediately" value="YES"/>
+                                                    </dictionary>
+                                                </binding>
+                                            </connections>
+                                        </menuItem>
+                                        <menuItem title="Smart Dashes" id="AbV-aj-udJ">
+                                            <modifierMask key="keyEquivalentModifierMask"/>
+                                            <connections>
+                                                <binding destination="1281" name="value" keyPath="values.NSAutomaticDashSubstitutionEnabled" id="zC0-1O-DsX">
+                                                    <dictionary key="options">
+                                                        <bool key="NSAllowsEditingMultipleValuesSelection" value="NO"/>
+                                                        <bool key="NSValidatesImmediately" value="YES"/>
+                                                    </dictionary>
+                                                </binding>
+                                            </connections>
+                                        </menuItem>
+                                        <menuItem title="Smart Links" tag="3" hidden="YES" enabled="NO" keyEquivalent="G" id="2fc-3s-8HK">
+                                            <modifierMask key="keyEquivalentModifierMask" shift="YES" command="YES"/>
+                                            <connections>
+                                                <action selector="toggleAutomaticLinkDetection:" target="-1" id="EeY-Cn-kcI"/>
+                                            </connections>
+                                        </menuItem>
+                                        <menuItem title="Text Replacement" id="6K3-ly-SUD">
+                                            <modifierMask key="keyEquivalentModifierMask"/>
+                                            <connections>
+                                                <binding destination="1281" name="value" keyPath="values.TextReplacementInNoteBody" id="vSX-MQ-KEb">
+                                                    <dictionary key="options">
+                                                        <bool key="NSAllowsEditingMultipleValuesSelection" value="NO"/>
+                                                        <bool key="NSValidatesImmediately" value="YES"/>
+                                                    </dictionary>
+                                                </binding>
+                                            </connections>
+                                        </menuItem>
+                                    </items>
+                                </menu>
+                            </menuItem>
+                            <menuItem title="Transformações" id="1093">
+                                <menu key="submenu" title="Transformações" id="1094">
+                                    <items>
+                                        <menuItem title="Tudo em Maiúsculas" id="1095">
+                                            <connections>
+                                                <action selector="uppercaseWord:" target="-1" id="1098"/>
+                                            </connections>
+                                        </menuItem>
+                                        <menuItem title="Tudo em Minúsculas" id="1096">
+                                            <connections>
+                                                <action selector="lowercaseWord:" target="-1" id="1099"/>
+                                            </connections>
+                                        </menuItem>
+                                        <menuItem title="Primeira Letra em Maiúsculo" id="1097">
+                                            <connections>
+                                                <action selector="capitalizeWord:" target="-1" id="1100"/>
+                                            </connections>
+                                        </menuItem>
+                                    </items>
+                                </menu>
+                            </menuItem>
+                        </items>
+                    </menu>
+                </menuItem>
+                <menuItem title="Visualizar" tag="99" id="382">
+                    <menu key="submenu" title="Visualizar" id="383">
+                        <items>
+                            <menuItem title="Enter Full Screen" tag="314" hidden="YES" enabled="NO" keyEquivalent="f" id="1300">
+                                <modifierMask key="keyEquivalentModifierMask" control="YES" command="YES"/>
+                                <connections>
+                                    <action selector="toggleFullScreen:" target="-1" id="1326"/>
+                                </connections>
+                            </menuItem>
+                            <menuItem title="Alternar para Leiaute Horizontal" keyEquivalent="l" id="1113">
+                                <modifierMask key="keyEquivalentModifierMask" option="YES" command="YES"/>
+                                <connections>
+                                    <action selector="switchViewLayout:" target="213" id="1115"/>
+                                </connections>
+                            </menuItem>
+                            <menuItem title="Collapse Notes List" keyEquivalent="C" id="1202">
+                                <connections>
+                                    <action selector="toggleCollapse:" target="213" id="1209"/>
+                                </connections>
+                            </menuItem>
+                            <menuItem title="Color Schemes" id="1203">
+                                <modifierMask key="keyEquivalentModifierMask"/>
+                                <menu key="submenu" title="Color Schemes" id="1204">
+                                    <items>
+                                        <menuItem title="B/W" state="on" alternate="YES" keyEquivalent="A" id="1205">
+                                            <connections>
+                                                <action selector="setBWColorScheme:" target="213" id="1211"/>
+                                            </connections>
+                                        </menuItem>
+                                        <menuItem title="Low Contrast" alternate="YES" keyEquivalent="S" id="1206">
+                                            <connections>
+                                                <action selector="setLCColorScheme:" target="213" id="1210"/>
+                                            </connections>
+                                        </menuItem>
+                                        <menuItem title="User Scheme" alternate="YES" keyEquivalent="D" id="1207">
+                                            <connections>
+                                                <action selector="setUserColorScheme:" target="213" id="1208"/>
+                                            </connections>
+                                        </menuItem>
+                                    </items>
+                                </menu>
+                            </menuItem>
+                            <menuItem isSeparatorItem="YES" id="1114"/>
+                            <menuItem title="Colunas" tag="97" id="386">
+                                <menu key="submenu" title="Colunas" id="387">
+                                    <items>
+                                        <menuItem title="Item" id="388"/>
+                                    </items>
+                                </menu>
+                            </menuItem>
+                            <menuItem title="Organizar Por" tag="98" id="389">
+                                <menu key="submenu" title="Organizar Por" id="390">
+                                    <items>
+                                        <menuItem title="Item" id="391"/>
+                                    </items>
+                                </menu>
+                            </menuItem>
+                            <menuItem isSeparatorItem="YES" id="508">
+                                <modifierMask key="keyEquivalentModifierMask" command="YES"/>
+                            </menuItem>
+                            <menuItem title="Show Word Count" alternate="YES" keyEquivalent="K" id="1280">
+                                <connections>
+                                    <action selector="toggleWordCount:" target="213" id="1284"/>
+                                    <binding destination="1281" name="value" keyPath="values.ShowWordCount" id="1283">
+                                        <dictionary key="options">
+                                            <string key="NSValueTransformerName">NSNegateBoolean</string>
+                                        </dictionary>
+                                    </binding>
+                                </connections>
+                            </menuItem>
+                            <menuItem title="Mostrar Prévia de Notas no Título" keyEquivalent="p" id="1062">
+                                <modifierMask key="keyEquivalentModifierMask" option="YES" command="YES"/>
+                                <connections>
+                                    <action selector="toggleNoteBodyPreviews:" target="1222" id="1250"/>
+                                </connections>
+                            </menuItem>
+                            <menuItem isSeparatorItem="YES" id="1061">
+                                <modifierMask key="keyEquivalentModifierMask" command="YES"/>
+                            </menuItem>
+                            <menuItem title="Próxima Nota" tag="106" keyEquivalent="j" id="521">
+                                <connections>
+                                    <action selector="incrementNoteSelection:" target="1222" id="1247"/>
+                                </connections>
+                            </menuItem>
+                            <menuItem title="Nota Anterior" tag="107" keyEquivalent="k" id="522">
+                                <connections>
+                                    <action selector="incrementNoteSelection:" target="1222" id="1248"/>
+                                </connections>
+                            </menuItem>
+                            <menuItem isSeparatorItem="YES" id="520">
+                                <modifierMask key="keyEquivalentModifierMask" command="YES"/>
+                            </menuItem>
+                            <menuItem title="Desmarcar Nota(s)" tag="101" keyEquivalent="d" id="507">
+                                <connections>
+                                    <action selector="deselectAll:" target="1222" id="1249"/>
+                                </connections>
+                            </menuItem>
+                        </items>
+                        <connections>
+                            <outlet property="delegate" destination="1222" id="1255"/>
+                        </connections>
+                    </menu>
+                </menuItem>
+                <menuItem title="Marcadores" tag="103" id="996">
+                    <menu key="submenu" title="Marcadores" id="997">
+                        <items>
+                            <menuItem title="Item" id="998"/>
+                        </items>
+                    </menu>
+                </menuItem>
+                <menuItem title="Formatar" id="397">
+                    <menu key="submenu" title="Formatar" id="398">
+                        <items>
+                            <menuItem title="Texto Simples" keyEquivalent="t" id="977">
+                                <connections>
+                                    <action selector="defaultStyle:" target="-1" id="978"/>
+                                </connections>
+                            </menuItem>
+                            <menuItem title="Negrito" tag="2" keyEquivalent="b" id="574">
+                                <attributedString key="attributedTitle">
+                                    <fragment content="Negrito">
+                                        <attributes>
+                                            <font key="NSFont" size="14" name="LucidaGrande-Bold"/>
+                                            <font key="NSOriginalFont" size="14" name="LucidaGrande-Bold"/>
+                                            <paragraphStyle key="NSParagraphStyle" alignment="natural" lineBreakMode="wordWrapping" baseWritingDirection="natural"/>
+                                        </attributes>
+                                    </fragment>
+                                </attributedString>
+                                <connections>
+                                    <action selector="bold:" target="-1" id="981"/>
+                                </connections>
+                            </menuItem>
+                            <menuItem title="Itálico" tag="1" keyEquivalent="i" id="575">
+                                <attributedString key="attributedTitle">
+                                    <fragment content="Itálico">
+                                        <attributes>
+                                            <font key="NSFont" size="14" name="LucidaGrande"/>
+                                            <font key="NSOriginalFont" size="14" name="LucidaGrande"/>
+                                            <paragraphStyle key="NSParagraphStyle" alignment="natural" lineBreakMode="wordWrapping" baseWritingDirection="natural"/>
+                                        </attributes>
+                                    </fragment>
+                                </attributedString>
+                                <connections>
+                                    <action selector="italic:" target="-1" id="982"/>
+                                </connections>
+                            </menuItem>
+                            <menuItem title="Tachado" keyEquivalent="y" id="576">
+                                <attributedString key="attributedTitle">
+                                    <fragment content="Tachado">
+                                        <attributes>
+                                            <font key="NSFont" size="14" name="LucidaGrande"/>
+                                            <font key="NSOriginalFont" size="14" name="LucidaGrande"/>
+                                            <paragraphStyle key="NSParagraphStyle" alignment="natural" lineBreakMode="wordWrapping" baseWritingDirection="natural"/>
+                                            <integer key="NSStrikethrough" value="1"/>
+                                        </attributes>
+                                    </fragment>
+                                </attributedString>
+                                <connections>
+                                    <action selector="strikethroughNV:" target="-1" id="1112"/>
+                                </connections>
+                            </menuItem>
+                            <menuItem isSeparatorItem="YES" id="577">
+                                <modifierMask key="keyEquivalentModifierMask" command="YES"/>
+                            </menuItem>
+                            <menuItem title="Diminuir Recuo" keyEquivalent="[" id="563">
+                                <connections>
+                                    <action selector="shiftLeftAction:" target="-1" id="568"/>
+                                </connections>
+                            </menuItem>
+                            <menuItem title="Aumentar Recuo" keyEquivalent="]" id="564">
+                                <connections>
+                                    <action selector="shiftRightAction:" target="-1" id="569"/>
+                                </connections>
+                            </menuItem>
+                            <menuItem isSeparatorItem="YES" id="565">
+                                <modifierMask key="keyEquivalentModifierMask" command="YES"/>
+                            </menuItem>
+                            <menuItem title="Corrigir Codificação de Texto…" tag="102" id="534">
+                                <connections>
+                                    <action selector="fixFileEncoding:" target="213" id="536"/>
+                                </connections>
+                            </menuItem>
+                        </items>
+                    </menu>
+                </menuItem>
+                <menuItem title="Preview" id="1258">
+                    <modifierMask key="keyEquivalentModifierMask"/>
+                    <menu key="submenu" title="Preview" id="1259">
+                        <items>
+                            <menuItem title="(Multi)Markdown" tag="13372" id="1262">
+                                <modifierMask key="keyEquivalentModifierMask"/>
+                                <connections>
+                                    <action selector="selectPreviewMode:" target="213" id="1266"/>
+                                </connections>
+                            </menuItem>
+                            <menuItem title="Textile" tag="13373" id="1263">
+                                <modifierMask key="keyEquivalentModifierMask"/>
+                                <connections>
+                                    <action selector="selectPreviewMode:" target="213" id="1268"/>
+                                </connections>
+                            </menuItem>
+                            <menuItem isSeparatorItem="YES" id="1261"/>
+                            <menuItem title="Toggle Preview Window" keyEquivalent="p" id="1260">
+                                <modifierMask key="keyEquivalentModifierMask" control="YES" command="YES"/>
+                                <connections>
+                                    <action selector="togglePreview:" target="213" id="1270"/>
+                                </connections>
+                            </menuItem>
+                            <menuItem title="Preview using Marked" keyEquivalent="m" id="1351">
+                                <modifierMask key="keyEquivalentModifierMask" control="YES" command="YES"/>
+                                <connections>
+                                    <action selector="previewNoteWithMarked:" target="213" id="1352"/>
+                                </connections>
+                            </menuItem>
+                            <menuItem title="Toggle Source View" keyEquivalent="u" id="1264">
+                                <connections>
+                                    <action selector="toggleSourceView:" target="213" id="1272"/>
+                                </connections>
+                            </menuItem>
+                            <menuItem title="Lock Note to Preview" keyEquivalent="L" id="1293">
+                                <modifierMask key="keyEquivalentModifierMask" option="YES" command="YES"/>
+                                <connections>
+                                    <action selector="lockPreview:" target="213" id="1295"/>
+                                </connections>
+                            </menuItem>
+                            <menuItem title="Print Preview / PDF" keyEquivalent="P" id="1294">
+                                <modifierMask key="keyEquivalentModifierMask" option="YES" command="YES"/>
+                                <connections>
+                                    <action selector="printPreview:" target="213" id="1296"/>
+                                </connections>
+                            </menuItem>
+                            <menuItem title="Save Preview HTML" keyEquivalent="S" id="1265">
+                                <connections>
+                                    <action selector="savePreview:" target="213" id="1273"/>
+                                </connections>
+                            </menuItem>
+                            <menuItem title="Enable Markdown Completion" keyEquivalent="M" id="1329">
+                                <connections>
+                                    <binding destination="1281" name="value" keyPath="values.UsesMarkdownCompletions" id="1332">
+                                        <dictionary key="options">
+                                            <bool key="NSAllowsEditingMultipleValuesSelection" value="NO"/>
+                                            <bool key="NSRaisesForNotApplicableKeys" value="NO"/>
+                                        </dictionary>
+                                    </binding>
+                                </connections>
+                            </menuItem>
+                        </items>
+                    </menu>
+                </menuItem>
+                <menuItem title="Janela" id="19">
+                    <menu key="submenu" title="Janela" systemMenu="window" id="24">
+                        <items>
+                            <menuItem title="Minimizar" keyEquivalent="m" id="23">
+                                <connections>
+                                    <action selector="performMiniaturize:" target="-1" id="37"/>
+                                </connections>
+                            </menuItem>
+                            <menuItem title="Fechar" keyEquivalent="w" id="489">
+                                <connections>
+                                    <action selector="performClose:" target="-1" id="496"/>
+                                </connections>
+                            </menuItem>
+                            <menuItem title="Zoom" id="197">
+                                <connections>
+                                    <action selector="performZoom:" target="-1" id="198"/>
+                                </connections>
+                            </menuItem>
+                            <menuItem isSeparatorItem="YES" id="92">
+                                <modifierMask key="keyEquivalentModifierMask" command="YES"/>
+                            </menuItem>
+                            <menuItem title="Show Main Window" keyEquivalent="N" id="abV-4P-Iin">
+                                <connections>
+                                    <action selector="makeActiveAndShowWindow:" target="213" id="U0z-BD-UI2"/>
+                                </connections>
+                            </menuItem>
+                            <menuItem title="Trazer Todas Para Frente" id="5">
+                                <connections>
+                                    <action selector="arrangeInFront:" target="-1" id="39"/>
+                                </connections>
+                            </menuItem>
+                        </items>
+                    </menu>
+                </menuItem>
+                <menuItem title="Ajuda" id="103">
+                    <menu key="submenu" title="Ajuda" id="106">
+                        <items>
+                            <menuItem title="Atalhos de Teclado" tag="1" id="111">
+                                <modifierMask key="keyEquivalentModifierMask"/>
+                                <connections>
+                                    <action selector="showHelpDocument:" target="213" id="1092"/>
+                                </connections>
+                            </menuItem>
+                            <menuItem isSeparatorItem="YES" id="1058">
+                                <modifierMask key="keyEquivalentModifierMask" command="YES"/>
+                            </menuItem>
+                            <menuItem title="nvALT Home" tag="5" id="1286">
+                                <modifierMask key="keyEquivalentModifierMask"/>
+                                <connections>
+                                    <action selector="showHelpDocument:" target="213" id="1289"/>
+                                </connections>
+                            </menuItem>
+                            <menuItem title="Web Site do Elasticthreads" tag="6" id="1287">
+                                <modifierMask key="keyEquivalentModifierMask"/>
+                                <connections>
+                                    <action selector="showHelpDocument:" target="213" id="1290"/>
+                                </connections>
+                            </menuItem>
+                            <menuItem title="Web Site do Brett Terpstra" tag="7" id="1288">
+                                <modifierMask key="keyEquivalentModifierMask"/>
+                                <connections>
+                                    <action selector="showHelpDocument:" target="213" id="1291"/>
+                                </connections>
+                            </menuItem>
+                            <menuItem title="Web Site do Notational Velocity" tag="3" id="1053">
+                                <modifierMask key="keyEquivalentModifierMask"/>
+                                <connections>
+                                    <action selector="showHelpDocument:" target="213" id="1091"/>
+                                </connections>
+                            </menuItem>
+                            <menuItem title="Web Site de Desenvolvimento" tag="4" id="1087">
+                                <modifierMask key="keyEquivalentModifierMask"/>
+                                <connections>
+                                    <action selector="showHelpDocument:" target="213" id="1090"/>
+                                </connections>
+                            </menuItem>
+                            <menuItem isSeparatorItem="YES" id="1057">
+                                <modifierMask key="keyEquivalentModifierMask" command="YES"/>
+                            </menuItem>
+                            <menuItem title="Agradecimentos (em Inglês)" tag="2" id="1055">
+                                <modifierMask key="keyEquivalentModifierMask"/>
+                                <connections>
+                                    <action selector="showHelpDocument:" target="213" id="1089"/>
+                                </connections>
+                            </menuItem>
+                        </items>
+                    </menu>
+                </menuItem>
+            </items>
+        </menu>
+        <customObject id="213" userLabel="AppController" customClass="AppController">
+            <connections>
+                <outlet property="editorStatusView" destination="341" id="348"/>
+                <outlet property="field" destination="1067" id="1074"/>
+                <outlet property="fsMenuItem" destination="1300" id="1301"/>
+                <outlet property="lockNoteItem" destination="1293" id="1297"/>
+                <outlet property="mainView" destination="1213" id="1285"/>
+                <outlet property="multiMarkdownPreview" destination="1262" id="1267"/>
+                <outlet property="notesScrollView" destination="1221" id="1279"/>
+                <outlet property="notesTableView" destination="1222" id="1230"/>
+                <outlet property="previewToggler" destination="1260" id="1271"/>
+                <outlet property="printPreviewItem" destination="1294" id="1298"/>
+                <outlet property="savePreviewItem" destination="1265" id="1299"/>
+                <outlet property="sparkleUpdateItem" destination="990" id="1052"/>
+                <outlet property="statBarMenu" destination="1123" id="1158"/>
+                <outlet property="syncWaitPanel" destination="1079" id="1085"/>
+                <outlet property="syncWaitSpinner" destination="1082" id="1084"/>
+                <outlet property="textScrollView" destination="1217" id="1278"/>
+                <outlet property="textView" destination="1218" id="1233"/>
+                <outlet property="textilePreview" destination="1263" id="1269"/>
+                <outlet property="window" destination="1212" id="1234"/>
+                <outlet property="wordCounter" destination="1274" id="1277"/>
+            </connections>
+        </customObject>
+        <customView id="341" userLabel="editorStatus" customClass="EmptyView">
+            <rect key="frame" x="0.0" y="0.0" width="147" height="102"/>
+            <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+            <subviews>
+                <textField verticalHuggingPriority="750" id="342">
+                    <rect key="frame" x="-3" y="27" width="153" height="46"/>
+                    <autoresizingMask key="autoresizingMask" flexibleMinX="YES" widthSizable="YES" flexibleMaxX="YES" flexibleMinY="YES" heightSizable="YES" flexibleMaxY="YES"/>
+                    <textFieldCell key="cell" sendsActionOnEndEditing="YES" alignment="center" title="Nenhuma Nota Selecionada" id="1102">
+                        <font key="font" size="18" name="Helvetica"/>
+                        <color key="textColor" white="0.49596774580000003" alpha="1" colorSpace="calibratedWhite"/>
+                        <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
+                    </textFieldCell>
+                </textField>
+            </subviews>
+            <connections>
+                <outlet property="labelText" destination="342" id="350"/>
+                <outlet property="nextKeyView" destination="1067" id="1076"/>
+            </connections>
+        </customView>
+        <customObject id="452" userLabel="Font Manager" customClass="NSFontManager"/>
+        <customView id="1066" userLabel="fieldcustomview">
+            <rect key="frame" x="0.0" y="0.0" width="381" height="24"/>
+            <autoresizingMask key="autoresizingMask" widthSizable="YES"/>
+            <subviews>
+                <textField verticalHuggingPriority="750" id="1067" customClass="DualField">
+                    <rect key="frame" x="0.0" y="1" width="381" height="23"/>
+                    <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMinY="YES"/>
+                    <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" state="on" borderStyle="bezel" drawsBackground="YES" id="1103">
+                        <font key="font" metaFont="system"/>
+                        <color key="textColor" name="textColor" catalog="System" colorSpace="catalog"/>
+                        <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                    </textFieldCell>
+                    <connections>
+                        <action selector="fieldAction:" target="213" id="1071"/>
+                        <outlet property="delegate" destination="213" id="1068"/>
+                        <outlet property="nextKeyView" destination="1218" id="1236"/>
+                        <outlet property="notesTable" destination="1222" id="1235"/>
+                    </connections>
+                </textField>
+                <tokenField verticalHuggingPriority="750" id="1274" userLabel="Word Count Token" customClass="WordCountToken">
+                    <rect key="frame" x="206" y="6" width="145" height="14"/>
+                    <autoresizingMask key="autoresizingMask" flexibleMinX="YES"/>
+                    <tokenFieldCell key="cell" controlSize="small" alignment="right" allowsEditingTextAttributes="YES" id="1275">
+                        <font key="font" metaFont="smallSystem"/>
+                        <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
+                        <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                    </tokenFieldCell>
+                    <connections>
+                        <outlet property="delegate" destination="213" id="1276"/>
+                    </connections>
+                </tokenField>
+            </subviews>
+        </customView>
+        <window allowsToolTipsWhenApplicationIsInactive="NO" autorecalculatesKeyViewLoop="NO" hidesOnDeactivate="YES" releasedWhenClosed="NO" visibleAtLaunch="NO" animationBehavior="default" id="1079" userLabel="quit waiting" customClass="NSPanel">
+            <windowStyleMask key="styleMask" titled="YES"/>
+            <windowPositionMask key="initialPositionMask" leftStrut="YES" rightStrut="YES" topStrut="YES" bottomStrut="YES"/>
+            <rect key="contentRect" x="454" y="634" width="387" height="106"/>
+            <rect key="screenRect" x="0.0" y="0.0" width="1440" height="878"/>
+            <value key="minSize" type="size" width="213" height="107"/>
+            <view key="contentView" id="1080">
+                <rect key="frame" x="0.0" y="0.0" width="387" height="106"/>
+                <autoresizingMask key="autoresizingMask"/>
+                <subviews>
+                    <button verticalHuggingPriority="750" id="1081">
+                        <rect key="frame" x="239" y="12" width="134" height="32"/>
+                        <autoresizingMask key="autoresizingMask"/>
+                        <buttonCell key="cell" type="push" title="Encerrar Agora" bezelStyle="rounded" alignment="center" borderStyle="border" inset="2" id="1104">
+                            <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                            <font key="font" metaFont="system"/>
+                            <string key="keyEquivalent" base64-UTF8="YES">
+DQ
+</string>
+                        </buttonCell>
+                        <connections>
+                            <action selector="syncWaitQuit:" target="213" id="1086"/>
+                        </connections>
+                    </button>
+                    <progressIndicator horizontalHuggingPriority="750" verticalHuggingPriority="750" maxValue="100" bezeled="NO" indeterminate="YES" style="spinning" id="1082">
+                        <rect key="frame" x="20" y="54" width="32" height="32"/>
+                        <autoresizingMask key="autoresizingMask"/>
+                    </progressIndicator>
+                    <textField verticalHuggingPriority="750" id="1083">
+                        <rect key="frame" x="70" y="60" width="306" height="20"/>
+                        <autoresizingMask key="autoresizingMask"/>
+                        <textFieldCell key="cell" sendsActionOnEndEditing="YES" title="Aguardando término do envio das alterações…" id="1105">
+                            <font key="font" metaFont="system"/>
+                            <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
+                            <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
+                        </textFieldCell>
+                    </textField>
+                </subviews>
+            </view>
+        </window>
+        <menu title="barMenu" id="1123">
+            <items>
+                <menuItem title="Marcadores" tag="901" id="1199">
+                    <menu key="submenu" title="Marcadores" id="1200">
+                        <items>
+                            <menuItem title="Item" id="1201"/>
+                        </items>
+                    </menu>
+                </menuItem>
+                <menuItem title="Formatar" id="1181">
+                    <menu key="submenu" title="Formatar" id="1182">
+                        <items>
+                            <menuItem title="Texto Simples" keyEquivalent="t" id="1183">
+                                <connections>
+                                    <action selector="defaultStyle:" target="-1" id="1197"/>
+                                </connections>
+                            </menuItem>
+                            <menuItem title="Negrito" tag="2" keyEquivalent="b" id="1187">
+                                <attributedString key="attributedTitle">
+                                    <fragment content="Negrito">
+                                        <attributes>
+                                            <font key="NSFont" size="14" name="LucidaGrande-Bold"/>
+                                            <font key="NSOriginalFont" size="14" name="LucidaGrande-Bold"/>
+                                            <paragraphStyle key="NSParagraphStyle" alignment="natural" lineBreakMode="wordWrapping" baseWritingDirection="natural"/>
+                                        </attributes>
+                                    </fragment>
+                                </attributedString>
+                                <connections>
+                                    <action selector="bold:" target="-1" id="1196"/>
+                                </connections>
+                            </menuItem>
+                            <menuItem title="Itálico" tag="1" keyEquivalent="i" id="1186">
+                                <attributedString key="attributedTitle">
+                                    <fragment content="Itálico">
+                                        <attributes>
+                                            <font key="NSFont" size="14" name="LucidaGrande"/>
+                                            <font key="NSOriginalFont" size="14" name="LucidaGrande"/>
+                                            <paragraphStyle key="NSParagraphStyle" alignment="natural" lineBreakMode="wordWrapping" baseWritingDirection="natural"/>
+                                        </attributes>
+                                    </fragment>
+                                </attributedString>
+                                <connections>
+                                    <action selector="italic:" target="-1" id="1195"/>
+                                </connections>
+                            </menuItem>
+                            <menuItem title="Tachado" keyEquivalent="y" id="1185">
+                                <attributedString key="attributedTitle">
+                                    <fragment content="Tachado">
+                                        <attributes>
+                                            <font key="NSFont" size="14" name="LucidaGrande"/>
+                                            <font key="NSOriginalFont" size="14" name="LucidaGrande"/>
+                                            <paragraphStyle key="NSParagraphStyle" alignment="natural" lineBreakMode="wordWrapping" baseWritingDirection="natural"/>
+                                            <integer key="NSStrikethrough" value="1"/>
+                                        </attributes>
+                                    </fragment>
+                                </attributedString>
+                                <connections>
+                                    <action selector="strikethroughNV:" target="-1" id="1193"/>
+                                </connections>
+                            </menuItem>
+                            <menuItem isSeparatorItem="YES" id="1184">
+                                <modifierMask key="keyEquivalentModifierMask" command="YES"/>
+                            </menuItem>
+                            <menuItem title="Diminuir Recuo" keyEquivalent="[" id="1190">
+                                <connections>
+                                    <action selector="shiftLeftAction:" target="-1" id="1192"/>
+                                </connections>
+                            </menuItem>
+                            <menuItem title="Aumentar Recuo" keyEquivalent="]" id="1189">
+                                <connections>
+                                    <action selector="shiftRightAction:" target="-1" id="1198"/>
+                                </connections>
+                            </menuItem>
+                            <menuItem isSeparatorItem="YES" id="1188">
+                                <modifierMask key="keyEquivalentModifierMask" command="YES"/>
+                            </menuItem>
+                            <menuItem title="Corrigir Codificação de Texto…" tag="102" id="1191">
+                                <connections>
+                                    <action selector="fixFileEncoding:" target="213" id="1194"/>
+                                </connections>
+                            </menuItem>
+                        </items>
+                    </menu>
+                </menuItem>
+                <menuItem isSeparatorItem="YES" id="1138"/>
+                <menuItem title="Buscar ou Criar…" keyEquivalent="l" id="1171">
+                    <connections>
+                        <action selector="bringFocusToControlField:" target="213" id="1172"/>
+                    </connections>
+                </menuItem>
+                <menuItem title="Mostrar no Finder" keyEquivalent="R" id="1173">
+                    <connections>
+                        <action selector="revealNote:" target="213" id="1174"/>
+                    </connections>
+                </menuItem>
+                <menuItem title="Renomear" tag="90" keyEquivalent="r" id="1165">
+                    <connections>
+                        <action selector="renameNote:" target="213" id="1168"/>
+                    </connections>
+                </menuItem>
+                <menuItem title="Etiquetar" tag="92" keyEquivalent="T" id="1166">
+                    <connections>
+                        <action selector="tagNote:" target="213" id="1169"/>
+                    </connections>
+                </menuItem>
+                <menuItem title="Apagar" tag="91" id="1167">
+                    <string key="keyEquivalent" base64-UTF8="YES">
+CA
+</string>
+                    <connections>
+                        <action selector="deleteNote:" target="213" id="1170"/>
+                    </connections>
+                </menuItem>
+                <menuItem title="Insert Link" keyEquivalent="L" id="1302">
+                    <connections>
+                        <action selector="insertLink:" target="1218" id="1303"/>
+                    </connections>
+                </menuItem>
+                <menuItem isSeparatorItem="YES" id="xlS-t6-kmU"/>
+                <menuItem title="Toggle Preview Window" keyEquivalent="p" id="1333">
+                    <modifierMask key="keyEquivalentModifierMask" control="YES" command="YES"/>
+                    <connections>
+                        <action selector="togglePreview:" target="213" id="1334"/>
+                    </connections>
+                </menuItem>
+                <menuItem title="Preview using Marked" keyEquivalent="m" id="De7-IN-E4D">
+                    <modifierMask key="keyEquivalentModifierMask" control="YES" command="YES"/>
+                    <connections>
+                        <action selector="previewNoteWithMarked:" target="213" id="SSA-Ll-PCH"/>
+                    </connections>
+                </menuItem>
+                <menuItem title="Enable Markdown Completion" keyEquivalent="M" id="1337">
+                    <connections>
+                        <binding destination="1281" name="value" keyPath="values.UsesMarkdownCompletions" id="1338">
+                            <dictionary key="options">
+                                <bool key="NSAllowsEditingMultipleValuesSelection" value="NO"/>
+                                <bool key="NSRaisesForNotApplicableKeys" value="NO"/>
+                            </dictionary>
+                        </binding>
+                    </connections>
+                </menuItem>
+                <menuItem isSeparatorItem="YES" id="1139"/>
+                <menuItem title="Alternar para Leiaute Horizontal" keyEquivalent="l" id="1175">
+                    <modifierMask key="keyEquivalentModifierMask" option="YES" command="YES"/>
+                    <connections>
+                        <action selector="switchViewLayout:" target="213" id="1176"/>
+                    </connections>
+                </menuItem>
+                <menuItem title="Collapse Notes List" keyEquivalent="C" id="1132">
+                    <connections>
+                        <action selector="toggleCollapse:" target="213" id="1177"/>
+                    </connections>
+                </menuItem>
+                <menuItem title="Color Schemes" id="1140">
+                    <modifierMask key="keyEquivalentModifierMask"/>
+                    <menu key="submenu" title="Color Schemes" id="1141">
+                        <items>
+                            <menuItem title="B/W" state="on" alternate="YES" keyEquivalent="A" id="1144">
+                                <connections>
+                                    <action selector="setBWColorScheme:" target="213" id="1178"/>
+                                </connections>
+                            </menuItem>
+                            <menuItem title="Low Contrast" alternate="YES" keyEquivalent="S" id="1143">
+                                <connections>
+                                    <action selector="setLCColorScheme:" target="213" id="1179"/>
+                                </connections>
+                            </menuItem>
+                            <menuItem title="User Scheme" alternate="YES" keyEquivalent="D" id="1142">
+                                <connections>
+                                    <action selector="setUserColorScheme:" target="213" id="1180"/>
+                                </connections>
+                            </menuItem>
+                        </items>
+                    </menu>
+                </menuItem>
+                <menuItem isSeparatorItem="YES" id="1137"/>
+                <menuItem title="Sobre o nvALT" id="oAb-Lt-iuK">
+                    <modifierMask key="keyEquivalentModifierMask"/>
+                    <connections>
+                        <action selector="orderFrontStandardAboutPanel:" target="-2" id="9Yq-Nu-d9k"/>
+                    </connections>
+                </menuItem>
+                <menuItem title="Preferências…" keyEquivalent="," id="1163">
+                    <connections>
+                        <action selector="showPreferencesWindow:" target="213" id="1164"/>
+                    </connections>
+                </menuItem>
+                <menuItem title="Verificar Atualizações…" tag="902" id="1162"/>
+                <menuItem title="Encerrar nvALT" keyEquivalent="q" id="1160">
+                    <connections>
+                        <action selector="terminate:" target="-2" id="1161"/>
+                    </connections>
+                </menuItem>
+            </items>
+            <connections>
+                <outlet property="delegate" destination="1124" id="1157"/>
+            </connections>
+        </menu>
+        <customView id="1124" customClass="StatusItemView">
+            <rect key="frame" x="0.0" y="0.0" width="163" height="96"/>
+            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+        </customView>
+        <scrollView borderType="none" autohidesScrollers="YES" horizontalLineScroll="10" horizontalPageScroll="10" verticalLineScroll="10" verticalPageScroll="10" hasHorizontalScroller="NO" usesPredominantAxisScrolling="NO" id="1217" userLabel="Scroll View - Linking Editor" customClass="ETNoteScrollView">
+            <rect key="frame" x="0.0" y="0.0" width="399" height="304"/>
+            <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+            <clipView key="contentView" drawsBackground="NO" id="Ri6-Rt-k8M">
+                <rect key="frame" x="0.0" y="0.0" width="399" height="304"/>
+                <autoresizingMask key="autoresizingMask"/>
+                <subviews>
+                    <textView drawsBackground="NO" importsGraphics="NO" richText="NO" usesFontPanel="YES" findStyle="panel" allowsUndo="YES" spellingCorrection="YES" id="1218" customClass="LinkingEditor">
+                        <rect key="frame" x="0.0" y="0.0" width="399" height="304"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                        <size key="minSize" width="399" height="304"/>
+                        <size key="maxSize" width="781" height="10000000"/>
+                        <color key="insertionPointColor" white="0.0" alpha="1" colorSpace="calibratedWhite"/>
+                        <connections>
+                            <outlet property="controlField" destination="1067" id="1239"/>
+                            <outlet property="delegate" destination="213" id="1240"/>
+                            <outlet property="nextKeyView" destination="1067" id="1238"/>
+                            <outlet property="notesTableView" destination="1222" id="1227"/>
+                        </connections>
+                    </textView>
+                </subviews>
+                <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+            </clipView>
+            <scroller key="horizontalScroller" hidden="YES" verticalHuggingPriority="750" arrowsPosition="none" doubleValue="1" horizontal="YES" id="1220">
+                <rect key="frame" x="-100" y="-100" width="87" height="18"/>
+                <autoresizingMask key="autoresizingMask"/>
+            </scroller>
+            <scroller key="verticalScroller" hidden="YES" verticalHuggingPriority="750" arrowsPosition="none" doubleValue="1" horizontal="NO" id="1219">
+                <rect key="frame" x="383" y="0.0" width="16" height="304"/>
+                <autoresizingMask key="autoresizingMask"/>
+            </scroller>
+            <connections>
+                <outlet property="nextKeyView" destination="1067" id="1256"/>
+            </connections>
+        </scrollView>
+        <scrollView borderType="none" horizontalLineScroll="16" horizontalPageScroll="10" verticalLineScroll="16" verticalPageScroll="10" hasHorizontalScroller="NO" usesPredominantAxisScrolling="NO" id="1221" userLabel="Scroll View - Notes Table View" customClass="ETScrollView">
+            <rect key="frame" x="0.0" y="0.0" width="399" height="153"/>
+            <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+            <clipView key="contentView" drawsBackground="NO" id="yEc-QV-RtR">
+                <rect key="frame" x="0.0" y="0.0" width="399" height="153"/>
+                <autoresizingMask key="autoresizingMask"/>
+                <subviews>
+                    <tableView focusRingType="none" verticalHuggingPriority="750" allowsExpansionToolTips="YES" autosaveColumns="NO" rowHeight="14" headerView="1225" id="1222" customClass="NotesTableView">
+                        <rect key="frame" x="0.0" y="0.0" width="399" height="136"/>
+                        <autoresizingMask key="autoresizingMask"/>
+                        <size key="intercellSpacing" width="3" height="2"/>
+                        <color key="backgroundColor" name="controlBackgroundColor" catalog="System" colorSpace="catalog"/>
+                        <color key="gridColor" name="gridColor" catalog="System" colorSpace="catalog"/>
+                        <connections>
+                            <outlet property="controlField" destination="1067" id="1244"/>
+                            <outlet property="delegate" destination="213" id="1245"/>
+                            <outlet property="nextKeyView" destination="1218" id="1228"/>
+                        </connections>
+                    </tableView>
+                </subviews>
+            </clipView>
+            <scroller key="horizontalScroller" hidden="YES" autoresizesSubviews="NO" focusRingType="none" verticalHuggingPriority="750" arrowsPosition="none" horizontal="YES" id="1224">
+                <rect key="frame" x="-100" y="-100" width="382" height="15"/>
+                <autoresizingMask key="autoresizingMask"/>
+            </scroller>
+            <scroller key="verticalScroller" autoresizesSubviews="NO" focusRingType="none" verticalHuggingPriority="750" arrowsPosition="none" horizontal="NO" id="1223">
+                <rect key="frame" x="383" y="17" width="16" height="136"/>
+                <autoresizingMask key="autoresizingMask"/>
+            </scroller>
+            <tableHeaderView key="headerView" id="1225" customClass="HeaderViewWithMenu">
+                <rect key="frame" x="0.0" y="0.0" width="399" height="17"/>
+                <autoresizingMask key="autoresizingMask"/>
+            </tableHeaderView>
+        </scrollView>
+        <userDefaultsController representsSharedInstance="YES" id="1281"/>
+    </objects>
+</document>

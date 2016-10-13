@@ -1,8 +1,8 @@
-<?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="6249" systemVersion="13F34" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none">
+<?xml version="1.0" encoding="UTF-8"?>
+<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="11201" systemVersion="16A323" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none">
     <dependencies>
         <deployment version="1060" identifier="macosx"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="6249"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="11201"/>
     </dependencies>
     <objects>
         <customObject id="-2" userLabel="File's Owner" customClass="NSApplication">
@@ -12,7 +12,7 @@
         </customObject>
         <customObject id="-1" userLabel="First Responder" customClass="FirstResponder"/>
         <customObject id="-3" userLabel="Application" customClass="NSObject"/>
-        <window title="nvALT" allowsToolTipsWhenApplicationIsInactive="NO" autorecalculatesKeyViewLoop="NO" oneShot="NO" releasedWhenClosed="NO" visibleAtLaunch="NO" frameAutosaveName="NotationWindow" animationBehavior="default" id="1214" userLabel="notation">
+        <window title="nvALT" allowsToolTipsWhenApplicationIsInactive="NO" autorecalculatesKeyViewLoop="NO" restorable="NO" oneShot="NO" releasedWhenClosed="NO" showsToolbarButton="NO" visibleAtLaunch="NO" frameAutosaveName="NotationWindow" animationBehavior="default" id="1214" userLabel="notation">
             <windowStyleMask key="styleMask" titled="YES" closable="YES" miniaturizable="YES" resizable="YES" unifiedTitleAndToolbar="YES"/>
             <windowPositionMask key="initialPositionMask" leftStrut="YES" rightStrut="YES" topStrut="YES" bottomStrut="YES"/>
             <rect key="contentRect" x="280" y="392" width="397" height="464"/>
@@ -270,32 +270,73 @@ CA
                                         </menuItem>
                                         <menuItem title="Vérifier en cours de frappe" id="191">
                                             <connections>
-                                                <action selector="toggleContinuousSpellChecking:" target="-1" id="192"/>
+                                                <binding destination="1291" name="value" keyPath="values.CheckSpellingInNoteBody" id="qFH-Tn-nE4">
+                                                    <dictionary key="options">
+                                                        <bool key="NSAllowsEditingMultipleValuesSelection" value="NO"/>
+                                                        <bool key="NSValidatesImmediately" value="YES"/>
+                                                    </dictionary>
+                                                </binding>
                                             </connections>
                                         </menuItem>
                                     </items>
                                 </menu>
                             </menuItem>
                             <menuItem title="Substitutions" id="1325">
-                                <menu key="submenu" title="Substitutions" id="1326">
+                                <menu key="submenu" title="Substitutions" id="HXd-Ar-3Zn">
                                     <items>
-                                        <menuItem title="Show Substitutions" id="1327">
+                                        <menuItem title="Show Substitutions" hidden="YES" enabled="NO" id="B3f-Eg-P49">
                                             <modifierMask key="keyEquivalentModifierMask"/>
                                             <connections>
-                                                <action selector="orderFrontSubstitutionsPanel:" target="-1" id="1331"/>
+                                                <action selector="orderFrontSubstitutionsPanel:" target="-1" id="5e2-nU-40K"/>
                                             </connections>
                                         </menuItem>
-                                        <menuItem isSeparatorItem="YES" id="1328"/>
-                                        <menuItem title="Smart Dashes" id="1329">
-                                            <modifierMask key="keyEquivalentModifierMask"/>
+                                        <menuItem isSeparatorItem="YES" hidden="YES" id="tic-Z0-p3n"/>
+                                        <menuItem title="Smart Copy/Paste" tag="1" keyEquivalent="f" id="4z0-J9-YdN">
                                             <connections>
-                                                <action selector="toggleAutomaticDashSubstitution:" target="-1" id="1332"/>
+                                                <binding destination="1291" name="value" keyPath="values.UseSmartInsertDelete" id="FNL-Qx-rO2">
+                                                    <dictionary key="options">
+                                                        <bool key="NSAllowsEditingMultipleValuesSelection" value="NO"/>
+                                                        <bool key="NSValidatesImmediately" value="YES"/>
+                                                    </dictionary>
+                                                </binding>
                                             </connections>
                                         </menuItem>
-                                        <menuItem title="Text Replacement" id="1330">
+                                        <menuItem title="Smart Quotes" tag="2" keyEquivalent="g" id="bXv-UL-YfK">
+                                            <connections>
+                                                <binding destination="1291" name="value" keyPath="values.NSAutomaticQuoteSubstitutionEnabled" id="pZa-aH-r9A">
+                                                    <dictionary key="options">
+                                                        <bool key="NSAllowsEditingMultipleValuesSelection" value="NO"/>
+                                                        <bool key="NSValidatesImmediately" value="YES"/>
+                                                    </dictionary>
+                                                </binding>
+                                            </connections>
+                                        </menuItem>
+                                        <menuItem title="Smart Dashes" id="ngE-qT-3rP">
                                             <modifierMask key="keyEquivalentModifierMask"/>
                                             <connections>
-                                                <action selector="toggleAutomaticTextReplacement:" target="-1" id="1333"/>
+                                                <binding destination="1291" name="value" keyPath="values.NSAutomaticDashSubstitutionEnabled" id="W4c-sc-RsB">
+                                                    <dictionary key="options">
+                                                        <bool key="NSAllowsEditingMultipleValuesSelection" value="NO"/>
+                                                        <bool key="NSValidatesImmediately" value="YES"/>
+                                                    </dictionary>
+                                                </binding>
+                                            </connections>
+                                        </menuItem>
+                                        <menuItem title="Smart Links" tag="3" hidden="YES" enabled="NO" keyEquivalent="G" id="EDA-MB-EdC">
+                                            <modifierMask key="keyEquivalentModifierMask" shift="YES" command="YES"/>
+                                            <connections>
+                                                <action selector="toggleAutomaticLinkDetection:" target="-1" id="149-Rc-AjW"/>
+                                            </connections>
+                                        </menuItem>
+                                        <menuItem title="Text Replacement" id="DcL-gz-37t">
+                                            <modifierMask key="keyEquivalentModifierMask"/>
+                                            <connections>
+                                                <binding destination="1291" name="value" keyPath="values.TextReplacementInNoteBody" id="0EP-sj-ccz">
+                                                    <dictionary key="options">
+                                                        <bool key="NSAllowsEditingMultipleValuesSelection" value="NO"/>
+                                                        <bool key="NSValidatesImmediately" value="YES"/>
+                                                    </dictionary>
+                                                </binding>
                                             </connections>
                                         </menuItem>
                                     </items>
@@ -596,6 +637,11 @@ CA
                             </menuItem>
                             <menuItem isSeparatorItem="YES" id="92">
                                 <modifierMask key="keyEquivalentModifierMask" command="YES"/>
+                            </menuItem>
+                            <menuItem title="Show Main Window" keyEquivalent="N" id="ul2-Tw-eyq">
+                                <connections>
+                                    <action selector="makeActiveAndShowWindow:" target="213" id="5jp-8m-hqv"/>
+                                </connections>
                             </menuItem>
                             <menuItem title="Tout mettre au premier plan" id="5">
                                 <connections>
@@ -981,13 +1027,14 @@ CA
             <rect key="frame" x="0.0" y="0.0" width="399" height="153"/>
             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
             <clipView key="contentView" drawsBackground="NO" id="UDx-7r-B6m">
-                <rect key="frame" x="0.0" y="17" width="399" height="136"/>
-                <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                <rect key="frame" x="0.0" y="0.0" width="399" height="153"/>
+                <autoresizingMask key="autoresizingMask"/>
                 <subviews>
                     <tableView focusRingType="none" verticalHuggingPriority="750" allowsExpansionToolTips="YES" autosaveColumns="NO" rowHeight="14" headerView="1227" id="1224" customClass="NotesTableView">
+                        <rect key="frame" x="0.0" y="0.0" width="399" height="136"/>
                         <autoresizingMask key="autoresizingMask"/>
                         <size key="intercellSpacing" width="3" height="2"/>
-                        <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                        <color key="backgroundColor" name="controlBackgroundColor" catalog="System" colorSpace="catalog"/>
                         <color key="gridColor" name="gridColor" catalog="System" colorSpace="catalog"/>
                         <connections>
                             <outlet property="controlField" destination="1067" id="1240"/>
@@ -995,7 +1042,6 @@ CA
                         </connections>
                     </tableView>
                 </subviews>
-                <color key="backgroundColor" name="controlBackgroundColor" catalog="System" colorSpace="catalog"/>
             </clipView>
             <scroller key="horizontalScroller" hidden="YES" autoresizesSubviews="NO" focusRingType="none" verticalHuggingPriority="750" horizontal="YES" id="1226">
                 <rect key="frame" x="-100" y="-100" width="382" height="15"/>
@@ -1010,22 +1056,20 @@ CA
                 <autoresizingMask key="autoresizingMask"/>
             </tableHeaderView>
         </scrollView>
-        <scrollView borderType="none" autohidesScrollers="YES" horizontalLineScroll="10" horizontalPageScroll="10" verticalLineScroll="10" verticalPageScroll="10" hasHorizontalScroller="NO" usesPredominantAxisScrolling="NO" id="1258" userLabel="Scroll View - Linking Editor" customClass="ETScrollView">
+        <scrollView borderType="none" autohidesScrollers="YES" horizontalLineScroll="10" horizontalPageScroll="10" verticalLineScroll="10" verticalPageScroll="10" hasHorizontalScroller="NO" usesPredominantAxisScrolling="NO" id="1258" userLabel="Scroll View - Linking Editor" customClass="ETNoteScrollView">
             <rect key="frame" x="0.0" y="0.0" width="399" height="304"/>
             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
             <clipView key="contentView" drawsBackground="NO" id="NQx-Wb-yiM">
                 <rect key="frame" x="0.0" y="0.0" width="399" height="304"/>
                 <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                 <subviews>
-                    <textView drawsBackground="NO" importsGraphics="NO" richText="NO" findStyle="panel" allowsUndo="YES" usesFontPanel="YES" verticallyResizable="YES" spellingCorrection="YES" id="1261" customClass="LinkingEditor">
+                    <textView drawsBackground="NO" importsGraphics="NO" richText="NO" usesFontPanel="YES" findStyle="panel" allowsUndo="YES" spellingCorrection="YES" id="1261" customClass="LinkingEditor">
                         <rect key="frame" x="0.0" y="0.0" width="399" height="304"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                         <size key="minSize" width="399" height="304"/>
                         <size key="maxSize" width="781" height="10000000"/>
                         <color key="insertionPointColor" white="0.0" alpha="1" colorSpace="calibratedWhite"/>
-                        <size key="minSize" width="399" height="304"/>
-                        <size key="maxSize" width="781" height="10000000"/>
                         <connections>
                             <outlet property="controlField" destination="1067" id="1265"/>
                             <outlet property="delegate" destination="213" id="1262"/>

@@ -10,7 +10,7 @@
  or promote products derived from this software without specific prior written permission. */
 //ET NV4
 
-#import "NSTextFinder.h"
+//#import "NSTextFinder.h"
 #import "AppController.h"
 #import "NoteObject.h"
 #import "GlobalPrefs.h"
@@ -34,7 +34,6 @@
 #import "DualField.h"
 #import "TitlebarButton.h"
 #import "RBSplitView/RBSplitView.h"
-//#import "AugmentedScrollView.h"
 #import "BookmarksController.h"
 #import "SyncSessionController.h"
 #import "MultiplePageView.h"
@@ -48,7 +47,7 @@
 #import "ETContentView.h"
 #import "PreviewController.h"
 #import "ETClipView.h"
-#import "ETScrollView.h"
+//#import "ETScrollView.h"
 #import "NSFileManager+DirectoryLocations.h"
 #import "nvaDevConfig.h"
 #import <Sparkle/SUUpdater.h>
@@ -416,20 +415,14 @@ void outletObjectAwoke(id sender) {
         [statBarMenu insertItem:theMenuItem atIndex:14];
         [theMenuItem release];
     }
-    
-	if (![prefsController showWordCount]) {
-		[wordCounter setHidden:NO];
-	}else {
-		[wordCounter setHidden:YES];
-	}
+    [wordCounter setHidden:[prefsController showWordCount]];
+
 	//
 	[NSApp setServicesProvider:self];
     if (!hasLaunched) {
-        
         hasLaunched=YES;
         [self focusControlField:self activate:NO];
-        
-        
+
     }
     
 //    self.isEditing=NO;
@@ -1175,24 +1168,24 @@ terminateApp:
 	[NSApp replyToOpenOrPrint:[filenames count] ? NSApplicationDelegateReplySuccess : NSApplicationDelegateReplyFailure];
 }
 
-- (void)applicationWillBecomeActive:(NSNotification *)aNotification {
-	
-	if (IsLeopardOrLater) {
-		SpaceSwitchingContext thisSpaceSwitchCtx;
-        if ([window windowNumber]!=-1) {
-            CurrentContextForWindowNumber([window windowNumber], &thisSpaceSwitchCtx);
-            
-        }
-		//what if the app is switched-to in another way? then the last-stored spaceSwitchCtx will cause us to return to the wrong app
-		//unfortunately this notification occurs only after NV has become the front process, but we can still verify the space number
-		
-		if ((thisSpaceSwitchCtx.userSpace != spaceSwitchCtx.userSpace) ||
-			(thisSpaceSwitchCtx.windowSpace != spaceSwitchCtx.windowSpace)) {
-			//forget the last space-switch info if it's effectively different from how we're switching into the app now
-			bzero(&spaceSwitchCtx, sizeof(SpaceSwitchingContext));
-		}
-	}
-}
+//- (void)applicationWillBecomeActive:(NSNotification *)aNotification {
+//	
+//	if (IsLeopardOrLater) {
+//		SpaceSwitchingContext thisSpaceSwitchCtx;
+//        if ([window windowNumber]!=-1) {
+//            CurrentContextForWindowNumber([window windowNumber], &thisSpaceSwitchCtx);
+//            
+//        }
+//		//what if the app is switched-to in another way? then the last-stored spaceSwitchCtx will cause us to return to the wrong app
+//		//unfortunately this notification occurs only after NV has become the front process, but we can still verify the space number
+//		
+//		if ((thisSpaceSwitchCtx.userSpace != spaceSwitchCtx.userSpace) ||
+//			(thisSpaceSwitchCtx.windowSpace != spaceSwitchCtx.windowSpace)) {
+//			//forget the last space-switch info if it's effectively different from how we're switching into the app now
+//			bzero(&spaceSwitchCtx, sizeof(SpaceSwitchingContext));
+//		}
+//	}
+//}
 
 - (void)applicationDidBecomeActive:(NSNotification *)aNotification {
 	[notationController checkJournalExistence];
@@ -1687,7 +1680,7 @@ terminateApp:
 	//BOOL enable = /*numberSelected != 1;*/ state;
     
 	[self postTextUpdate];
-    [self updateWordCount:(![prefsController showWordCount])];
+    [self updateWordCount:![prefsController showWordCount]];
 	[textView setHidden:state];
 	[editorStatusView setHidden:!state];
 	
@@ -1925,7 +1918,7 @@ terminateApp:
 			//for external url-handling, often the app will already have been brought to the foreground
 			if (![NSApp isActive]) {
 				if (IsLeopardOrLater)
-					CurrentContextForWindowNumber([window windowNumber], &spaceSwitchCtx);
+//                CurrentContextForWindowNumber([window windowNumber], &spaceSwitchCtx);
 				[NSApp activateIgnoringOtherApps:YES];
 			}
 			if (![window isKeyWindow])
@@ -2247,27 +2240,48 @@ terminateApp:
 }
 
 - (IBAction)toggleNVActivation:(id)sender {
-    
-	if ([NSApp isActive] && [window isMainWindow]&&[window isVisible]) {
+    if ([NSApp isActive]) {
         
-		SpaceSwitchingContext laterSpaceSwitchCtx;
-		if (IsLeopardOrLater){
-			CurrentContextForWindowNumber([window windowNumber], &laterSpaceSwitchCtx);
-            
-        }
-		if (!IsLeopardOrLater || !CompareContextsAndSwitch(&spaceSwitchCtx, &laterSpaceSwitchCtx)) {
+//		SpaceSwitchingContext laterSpaceSwitchCtx;
+//		if (IsLeopardOrLater){
+//			CurrentContextForWindowNumber([window windowNumber], &laterSpaceSwitchCtx);
+//            
+//        }
+//        if (!IsLeopardOrLater){// || !CompareContextsAndSwitch(&spaceSwitchCtx, &laterSpaceSwitchCtx)) {
 			//hide only if we didn't need to or weren't able to switch spaces
+        if (!window.isMainWindow||!window.isVisible) {
+            [window makeKeyAndOrderFront:sender];
+        }else{
 			[NSApp hide:sender];
-		}
+        }
+//		}
 		//clear the space-switch context that we just looked at, to ensure it's not reused inadvertently
-		bzero(&spaceSwitchCtx, sizeof(SpaceSwitchingContext));
-		return;
-	}
-	[self bringFocusToControlField:sender];
+//		bzero(&spaceSwitchCtx, sizeof(SpaceSwitchingContext));
+    }else{
+        [NSApp activateIgnoringOtherApps:YES];
+        dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.03 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+            if (!window.isMainWindow||!window.isVisible) {
+                [window makeKeyAndOrderFront:sender];
+            }
+        });
+    }
+}
+
+- (IBAction)makeActiveAndShowWindow:(id)sender{
+    if (![NSApp isActive]) {
+        [NSApp activateIgnoringOtherApps:YES];
+        dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.03 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+            if (!window.isMainWindow||!window.isVisible) {
+                [window makeKeyAndOrderFront:sender];
+            }
+        });
+    }else if (!window.isMainWindow||!window.isVisible) {
+        [window makeKeyAndOrderFront:sender];
+    }
+
 }
 
 - (void)focusControlField:(id)sender activate:(BOOL)shouldActivate{
-//        [[NSNotificationCenter defaultCenter] postNotificationName:@"TextFinderShouldHide" object:sender];
 
 	if ([notesSubview isCollapsed]) {
 		[self toggleCollapse:self];
@@ -2280,22 +2294,28 @@ terminateApp:
     
 	if (!shouldActivate) {
         [window makeKeyAndOrderFront:sender];
-        [window makeMainWindow];
-        if (![NSApp isActive]) {
-            CurrentContextForWindowNumber([window windowNumber], &spaceSwitchCtx);
-        }
+
+//        if ([window canBecomeMainWindow]) {
+//            [window makeMainWindow];
+//        }else{
+//            NSLog(@"main window can't become main for some reason");
+//        }
+//        if (![NSApp isActive]) {
+//            CurrentContextForWindowNumber([window windowNumber], &spaceSwitchCtx);
+//        }
     }else{
         if (![NSApp isActive]) {
-            CurrentContextForWindowNumber([window windowNumber], &spaceSwitchCtx);
+//            CurrentContextForWindowNumber([window windowNumber], &spaceSwitchCtx);
             [NSApp activateIgnoringOtherApps:YES];
         }
-        if (![window isMainWindow]||![window isVisible]){
-            [window makeKeyAndOrderFront:sender];
-        }
+        dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.03 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+            if (!window.isMainWindow||!window.isVisible) {
+                [window makeKeyAndOrderFront:sender];
+            }
+        });
 	}
 	[self setEmptyViewState:currentNote == nil];
     self.isEditing = NO;
-    
     
 }
 
@@ -2789,7 +2809,7 @@ terminateApp:
         if (([[NSUserDefaults standardUserDefaults] boolForKey:@"ShowDockIcon"])&&(IsSnowLeopardOrLater)) {
             options = [NSDictionary dictionaryWithObjectsAndKeys:[NSNumber numberWithInt:(NSApplicationPresentationAutoHideMenuBar | NSApplicationPresentationHideDock)],@"NSFullScreenModeApplicationPresentationOptions", nil];
         }else {
-            options = [NSDictionary dictionaryWithObjectsAndKeys:nil];
+            options = nil;
         }
         CGFloat colW = [notesSubview dimension];
         
@@ -3075,7 +3095,6 @@ terminateApp:
         if ([prefsController showWordCount]) {
             [self updateWordCount:YES];
             [wordCounter setHidden:NO];
-            
             popped=1;
         }else {
             [wordCounter setHidden:YES];
@@ -3343,8 +3362,8 @@ terminateApp:
         }else{
 //            NSLog(@"hiding dock incon in snow leopard");
             id fullPath = [[NSBundle mainBundle] executablePath];
-            NSArray *arg = [NSArray arrayWithObjects:nil];
-            [NSTask launchedTaskWithLaunchPath:fullPath arguments:arg];
+//            NSArray *arg = [NSArray arrayWithObjects:nil];
+            [NSTask launchedTaskWithLaunchPath:fullPath arguments:@[]];
             [NSApp terminate:self];
         }
         
