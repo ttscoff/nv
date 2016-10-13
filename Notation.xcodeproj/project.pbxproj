@@ -249,8 +249,6 @@
 		93365DDF1D9AD651005A230B /* AutoHyperlinks.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 93365DDE1D9AD651005A230B /* AutoHyperlinks.framework */; };
 		93365DE01D9AD6AA005A230B /* AutoHyperlinks.framework in CopyFiles */ = {isa = PBXBuildFile; fileRef = 93365DDE1D9AD651005A230B /* AutoHyperlinks.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		93365DE11D9AD97B005A230B /* multimarkdown in CopyFiles */ = {isa = PBXBuildFile; fileRef = 9335C40C148EC7AC009CE623 /* multimarkdown */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
-		93458F2D1D9ECAE800F80B29 /* libcrypto.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 93365DD01D9AAC15005A230B /* libcrypto.a */; };
-		93458F2E1D9ECAED00F80B29 /* libcrypto.a in CopyFiles */ = {isa = PBXBuildFile; fileRef = 93365DD01D9AAC15005A230B /* libcrypto.a */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
 		934C3FB214FDA069000D14BA /* custom.css in Resources */ = {isa = PBXBuildFile; fileRef = 934C3FAE14FDA069000D14BA /* custom.css */; };
 		934C3FB314FDA06A000D14BA /* customclean.css in Resources */ = {isa = PBXBuildFile; fileRef = 934C3FAF14FDA069000D14BA /* customclean.css */; };
 		934C3FB414FDA06A000D14BA /* template.html in Resources */ = {isa = PBXBuildFile; fileRef = 934C3FB014FDA069000D14BA /* template.html */; };
@@ -1479,7 +1477,7 @@
 				ORGANIZATIONNAME = elasticthreads;
 				TargetAttributes = {
 					8D1107260486CEB800E47090 = {
-						DevelopmentTeam = HGL36W2TP6;
+						DevelopmentTeam = 47TRS7H4BH;
 						ProvisioningStyle = Automatic;
 					};
 				};
@@ -2219,7 +2217,7 @@
 				CODE_SIGN_IDENTITY = "Mac Developer";
 				COMBINE_HIDPI_IMAGES = YES;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
-				DEVELOPMENT_TEAM = HGL36W2TP6;
+				DEVELOPMENT_TEAM = 47TRS7H4BH;
 				ENABLE_STRICT_OBJC_MSGSEND = NO;
 				LD_RUNPATH_SEARCH_PATHS = "";
 				LIBRARY_SEARCH_PATHS = "$(PROJECT_DIR)";
@@ -2418,7 +2416,7 @@
 				CODE_SIGN_IDENTITY = "Mac Developer";
 				COMBINE_HIDPI_IMAGES = YES;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
-				DEVELOPMENT_TEAM = HGL36W2TP6;
+				DEVELOPMENT_TEAM = 47TRS7H4BH;
 				ENABLE_STRICT_OBJC_MSGSEND = NO;
 				LD_RUNPATH_SEARCH_PATHS = "";
 				LIBRARY_SEARCH_PATHS = "$(PROJECT_DIR)";
@@ -2524,7 +2522,7 @@
 				CODE_SIGN_IDENTITY = "Mac Developer";
 				COMBINE_HIDPI_IMAGES = YES;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
-				DEVELOPMENT_TEAM = HGL36W2TP6;
+				DEVELOPMENT_TEAM = 47TRS7H4BH;
 				ENABLE_STRICT_OBJC_MSGSEND = NO;
 				LD_RUNPATH_SEARCH_PATHS = "";
 				LIBRARY_SEARCH_PATHS = "$(PROJECT_DIR)";
