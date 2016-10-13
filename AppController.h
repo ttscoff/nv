@@ -29,7 +29,6 @@
 @class TitlebarButton;
 @class LinearDividerShader;
 @class TagEditingManager;
-@class StatusItemView;
 @class DFView;
 @class PreviewController;
 @class WordCountToken;
@@ -63,7 +62,6 @@
     BOOL wasDeleting;
     IBOutlet ETContentView *mainView;
 	DFView *dualFieldView;
-	StatusItemView *cView;
     NSStatusItem *statusItem;
 	IBOutlet NSMenu *statBarMenu;
 	TagEditingManager *tagEditor;
@@ -186,8 +184,6 @@ void outletObjectAwoke(id sender);
 //- (void)setIsEditing:(BOOL)inBool inCell:(NSCell *)theCell;
 //- (void)focusOnCtrlFld:(id)sender;
 - (NSMenu *)statBarMenu;
-- (void)toggleAttachedWindow:(NSNotification *)aNotification;
-- (void)toggleAttachedMenu:(NSNotification *)aNotification;
 - (NSArray *)commonLabelsForNotesAtIndexes:(NSIndexSet *)selDexes;
 - (IBAction)multiTag:(id)sender;
 - (void)releaseTagEditor:(NSNotification *)note;

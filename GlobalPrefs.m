@@ -663,16 +663,14 @@ BOOL ColorsEqualWith8BitChannels(NSColor *c1, NSColor *c2) {
 		NSMutableDictionary *attrs = [[NSMutableDictionary dictionaryWithObjectsAndKeys:bodyFont, NSFontAttributeName, nil] retain];
 		
 		//not storing the foreground color in each note will make the database smaller, and black is assumed when drawing text
-		//NSColor *fgColor = [self foregroundTextColor];
-		NSColor *fgColor = [[NSApp delegate] foregrndColor];
+		NSColor *fgColor = [(AppController *)[NSApp delegate] foregrndColor];
 		
 		if (!ColorsEqualWith8BitChannels([NSColor blackColor], fgColor)) {
 			[attrs setObject:fgColor forKey:NSForegroundColorAttributeName];
 		}
 		// background text color is handled directly by the NSTextView subclass and so does not need to be stored here
-		if ([self _bodyFontIsMonospace]) {
-			
-		//	NSLog(@"notebody att3");
+		if ([self _bodyFontIsMonospace]) {			
+//			NSLog(@"notebody att3");
 			NSParagraphStyle *pStyle = [self noteBodyParagraphStyle];
 			if (pStyle)
 				[attrs setObject:pStyle forKey:NSParagraphStyleAttributeName];
@@ -683,7 +681,7 @@ BOOL ColorsEqualWith8BitChannels(NSColor *c1, NSColor *c2) {
 	}else {
 		//NSLog(@"notebody att4");
 		NSMutableDictionary *attrs = [[NSMutableDictionary dictionaryWithObjectsAndKeys:bodyFont, NSFontAttributeName, nil] retain];
-		NSColor *fgColor = [[NSApp delegate] foregrndColor];
+		NSColor *fgColor = [(AppController *)[NSApp delegate] foregrndColor];
 		
 		//	if (!ColorsEqualWith8BitChannels([NSColor blackColor], fgColor)) {
 		[attrs setObject:fgColor forKey:NSForegroundColorAttributeName];
@@ -709,18 +707,16 @@ BOOL ColorsEqualWith8BitChannels(NSColor *c1, NSColor *c2) {
 		while (numberOfSpaces--) {
 			[sizeString appendString:@" "];
 		}
-		NSDictionary *sizeAttribute = [[NSDictionary alloc] initWithObjectsAndKeys:bodyFont, NSFontAttributeName, nil];
-		float sizeOfTab = [sizeString sizeWithAttributes:sizeAttribute].width;
-		[sizeAttribute release];
+
+		float sizeOfTab = [sizeString sizeWithAttributes:@{NSFontAttributeName:bodyFont}].width;
 		[sizeString release];
 		
 		noteBodyParagraphStyle = [[NSParagraphStyle defaultParagraphStyle] mutableCopy];
-		
-		NSTextTab *textTabToBeRemoved;
-		NSEnumerator *enumerator = [[noteBodyParagraphStyle tabStops] objectEnumerator];
-		while ((textTabToBeRemoved = [enumerator nextObject])) {
-			[noteBodyParagraphStyle removeTabStop:textTabToBeRemoved];
-		}
+
+
+        for (NSTextTab *textTabToBeRemoved in [noteBodyParagraphStyle tabStops]) {
+            [noteBodyParagraphStyle removeTabStop:textTabToBeRemoved];
+        }
 		//[paragraphStyle setHeadIndent:sizeOfTab]; //for soft-indents, this would probably have to be applied contextually, and heaven help us for soft tabs
 
 		[noteBodyParagraphStyle setDefaultTabInterval:sizeOfTab];

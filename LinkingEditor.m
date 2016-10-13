@@ -170,9 +170,10 @@ if ([selectorString isEqualToString:SEL_STR(setNoteBodyFont:sender:)]) {
 			[self performSelector:@selector(indicateRange:) withObject:[NSValue valueWithRange:range] afterDelay:0];
 		}
 	}
-	
 	[self setTypingAttributes:[prefsController noteBodyAttributes]];
-	
+//    NSLog(@"exist :>%@<",self.defaultParagraphStyle);
+//    [self.textStorage setAttributes:@{NSParagraphStyleAttributeName:[NSParagraphStyle defaultParagraphStyle]} range:NSMakeRange(0, self.string.length)];
+//    NSLog(@"exist :>%@<",self.defaultParagraphStyle);
 	[self performSelector:@selector(_fixCursorForBackgroundUpdatingMouseInside:) withObject:[NSNumber numberWithBool:YES] afterDelay:0.0];
 	
 	return [super becomeFirstResponder];
@@ -1008,11 +1009,11 @@ copyRTFType:
 					[super deleteBackward:sender];
 				} else {
                     
-					unsigned tabWidth = [prefsController numberOfSpacesInTab];
-					unsigned indentWidth = 4;
+					NSInteger tabWidth = [prefsController numberOfSpacesInTab];
+					NSInteger indentWidth = 4;
 					BOOL usesTabs = ![prefsController softTabs];
 					NSRange leadingSpaceRange = paraRange;
-					unsigned leadingSpaces = [string numberOfLeadingSpacesFromRange:&leadingSpaceRange tabWidth:tabWidth];
+					NSInteger leadingSpaces = [string numberOfLeadingSpacesFromRange:&leadingSpaceRange tabWidth:tabWidth];
 					
 					if (charRange.location > NSMaxRange(leadingSpaceRange)) {
                         
@@ -1032,7 +1033,7 @@ copyRTFType:
 						}
 						
 						NSTextStorage *text = [self textStorage];
-						unsigned leadingIndents = leadingSpaces / indentWidth;
+						NSInteger leadingIndents = leadingSpaces / indentWidth;
 						NSString *replaceString;
 						
 						// If we were indented to an fractional level just go back to the last even multiple of indentWidth, if we were exactly on, go back a full level.
@@ -1736,7 +1737,7 @@ static long (*GetGetScriptManagerVariablePointer())(short) {
     // display modal overlay, get user selection and insert it
     // Nice to have:
     // keep stats on the user's selection and then use the most frequent choice in [insertGeneratedPassword] (instead of just [strong])
-    #lse
+    #else
     [self insertGeneratedPassword:nil];
     #endif
 }

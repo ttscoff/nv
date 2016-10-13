@@ -52,6 +52,9 @@
 		[window center];
 	
 	[window makeKeyAndOrderFront:self];
+    if (!NSApp.isActive) {
+        [NSApp activateIgnoringOtherApps:YES];
+    }
 }
 
 - (void)windowWillClose:(NSNotification *)aNotification {

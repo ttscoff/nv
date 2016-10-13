@@ -1028,14 +1028,7 @@ CA
                     </connections>
                 </menuItem>
             </items>
-            <connections>
-                <outlet property="delegate" destination="1163" id="1164"/>
-            </connections>
         </menu>
-        <customView id="1163" customClass="StatusItemView">
-            <rect key="frame" x="0.0" y="0.0" width="163" height="96"/>
-            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-        </customView>
         <userDefaultsController representsSharedInstance="YES" id="1258"/>
         <scrollView borderType="none" autohidesScrollers="YES" horizontalLineScroll="10" horizontalPageScroll="10" verticalLineScroll="10" verticalPageScroll="10" hasHorizontalScroller="NO" usesPredominantAxisScrolling="NO" id="1016" userLabel="Scroll View - Linking Editor" customClass="ETNoteScrollView">
             <rect key="frame" x="0.0" y="0.0" width="399" height="304"/>

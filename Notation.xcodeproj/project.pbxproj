@@ -121,7 +121,6 @@
 		5C177AE7141EF95200BC0C0A /* ETClipView.m in Sources */ = {isa = PBXBuildFile; fileRef = 5C177AE6141EF95200BC0C0A /* ETClipView.m */; };
 		5C1830CA132EA675005E2210 /* MarkupPreview.xib in Resources */ = {isa = PBXBuildFile; fileRef = 5C1830CC132EA675005E2210 /* MarkupPreview.xib */; };
 		5C1830CD132EA687005E2210 /* SaveHTMLPreview.nib in Resources */ = {isa = PBXBuildFile; fileRef = 5C1830CF132EA687005E2210 /* SaveHTMLPreview.nib */; };
-		5C2CC186134989A8006FFE56 /* nvMenuC.png in Resources */ = {isa = PBXBuildFile; fileRef = 5C2CC183134989A8006FFE56 /* nvMenuC.png */; };
 		5C2CC18A134989D7006FFE56 /* nvMenuDark.png in Resources */ = {isa = PBXBuildFile; fileRef = 5C2CC189134989D7006FFE56 /* nvMenuDark.png */; };
 		5C2FAD2B1333970200FBFD34 /* ETScrollView.m in Sources */ = {isa = PBXBuildFile; fileRef = 5C2CD036132ED47900CA0D7C /* ETScrollView.m */; };
 		5C367EE91DA2C06F0043C8EC /* libcrypto.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 5C367EE81DA2C06F0043C8EC /* libcrypto.a */; };
@@ -147,7 +146,6 @@
 		5C8BCF881DA2617C0036FA7E /* Contact.nvhelp in Resources */ = {isa = PBXBuildFile; fileRef = 5C8BCF821DA2617C0036FA7E /* Contact.nvhelp */; };
 		5C8BCF891DA2617C0036FA7E /* Raccourcis incroyablement utiles.nvhelp in Resources */ = {isa = PBXBuildFile; fileRef = 5C8BCF841DA2617C0036FA7E /* Raccourcis incroyablement utiles.nvhelp */; };
 		5C8BCF981DA262EA0036FA7E /* Contatti.nvhelp in Resources */ = {isa = PBXBuildFile; fileRef = 5C8BCF961DA262EA0036FA7E /* Contatti.nvhelp */; };
-		5C91A1861723079B006BF757 /* nvMenuW.png in Resources */ = {isa = PBXBuildFile; fileRef = 5C91A1851723079B006BF757 /* nvMenuW.png */; };
 		5C94376F132A0C9E00B08B80 /* greyscrollervertbottom3.tif in Resources */ = {isa = PBXBuildFile; fileRef = 5C94376C132A0C9D00B08B80 /* greyscrollervertbottom3.tif */; };
 		5C943771132A0C9E00B08B80 /* greyscrollerverttop3.tif in Resources */ = {isa = PBXBuildFile; fileRef = 5C94376E132A0C9D00B08B80 /* greyscrollerverttop3.tif */; };
 		5C96F4FF131C2F9500A2E4AC /* TabClose_Front_Pressed.tif in Resources */ = {isa = PBXBuildFile; fileRef = 5C96F4FC131C2F9500A2E4AC /* TabClose_Front_Pressed.tif */; };
@@ -179,7 +177,6 @@
 		5CA10F3B131C2A3F00DE1F91 /* MAAttachedWindow.m in Sources */ = {isa = PBXBuildFile; fileRef = 5CA10F3A131C2A3F00DE1F91 /* MAAttachedWindow.m */; };
 		5CBA7A911305E2DF004ADEBB /* TagEditingManager.xib in Resources */ = {isa = PBXBuildFile; fileRef = 5CBA7A8F1305E2DF004ADEBB /* TagEditingManager.xib */; };
 		5CBA7A981305E38C004ADEBB /* TagEditingManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 5CBA7A971305E38C004ADEBB /* TagEditingManager.m */; };
-		5CC2DF0B13083BCF006772D9 /* StatusItemView.m in Sources */ = {isa = PBXBuildFile; fileRef = 5CC2DF0A13083BCF006772D9 /* StatusItemView.m */; };
 		5CCEEF1D130B599B00E15B77 /* DFView.m in Sources */ = {isa = PBXBuildFile; fileRef = 5CCEEF1C130B599B00E15B77 /* DFView.m */; };
 		5CD1B00714F4593900AC948E /* Add.tiff in Resources */ = {isa = PBXBuildFile; fileRef = 219196BC09D4F20000586B15 /* Add.tiff */; };
 		5CE5B0081422795300FB554C /* PTKeyComboPanel.xib in Resources */ = {isa = PBXBuildFile; fileRef = 5CE5B00A1422795300FB554C /* PTKeyComboPanel.xib */; };
@@ -1147,8 +1144,6 @@
 				93B348261371547800658F98 /* HUDIconSave.png */,
 				93B348271371547800658F98 /* HUDIconShare.png */,
 				5C2CC189134989D7006FFE56 /* nvMenuDark.png */,
-				5C2CC183134989A8006FFE56 /* nvMenuC.png */,
-				5C91A1851723079B006BF757 /* nvMenuW.png */,
 				93A158BD133C497400E1E7DA /* Notality.icns */,
 				5C94376C132A0C9D00B08B80 /* greyscrollervertbottom3.tif */,
 				5C94376D132A0C9D00B08B80 /* greyscrollervertfill3.tif */,
@@ -1276,6 +1271,7 @@
 		29B97314FDCFA39411CA2CEA /* Notation */ = {
 			isa = PBXGroup;
 			children = (
+				5C6802051DAD6CCA00713DF0 /* disabled/old classes */,
 				080E96DDFE201D6D7F000001 /* Classes */,
 				29B97315FDCFA39411CA2CEA /* Other Sources */,
 				29B97317FDCFA39411CA2CEA /* Resources */,
@@ -1361,6 +1357,17 @@
 			name = Frameworks;
 			sourceTree = "<group>";
 		};
+		5C6802051DAD6CCA00713DF0 /* disabled/old classes */ = {
+			isa = PBXGroup;
+			children = (
+				5C2CC183134989A8006FFE56 /* nvMenuC.png */,
+				5C91A1851723079B006BF757 /* nvMenuW.png */,
+				5CC2DF0913083BCF006772D9 /* StatusItemView.h */,
+				5CC2DF0A13083BCF006772D9 /* StatusItemView.m */,
+			);
+			name = "disabled/old classes";
+			sourceTree = "<group>";
+		};
 		5C96F5A8131C379200A2E4AC /* Markup */ = {
 			isa = PBXGroup;
 			children = (
@@ -1395,8 +1402,6 @@
 				5C96F6DD131C488B00A2E4AC /* ETTransparentButtonCell.m */,
 				5CA10F39131C2A3F00DE1F91 /* MAAttachedWindow.h */,
 				5CA10F3A131C2A3F00DE1F91 /* MAAttachedWindow.m */,
-				5CC2DF0913083BCF006772D9 /* StatusItemView.h */,
-				5CC2DF0A13083BCF006772D9 /* StatusItemView.m */,
 				21918FCF09C49B2500586B15 /* EmptyView.h */,
 				21918FCE09C49B2400586B15 /* EmptyView.m */,
 				5CCEEF1B130B599B00E15B77 /* DFView.h */,
@@ -1619,7 +1624,6 @@
 				5CF96E0C132EA29D0079B3FD /* NotationPrefsView.nib in Resources */,
 				93A158BC133C304D00E1E7DA /* Markdownify.nvhelp in Resources */,
 				93A158BE133C497400E1E7DA /* Notality.icns in Resources */,
-				5C2CC186134989A8006FFE56 /* nvMenuC.png in Resources */,
 				5C8BCF891DA2617C0036FA7E /* Raccourcis incroyablement utiles.nvhelp in Resources */,
 				5C2CC18A134989D7006FFE56 /* nvMenuDark.png in Resources */,
 				93B348281371547800658F98 /* HUDIconLock.png in Resources */,
@@ -1658,7 +1662,6 @@
 				B683A0DC16F1CDA600564A1D /* TBRolloverBG@2x.png in Resources */,
 				B683A0DD16F1CDA600564A1D /* TBSynchronizing@2x.png in Resources */,
 				B683A0DE16F1CDA600564A1D /* TBSynchronizingWhite@2x.png in Resources */,
-				5C91A1861723079B006BF757 /* nvMenuW.png in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1752,7 +1755,6 @@
 				21B64C4E12E62A5700D87EFC /* UnifiedCell.m in Sources */,
 				5CBA7A981305E38C004ADEBB /* TagEditingManager.m in Sources */,
 				5C4B356A1307225000014119 /* ETTransparentScroller.m in Sources */,
-				5CC2DF0B13083BCF006772D9 /* StatusItemView.m in Sources */,
 				5CF33C721308B478002B5499 /* NotesTableHeaderCell.m in Sources */,
 				5CCEEF1D130B599B00E15B77 /* DFView.m in Sources */,
 				5CA10F1A131C297000DE1F91 /* PreviewController.m in Sources */,
@@ -2214,6 +2216,7 @@
 		212B842409780B5000F3597F /* Development */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				CLANG_ENABLE_MODULES = NO;
 				CODE_SIGN_IDENTITY = "Mac Developer";
 				COMBINE_HIDPI_IMAGES = YES;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
@@ -2413,6 +2416,7 @@
 		5C45D997196C95A9004C55F8 /* ForBuilding 10.6 */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				CLANG_ENABLE_MODULES = NO;
 				CODE_SIGN_IDENTITY = "Mac Developer";
 				COMBINE_HIDPI_IMAGES = YES;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
@@ -2506,8 +2510,6 @@
 					__TEXT,
 					__text,
 					Notation.launchorder,
-					"-e",
-					start,
 				);
 				VALID_ARCHS = x86_64;
 				VERSION_INFO_BUILDER = "David Halter";
@@ -2519,6 +2521,7 @@
 		5C9CB58C134A7F0400073277 /* ForBuilding */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				CLANG_ENABLE_MODULES = NO;
 				CODE_SIGN_IDENTITY = "Mac Developer";
 				COMBINE_HIDPI_IMAGES = YES;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
