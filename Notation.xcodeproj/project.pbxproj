@@ -142,7 +142,6 @@
 		5C84319114229D810020E5A7 /* PassphraseRetriever.xib in Resources */ = {isa = PBXBuildFile; fileRef = 5C84319314229D810020E5A7 /* PassphraseRetriever.xib */; };
 		5C8BCF6A1DA25C810036FA7E /* Sparkle.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 213623E50B92AA4E008C0830 /* Sparkle.framework */; };
 		5C8BCF861DA2617C0036FA7E /* Ceci est le titre d'une note.nvhelp in Resources */ = {isa = PBXBuildFile; fileRef = 5C8BCF7E1DA2617C0036FA7E /* Ceci est le titre d'une note.nvhelp */; };
-		5C8BCF871DA2617C0036FA7E /* Comment ça marche.nvhelp in Resources */ = {isa = PBXBuildFile; fileRef = 5C8BCF801DA2617C0036FA7E /* Comment ça marche.nvhelp */; };
 		5C8BCF881DA2617C0036FA7E /* Contact.nvhelp in Resources */ = {isa = PBXBuildFile; fileRef = 5C8BCF821DA2617C0036FA7E /* Contact.nvhelp */; };
 		5C8BCF891DA2617C0036FA7E /* Raccourcis incroyablement utiles.nvhelp in Resources */ = {isa = PBXBuildFile; fileRef = 5C8BCF841DA2617C0036FA7E /* Raccourcis incroyablement utiles.nvhelp */; };
 		5C8BCF981DA262EA0036FA7E /* Contatti.nvhelp in Resources */ = {isa = PBXBuildFile; fileRef = 5C8BCF961DA262EA0036FA7E /* Contatti.nvhelp */; };
@@ -186,10 +185,7 @@
 		5CF33C721308B478002B5499 /* NotesTableHeaderCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 5CF33C711308B478002B5499 /* NotesTableHeaderCell.m */; };
 		5CF96CBD132EA1890079B3FD /* PassphrasePicker.nib in Resources */ = {isa = PBXBuildFile; fileRef = 214495740ADCC06300E2A2B6 /* PassphrasePicker.nib */; };
 		5CF96CDD132EA1980079B3FD /* Kontaktdaten.nvhelp in Resources */ = {isa = PBXBuildFile; fileRef = 5CF96CCA132EA1970079B3FD /* Kontaktdaten.nvhelp */; };
-		5CF96D93132EA29D0079B3FD /* Atalhos Incrivelmente Úteis.nvhelp in Resources */ = {isa = PBXBuildFile; fileRef = 5CF96D56132EA29D0079B3FD /* Atalhos Incrivelmente Úteis.nvhelp */; };
 		5CF96D95132EA29D0079B3FD /* Como funciona isso?.nvhelp in Resources */ = {isa = PBXBuildFile; fileRef = 5CF96D5C132EA29D0079B3FD /* Como funciona isso?.nvhelp */; };
-		5CF96D98132EA29D0079B3FD /* Este é o título de uma nota.nvhelp in Resources */ = {isa = PBXBuildFile; fileRef = 5CF96D64132EA29D0079B3FD /* Este é o título de uma nota.nvhelp */; };
-		5CF96D9B132EA29D0079B3FD /* Informações de Contato.nvhelp in Resources */ = {isa = PBXBuildFile; fileRef = 5CF96D6F132EA29D0079B3FD /* Informações de Contato.nvhelp */; };
 		5CF96DA8132EA29D0079B3FD /* MainMenu.xib in Resources */ = {isa = PBXBuildFile; fileRef = 5CF96BFD132EA0300079B3FD /* MainMenu.xib */; };
 		5CF96DA9132EA29D0079B3FD /* dsa_pub.pem in Resources */ = {isa = PBXBuildFile; fileRef = 5C49E553131C72FD00696B68 /* dsa_pub.pem */; };
 		5CF96DAA132EA29D0079B3FD /* Acknowledgments.txt in Resources */ = {isa = PBXBuildFile; fileRef = 21813561105AF27400A0AE18 /* Acknowledgments.txt */; };
@@ -666,16 +662,12 @@
 		5C8BCF7C1DA25EC50036FA7E /* pt-PT */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = "pt-PT"; path = "pt-PT.lproj/TagEditingManager.xib"; sourceTree = "<group>"; };
 		5C8BCF7D1DA25EC50036FA7E /* pt-PT */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = "pt-PT"; path = "pt-PT.lproj/DeletionManager.nib"; sourceTree = "<group>"; };
 		5C8BCF7F1DA2617C0036FA7E /* fr */ = {isa = PBXFileReference; lastKnownFileType = text; name = fr; path = "fr.lproj/Ceci est le titre d'une note.nvhelp"; sourceTree = "<group>"; };
-		5C8BCF811DA2617C0036FA7E /* fr */ = {isa = PBXFileReference; lastKnownFileType = text; name = fr; path = "fr.lproj/Comment ça marche.nvhelp"; sourceTree = "<group>"; };
 		5C8BCF831DA2617C0036FA7E /* fr */ = {isa = PBXFileReference; lastKnownFileType = text; name = fr; path = fr.lproj/Contact.nvhelp; sourceTree = "<group>"; };
 		5C8BCF851DA2617C0036FA7E /* fr */ = {isa = PBXFileReference; lastKnownFileType = text; name = fr; path = "fr.lproj/Raccourcis incroyablement utiles.nvhelp"; sourceTree = "<group>"; };
 		5C8BCF8A1DA261C00036FA7E /* fr */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = fr; path = fr.lproj/Localizable.strings; sourceTree = "<group>"; };
 		5C8BCF8B1DA261C30036FA7E /* pt-PT */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "pt-PT"; path = "pt-PT.lproj/Localizable.strings"; sourceTree = "<group>"; };
 		5C8BCF8C1DA261D40036FA7E /* pt-PT */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "pt-PT"; path = "pt-PT.lproj/ServicesMenu.strings"; sourceTree = "<group>"; };
 		5C8BCF8D1DA261D50036FA7E /* fr */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = fr; path = fr.lproj/ServicesMenu.strings; sourceTree = "<group>"; };
-		5C8BCF8E1DA261EB0036FA7E /* pt-PT */ = {isa = PBXFileReference; lastKnownFileType = text; name = "pt-PT"; path = "pt-PT.lproj/Atalhos Incrivelmente Úteis.nvhelp"; sourceTree = "<group>"; };
-		5C8BCF8F1DA261F50036FA7E /* pt-PT */ = {isa = PBXFileReference; lastKnownFileType = text; name = "pt-PT"; path = "pt-PT.lproj/Este é o título de uma nota.nvhelp"; sourceTree = "<group>"; };
-		5C8BCF901DA261FA0036FA7E /* pt-PT */ = {isa = PBXFileReference; lastKnownFileType = text; name = "pt-PT"; path = "pt-PT.lproj/Informações de Contato.nvhelp"; sourceTree = "<group>"; };
 		5C8BCF911DA262190036FA7E /* pt-PT */ = {isa = PBXFileReference; lastKnownFileType = text; name = "pt-PT"; path = "pt-PT.lproj/Como funciona isso?.nvhelp"; sourceTree = "<group>"; };
 		5C8BCF921DA262540036FA7E /* fr */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; name = fr; path = fr.lproj/CarbonErrorStrings.plist; sourceTree = "<group>"; };
 		5C8BCF971DA262EA0036FA7E /* it */ = {isa = PBXFileReference; lastKnownFileType = text; name = it; path = it.lproj/Contatti.nvhelp; sourceTree = "<group>"; };
@@ -1057,14 +1049,10 @@
 				5C4366991DA268500086FF84 /* This is the title of a note.nvhelp */,
 				5C8BCF961DA262EA0036FA7E /* Contatti.nvhelp */,
 				5C8BCF7E1DA2617C0036FA7E /* Ceci est le titre d'une note.nvhelp */,
-				5C8BCF801DA2617C0036FA7E /* Comment ça marche.nvhelp */,
 				5C8BCF821DA2617C0036FA7E /* Contact.nvhelp */,
 				5C8BCF841DA2617C0036FA7E /* Raccourcis incroyablement utiles.nvhelp */,
 				93A158BB133C304D00E1E7DA /* Markdownify.nvhelp */,
-				5CF96D56132EA29D0079B3FD /* Atalhos Incrivelmente Úteis.nvhelp */,
 				5CF96D5C132EA29D0079B3FD /* Como funciona isso?.nvhelp */,
-				5CF96D64132EA29D0079B3FD /* Este é o título de uma nota.nvhelp */,
-				5CF96D6F132EA29D0079B3FD /* Informações de Contato.nvhelp */,
 				5CF96CC1132EA1970079B3FD /* Dies ist der Titel einer Notiz.nvhelp */,
 				5CF96CCA132EA1970079B3FD /* Kontaktdaten.nvhelp */,
 				5CF96CCE132EA1970079B3FD /* Moglicherweise nutzliche Tastenkurzel.nvhelp */,
@@ -1482,7 +1470,7 @@
 				ORGANIZATIONNAME = elasticthreads;
 				TargetAttributes = {
 					8D1107260486CEB800E47090 = {
-						DevelopmentTeam = 47TRS7H4BH;
+						DevelopmentTeam = HGL36W2TP6;
 						ProvisioningStyle = Automatic;
 					};
 				};
@@ -1565,11 +1553,7 @@
 				5C943771132A0C9E00B08B80 /* greyscrollerverttop3.tif in Resources */,
 				5CF96CBD132EA1890079B3FD /* PassphrasePicker.nib in Resources */,
 				5CF96CDD132EA1980079B3FD /* Kontaktdaten.nvhelp in Resources */,
-				5CF96D93132EA29D0079B3FD /* Atalhos Incrivelmente Úteis.nvhelp in Resources */,
 				5CF96D95132EA29D0079B3FD /* Como funciona isso?.nvhelp in Resources */,
-				5CF96D98132EA29D0079B3FD /* Este é o título de uma nota.nvhelp in Resources */,
-				5CF96D9B132EA29D0079B3FD /* Informações de Contato.nvhelp in Resources */,
-				5C8BCF871DA2617C0036FA7E /* Comment ça marche.nvhelp in Resources */,
 				5CF96DA8132EA29D0079B3FD /* MainMenu.xib in Resources */,
 				5CF96DA9132EA29D0079B3FD /* dsa_pub.pem in Resources */,
 				5CF96DAA132EA29D0079B3FD /* Acknowledgments.txt in Resources */,
@@ -2074,14 +2058,6 @@
 			name = "Ceci est le titre d'une note.nvhelp";
 			sourceTree = "<group>";
 		};
-		5C8BCF801DA2617C0036FA7E /* Comment ça marche.nvhelp */ = {
-			isa = PBXVariantGroup;
-			children = (
-				5C8BCF811DA2617C0036FA7E /* fr */,
-			);
-			name = "Comment ça marche.nvhelp";
-			sourceTree = "<group>";
-		};
 		5C8BCF821DA2617C0036FA7E /* Contact.nvhelp */ = {
 			isa = PBXVariantGroup;
 			children = (
@@ -2178,36 +2154,12 @@
 			name = "Wie funktioniert dieses Programm?.nvhelp";
 			sourceTree = "<group>";
 		};
-		5CF96D56132EA29D0079B3FD /* Atalhos Incrivelmente Úteis.nvhelp */ = {
-			isa = PBXVariantGroup;
-			children = (
-				5C8BCF8E1DA261EB0036FA7E /* pt-PT */,
-			);
-			name = "Atalhos Incrivelmente Úteis.nvhelp";
-			sourceTree = "<group>";
-		};
 		5CF96D5C132EA29D0079B3FD /* Como funciona isso?.nvhelp */ = {
 			isa = PBXVariantGroup;
 			children = (
 				5C8BCF911DA262190036FA7E /* pt-PT */,
 			);
 			name = "Como funciona isso?.nvhelp";
-			sourceTree = "<group>";
-		};
-		5CF96D64132EA29D0079B3FD /* Este é o título de uma nota.nvhelp */ = {
-			isa = PBXVariantGroup;
-			children = (
-				5C8BCF8F1DA261F50036FA7E /* pt-PT */,
-			);
-			name = "Este é o título de uma nota.nvhelp";
-			sourceTree = "<group>";
-		};
-		5CF96D6F132EA29D0079B3FD /* Informações de Contato.nvhelp */ = {
-			isa = PBXVariantGroup;
-			children = (
-				5C8BCF901DA261FA0036FA7E /* pt-PT */,
-			);
-			name = "Informações de Contato.nvhelp";
 			sourceTree = "<group>";
 		};
 /* End PBXVariantGroup section */
@@ -2220,7 +2172,7 @@
 				CODE_SIGN_IDENTITY = "Mac Developer";
 				COMBINE_HIDPI_IMAGES = YES;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
-				DEVELOPMENT_TEAM = 47TRS7H4BH;
+				DEVELOPMENT_TEAM = HGL36W2TP6;
 				ENABLE_STRICT_OBJC_MSGSEND = NO;
 				LD_RUNPATH_SEARCH_PATHS = "";
 				LIBRARY_SEARCH_PATHS = "$(PROJECT_DIR)";
@@ -2420,7 +2372,7 @@
 				CODE_SIGN_IDENTITY = "Mac Developer";
 				COMBINE_HIDPI_IMAGES = YES;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
-				DEVELOPMENT_TEAM = 47TRS7H4BH;
+				DEVELOPMENT_TEAM = HGL36W2TP6;
 				ENABLE_STRICT_OBJC_MSGSEND = NO;
 				LD_RUNPATH_SEARCH_PATHS = "";
 				LIBRARY_SEARCH_PATHS = "$(PROJECT_DIR)";
@@ -2525,7 +2477,7 @@
 				CODE_SIGN_IDENTITY = "Mac Developer";
 				COMBINE_HIDPI_IMAGES = YES;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
-				DEVELOPMENT_TEAM = 47TRS7H4BH;
+				DEVELOPMENT_TEAM = HGL36W2TP6;
 				ENABLE_STRICT_OBJC_MSGSEND = NO;
 				LD_RUNPATH_SEARCH_PATHS = "";
 				LIBRARY_SEARCH_PATHS = "$(PROJECT_DIR)";

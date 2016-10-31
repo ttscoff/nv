@@ -1,25 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
 <document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="11201" systemVersion="16A323" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none">
     <dependencies>
         <deployment identifier="macosx"/>
-=======
-<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="11201" systemVersion="16B2548a" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none">
-    <dependencies>
-        <deployment version="1060" identifier="macosx"/>
->>>>>>> origin/2.2.5
-=======
-<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="11201" systemVersion="16B2548a" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none">
-    <dependencies>
-        <deployment version="1060" identifier="macosx"/>
->>>>>>> 12cd37599eefca3a7d15677fa5096a0c7c6aac4b
-=======
-<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="11201" systemVersion="16B2548a" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none">
-    <dependencies>
-        <deployment version="1060" identifier="macosx"/>
->>>>>>> origin/2.2.5
         <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="11201"/>
         <plugIn identifier="com.apple.WebKitIBPlugin" version="11201"/>
     </dependencies>
@@ -111,19 +93,7 @@ Gw
                                         <webView maintainsBackForwardList="NO" id="229">
                                             <rect key="frame" x="0.0" y="0.0" width="445" height="494"/>
                                             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
                                             <webPreferences key="preferences" identifier="previewWebView" defaultFontSize="12" defaultFixedFontSize="12" plugInsEnabled="NO" javaEnabled="NO"/>
-=======
-                                            <webPreferences key="preferences" identifier="previewWebView" defaultFontSize="12" defaultFixedFontSize="12" javaEnabled="NO"/>
->>>>>>> origin/2.2.5
-=======
-                                            <webPreferences key="preferences" identifier="previewWebView" defaultFontSize="12" defaultFixedFontSize="12" javaEnabled="NO"/>
->>>>>>> 12cd37599eefca3a7d15677fa5096a0c7c6aac4b
-=======
-                                            <webPreferences key="preferences" identifier="previewWebView" defaultFontSize="12" defaultFixedFontSize="12" javaEnabled="NO"/>
->>>>>>> origin/2.2.5
                                             <connections>
                                                 <outlet property="UIDelegate" destination="-2" id="247"/>
                                                 <outlet property="frameLoadDelegate" destination="-2" id="244"/>
@@ -142,19 +112,7 @@ Gw
                                         <scrollView borderType="none" autohidesScrollers="YES" horizontalLineScroll="10" horizontalPageScroll="10" verticalLineScroll="10" verticalPageScroll="10" hasHorizontalScroller="NO" usesPredominantAxisScrolling="NO" id="225">
                                             <rect key="frame" x="0.0" y="0.0" width="445" height="494"/>
                                             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
                                             <clipView key="contentView" id="fex-1U-HyK">
-=======
-                                            <clipView key="contentView" id="WZM-vW-gb7">
->>>>>>> origin/2.2.5
-=======
-                                            <clipView key="contentView" id="WZM-vW-gb7">
->>>>>>> 12cd37599eefca3a7d15677fa5096a0c7c6aac4b
-=======
-                                            <clipView key="contentView" id="WZM-vW-gb7">
->>>>>>> origin/2.2.5
                                                 <rect key="frame" x="0.0" y="0.0" width="445" height="494"/>
                                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                 <subviews>
