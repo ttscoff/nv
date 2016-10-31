@@ -459,11 +459,41 @@
 
 -(IBAction)printPreview:(id)sender
 {
+    NSTabViewItem *selectedTab=[tabView selectedTabViewItem];
+    //1 is webview   2 is source view
+    if ([selectedTab.identifier integerValue]==1) {
+        [tabView selectNextTabViewItem:self];
+    }
     NSPrintInfo* printInfo = [NSPrintInfo sharedPrintInfo];
 
     [printInfo setHorizontallyCentered:YES];
     [printInfo setVerticallyCentered:NO];
-    [[[[preview mainFrame] frameView] documentView] print:nil];
+<<<<<<< HEAD
+<<<<<<< HEAD
+    NSPrintOperation *printOp=[[[preview mainFrame] frameView] printOperationWithPrintInfo:printInfo];
+    [printOp runOperationModalForWindow:tabView.window delegate:self didRunSelector:@selector(printOperationDidRun:success:contextInfo:) contextInfo:selectedTab];
+}
+
+- (void)printOperationDidRun:(NSPrintOperation *)printOperation  success:(BOOL)success  contextInfo:(void *)contextInfo{
+    NSTabViewItem *selTab=(NSTabViewItem *)contextInfo;
+    if (selTab&&(tabView.selectedTabViewItem!=selTab)) {
+        [tabView selectTabViewItem:selTab];
+    }
+=======
+=======
+>>>>>>> 12cd37599eefca3a7d15677fa5096a0c7c6aac4b
+
+    NSPrintOperation * printOp;
+
+    printOp = [NSPrintOperation printOperationWithView:[[[preview mainFrame] frameView] documentView]
+                                             printInfo:printInfo];
+//    [printOp runOperation];
+    [printOp runOperationModalForWindow:preview.window delegate:self didRunSelector:nil contextInfo:nil];
+//    [[[[preview mainFrame] frameView] documentView] print:nil];
+<<<<<<< HEAD
+>>>>>>> origin/2.2.5
+=======
+>>>>>>> 12cd37599eefca3a7d15677fa5096a0c7c6aac4b
 }
 
 -(IBAction)shareNote:(id)sender
