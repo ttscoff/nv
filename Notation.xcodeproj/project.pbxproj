@@ -728,6 +728,11 @@
 		5CAB2F831DC769E6000AFED9 /* pt-PT */ = {isa = PBXFileReference; lastKnownFileType = text; name = "pt-PT"; path = "pt-PT.lproj/Excruciatingly Useful Shortcuts.nvhelp"; sourceTree = "<group>"; };
 		5CAB2F8A1DC76A7C000AFED9 /* it */ = {isa = PBXFileReference; lastKnownFileType = text; name = it; path = "it.lproj/How does this thing work?.nvhelp"; sourceTree = "<group>"; };
 		5CAB2F8B1DC76AA1000AFED9 /* it */ = {isa = PBXFileReference; lastKnownFileType = text; name = it; path = "it.lproj/Excruciatingly Useful Shortcuts.nvhelp"; sourceTree = "<group>"; };
+		5CAB2F8C1DC76EFB000AFED9 /* it */ = {isa = PBXFileReference; lastKnownFileType = text; name = it; path = "it.lproj/This is the title of a note.nvhelp"; sourceTree = "<group>"; };
+		5CAB2F8D1DC7998C000AFED9 /* zh */ = {isa = PBXFileReference; lastKnownFileType = text; name = zh; path = "zh.lproj/Excruciatingly Useful Shortcuts.nvhelp"; sourceTree = "<group>"; };
+		5CAB2F8E1DC799AB000AFED9 /* zh */ = {isa = PBXFileReference; lastKnownFileType = text; name = zh; path = zh.lproj/Contact.nvhelp; sourceTree = "<group>"; };
+		5CAB2F8F1DC799D2000AFED9 /* zh */ = {isa = PBXFileReference; lastKnownFileType = text; name = zh; path = "zh.lproj/This is the title of a note.nvhelp"; sourceTree = "<group>"; };
+		5CAB2F901DC799EE000AFED9 /* zh */ = {isa = PBXFileReference; lastKnownFileType = text; name = zh; path = "zh.lproj/How does this thing work?.nvhelp"; sourceTree = "<group>"; };
 		5CBA7A961305E38C004ADEBB /* TagEditingManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TagEditingManager.h; sourceTree = "<group>"; };
 		5CBA7A971305E38C004ADEBB /* TagEditingManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TagEditingManager.m; sourceTree = "<group>"; };
 		5CBD88F0132A84E000FC5A79 /* ETTransparentButtonCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ETTransparentButtonCell.h; sourceTree = "<group>"; };
@@ -2004,6 +2009,7 @@
 				5CAB2F7F1DC766C4000AFED9 /* fr */,
 				5CAB2F831DC769E6000AFED9 /* pt-PT */,
 				5CAB2F8B1DC76AA1000AFED9 /* it */,
+				5CAB2F8D1DC7998C000AFED9 /* zh */,
 			);
 			name = "Excruciatingly Useful Shortcuts.nvhelp";
 			sourceTree = "<group>";
@@ -2016,6 +2022,7 @@
 				5CAB2F7D1DC76670000AFED9 /* pt-PT */,
 				5CAB2F801DC7699E000AFED9 /* fr */,
 				5CAB2F8A1DC76A7C000AFED9 /* it */,
+				5CAB2F901DC799EE000AFED9 /* zh */,
 			);
 			name = "How does this thing work?.nvhelp";
 			sourceTree = "<group>";
@@ -2027,6 +2034,8 @@
 				5CAB2F7C1DC76646000AFED9 /* de */,
 				5CAB2F7E1DC7669F000AFED9 /* fr */,
 				5CAB2F811DC769B3000AFED9 /* pt-PT */,
+				5CAB2F8C1DC76EFB000AFED9 /* it */,
+				5CAB2F8F1DC799D2000AFED9 /* zh */,
 			);
 			name = "This is the title of a note.nvhelp";
 			sourceTree = "<group>";
@@ -2052,6 +2061,7 @@
 				5CAB2F771DC76578000AFED9 /* it */,
 				5CAB2F781DC765B5000AFED9 /* de */,
 				5CAB2F821DC769C9000AFED9 /* pt-PT */,
+				5CAB2F8E1DC799AB000AFED9 /* zh */,
 			);
 			name = Contact.nvhelp;
 			sourceTree = "<group>";
