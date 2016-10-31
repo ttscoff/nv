@@ -470,6 +470,7 @@
     [printInfo setVerticallyCentered:NO];
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
     NSPrintOperation *printOp=[[[preview mainFrame] frameView] printOperationWithPrintInfo:printInfo];
     [printOp runOperationModalForWindow:tabView.window delegate:self didRunSelector:@selector(printOperationDidRun:success:contextInfo:) contextInfo:selectedTab];
 }
@@ -482,6 +483,8 @@
 =======
 =======
 >>>>>>> 12cd37599eefca3a7d15677fa5096a0c7c6aac4b
+=======
+>>>>>>> origin/2.2.5
 
     NSPrintOperation * printOp;
 
@@ -491,9 +494,12 @@
     [printOp runOperationModalForWindow:preview.window delegate:self didRunSelector:nil contextInfo:nil];
 //    [[[[preview mainFrame] frameView] documentView] print:nil];
 <<<<<<< HEAD
+<<<<<<< HEAD
 >>>>>>> origin/2.2.5
 =======
 >>>>>>> 12cd37599eefca3a7d15677fa5096a0c7c6aac4b
+=======
+>>>>>>> origin/2.2.5
 }
 
 -(IBAction)shareNote:(id)sender
