@@ -8,9 +8,9 @@
 \
 Ceci est le corps d'une note. \
 \
-Vos notes peuvent avoir la longueur que vous d\'e9sirez. Vous pouvez les mettre en 
+Vos notes peuvent avoir la longueur que vous d\'e9sirez. Vous pouvez les mettre en
 \b gras
-\b0 , en 
+\b0 , en
 \i italiques
 \i0  ou les \strike \strikec0 barrer\strike0\striked0 . \
 \
@@ -18,7 +18,7 @@ Cr\'e9ez des liens entre les notes : [[Comment \'e7a marche]] ?\
 \
 Vous pouvez cr\'e9er autant de notes que vous le d\'e9sirez. \CocoaLigature1 NV\CocoaLigature0  peu en stocker des milliers, et il fonctionnera de mani\'e8re optimale si les informations sont r\'e9parties dans de nombreuses notes.\
 \
-Si vous activez le chiffrement (Pr\'e9f\'e9rences > Notes > S\'e9curit\'e9), vous pouvez stocker vos mots de passe et autres donn\'e9es sensibles sans vous inqui\'e9ter que qui que ce soit puisse y acc\'e9der. 
+Si vous activez le chiffrement (Pr\'e9f\'e9rences > Notes > S\'e9curit\'e9), vous pouvez stocker vos mots de passe et autres donn\'e9es sensibles sans vous inqui\'e9ter que qui que ce soit puisse y acc\'e9der.
 \b Attention, ne perdez pas votre mot de passe : vous ne pourriez plus afficher vos notes !
 \b0 \
 \
