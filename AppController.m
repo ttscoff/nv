@@ -3377,7 +3377,7 @@ terminateApp:
     [statusIcon setSize:NSMakeSize(16.0, 16.0)];
     [statusIcon setTemplate:YES];
     statusItem =[[NSStatusBar systemStatusBar] statusItemWithLength:24.f];
-    if (!IsYosemiteOrLater) {
+    if (IsYosemiteOrLater) {
         statusItem.button.image=statusIcon;
         statusItem.button.target=self;
         statusItem.button.action=@selector(statusItemAction:);
