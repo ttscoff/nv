@@ -492,7 +492,7 @@
 											<object class="NSTextFieldCell" key="NSCell" id="571597860">
 												<int key="NSCellFlags">67108864</int>
 												<int key="NSCellFlags2">272760832</int>
-												<string key="NSContents">Warning: Note contents will be delivered as clear text. Notes &gt;400k in size may have issues with sync.</string>
+												<string key="NSContents">Warning: Note contents will be encrypted during transmission with HTTPS, but stored in clear text. Notes &gt;400k in size may have issues with sync.</string>
 												<reference key="NSSupport" ref="26"/>
 												<reference key="NSControlView" ref="769377958"/>
 												<bool key="NSDrawsBackground">YES</bool>
