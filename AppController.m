@@ -2225,92 +2225,57 @@ terminateApp:
 	[prefsWindowController showWindow:sender];
 }
 
-- (IBAction)toggleNVActivation:(id)sender {
-    if ([NSApp isActive]) {
-        
-//		SpaceSwitchingContext laterSpaceSwitchCtx;
-//		if (IsLeopardOrLater){
-//			CurrentContextForWindowNumber([window windowNumber], &laterSpaceSwitchCtx);
-//            
-//        }
-//        if (!IsLeopardOrLater){// || !CompareContextsAndSwitch(&spaceSwitchCtx, &laterSpaceSwitchCtx)) {
-			//hide only if we didn't need to or weren't able to switch spaces
-        if (!window.isMainWindow||!window.isVisible) {
-            [window makeKeyAndOrderFront:sender];
-        }else{
-			[NSApp hide:sender];
-        }
-//		}
-		//clear the space-switch context that we just looked at, to ensure it's not reused inadvertently
-//		bzero(&spaceSwitchCtx, sizeof(SpaceSwitchingContext));
-    }else{
-        [NSApp activateIgnoringOtherApps:YES];
-        dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.03 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
-            if (!window.isMainWindow||!window.isVisible) {
-                [window makeKeyAndOrderFront:sender];
-            }
-        });
-    }
-}
 
 - (IBAction)makeActiveAndShowWindow:(id)sender{
-    if (![NSApp isActive]) {
-        [NSApp activateIgnoringOtherApps:YES];
-        dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.03 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
-            if (!window.isMainWindow||!window.isVisible) {
-                [window makeKeyAndOrderFront:sender];
-            }
-        });
-    }else if (!window.isMainWindow||!window.isVisible) {
-        [window makeKeyAndOrderFront:sender];
-    }
-
-}
-
-- (void)focusControlField:(id)sender activate:(BOOL)shouldActivate{
-
-	if ([notesSubview isCollapsed]) {
-		[self toggleCollapse:self];
-	}else if (![self dualFieldIsVisible]){
-		
-        [self setDualFieldIsVisible:YES];
-	}
-    
-	[field selectText:sender];
-    
-	if (!shouldActivate) {
-        [window makeKeyAndOrderFront:sender];
-
-//        if ([window canBecomeMainWindow]) {
-//            [window makeMainWindow];
-//        }else{
-//            NSLog(@"main window can't become main for some reason");
-//        }
-//        if (![NSApp isActive]) {
-//            CurrentContextForWindowNumber([window windowNumber], &spaceSwitchCtx);
-//        }
-    }else{
-        if (![NSApp isActive]) {
-//            CurrentContextForWindowNumber([window windowNumber], &spaceSwitchCtx);
-            [NSApp activateIgnoringOtherApps:YES];
-        }
-        dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.03 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
-            if (!window.isMainWindow||!window.isVisible) {
-                [window makeKeyAndOrderFront:sender];
-            }
-        });
-	}
-	[self setEmptyViewState:currentNote == nil];
-    self.isEditing = NO;
-    
+    [self makeActiveAndShowWindowByFocusingControlField:NO andForcingActivation:YES];
 }
 
 - (IBAction)bringFocusToControlField:(id)sender {
-	//For ElasticThreads' fullscreen mode use this if/else otherwise uncomment the expand toolbar
-    
+    //For ElasticThreads' fullscreen mode use this if/else otherwise uncomment the expand toolbar
+
     [self focusControlField:sender activate:YES];
 }
 
+- (void)focusControlField:(id)sender activate:(BOOL)shouldActivate{
+    [self makeActiveAndShowWindowByFocusingControlField:YES andForcingActivation:shouldActivate];
+}
+
+- (IBAction)toggleNVActivation:(id)sender {
+
+    if ([NSApp isActive] && [window isMainWindow]&&[window isVisible]) {
+        [NSApp hide:sender];
+        return;
+    }
+    [self focusControlField:sender activate:YES];
+}
+
+- (void)makeActiveAndShowWindowByFocusingControlField:(BOOL)focus andForcingActivation:(BOOL)activate{
+
+    if (focus) {
+        if ([notesSubview isCollapsed]) {
+            [self toggleCollapse:self];
+        }else if (![self dualFieldIsVisible]){
+            [self setDualFieldIsVisible:YES];
+        }
+    }
+
+    CGFloat delay=0.0f;
+    if (activate&&![NSApp isActive]) {
+        delay=0.03f;
+        [NSApp activateIgnoringOtherApps:YES];
+    }
+    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(delay * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+        if (focus) {
+            [field selectText:nil];
+        }
+
+        [self setEmptyViewState:currentNote == nil];
+        self.isEditing = NO;
+        if (!window.isMainWindow||!window.isVisible) {
+            [window makeKeyAndOrderFront:nil];
+        }
+    });
+}
 
 - (NSWindow*)window {
 	return window;
