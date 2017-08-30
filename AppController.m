@@ -57,7 +57,7 @@
 #define NSApplicationPresentationHideDock (1 <<  1)
 //#define NSApplicationActivationPolicyAccessory
 
-#define kSparkleUpdateFeedForLions @"http://abyss.designheresy.com/nvalt/updates.xml"
+#define kSparkleUpdateFeedForLions @"https://updates.designheresy.com/nvalt/updates.xml"
 #define kSparkleUpdateFeedForSnowLeopard @"http://abyss.designheresy.com/nvalt2/nvalt2snowleopardfeed.xml"
 //http://abyss.designheresy.com/nvalt/betaupdates.xml
 
@@ -3229,8 +3229,8 @@ terminateApp:
                 // [notesTableView setNeedsDisplay:YES];
             }
         }else {//if (client==field) {
-            [theFieldEditor setDrawsBackground:NO];
-            [theFieldEditor setSelectedTextAttributes:[NSDictionary dictionaryWithObjectsAndKeys:[NSColor selectedTextBackgroundColor], NSBackgroundColorAttributeName, nil]];
+//            [theFieldEditor setDrawsBackground:NO];
+//            [theFieldEditor setSelectedTextAttributes:[NSDictionary dictionaryWithObjectsAndKeys:[NSColor selectedTextBackgroundColor], NSBackgroundColorAttributeName, nil]];
             [theFieldEditor setInsertionPointColor:[NSColor blackColor]];
         }
         // NSLog(@"window first is :%@",[window firstResponder]);
