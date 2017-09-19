@@ -2982,7 +2982,7 @@ terminateApp:
             NSUInteger theCount = [[[textView textStorage] words] count];
 
             if (theCount > 0) {
-                [wordCounter setStringValue:[[NSString stringWithFormat:@"%d", theCount] stringByAppendingString:@" words"]];
+                [wordCounter setStringValue:[[NSString stringWithFormat:@"%d", theCount] stringByAppendingString:theCount == 1 ? @" word" : @" words"]];
             }else {
                 [wordCounter setStringValue:@""];
             }
