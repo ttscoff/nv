@@ -47,7 +47,7 @@ typedef struct _ViewLocationContext {
 	GlobalPrefs *globalPrefs;
 	NSMenuItem *dummyItem;
 	HeaderViewWithMenu *headerView;
-	NSView *cornerView;
+//	NSView *cornerView;
 	NSTextFieldCell *cachedCell;
 	
 	NSDictionary *loadStatusAttributes;
@@ -56,7 +56,7 @@ typedef struct _ViewLocationContext {
 	
 	float tableFontHeight;
 
-	int affinity;	
+	NSInteger affinity;
 
 	NSUserDefaults *userDefaults;
 }

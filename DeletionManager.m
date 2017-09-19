@@ -23,17 +23,21 @@
 @implementation DeletionManager
 
 - (id)init {
-	if ([super init]) {
+	if (self=[super init]) {
 		deletedNotes = [[NSMutableArray alloc] init];
-	}
-	return self;
+	
+        return self;
+    }
+    return nil;
 }
 
 - (id)initWithNotationController:(NotationController*)aNotationController {
-	if ([self init]) {
+	if (self=[self init]) {
 		notationController = [aNotationController retain];
-	}
-	return self;
+	
+        return self;
+    }
+	return nil;
 }
 
 - (void)awakeFromNib {

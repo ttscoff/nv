@@ -32,7 +32,7 @@
 @implementation LabelsListController
 
 - (id)init {
-	if ([super init]) {
+	if (self=[super init]) {
 	    
 	    allLabels = [[NSCountedSet alloc] init]; //authoritative
 	    //for faster(?) filtering during search
@@ -77,39 +77,36 @@
 }
 
 - (NSArray*)labelTitlesPrefixedByString:(NSString*)prefixString indexOfSelectedItem:(NSInteger *)anIndex minusWordSet:(NSSet*)antiSet {
-	
-	NSMutableArray *objs = [[[allLabels allObjects] mutableCopy] autorelease];
-	NSMutableArray *titles = [NSMutableArray arrayWithCapacity:[allLabels count]];
+    NSUInteger labelCt=allLabels.count;
+    if (labelCt==0) {
+        return @[];
+    }
 
-	[objs sortUnstableUsingFunction:(NSInteger (*)(id *, id *))compareLabel];
-	
-	CFStringRef prefix = (CFStringRef)prefixString;
-	NSUInteger i, titleLen, j = 0, shortestTitleLen = UINT_MAX;
-	
-	for (i=0; i<[objs count]; i++) {
-		CFStringRef title = (CFStringRef)titleOfLabel((LabelObject*)[objs objectAtIndex:i]);
-		
-		if (CFStringFindWithOptions(title, prefix, CFRangeMake(0, CFStringGetLength(prefix)), kCFCompareAnchored | kCFCompareCaseInsensitive, NULL)) {
-			
-			if (![antiSet containsObject:(id)title]) {
-				[titles addObject:(id)title];
-				if (anIndex && (titleLen = CFStringGetLength(title)) < shortestTitleLen) {
-					*anIndex = j;
-					shortestTitleLen = titleLen;
-				}
-				j++;
-			}
-		}
-	}
-	return titles;
+    NSMutableArray *objs = [[[allLabels allObjects] mutableCopy] autorelease];
+    NSMutableArray *titles = [NSMutableArray arrayWithCapacity:[allLabels count]];
+
+    [objs sortUnstableUsingFunction:(NSInteger (*)(id *, id *))compareLabel];
+
+    NSUInteger  titleLen, j = 0, shortestTitleLen = UINT_MAX;
+    for (LabelObject *aLabelObject in objs) {
+        NSString *labelString=titleOfLabel(aLabelObject);
+        if ([labelString rangeOfString:prefixString options:NSCaseInsensitiveSearch|NSDiacriticInsensitiveSearch|NSAnchoredSearch].location!=NSNotFound) {
+            if (![antiSet containsObject:labelString]) {
+                [titles addObject:labelString];
+                if (anIndex && (titleLen = labelString.length) < shortestTitleLen) {
+                    *anIndex = j;
+                    shortestTitleLen = titleLen;
+                }
+                j++;
+            }
+        }
+    }
+    if (titles.count>0) {
+        return [NSArray arrayWithArray:titles];
+    }
+    return @[];
 }
 
-#if MAC_OS_X_VERSION_MAX_ALLOWED < MAC_OS_X_VERSION_10_5
-static CGRect NSRectToCGRect(NSRect nsrect) {
-    union _ {NSRect ns; CGRect cg;};
-    return ((union _ *)&nsrect)->cg;
-}
-#endif
 
 - (void)invalidateCachedLabelImages {
 	//used when the list font size changes
@@ -163,6 +160,9 @@ static CGRect NSRectToCGRect(NSRect nsrect) {
 //figure out which notes to display given some selected labels
 - (NSSet*)notesAtFilteredIndexes:(NSIndexSet*)anIndexSet {
     NSUInteger i, numLabels = [anIndexSet count];
+    if (numLabels==0) {
+        return [NSSet set];
+    }
     NSUInteger *labelsBuffer = malloc(numLabels * sizeof(NSUInteger));
     
     NSRange range = NSMakeRange([anIndexSet firstIndex], ([anIndexSet lastIndex]-[anIndexSet firstIndex]) + 1);
@@ -174,7 +174,7 @@ static CGRect NSRectToCGRect(NSRect nsrect) {
 	NSUInteger labelIndex = labelsBuffer[i];
 	[notesOfLabels unionSet:[objects[labelIndex] noteSet]];
     }
-    
+    free(labelsBuffer);
     return [notesOfLabels autorelease];
 }
 

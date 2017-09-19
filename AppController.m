@@ -10,7 +10,7 @@
  or promote products derived from this software without specific prior written permission. */
 //ET NV4
 
-#import "NSTextFinder.h"
+//#import "NSTextFinder.h"
 #import "AppController.h"
 #import "NoteObject.h"
 #import "GlobalPrefs.h"
@@ -34,7 +34,6 @@
 #import "DualField.h"
 #import "TitlebarButton.h"
 #import "RBSplitView/RBSplitView.h"
-//#import "AugmentedScrollView.h"
 #import "BookmarksController.h"
 #import "SyncSessionController.h"
 #import "MultiplePageView.h"
@@ -44,11 +43,10 @@
 #import "TagEditingManager.h"
 #import "NotesTableHeaderCell.h"
 #import "DFView.h"
-#import "StatusItemView.h"
 #import "ETContentView.h"
 #import "PreviewController.h"
 #import "ETClipView.h"
-#import "ETScrollView.h"
+//#import "ETScrollView.h"
 #import "NSFileManager+DirectoryLocations.h"
 #import "nvaDevConfig.h"
 #import <Sparkle/SUUpdater.h>
@@ -59,20 +57,22 @@
 #define NSApplicationPresentationHideDock (1 <<  1)
 //#define NSApplicationActivationPolicyAccessory
 
-#define kSparkleUpdateFeedForLions @"http://abyss.designheresy.com/nvalt2/nvalt2main.xml"
+#define kSparkleUpdateFeedForLions @"https://updates.designheresy.com/nvalt/updates.xml"
 #define kSparkleUpdateFeedForSnowLeopard @"http://abyss.designheresy.com/nvalt2/nvalt2snowleopardfeed.xml"
 //http://abyss.designheresy.com/nvalt/betaupdates.xml
 
-
+#define kSplitViewExpandedDividerThickness 8.0f
+#define kSplitViewCollapsedDividerThickness 5.0f
 
 //#define NSTextViewChangedNotification @"TextViewHasChangedContents"
 //#define kDefaultMarkupPreviewMode @"markupPreviewMode"
 #define kDualFieldHeight 35.0
 
+#define k_FinderTaggingReset 0
 
 NSWindow *normalWindow;
-int ModFlagger;
-int popped;
+NSInteger ModFlagger;
+NSInteger popped;
 BOOL splitViewAwoke;
 
 
@@ -93,6 +93,14 @@ BOOL splitViewAwoke;
 - (id)init {
     self = [super init];
     if (self) {
+
+        if (floor(NSAppKitVersionNumber) > NSAppKitVersionNumber10_11) {
+            [NSWindow setAllowsAutomaticWindowTabbing:NO];
+        }
+#if k_FinderTaggingReset
+        [[NSUserDefaults standardUserDefaults]removeObjectForKey:@"UseFinderTags"];
+#endif
+        
         hasLaunched=NO;
 
         if (![[NSUserDefaults standardUserDefaults] boolForKey:@"ShowDockIcon"]){
@@ -122,18 +130,18 @@ BOOL splitViewAwoke;
         NSFileManager *fileManager = [NSFileManager defaultManager];
 
 
-        NSString *folder = [[NSFileManager defaultManager] applicationSupportDirectory];
+        NSString *folder = [fileManager applicationSupportDirectory];
 
         if ([fileManager fileExistsAtPath: folder] == NO)
         {
-            [fileManager createDirectoryAtPath: folder attributes: nil];
+            [fileManager createFolderAtPath:folder];
+            
+//            [fileManager createDirectoryAtPath: folder attributes: nil];
 
         }
 
         NSNotificationCenter *nc=[NSNotificationCenter defaultCenter];
         [nc addObserver:previewController selector:@selector(requestPreviewUpdate:) name:@"TextViewHasChangedContents" object:self];
-        [nc addObserver:self selector:@selector(toggleAttachedWindow:) name:@"NVShouldActivate" object:nil];
-        [nc addObserver:self selector:@selector(toggleAttachedMenu:) name:@"StatusItemMenuShouldDrop" object:nil];
         [nc addObserver:self selector:@selector(togDockIcon:) name:@"AppShouldToggleDockIcon" object:nil];
         [nc addObserver:self selector:@selector(toggleStatusItem:) name:@"AppShouldToggleStatusItem" object:nil];
 
@@ -154,6 +162,7 @@ BOOL splitViewAwoke;
 }
 
 - (void)awakeFromNib {
+    splitViewIsChangingLayout=NO;
     theFieldEditor = [[[NSTextView alloc]initWithFrame:[window frame]] retain];
 	[theFieldEditor setFieldEditor:YES];
     // [theFieldEditor setDelegate:self];
@@ -166,16 +175,16 @@ BOOL splitViewAwoke;
     splitView = [[[RBSplitView alloc] initWithFrame:[mainView frame] andSubviews:2] retain];
     [splitView setAutosaveName:@"centralSplitView" recursively:NO];
     [splitView setDelegate:self];
+//here
     NSImage *image = [[[NSImage alloc] initWithSize:NSMakeSize(1.0,1.0)] autorelease];
     [image lockFocus];
     [[NSColor clearColor] set];
-
     NSRectFill(NSMakeRect(0.0,0.0,1.0,1.0));
     [image unlockFocus];
-    [image setFlipped:YES];
+//    [image setFlipped:YES];
     [splitView setDivider:image];
 
-    [splitView setDividerThickness:8.75f];
+//    [splitView setDividerThickness:kSplitViewExpandedDividerThickness];
     [splitView setAutoresizesSubviews:YES];
     [splitView setAutoresizingMask:(NSViewWidthSizable | NSViewHeightSizable)];
     [mainView addSubview:splitView];
@@ -226,11 +235,14 @@ BOOL splitViewAwoke;
 	//set up temporary FastListDataSource containing false visible notes
 
 	//this will not make a difference
-	[window useOptimizedDrawing:YES];
 
 
 	//[window makeKeyAndOrderFront:self];
 	//[self setEmptyViewState:YES];
+    if (!IsYosemiteOrLater) {
+        [window useOptimizedDrawing:YES];
+    }
+   
 
 	// Create elasticthreads' NSStatusItem.
 	if ( [[NSUserDefaults standardUserDefaults] boolForKey:@"StatusBarItem"]) {
@@ -337,11 +349,12 @@ void outletObjectAwoke(id sender) {
 	[[SecureTextEntryManager sharedInstance] checkForIncompatibleApps];
 
 	//connect sparkle programmatically to avoid loading its framework at nib awake;
-
-	if (!NSClassFromString(@"SUUpdater")) {
+    //    if (!NSClassFromString(@"SUUpdater")) {
+    //        NSLog(@"su:%@ SEL:%@",sparkleUpdateItem.target,sparkleUpdateItem.action);
+    //    }else{
 		NSString *frameworkPath = [[[NSBundle bundleForClass:[self class]] privateFrameworksPath] stringByAppendingPathComponent:@"Sparkle.framework"];
 		if ([[NSBundle bundleWithPath:frameworkPath] load]) {
-			SUUpdater *updater =[NSClassFromString(@"SUUpdater") performSelector:@selector(sharedUpdater)];
+        SUUpdater *updater =[SUUpdater sharedUpdater];
             if (IsLionOrLater) {
                 [updater setFeedURL:[NSURL URLWithString:kSparkleUpdateFeedForLions]];
             }else{
@@ -361,21 +374,9 @@ void outletObjectAwoke(id sender) {
 		} else {
 			NSLog(@"Could not load %@!", frameworkPath);
 		}
-	}else{
-        NSLog(@"su");
-    }
+    //    }
 	// add elasticthreads' menuitems
-	NSMenuItem *theMenuItem = [[[NSMenuItem alloc] init] autorelease];
-	[theMenuItem setTarget:self];
-    //	NSMenu *notesMenu = [[[NSApp mainMenu] itemWithTag:NOTES_MENU_ID] submenu];
-	theMenuItem = [theMenuItem copy];
-    //	[statBarMenu insertItem:theMenuItem atIndex:4];
-	[theMenuItem release];
-    //theMenuItem = [[viewMenu itemWithTag:801] copy];
-	//[statBarMenu insertItem:theMenuItem atIndex:11];
-    //[theMenuItem release];
     if(IsLeopardOrLater){
-        //theMenuItem =[viewMenu itemWithTag:314];
         [fsMenuItem setEnabled:YES];
         [fsMenuItem setHidden:NO];
 
@@ -385,7 +386,7 @@ void outletObjectAwoke(id sender) {
             //
             [window setCollectionBehavior:NSWindowCollectionBehaviorFullScreenPrimary];
             //            [window setCollectionBehavior:NSWindowCollectionBehaviorFullScreenAuxiliary];
-            [NSApp setPresentationOptions:NSApplicationPresentationFullScreen];
+            //            [NSApp setPresentationOptions:[NSApp currentSystemPresentationOptions]|NSApplicationPresentationFullScreen];
 
 
         }else{
@@ -396,23 +397,18 @@ void outletObjectAwoke(id sender) {
 #if MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_7
         }
 #endif
-        theMenuItem = [fsMenuItem copy];
-        [statBarMenu insertItem:theMenuItem atIndex:12];
+
+        NSMenuItem *theMenuItem = [fsMenuItem copy];
+        [statBarMenu insertItem:theMenuItem atIndex:14];
         [theMenuItem release];
     }
+    [wordCounter setHidden:[prefsController showWordCount]];
 
-	if (![prefsController showWordCount]) {
-		[wordCounter setHidden:NO];
-	}else {
-		[wordCounter setHidden:YES];
-	}
 	//
 	[NSApp setServicesProvider:self];
     if (!hasLaunched) {
-
         hasLaunched=YES;
         [self focusControlField:self activate:NO];
-
 
     }
 
@@ -448,10 +444,10 @@ void outletObjectAwoke(id sender) {
 	}
 
 	if (aliasData) {
-	    newNotation = [[NotationController alloc] initWithAliasData:aliasData error:&err];//autorelease]
+	    newNotation = [[[NotationController alloc] initWithAliasData:aliasData error:&err] autorelease];
 	    subMessage = NSLocalizedString(@"Please choose a different folder in which to store your notes.",nil);
 	} else {
-	    newNotation = [[NotationController alloc] initWithDefaultDirectoryReturningError:&err];
+	    newNotation = [[[NotationController alloc] initWithDefaultDirectoryReturningError:&err] autorelease];
 	    subMessage = NSLocalizedString(@"Please choose a folder in which your notes will be stored.",nil);
 	}
 	//no need to display an alert if the error wasn't real
@@ -479,8 +475,9 @@ void outletObjectAwoke(id sender) {
 		showOpenPanel:
 			if (![prefsWindowController getNewNotesRefFromOpenPanel:&notesDirectoryRef returnedPath:&location]) {
 				//they cancelled the open panel, or it was unable to get the path/FSRef of the file
+//                [newNotation release];
 				goto terminateApp;
-			} else if ((newNotation = [[NotationController alloc] initWithDirectoryRef:&notesDirectoryRef error:&err])) {
+			} else if ((newNotation = [[[NotationController alloc] initWithDirectoryRef:&notesDirectoryRef error:&err] autorelease])) {
 				//have to make sure alias data is saved from setNotationController
 				[newNotation setAliasNeedsUpdating:YES];
 				break;
@@ -498,14 +495,14 @@ void outletObjectAwoke(id sender) {
 	//import old database(s) here if necessary
 	[AlienNoteImporter importBlorOrHelpFilesIfNecessaryIntoNotation:newNotation];
 
-	[newNotation release];
+//	[newNotation release];
 	if (pathsToOpenOnLaunch) {
 		[notationController openFiles:[pathsToOpenOnLaunch autorelease]];//autorelease
 		pathsToOpenOnLaunch = nil;
 	}
 
 	if (URLToInterpretOnLaunch) {
-		[self interpretNVURL:[URLToInterpretOnLaunch autorelease]];
+		[self interpretNVURL:[NSURL URLWithString:URLToInterpretOnLaunch]];
 		URLToInterpretOnLaunch = nil;
 	}
 
@@ -521,6 +518,7 @@ void outletObjectAwoke(id sender) {
 	 @selector(removeTableColumn:sender:),  //ditto
 	 @selector(setTableColumnsShowPreview:sender:),  //when to tell notationcontroller to generate or disable note-body previews
 	 @selector(setConfirmNoteDeletion:sender:),  //whether "delete note" should have an ellipsis
+     @selector(setUseFinderTags:),  //whether nvalt should use findertags
 	 @selector(setAutoCompleteSearches:sender:),@selector(setUseETScrollbarsOnLion:sender:), nil];   //when to tell notationcontroller to build its title-prefix connections
 
 	[self performSelector:@selector(runDelayedUIActionsAfterLaunch) withObject:nil afterDelay:0.0];
@@ -703,7 +701,7 @@ terminateApp:
     } else if (selector == @selector(editNoteExternally:)) {
         return (numberSelected > 0) && [[menuItem representedObject] canEditAllNotes:[notationController notesAtIndexes:[notesTableView selectedRowIndexes]]];
 	}else if (selector == @selector(previewNoteWithMarked:)){
-        BOOL gotMarked=[[[NSWorkspace sharedWorkspace]URLForApplicationWithBundleIdentifier:@"com.brettterpstra.marky"] isFileURL];
+        BOOL gotMarked=[[[NSWorkspace sharedWorkspace]URLForApplicationWithBundleIdentifier:@"com.brettterpstra.marky"] isFileURL] || [[[NSWorkspace sharedWorkspace]URLForApplicationWithBundleIdentifier:@"com.brettterpstra.marked2"] isFileURL];
         if ([menuItem isHidden]==gotMarked) {
             [menuItem setHidden:!gotMarked];
         }
@@ -759,28 +757,24 @@ terminateApp:
 }
 
 - (void)_configureDividerForCurrentLayout {
-
+    splitViewIsChangingLayout=YES;
     self.isEditing = NO;
 	BOOL horiz = [prefsController horizontalLayout];
 	if ([notesSubview isCollapsed]) {
 		[notesSubview expand];
 		[splitView setVertical:horiz];
-		[splitView setDividerThickness:7.0f];
-//        NSSize size = [notesSubview frame].size;
-//        [notesScrollView setFrame: NSMakeRect(0, 0, size.width, size.height + 1)];
+        [splitView setDividerThickness:kSplitViewCollapsedDividerThickness];
 		[notesSubview collapse];
 	}else {
         [splitView setVertical:horiz];
-        if (!verticalDividerImg && [splitView divider]) verticalDividerImg = [[splitView divider] retain];
-        [splitView setDivider: verticalDividerImg];
-		[splitView setDividerThickness:8.75f];
-//        NSSize size = [notesSubview frame].size;
-//        [notesScrollView setFrame: horiz? NSMakeRect(0, 0, size.width, size.height) :  NSMakeRect(0, 0, size.width, size.height + 1)];
+//        if (!verticalDividerImg && [splitView divider]) verticalDividerImg = [[splitView divider] retain];
+//        [splitView setDivider: verticalDividerImg];
+		[splitView setDividerThickness:kSplitViewExpandedDividerThickness];
         if (![self dualFieldIsVisible]) {
             [self setDualFieldIsVisible:YES];
         }
 	}
-
+    splitViewIsChangingLayout=NO;
     if (horiz) {
         [splitSubview setMinDimension:100.0 andMaxDimension:0.0];
     }
@@ -833,55 +827,76 @@ terminateApp:
 
 	[notesTableView editRowAtColumnWithIdentifier:NoteTitleColumnString];
 }
+//
+- (void)deleteAlertDidEnd:(NSAlert *)alert returnCode:(NSInteger)returnCode contextInfo:(NSIndexSet *)contextInfo {
+    if ((returnCode == NSAlertFirstButtonReturn)&&(contextInfo!=nil)&&([contextInfo count]>0)) {
+//        NSLog(@"gonna delete:%@",contextInfo);
+//        NSIndexSet *indexes=(NSIndexSet *)contextInfo;
 
-- (void)deleteAlertDidEnd:(NSAlert *)alert returnCode:(NSInteger)returnCode contextInfo:(void *)contextInfo {
-
-	id retainedDeleteObj = (id)contextInfo;
-
-	if (returnCode == NSAlertDefaultReturn) {
-		//delete! nil-msgsnd-checking
-
-		//ensure that there are no pending edits in the tableview,
-		//lest editing end with the same field editor and a different selected note
-		//resulting in the renaming of notes in adjacent rows
-		[notesTableView abortEditing];
-
-		if ([retainedDeleteObj isKindOfClass:[NSArray class]]) {
-			[notationController removeNotes:retainedDeleteObj];
-		} else if ([retainedDeleteObj isKindOfClass:[NoteObject class]]) {
-			[notationController removeNote:retainedDeleteObj];
+        [notationController removeNotesAtIndexes:contextInfo];
+    }
+    [contextInfo release];
+    [alert release];
 		}
 
-		if (IsLeopardOrLater && [[alert suppressionButton] state] == NSOnState) {
-			[prefsController setConfirmNoteDeletion:NO sender:self];
-		}
-	}
-	[retainedDeleteObj release];
-}
+//
+//	id retainedDeleteObj = (id)contextInfo;
+//	
+//	if (returnCode == NSAlertDefaultReturn) {
+//		//delete! nil-msgsnd-checking
+//		
+//		//ensure that there are no pending edits in the tableview,
+//		//lest editing end with the same field editor and a different selected note
+//		//resulting in the renaming of notes in adjacent rows
+//		[notesTableView abortEditing];
+//		
+//		if ([retainedDeleteObj isKindOfClass:[NSArray class]]) {
+//			[notationController removeNotes:retainedDeleteObj];
+//		} else if ([retainedDeleteObj isKindOfClass:[NoteObject class]]) {
+//			[notationController removeNote:retainedDeleteObj];
+//		}
+//		
+//		if (IsLeopardOrLater && [[alert suppressionButton] state] == NSOnState) {
+//			[prefsController setConfirmNoteDeletion:NO sender:self];
+//		}
+//	}
+//	[retainedDeleteObj release];
+//}
 
 
 - (IBAction)deleteNote:(id)sender {
-
 	NSIndexSet *indexes = [notesTableView selectedRowIndexes];
 	if ([indexes count] > 0) {
-		id deleteObj = [indexes count] > 1 ? (id)([notationController notesAtIndexes:indexes]) : (id)([notationController noteObjectAtFilteredIndex:[indexes firstIndex]]);
 
 		if ([prefsController confirmNoteDeletion]) {
-			[deleteObj retain];
+//			[deleteObj retain];
 			NSString *warningSingleFormatString = NSLocalizedString(@"Delete the note titled quotemark%@quotemark?", @"alert title when asked to delete a note");
 			NSString *warningMultipleFormatString = NSLocalizedString(@"Delete %d notes?", @"alert title when asked to delete multiple notes");
 			NSString *warnString = currentNote ? [NSString stringWithFormat:warningSingleFormatString, titleOfNote(currentNote)] :
 			[NSString stringWithFormat:warningMultipleFormatString, [indexes count]];
+			
+            NSAlert *alert=[NSAlert new];
+            alert.messageText=warnString;
+            alert.informativeText=NSLocalizedString(@"Press Command-Z to undo this action later.", @"informational delete-this-note? text");
+            [alert addButtonWithTitle:NSLocalizedString(@"Delete", @"name of delete button")];
+            [alert addButtonWithTitle:NSLocalizedString(@"Cancel", @"name of cancel button")];
+            [alert setShowsSuppressionButton:YES];
+            if (IsMavericksOrLater) {
+                [alert beginSheetModalForWindow:window completionHandler:^(NSModalResponse returnCode) {
+                    if (returnCode == NSAlertFirstButtonReturn) {
+                        [notationController removeNotesAtIndexes:indexes];
+                    }
+                }];
+                [alert release];
 
-			NSAlert *alert = [NSAlert alertWithMessageText:warnString defaultButton:NSLocalizedString(@"Delete", @"name of delete button")
-										   alternateButton:NSLocalizedString(@"Cancel", @"name of cancel button") otherButton:nil
-								 informativeTextWithFormat:NSLocalizedString(@"Press Command-Z to undo this action later.", @"informational delete-this-note? text")];
-			if (IsLeopardOrLater) [alert setShowsSuppressionButton:YES];
+            }else{
+                [indexes retain];
+                [alert beginSheetModalForWindow:window modalDelegate:self didEndSelector:@selector(deleteAlertDidEnd:returnCode:contextInfo:) contextInfo:indexes];
+            }
 
-			[alert beginSheetModalForWindow:window modalDelegate:self didEndSelector:@selector(deleteAlertDidEnd:returnCode:contextInfo:) contextInfo:(void*)deleteObj];
 		} else {
 			//just delete the notes outright
-			[notationController performSelector:[indexes count] > 1 ? @selector(removeNotes:) : @selector(removeNote:) withObject:deleteObj];
+            [notationController removeNotesAtIndexes:indexes];
 		}
 	}
 }
@@ -932,7 +947,7 @@ terminateApp:
 }
 
 - (IBAction)previewNoteWithMarked:(id)sender {
-    if (![[[NSWorkspace sharedWorkspace]URLForApplicationWithBundleIdentifier:@"com.brettterpstra.marky"] isFileURL])
+    if (![[[NSWorkspace sharedWorkspace]URLForApplicationWithBundleIdentifier:@"com.brettterpstra.marked2"] isFileURL] && ![[[NSWorkspace sharedWorkspace]URLForApplicationWithBundleIdentifier:@"com.brettterpstra.marky"] isFileURL])
     {
         NSBeep();
         NSLog(@"Marked not found");
@@ -1080,7 +1095,11 @@ terminateApp:
 		if ([prefsController autoCompleteSearches])
 			[notationController updateTitlePrefixConnections];
 
+	}else if ([selectorString isEqualToString:SEL_STR(setUseFinderTags:)]) {
+        if(IsMavericksOrLater&&(([notationController currentNoteStorageFormat] != SingleDatabaseFormat))){
+            [notationController mirrorAllOMToFinderTags];
 	}
+    }
 
 }
 
@@ -1136,24 +1155,24 @@ terminateApp:
 	[NSApp replyToOpenOrPrint:[filenames count] ? NSApplicationDelegateReplySuccess : NSApplicationDelegateReplyFailure];
 }
 
-- (void)applicationWillBecomeActive:(NSNotification *)aNotification {
-
-	if (IsLeopardOrLater) {
-		SpaceSwitchingContext thisSpaceSwitchCtx;
-        if ([window windowNumber]!=-1) {
-            CurrentContextForWindowNumber([window windowNumber], &thisSpaceSwitchCtx);
-
-        }
-		//what if the app is switched-to in another way? then the last-stored spaceSwitchCtx will cause us to return to the wrong app
-		//unfortunately this notification occurs only after NV has become the front process, but we can still verify the space number
-
-		if (thisSpaceSwitchCtx.userSpace != spaceSwitchCtx.userSpace ||
-			thisSpaceSwitchCtx.windowSpace != spaceSwitchCtx.windowSpace) {
-			//forget the last space-switch info if it's effectively different from how we're switching into the app now
-			bzero(&spaceSwitchCtx, sizeof(SpaceSwitchingContext));
-		}
-	}
-}
+//- (void)applicationWillBecomeActive:(NSNotification *)aNotification {
+//	
+//	if (IsLeopardOrLater) {
+//		SpaceSwitchingContext thisSpaceSwitchCtx;
+//        if ([window windowNumber]!=-1) {
+//            CurrentContextForWindowNumber([window windowNumber], &thisSpaceSwitchCtx);
+//            
+//        }
+//		//what if the app is switched-to in another way? then the last-stored spaceSwitchCtx will cause us to return to the wrong app
+//		//unfortunately this notification occurs only after NV has become the front process, but we can still verify the space number
+//		
+//		if ((thisSpaceSwitchCtx.userSpace != spaceSwitchCtx.userSpace) ||
+//			(thisSpaceSwitchCtx.windowSpace != spaceSwitchCtx.windowSpace)) {
+//			//forget the last space-switch info if it's effectively different from how we're switching into the app now
+//			bzero(&spaceSwitchCtx, sizeof(SpaceSwitchingContext));
+//		}
+//	}
+//}
 
 - (void)applicationDidBecomeActive:(NSNotification *)aNotification {
 	[notationController checkJournalExistence];
@@ -1553,7 +1572,7 @@ terminateApp:
 			if (!isFilteringFromTyping && !isCreatingANote)
 				[field setSnapbackString:typedString];
 
-			if ([self displayContentsForNoteAtIndex:selectedRow]) {
+			if ([self displayContentsForNoteAtIndex:(NSUInteger)selectedRow]) {
 
 				[[field cell] setShowsClearButton:YES];
 
@@ -1648,7 +1667,7 @@ terminateApp:
 	//BOOL enable = /*numberSelected != 1;*/ state;
 
 	[self postTextUpdate];
-    [self updateWordCount:(![prefsController showWordCount])];
+    [self updateWordCount:![prefsController showWordCount]];
 	[textView setHidden:state];
 	[editorStatusView setHidden:!state];
 
@@ -1661,7 +1680,7 @@ terminateApp:
 	}
 }
 
-- (BOOL)displayContentsForNoteAtIndex:(int)noteIndex {
+- (BOOL)displayContentsForNoteAtIndex:(NSUInteger)noteIndex {
 	NoteObject *note = [notationController noteObjectAtFilteredIndex:noteIndex];
 	if (note != currentNote) {
 		[self setEmptyViewState:NO];
@@ -1844,6 +1863,7 @@ terminateApp:
     return currentNote;
 }
 
+
 - (void)restoreListStateUsingPreferences {
 	//to be invoked after loading a notationcontroller
 
@@ -1885,7 +1905,7 @@ terminateApp:
 			//for external url-handling, often the app will already have been brought to the foreground
 			if (![NSApp isActive]) {
 				if (IsLeopardOrLater)
-					CurrentContextForWindowNumber([window windowNumber], &spaceSwitchCtx);
+//                CurrentContextForWindowNumber([window windowNumber], &spaceSwitchCtx);
 				[NSApp activateIgnoringOtherApps:YES];
 			}
 			if (![window isKeyWindow])
@@ -1945,35 +1965,6 @@ terminateApp:
 	}
 }
 
-
-
-- (void)splitView:(RBSplitView*)sender wasResizedFrom:(CGFloat)oldDimension to:(CGFloat)newDimension {
-	if (sender == splitView) {
-		[sender adjustSubviewsExcepting:notesSubview];
-	}
-}
-
-- (BOOL)splitView:(RBSplitView*)sender shouldHandleEvent:(NSEvent*)theEvent inDivider:(NSUInteger)divider
-	  betweenView:(RBSplitSubview*)leading andView:(RBSplitSubview*)trailing {
-	//if upon the first mousedown, the top selected index is visible, snap to it when resizing
-	[notesTableView noteFirstVisibleRow];
-	if ([theEvent clickCount]>1) {
-        if ((currentNote)||([notesSubview isCollapsed])){
-            [self toggleCollapse:sender];
-        }
-		return NO;
-	}
-	return YES;
-}
-
-//mail.app-like resizing behavior wrt item selections
-- (void)willAdjustSubviews:(RBSplitView*)sender {
-	//problem: don't do this if the horizontal splitview is being resized; in horizontal layout, only do this when resizing the window
-	if (![prefsController horizontalLayout]) {
-		[notesTableView makeFirstPreviouslyVisibleRowVisibleIfNecessary];
-	}
-}
-
 - (NSSize)windowWillResize:(NSWindow *)window toSize:(NSSize)proposedFrameSize {
 	if ([prefsController horizontalLayout]) {
 		[notesTableView makeFirstPreviouslyVisibleRowVisibleIfNecessary];
@@ -2008,31 +1999,6 @@ terminateApp:
  }
  }
  */
-- (BOOL)splitView:(RBSplitView*)sender shouldResizeWindowForDivider:(NSUInteger)divider
-	  betweenView:(RBSplitSubview*)leading andView:(RBSplitSubview*)trailing willGrow:(BOOL)grow {
-
-	if ([sender isDragging]) {
-		BOOL toolbarVisible  = [self dualFieldIsVisible];
-		NSPoint mouse = [sender convertPoint:[[window currentEvent] locationInWindow] fromView:nil];
-        CGFloat mouseDim = mouse.y;
-        if ([splitView isVertical]) {
-            mouseDim = mouse.x - 50.0;
-        }
-		if ((toolbarVisible && !grow && mouseDim < -28.0 && ![leading canShrink]) ||
-			(!toolbarVisible && grow)) {
-            [self setDualFieldIsVisible:!toolbarVisible];
-
-            [mainView setNeedsDisplay:YES];
-			if (!toolbarVisible && [window firstResponder] == window) {
-				//if dualfield had first responder previously, it might need to be restored
-				//if it had been removed from the view hierarchy due to hiding the toolbar
-				[field selectText:sender];
-			}
-		}
-	}
-
-	return NO;
-}
 
 - (void)tableViewColumnDidResize:(NSNotification *)aNotification {
 	NoteAttributeColumn *col = [[aNotification userInfo] objectForKey:@"NSTableColumn"];
@@ -2042,30 +2008,6 @@ terminateApp:
 	 	[NSObject cancelPreviousPerformRequestsWithTarget:notesTableView selector:@selector(reloadDataIfNotEditing) object:nil];
 		[notesTableView performSelector:@selector(reloadDataIfNotEditing) withObject:nil afterDelay:0.0];
 	}
-}
-
-- (NSRect)splitView:(RBSplitView*)sender willDrawDividerInRect:(NSRect)dividerRect betweenView:(RBSplitSubview*)leading
-			andView:(RBSplitSubview*)trailing withProposedRect:(NSRect)imageRect {
-
-	[dividerShader drawDividerInRect:dividerRect withDimpleRect:imageRect blendVertically:![prefsController horizontalLayout]];
-
-	return NSZeroRect;
-}
-
-- (NSUInteger)splitView:(RBSplitView*)sender dividerForPoint:(NSPoint)point inSubview:(RBSplitSubview*)subview {
-	//if ([(AugmentedScrollView*)[notesTableView enclosingScrollView] shouldDragWithPoint:point sender:sender]) {
-	//	return 0;       // [firstSplit position], which we assume to be zero
-	//}
-	return NSNotFound;
-}
-
-- (BOOL)splitView:(RBSplitView*)sender canCollapse:(RBSplitSubview*)subview {
-	if ([sender subviewAtPosition:0] == subview) {
-		return currentNote != nil;
-		//this is the list view; let it collapse in horizontal layout when a note is being edited
-		//return [prefsController horizontalLayout] && currentNote != nil;
-	}
-	return NO;
 }
 
 
@@ -2273,7 +2215,6 @@ terminateApp:
 	[dividerShader release];
 	[[NSStatusBar systemStatusBar] removeStatusItem:statusItem];
     [statusItem release];
-    [cView release];
     [statBarMenu release];
 	[self postTextUpdate];
 
@@ -2284,76 +2225,184 @@ terminateApp:
 	[prefsWindowController showWindow:sender];
 }
 
-- (IBAction)toggleNVActivation:(id)sender {
 
-	if ([NSApp isActive] && [window isMainWindow]&&[window isVisible]) {
-
-		SpaceSwitchingContext laterSpaceSwitchCtx;
-		if (IsLeopardOrLater){
-			CurrentContextForWindowNumber([window windowNumber], &laterSpaceSwitchCtx);
-
-        }
-		if (!IsLeopardOrLater || !CompareContextsAndSwitch(&spaceSwitchCtx, &laterSpaceSwitchCtx)) {
-			//hide only if we didn't need to or weren't able to switch spaces
-			[NSApp hide:sender];
-		}
-		//clear the space-switch context that we just looked at, to ensure it's not reused inadvertently
-		bzero(&spaceSwitchCtx, sizeof(SpaceSwitchingContext));
-		return;
-	}
-	[self bringFocusToControlField:sender];
-}
-
-- (void)focusControlField:(id)sender activate:(BOOL)shouldActivate{
-//        [[NSNotificationCenter defaultCenter] postNotificationName:@"TextFinderShouldHide" object:sender];
-
-	if ([notesSubview isCollapsed]) {
-		[self toggleCollapse:self];
-	}else if (![self dualFieldIsVisible]){
-
-        [self setDualFieldIsVisible:YES];
-	}
-
-	[field selectText:sender];
-
-	if (!shouldActivate) {
-        [window makeKeyAndOrderFront:sender];
-        [window makeMainWindow];
-        if (![NSApp isActive]) {
-            CurrentContextForWindowNumber([window windowNumber], &spaceSwitchCtx);
-        }
-    }else{
-        if (![NSApp isActive]) {
-            CurrentContextForWindowNumber([window windowNumber], &spaceSwitchCtx);
-            [NSApp activateIgnoringOtherApps:YES];
-        }
-        if (![window isMainWindow]||![window isVisible]){
-            [window makeKeyAndOrderFront:sender];
-        }
-	}
-	[self setEmptyViewState:currentNote == nil];
-    self.isEditing = NO;
-
-
+- (IBAction)makeActiveAndShowWindow:(id)sender{
+    [self makeActiveAndShowWindowByFocusingControlField:NO andForcingActivation:YES];
 }
 
 - (IBAction)bringFocusToControlField:(id)sender {
-	//For ElasticThreads' fullscreen mode use this if/else otherwise uncomment the expand toolbar
+    //For ElasticThreads' fullscreen mode use this if/else otherwise uncomment the expand toolbar
 
     [self focusControlField:sender activate:YES];
 }
 
+- (void)focusControlField:(id)sender activate:(BOOL)shouldActivate{
+    [self makeActiveAndShowWindowByFocusingControlField:YES andForcingActivation:shouldActivate];
+        }
+
+- (IBAction)toggleNVActivation:(id)sender {
+
+    if ([NSApp isActive] && [window isMainWindow]&&[window isVisible]) {
+			[NSApp hide:sender];
+		return;
+	}
+    [self focusControlField:sender activate:YES];
+}
+
+- (void)makeActiveAndShowWindowByFocusingControlField:(BOOL)focus andForcingActivation:(BOOL)activate{
+
+    if (focus) {
+	if ([notesSubview isCollapsed]) {
+		[self toggleCollapse:self];
+	}else if (![self dualFieldIsVisible]){
+            [self setDualFieldIsVisible:YES];
+        }
+    }
+
+    CGFloat delay=0.0f;
+    if (activate&&![NSApp isActive]) {
+        delay=0.03f;
+        [NSApp activateIgnoringOtherApps:YES];
+    }
+    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(delay * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+        if (focus) {
+            [field selectText:nil];
+        }
+
+        [self setEmptyViewState:currentNote == nil];
+        self.isEditing = NO;
+        if (!window.isMainWindow||!window.isVisible) {
+            [window makeKeyAndOrderFront:nil];
+        }
+    });
+}
 
 - (NSWindow*)window {
 	return window;
 }
+
+
+
+#pragma mark SplitView Delegate methods
+
+- (void)splitView:(RBSplitView*)sender wasResizedFrom:(CGFloat)oldDimension to:(CGFloat)newDimension {
+	if (sender == splitView) {
+		[sender adjustSubviewsExcepting:notesSubview];
+	}
+}
+
+- (BOOL)splitView:(RBSplitView*)sender shouldHandleEvent:(NSEvent*)theEvent inDivider:(NSUInteger)divider
+	  betweenView:(RBSplitSubview*)leading andView:(RBSplitSubview*)trailing {
+	//if upon the first mousedown, the top selected index is visible, snap to it when resizing
+	[notesTableView noteFirstVisibleRow];
+	if ([theEvent clickCount]>1) {
+        if ((currentNote)||([notesSubview isCollapsed])){
+            [self toggleCollapse:sender];
+        }
+		return NO;
+	}
+	return YES;
+}
+
+//mail.app-like resizing behavior wrt item selections
+- (void)willAdjustSubviews:(RBSplitView*)sender {
+	//problem: don't do this if the horizontal splitview is being resized; in horizontal layout, only do this when resizing the window
+	if (![prefsController horizontalLayout]) {
+		[notesTableView makeFirstPreviouslyVisibleRowVisibleIfNecessary];
+	}
+	}
+
+- (BOOL)splitView:(RBSplitView*)sender shouldResizeWindowForDivider:(NSUInteger)divider
+	  betweenView:(RBSplitSubview*)leading andView:(RBSplitSubview*)trailing willGrow:(BOOL)grow {
+    
+	if ([sender isDragging]) {
+		BOOL toolbarVisible  = [self dualFieldIsVisible];
+        //		NSPoint mouse = [sender convertPoint:[[window currentEvent] locationInWindow] fromView:nil];
+        //        CGFloat mouseDim = mouse.y;
+        //        if ([splitView isVertical]) {
+        //            mouseDim = mouse.x - 50.0;
+        //        }
+		if (!toolbarVisible && grow&&([notesSubview dimension]>80.3f)) {
+            //                [self setDualFieldIsVisible:YES];
+            
+			if ([window firstResponder] == window) {
+				//if dualfield had first responder previously, it might need to be restored
+				//if it had been removed from the view hierarchy due to hiding the toolbar
+	[field selectText:sender];
+			}
+		}
+	}
+
+	return NO;
+}
+
+- (NSRect)splitView:(RBSplitView*)sender willDrawDividerInRect:(NSRect)dividerRect betweenView:(RBSplitSubview*)leading
+			andView:(RBSplitSubview*)trailing withProposedRect:(NSRect)imageRect {
+	[dividerShader drawDividerInRect:dividerRect withDimpleRect:imageRect blendVertically:![prefsController horizontalLayout]];
+	
+	return NSZeroRect;
+        }
+
+- (NSUInteger)splitView:(RBSplitView*)sender dividerForPoint:(NSPoint)point inSubview:(RBSplitSubview*)subview {
+	//if ([(AugmentedScrollView*)[notesTableView enclosingScrollView] shouldDragWithPoint:point sender:sender]) {
+	//	return 0;       // [firstSplit position], which we assume to be zero
+	//}
+	return NSNotFound;
+        }
+
+- (BOOL)splitView:(RBSplitView*)sender canCollapse:(RBSplitSubview*)subview {
+	if ([sender subviewAtPosition:0] == subview) {
+		return currentNote != nil;
+		//this is the list view; let it collapse in horizontal layout when a note is being edited
+		//return [prefsController horizontalLayout] && currentNote != nil;
+        }
+	return NO;
+	}
+
+
+- (void)splitView:(RBSplitView*)sender willCollapse:(RBSplitSubview*)subview{
+    if(!splitViewIsChangingLayout){
+        [self setDualFieldIsVisible:NO];
+        if ([self isInFullScreen]) {
+            [sender setMustAdjust];
+}
+    }
+}
+
+- (void)splitView:(RBSplitView*)sender didCollapse:(RBSplitSubview*)subview{
+    if(!splitViewIsChangingLayout){
+        [splitView setDividerThickness: kSplitViewCollapsedDividerThickness];
+        [window makeFirstResponder:textView];
+        [splitView adjustSubviews];
+        [mainView setNeedsDisplay:YES];
+    }
+}
+
+- (void)splitView:(RBSplitView*)sender willExpand:(RBSplitSubview*)subview{
+    if(!splitViewIsChangingLayout){
+        [self setDualFieldIsVisible:YES];
+        if ([self isInFullScreen]) {
+            [sender setMustAdjust];
+        }
+    }
+}
+
+
+- (void)splitView:(RBSplitView*)sender didExpand:(RBSplitSubview*)subview{
+    if(!splitViewIsChangingLayout){
+        [splitView setDividerThickness:kSplitViewExpandedDividerThickness];
+        [splitView adjustSubviews];
+        [mainView setNeedsDisplay:YES];
+    }
+}
+
 
 #pragma mark nvALT methods
 
 - (void)tableView:(NSTableView *)aTableView willDisplayCell:(id)aCell forTableColumn:(NSTableColumn *)aTableColumn row:(NSInteger)rowIndex {
     if (aTableView==notesTableView) {
         if ([aCell isHighlighted]) {
-            if (([window firstResponder]==notesTableView)||([notesTableView rowHeight]>30.0)||(isEditing&&([notesTableView editedRow]==rowIndex))) {
+            if (([window firstResponder]==notesTableView)||(isEditing&&([notesTableView editedRow]==rowIndex))) {//([notesTableView rowHeight]>30.0)||
                 [aCell setTextColor:[NSColor whiteColor]];
                 return;
             }else if ([[foregrndColor colorUsingColorSpaceName:NSCalibratedWhiteColorSpace] whiteComponent]>0.5) {
@@ -2369,15 +2418,7 @@ terminateApp:
 	return statBarMenu;
 }
 
-- (void)toggleAttachedWindow:(NSNotification *)aNotification
-{
-	[self toggleNVActivation:[aNotification object]];
-}
 
-- (void)toggleAttachedMenu:(NSNotification *)aNotification
-{
-	[statusItem popUpStatusItemMenu:statBarMenu];
-}
 
 #pragma mark multitagging
 
@@ -2546,7 +2587,7 @@ terminateApp:
     [mainView addSubview:dualFieldView positioned:NSWindowAbove relativeTo:splitView];
 	NSRect dsvFrame = [dualSV frame];
 	dsvFrame.origin.y +=1.0;
-    if (![mainView isInFullScreenMode]) {
+    if (![self isInFullScreen]) {
         dsvFrame.origin.y +=4.0;
     }
 	dsvFrame.size.width = roundf(wSize.width * 0.99);
@@ -2562,7 +2603,7 @@ terminateApp:
 
 - (void)setDualFieldIsVisible:(BOOL)isVis{
     if ([self dualFieldIsVisible]!=isVis) {
-        if (IsLionOrLater||![mainView isInFullScreenMode]) {
+        if (IsLionOrLater||![self isInFullScreen]) {
             [toolbar setVisible:isVis];
         }else{
             NSSize wSize = [mainView frame].size;
@@ -2604,33 +2645,18 @@ terminateApp:
 
 
 - (BOOL)dualFieldIsVisible{
-    BOOL dfIsVis=NO;
-    if (!IsLionOrLater&&[mainView isInFullScreenMode]) {
-        if (dualFieldView) {
-            dfIsVis=![dualFieldView isHidden];
+    if (!IsLionOrLater&&dualFieldView&&[self isInFullScreen]) {
+        return ![dualFieldView isHidden];
         }
-    }else{
-        dfIsVis=[toolbar isVisible];
+    return [toolbar isVisible];
     }
-    return dfIsVis;
-}
 
 - (IBAction)toggleCollapse:(id)sender{
-
 	if ([notesSubview isCollapsed]) {
-		[self setDualFieldIsVisible:YES];
-		//[splitView setDivider: verticalDividerImg];//horiz ? nil : verticalDividerImg];
-		//BOOL horiz = [prefsController horizontalLayout];
-        [splitView setDividerThickness:8.75f];
 		[notesSubview expand];
 	}else {
-        [self setDualFieldIsVisible:NO];
-        [splitView setDividerThickness: 7.0];
         [notesSubview collapse];
-        [window makeFirstResponder:textView];
 	}
-    [splitView adjustSubviews];
-    [mainView setNeedsDisplay:YES];
 }
 
 #pragma mark fullscreen methods
@@ -2724,14 +2750,14 @@ terminateApp:
         NSResponder *currentResponder = [window firstResponder];
         NSDictionary* options;
         if (([[NSUserDefaults standardUserDefaults] boolForKey:@"ShowDockIcon"])&&(IsSnowLeopardOrLater)) {
-            options = [NSDictionary dictionaryWithObjectsAndKeys:[NSNumber numberWithInt:(NSApplicationPresentationAutoHideMenuBar | NSApplicationPresentationHideDock)],@"NSFullScreenModeApplicationPresentationOptions", nil];
+            options = @{@"NSFullScreenModeApplicationPresentationOptions":@(NSApplicationPresentationAutoHideMenuBar | NSApplicationPresentationHideDock)};
         }else {
-            options = [NSDictionary dictionaryWithObjectsAndKeys:nil];
+            options = nil;
         }
         CGFloat colW = [notesSubview dimension];
 
         wasDFVisible=[self dualFieldIsVisible];
-        if ([mainView isInFullScreenMode]) {
+        if ([self isInFullScreen]) {
             window = normalWindow;
             [mainView exitFullScreenModeWithOptions:options];
 
@@ -2853,20 +2879,19 @@ terminateApp:
         [[viewM  itemAtIndex:0] setState:0];
         [[viewM  itemAtIndex:1] setState:0];
         [[viewM  itemAtIndex:2] setState:1];
-        //NSLog(@"foreground col is: %@",[foregrndColor description]);
-        //NSLog(@"background col is: %@",[backgrndColor description]);
         [self updateColorScheme];
     }
 
 - (void)updateColorScheme{
     if (!IsLionOrLater) {
-
-        [window setBackgroundColor:backgrndColor];//[NSColor blueColor]
+        [window setBackgroundColor:backgrndColor];
         [dualFieldView setBackgroundColor:backgrndColor];
     }
     [mainView setBackgroundColor:backgrndColor];
-    [notesTableView setBackgroundColor:backgrndColor];
     [NotesTableHeaderCell setTxtColor:foregrndColor];
+    
+    [notesTableView setGridColor:foregrndColor];
+    [notesTableView setBackgroundColor:backgrndColor];
     [notationController setForegroundTextColor:foregrndColor];
 
     [textView setBackgroundColor:backgrndColor];
@@ -2875,8 +2900,9 @@ terminateApp:
     if (currentNote) {
         [self contentsUpdatedForNote:currentNote];
     }
-    [dividerShader updateColors:backgrndColor];
+    [dividerShader updateColorsWithBackgroundColor:backgrndColor andForegroundColor:foregrndColor];
     [splitView setNeedsDisplay:YES];
+    
 }
 
     - (void)updateFieldAttributes{
@@ -2894,10 +2920,8 @@ terminateApp:
         if (self.isEditing) {
             [theFieldEditor setDrawsBackground:NO];
             [theFieldEditor setTextColor:foregrndColor];
-            // [theFieldEditor setBackgroundColor:backgrndColor];
             [theFieldEditor setSelectedTextAttributes:fieldAttributes];
             [theFieldEditor setInsertionPointColor:foregrndColor];
-            //   [notesTableView setNeedsDisplay:YES];
 
         }
 
@@ -2919,7 +2943,7 @@ terminateApp:
 
     - (NSColor *)backgrndColor{
         if (!backgrndColor) {
-            NSColor *theColor;// = [NSColor redColor];
+            NSColor *theColor;
             if (!userScheme) {
                 userScheme = [[NSUserDefaults standardUserDefaults] integerForKey:@"ColorScheme"];
             }
@@ -2953,7 +2977,6 @@ terminateApp:
             if (!userScheme) {
                 userScheme = [[NSUserDefaults standardUserDefaults] integerForKey:@"ColorScheme"];
             }
-
             if (userScheme==0) {
                 theColor = [NSColor colorWithCalibratedRed:0.0f green:0.0f blue:0.0f alpha:1.0f];
             }else if (userScheme==1) {
@@ -3015,7 +3038,6 @@ terminateApp:
         if ([prefsController showWordCount]) {
             [self updateWordCount:YES];
             [wordCounter setHidden:NO];
-
             popped=1;
         }else {
             [wordCounter setHidden:YES];
@@ -3179,7 +3201,7 @@ terminateApp:
         currentPreviewMode = [previewItem tag];
 
         // update user defaults
-        [[NSUserDefaults standardUserDefaults] setObject:[NSNumber numberWithInt:currentPreviewMode]
+        [[NSUserDefaults standardUserDefaults] setObject:[NSNumber numberWithInteger:currentPreviewMode]
                                                   forKey:@"markupPreviewMode"];
 
         [self postTextUpdate];
@@ -3207,8 +3229,8 @@ terminateApp:
                 // [notesTableView setNeedsDisplay:YES];
             }
         }else {//if (client==field) {
-            [theFieldEditor setDrawsBackground:NO];
-            [theFieldEditor setSelectedTextAttributes:[NSDictionary dictionaryWithObjectsAndKeys:[NSColor selectedTextBackgroundColor], NSBackgroundColorAttributeName, nil]];
+//            [theFieldEditor setDrawsBackground:NO];
+//            [theFieldEditor setSelectedTextAttributes:[NSDictionary dictionaryWithObjectsAndKeys:[NSColor selectedTextBackgroundColor], NSBackgroundColorAttributeName, nil]];
             [theFieldEditor setInsertionPointColor:[NSColor blackColor]];
         }
         // NSLog(@"window first is :%@",[window firstResponder]);
@@ -3283,8 +3305,8 @@ terminateApp:
         }else{
 //            NSLog(@"hiding dock incon in snow leopard");
             id fullPath = [[NSBundle mainBundle] executablePath];
-            NSArray *arg = [NSArray arrayWithObjects:nil];
-            [NSTask launchedTaskWithLaunchPath:fullPath arguments:arg];
+//            NSArray *arg = [NSArray arrayWithObjects:nil];
+            [NSTask launchedTaskWithLaunchPath:fullPath arguments:@[]];
             [NSApp terminate:self];
         }
 
@@ -3299,13 +3321,41 @@ terminateApp:
         [self performSelector:@selector(hideDockIcon) withObject:nil afterDelay:0.22];
     }
 
-- (void)setUpStatusBarItem{
-    NSRect viewFrame = NSMakeRect(0.0f, 0.0f, 24.0f,[[NSStatusBar systemStatusBar] thickness]);
-    statusItem = [[[NSStatusBar systemStatusBar] statusItemWithLength:24.0f] retain];
-    cView = [[[StatusItemView alloc] initWithFrame:viewFrame] autorelease];
-    [statusItem setView:cView];
 
-    [[NSNotificationCenter defaultCenter]postNotificationName:@"StatusBarMenuIsAwake" object:statBarMenu];
+
+- (IBAction)statusItemAction:(id)sender{
+
+    NSEvent *curEv=[NSApp currentEvent];
+    if ((curEv.type==NSEventTypeRightMouseUp)||((NSEventModifierFlagControl&curEv.modifierFlags)!=0)) {
+        [statusItem popUpStatusItemMenu:statBarMenu];
+        //        NSPoint og=NSMakePoint(statusItem.button.frame.origin.x, 27.f);//NSMaxY(statusItem.button.frame));
+        //        [self.statusMenu popUpMenuPositioningItem:nil atLocation:og inView:statusItem.button];
+    }else{
+        [self toggleNVActivation:sender];
+    }
+}
+
+
+- (void)setUpStatusBarItem{
+
+    NSImage *statusIcon=[NSImage imageNamed:@"nvMenuDark"];
+    [statusIcon setSize:NSMakeSize(16.0, 16.0)];
+    [statusIcon setTemplate:YES];
+    statusItem =[[NSStatusBar systemStatusBar] statusItemWithLength:24.f];
+    if (IsYosemiteOrLater) {
+        statusItem.button.image=statusIcon;
+        statusItem.button.target=self;
+        statusItem.button.action=@selector(statusItemAction:);
+        [statusItem.button sendActionOn:NSEventMaskLeftMouseUp|NSEventMaskRightMouseUp];
+    }else{
+        statusItem.image=statusIcon;
+        statusItem.target=self;
+        statusItem.action=@selector(statusItemAction:);
+         [statusItem sendActionOn:NSEventMaskLeftMouseUp|NSEventMaskRightMouseUp];
+        statusItem.highlightMode=YES;
+    }
+    [statusItem retain];
+
 }
 
     - (void)toggleStatusItem:(NSNotification *)notification{
@@ -3313,7 +3363,6 @@ terminateApp:
             [self setUpStatusBarItem];
         }else{
             [[NSStatusBar systemStatusBar]removeStatusItem:statusItem];
-            cView=nil;
             statusItem=nil;
         }
     }

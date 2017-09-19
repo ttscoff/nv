@@ -38,7 +38,7 @@
 @implementation WALController
 
 - (id)initWithParentFSRep:(const char*)path encryptionKey:(NSData*)key {
-    if ([super init]) {
+    if (self=[super init]) {
 		logFD = -1;
 		char filename[] = "Interim Note-Changes";
 		size_t newPathLength = sizeof(filename) + strlen(path) + 2;
@@ -52,8 +52,9 @@
 		//if the database has no encryption, it should have passed some constant known key to us instead
 		logSessionKey = [key retain];
 		
+        return self;
     }
-    return self;
+    return nil;
 }
 
 - (id)delegate {
@@ -124,43 +125,43 @@
 
 
 - (id)initWithParentFSRep:(const char*)path encryptionKey:(NSData*)key {
-    if ([super initWithParentFSRep:path encryptionKey:key]) {
-	
-	//we could make parent dir writable just in case, but that might be a security hazard depending on ownership
-	//chmod(path, S_IRWXU | S_IRWXG | S_IRWXO);
-	
-	//attempt to open/create the file exclusively with write-only and append access
-	
-	if ((logFD = open(journalFile, O_CREAT | O_EXCL | O_WRONLY | O_APPEND, S_IRUSR | S_IWUSR)) < 0) {
-	    //if this fails, the file probably still exists, or we don't have write permission
-	    //either way, we shouldn't continue
-	    
-	    NSLog(@"WALStorageController: open error for file %s: %s", journalFile, strerror(errno));
-	    
-	    return nil;
-	}
-	if (fcntl(logFD, F_NOCACHE, 1) < 0) {
-		NSLog(@"Unable to disable disk caching for writing: %s", strerror(errno));
-	}
+    if (self=[super initWithParentFSRep:path encryptionKey:key]) {
+        
+        //we could make parent dir writable just in case, but that might be a security hazard depending on ownership
+        //chmod(path, S_IRWXU | S_IRWXG | S_IRWXO);
+        
+        //attempt to open/create the file exclusively with write-only and append access
+        
+        if ((logFD = open(journalFile, O_CREAT | O_EXCL | O_WRONLY | O_APPEND, S_IRUSR | S_IWUSR)) < 0) {
+            //if this fails, the file probably still exists, or we don't have write permission
+            //either way, we shouldn't continue
+            
+            NSLog(@"WALStorageController: open error for file %s: %s", journalFile, strerror(errno));
+            
+            return nil;
+        }
+        if (fcntl(logFD, F_NOCACHE, 1) < 0) {
+            NSLog(@"Unable to disable disk caching for writing: %s", strerror(errno));
+        }
 		
-	//this will grow as necessary
-	unwrittenData = [[NSMutableData dataWithCapacity:16] retain];
-	
-	//initialize the compression
+        //this will grow as necessary
+        unwrittenData = [[NSMutableData dataWithCapacity:16] retain];
+        
+        //initialize the compression
 		compressionStream.total_in = 0;
 		compressionStream.total_out = 0;
 		compressionStream.zalloc = Z_NULL;
 		compressionStream.zfree = Z_NULL;
 		compressionStream.opaque = Z_NULL;
-
+        
 		if (deflateInit2(&compressionStream, 5, Z_DEFLATED, MAX_WBITS, MAX_MEM_LEVEL, Z_DEFAULT_STRATEGY) != Z_OK) {
 			NSLog(@"deflateInit2 returned error: %s", compressionStream.msg);
 			return nil;
 		}
 		
+        return self;
     }
-    
-    return self;
+    return nil;
 }
 
 - (BOOL)writeNoteObject:(id<SynchronizedNote>)aNoteObject {
@@ -340,45 +341,46 @@
 //if that works, then remove the log file
 
 - (id)initWithParentFSRep:(const char*)path encryptionKey:(NSData*)key {
-    if ([super initWithParentFSRep:path encryptionKey:key]) {
-	fileLength = totalBytesRead = 0;
-	
-	//make file readable just in case
-	chmod(journalFile, S_IRUSR);
-	
-	//attempt to open file read-only
-	if ((logFD = open(journalFile, O_EXCL | O_RDONLY)) < 0) {
-	    NSLog(@"WALRecoveryController: open error for file %s: %s", journalFile, strerror(errno));
-	    return nil;
-	}
-	
-	struct stat sb;
-	if (fstat(logFD, &sb) < 0) {
-	    NSLog(@"WALRecoveryController: fstat error for file %s: %s", journalFile, strerror(errno));
-	    return nil;
-	}
-	
-	if (S_ISDIR(sb.st_mode)) {
-	    NSLog(@"WALRecoveryController: log file is actually a directory! Don't play games with me!");
-	    return nil;
-	}
-	
-	fileLength = sb.st_size;
-	
-	//initialize decompression context
-	compressionStream.total_in = 0;
-	compressionStream.total_out = 0;
-	compressionStream.zalloc = Z_NULL;
-	compressionStream.zfree = Z_NULL;
-	compressionStream.opaque = Z_NULL;
-	
-	if (inflateInit2(&compressionStream, MAX_WBITS) != Z_OK) {
-		NSLog(@"inflateInit2 error: %s", compressionStream.msg);
-		return nil;
-	}
-	
+    if (self=[super initWithParentFSRep:path encryptionKey:key]) {
+        fileLength = totalBytesRead = 0;
+        
+        //make file readable just in case
+        chmod(journalFile, S_IRUSR);
+        
+        //attempt to open file read-only
+        if ((logFD = open(journalFile, O_EXCL | O_RDONLY)) < 0) {
+            NSLog(@"WALRecoveryController: open error for file %s: %s", journalFile, strerror(errno));
+            return nil;
+        }
+        
+        struct stat sb;
+        if (fstat(logFD, &sb) < 0) {
+            NSLog(@"WALRecoveryController: fstat error for file %s: %s", journalFile, strerror(errno));
+            return nil;
+        }
+        
+        if (S_ISDIR(sb.st_mode)) {
+            NSLog(@"WALRecoveryController: log file is actually a directory! Don't play games with me!");
+            return nil;
+        }
+        
+        fileLength = sb.st_size;
+        
+        //initialize decompression context
+        compressionStream.total_in = 0;
+        compressionStream.total_out = 0;
+        compressionStream.zalloc = Z_NULL;
+        compressionStream.zfree = Z_NULL;
+        compressionStream.opaque = Z_NULL;
+        
+        if (inflateInit2(&compressionStream, MAX_WBITS) != Z_OK) {
+            NSLog(@"inflateInit2 error: %s", compressionStream.msg);
+            return nil;
+        }
+        return self;
+        
     }
-    return self;
+    return nil;
 }
 
 //log enumerating method

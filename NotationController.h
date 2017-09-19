@@ -88,7 +88,7 @@ typedef struct _NoteCatalogEntry {
 	int lastLayoutStyleGenerated;
     long blockSize;
 	struct statfs *statfsInfo;
-	unsigned int diskUUIDIndex;
+	NSUInteger diskUUIDIndex;
 	CFUUIDRef diskUUID;
     FSRef noteDirectoryRef, noteDatabaseRef;
     AliasHandle aliasHandle;
@@ -118,6 +118,8 @@ typedef struct _NoteCatalogEntry {
 - (BOOL)flushAllNoteChanges;
 - (void)flushEverything;
 
+- (void)mirrorAllOMToFinderTags;
+
 - (void)upgradeDatabaseIfNecessary;
 
 - (id)delegate;
@@ -126,7 +128,7 @@ typedef struct _NoteCatalogEntry {
 - (void)databaseEncryptionSettingsChanged;
 - (void)databaseSettingsChangedFromOldFormat:(NSInteger)oldFormat;
 
-- (int)currentNoteStorageFormat;
+- (NSInteger)currentNoteStorageFormat;
 - (void)synchronizeNoteChanges:(NSTimer*)timer;
 
 - (void)updateDateStringsIfNecessary;
@@ -168,7 +170,7 @@ typedef struct _NoteCatalogEntry {
 - (BOOL)filterNotesFromUTF8String:(const char*)searchString forceUncached:(BOOL)forceUncached;
 - (NSUInteger)preferredSelectedNoteIndex;
 - (NSArray*)noteTitlesPrefixedByString:(NSString*)prefixString indexOfSelectedItem:(NSInteger *)anIndex;
-- (NoteObject*)noteObjectAtFilteredIndex:(int)noteIndex;
+- (NoteObject*)noteObjectAtFilteredIndex:(NSUInteger)noteIndex;
 - (NSArray*)notesAtIndexes:(NSIndexSet*)indexSet;
 - (NSIndexSet*)indexesOfNotes:(NSArray*)noteSet;
 - (NSUInteger)indexInFilteredListForNoteIdenticalTo:(NoteObject*)note;
@@ -194,7 +196,9 @@ typedef struct _NoteCatalogEntry {
 - (void)dealloc;
 
 #pragma mark nvALT stuff
-- (NSString *)createCachesFolderString;
+
+- (void)removeNotesAtIndexes:(NSIndexSet *)indexes;
+- (NSString *)createCachesFolder;
 
 @end
 

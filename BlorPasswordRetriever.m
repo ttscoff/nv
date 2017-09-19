@@ -27,7 +27,7 @@
 @implementation BlorPasswordRetriever
 
 - (id)initWithBlor:(NSString*)blorPath {
-	if ([super init]) {
+	if (self=[super init]) {
 		path = [blorPath retain];
 		
 		couldRetrieveFromKeychain = NO;
@@ -40,9 +40,10 @@
 		
 		if (!hashData || [hashData length] < 20)
 			return nil;
-	}
-	
-	return self;
+        
+        return self;
+	}	
+	return nil;
 }
 
 - (IBAction)cancelAction:(id)sender {
@@ -168,7 +169,7 @@
 @implementation BlorNoteEnumerator
 
 - (id)initWithBlor:(NSString*)blorPath passwordHashData:(NSData*)passwordHashData {
-	if ([super init]) {
+	if (self=[super init]) {
 		path = [blorPath retain];
 		
 		if (!(keyData = [passwordHashData retain]))
@@ -178,7 +179,7 @@
 			return nil;
 			
 		if ([blorData length] < 28) {
-			NSLog(@"read data is too small (%d) to hold any notes!", [blorData length]);
+			NSLog(@"read data is too small (%lu) to hold any notes!", (unsigned long)[blorData length]);
 			return nil;
 		}
 		
@@ -188,9 +189,10 @@
 			
 		currentByteOffset = 24;
 		//read past the # of notes marker--we're just going to read as many notes as possible
+        return self;
 	}
+    return nil;
 	
-	return self;
 }
 
 - (void)dealloc {
@@ -229,7 +231,7 @@
 } while (0)
 
 - (id)nextNote {
-	int titleBytesLength; 
+	int titleBytesLength;
 	//read length of title
 	ASSERT_CAN_READ_BYTE_COUNT(sizeof(titleBytesLength));
 	titleBytesLength = *(int*)([blorData bytes] + currentByteOffset);
@@ -240,7 +242,7 @@
 	ASSERT_CAN_READ_BYTE_COUNT(titleBytesLength);
 	[self decryptNextBytesOfLength:titleBytesLength];
 	NSData *titleData = [NSData dataWithBytesNoCopy:[blorData mutableBytes] + currentByteOffset length:titleBytesLength freeWhenDone:NO];
-	NSString *titleString = [[NSString alloc] initWithData:titleData encoding:NSUnicodeStringEncoding];
+	NSString *titleString = [[[NSString alloc] initWithData:titleData encoding:NSUnicodeStringEncoding] autorelease];
 	currentByteOffset += titleBytesLength;
 	
 	int bodyBufferBytesLength, bodyBytesLength;
@@ -273,7 +275,7 @@
 
 	[bodyString release];
 	[attributedBody release];
-	[titleString release];
+//	[titleString release];
 	
 	successfullyReadNoteCount++;
 	

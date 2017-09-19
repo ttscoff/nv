@@ -460,14 +460,14 @@ static inline CGFloat fMAX(CGFloat a,CGFloat b) {
 - (void)setDivider:(NSImage*)image {
 	if (![self couplingSplitView]) {
 		[divider autorelease];
-		if ([image isFlipped]) {
+//		if ([image isFlipped]) {
             // If the image is flipped, we just retain it.
 			divider = [image retain];
-		} else {
+//		} else {
             // if the image isn't flipped, we copy the image instead of retaining it, and flip the copy.
-			divider = [image copy];
-			[divider setFlipped:YES];
-		}
+//			divider = [image copy];
+//			[divider setFlipped:YES];
+//		}
         // We set the thickness to 0.0 so the image dimension will prevail.
 		[self setDividerThickness:0.0];
 		[self setMustAdjust];
@@ -582,7 +582,6 @@ static inline CGFloat fMAX(CGFloat a,CGFloat b) {
 // "closed hand" cursor is shown. Double clicks are handled separately. Nothing will happen if
 // no divider image is set.
 - (void)mouseDown:(NSEvent*)theEvent {
-    
 	if (!dividers) {
 		return;
 	}
@@ -816,11 +815,14 @@ static inline CGFloat fMAX(CGFloat a,CGFloat b) {
 - (void)drawDivider:(NSImage*)anImage inRect:(NSRect)rect betweenView:(RBSplitSubview*)leading andView:(RBSplitSubview*)trailing {
     // Fill the view with the background color (if there's any). Don't draw the background again for
     // thumbs.
-	if ((rect.origin.x==0)&&(rect.origin.y==0)) {
-		[self setDividerThickness:7.0];
-	}else {
-		[self setDividerThickness:8.75f];// [self isVertical] ? 9.0f : 9.0f];		
-	}
+    
+    //HERE
+//     NSLog(@"divThikc :>%f<",[self dividerThickness]);
+//	if ((rect.origin.x==0)&&(rect.origin.y==0)) {
+//		[self setDividerThickness:7.0];
+//	}else {
+//		[self setDividerThickness:8.75f];// [self isVertical] ? 9.0f : 9.0f];		
+//	}
 	if (leading||trailing) {
 		NSColor* bg = [self background];
 		if (bg) {
@@ -842,7 +844,7 @@ static inline CGFloat fMAX(CGFloat a,CGFloat b) {
 	}
     // Draw the image if the delegate returned a non-empty rect.
 	if (!NSIsEmptyRect(dorect)) {
-		[anImage drawInRect:dorect fromRect:imrect operation:NSCompositeSourceOver fraction:1.0];
+		[anImage drawInRect:dorect fromRect:imrect operation:NSCompositeSourceOver fraction:1.0 respectFlipped:YES hints:nil];
 	}
 }
 
@@ -949,7 +951,7 @@ static inline CGFloat fMAX(CGFloat a,CGFloat b) {
 		if (data) {
 			NSBitmapImageRep* rep = [NSBitmapImageRep imageRepWithData:data];
 			NSImage* image = [[[NSImage alloc] initWithSize:[rep size]] autorelease];
-			[image setFlipped:YES];
+//			[image setFlipped:YES];
 			[image addRepresentation:rep];
 			[self setDivider:image];
 		} else {

@@ -24,13 +24,19 @@
 @interface NSFileManager (NV)
 
 
-- (id)getOpenMetaTagsAtFSPath:(const char*)path;
-- (BOOL)setOpenMetaTags:(id)plistObject atFSPath:(const char*)path;
+- (id)getTagsAtFSPath:(const char*)path;
+- (BOOL)setTags:(id)plistObject atFSPath:(const char*)path;
 
 - (NSString*)pathCopiedFromAliasData:(NSData*)aliasData;
 - (BOOL)setTextEncodingAttribute:(NSStringEncoding)encoding atFSPath:(const char*)path;
 - (NSStringEncoding)textEncodingAttributeOfFSPath:(const char*)path;
 - (NSString*)pathFromFSPath:(char*)path;
 - (NSString*)pathWithFSRef:(FSRef*)fsRef;
+- (BOOL)createFolderAtPath:(NSString *)path;
+- (BOOL)createFolderAtPath:(NSString *)path withAttributes:(NSDictionary *)attributes;
+- (NSDictionary *)attributesAtPath:(NSString *)path followLink:(BOOL)follow;
+- (NSArray *)folderContentsAtPath:(NSString *)path;
+- (NSArray *)mergedTagsForFileAtPath:(const char*)path;
+- (BOOL)deleteFileAtPath:(NSString *)path;
 
 @end

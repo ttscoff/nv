@@ -17,8 +17,17 @@
 #import <Cocoa/Cocoa.h>
 #endif
 
+#ifndef NSFoundationVersionNumber10_10
+#define NSFoundationVersionNumber10_10 1151.00
+#endif
+#ifndef NSFoundationVersionNumber10_9
+#define NSFoundationVersionNumber10_9 1056.00
+#endif
+#ifndef NSFoundationVersionNumber10_8
+#define NSFoundationVersionNumber10_8 945.00
+#endif
 #ifndef NSFoundationVersionNumber10_7
-#define NSFoundationVersionNumber10_7 830.00
+#define NSFoundationVersionNumber10_7 833.10
 #endif
 #ifndef NSFoundationVersionNumber10_6
 #define NSFoundationVersionNumber10_6 751.00
@@ -81,11 +90,13 @@ typedef char _COMPILE_ASSERT_SYMBOL(__LINE__, msg) [ ((test) ? 1 : -1) ]
 
 #define VERIFY_SALT "Salt for verifying master key in a single iteration"
 #define LOG_SESSION_SALT "Salt for encrypting a write-ahead-log session"
-
+#define DevelopingOnYosemiteOrLater 0
 
 #define IsLeopardOrLater (floor(NSFoundationVersionNumber) >= NSFoundationVersionNumber10_5)
 #define IsSnowLeopardOrLater (floor(NSFoundationVersionNumber) >= NSFoundationVersionNumber10_6)
 #define IsLionOrLater (floor(NSFoundationVersionNumber) >= NSFoundationVersionNumber10_7)
+#define IsMavericksOrLater (floor(NSFoundationVersionNumber) >= NSFoundationVersionNumber10_9)
+#define IsYosemiteOrLater (floor(NSFoundationVersionNumber) >= NSFoundationVersionNumber10_10)
 
 #define NOTES_MENU_ID 89
 #define VIEW_MENU_ID 99

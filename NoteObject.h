@@ -80,7 +80,7 @@ typedef struct _NoteFilterContext {
 	UInt32 logicalSize;
 	UTCDateTime fileModifiedDate, *attrsModifiedDate;
 	NSStringEncoding fileEncoding;
-	int currentFormatID;
+	NSInteger currentFormatID;
 	CFAbsoluteTime modifiedDate, createdDate;
 }
 
@@ -110,7 +110,7 @@ NSInteger compareFileSize(id *a, id *b);
 - (BOOL)youngerThanLogObject:(id<SynchronizedNote>)obj;
 
 	//syncing w/ files in directory
-	int storageFormatOfNote(NoteObject *note);
+	NSInteger storageFormatOfNote(NoteObject *note);
 	NSString* filenameOfNote(NoteObject *note);
 	UInt32 fileNodeIDOfNote(NoteObject *note);
 	UInt32 fileSizeOfNote(NoteObject *note);
@@ -148,7 +148,7 @@ NSInteger compareFileSize(id *a, id *b);
 - (id)delegate;
 - (void)setDelegate:(id)theDelegate;
 - (id)initWithNoteBody:(NSAttributedString*)bodyText title:(NSString*)aNoteTitle 
-			  delegate:(id)aDelegate format:(int)formatID labels:(NSString*)aLabelString;
+			  delegate:(id)aDelegate format:(NSInteger)formatID labels:(NSString*)aLabelString;
 - (id)initWithCatalogEntry:(NoteCatalogEntry*)entry delegate:(id)aDelegate;
 
 - (NSSet*)labelSet;
@@ -178,9 +178,11 @@ NSInteger compareFileSize(id *a, id *b);
 - (BOOL)upgradeEncodingToUTF8;
 - (BOOL)updateFromFile;
 - (BOOL)updateFromCatalogEntry:(NoteCatalogEntry*)catEntry;
-- (BOOL)updateFromData:(NSMutableData*)data inFormat:(int)fmt;
+- (BOOL)updateFromData:(NSMutableData*)data inFormat:(NSInteger)fmt;
 
 - (OSStatus)writeFileDatesAndUpdateTrackingInfo;
+
+- (BOOL)mirrorTags;
 
 - (NSURL*)uniqueNoteLink;
 - (NSString*)noteFilePath;

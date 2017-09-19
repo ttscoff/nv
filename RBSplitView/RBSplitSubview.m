@@ -481,6 +481,7 @@ static animationData* currentAnimation = NULL;
 // This method handles clicking and dragging in an empty portion of the subview, or in an alternate
 // drag view as designated by the delegate.
 - (void)mouseDown:(NSEvent*)theEvent {
+    if ([theEvent clickCount]<2) {
 	NSWindow* window = [self window];
 	NSPoint where = [theEvent locationInWindow];
 	if (actDivider<NSNotFound) {
@@ -537,8 +538,10 @@ static animationData* currentAnimation = NULL;
 			[window setFrameOrigin:origin];
 			where = now;
 			[pool drain];
+            }
 		}
-	}
+	} 
+    [super mouseDown:theEvent];
 }
 
 // These two methods encode and decode subviews.
@@ -707,6 +710,10 @@ static animationData* currentAnimation = NULL;
 		}
         // We're finished, either collapse or expand entirely now.
 		if (anim->collapsing) {
+            id delegate = [sv delegate];
+            if ([delegate respondsToSelector:@selector(splitView:willCollapse:)]) {
+                [delegate splitView:sv willCollapse:self];
+            }
 			DIM(frame.size) = 0.0;
 			[self RB___finishCollapse:frame withFraction:anim->dimension/[sv RB___dimensionWithoutDividers]];
 		} else {
@@ -767,6 +774,10 @@ static animationData* currentAnimation = NULL;
 		if (dim>=1.0) {
             // Old state was not collapsed, so we clear first responder and change the frame.
 			[self RB___clearResponder];
+            id delegate = [[self splitView] delegate];
+            if ([delegate respondsToSelector:@selector(splitView:willCollapse:)]) {
+                [delegate splitView:[self splitView] willCollapse:self];
+            }
 			[self RB___finishCollapse:cache->rect withFraction:dim/value];
 		} else {
             // It was collapsed already, but the frame may have changed, so we set it.
@@ -816,6 +827,10 @@ static animationData* currentAnimation = NULL;
 	if (![self isCollapsed]) {
 		RBSplitView* sv = [self splitView];
 		if (sv&&[self canCollapse]) {
+            id delegate = [sv delegate];
+            if ([delegate respondsToSelector:@selector(splitView:willCollapse:)]) {
+                [delegate splitView:sv willCollapse:self];
+            }
 			[self RB___clearResponder];
 			NSRect frame = [self frame];
 			BOOL ishor = [sv isHorizontal];
@@ -871,13 +886,16 @@ static animationData* currentAnimation = NULL;
 // there is one, and calling the delegate method if there is one.
 - (void)RB___finishExpand:(NSRect)rect withFraction:(double)value {
 	RBSplitView* sv = [self splitView];
+    id delegate = [sv delegate];
+    if ([delegate respondsToSelector:@selector(splitView:willExpand:)]) {
+        [delegate splitView:sv willExpand:self];
+    }
 	BOOL finish = [self RB___stopAnimation];
 	[self RB___setFrame:rect withFraction:value notify:YES];
 	[sv RB___setMustClearFractions];
 	if (finish) {
 		[self display];
 	}
-	id delegate = [sv delegate];
 	if ([delegate respondsToSelector:@selector(splitView:didExpand:)]) {
 		[delegate splitView:sv didExpand:self];
 	}

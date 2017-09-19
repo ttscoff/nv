@@ -396,11 +396,11 @@ David Smith
 */
 
 --
-ElasticThreads' contributions, including (but not limited to) the fullscreen mode, color scheming, the status bar icon, and the ability to open notes in other text editors are released under the "new" BSD license: 
+Elasticthreads's contributions, including (but not limited to) the fullscreen mode, color scheming, the status bar icon, and the ability to open notes in other text editors are released under the "new" BSD license:
 
 http://elasticthreads.tumblr.com/nv/
 
-Copyright (c) 2011, ElasticThreads
+Copyright (c) 2011, Elasticthreads
 All rights reserved.
 Redistribution and use in source and binary forms, with or without
 modification, are permitted provided that the following conditions are
@@ -410,7 +410,7 @@ notice, this list of conditions and the following disclaimer.
 •	Redistributions in binary form must reproduce the above copyright
 notice, this list of conditions and the following disclaimer in the
 documentation and/or other materials provided with the distribution.
-•	Neither the name of the ElasticThreads nor the names of its
+•	Neither the name of the Elasticthreads nor the names of its
 contributors may be used to endorse or promote products derived from
 this software without specific prior written permission.
 
@@ -469,7 +469,7 @@ http://www.opensource.org/licenses/bsd-license.php
 ETTransparentScroller
 The main window uses a scroller class are based on the BWTransparentScroller from BWToolKit
 http://www.brandonwalkin.com/bwtoolkit/
-(modifications by ElasticThreads on 10/19/2010)
+(modifications by Elasticthreads on 10/19/2010)
 
 see BWToolkit above
 --
@@ -477,7 +477,7 @@ see BWToolkit above
 BTTransparentScroller
 The Markdown preview pane uses a scroller class are based on the BWTransparentScroller from BWToolKit
 http://www.brandonwalkin.com/bwtoolkit/
-(but modified by Brett Terpstra on 12/8/10 and again by ElasticThreads on 03/10/11)
+(but modified by Brett Terpstra on 12/8/10 and again by Elasticthreads on 03/10/11)
 
 see BWToolkit above
 

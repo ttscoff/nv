@@ -25,7 +25,8 @@
 }
 
 + (NSScrollerStyle)preferredScrollerStyle{
-    return NSScrollerStyleOverlay;
+   
+    return [[NSScroller class]preferredScrollerStyle];
 }
 
 #endif
@@ -41,7 +42,7 @@
         knobAlpha=0.6f;
         slotAlpha=0.55f;
         fillBackground=NO;
-        isOverlay=YES;
+//        isOverlay=YES;
 	}
 	return self;
 }

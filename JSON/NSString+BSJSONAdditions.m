@@ -16,7 +16,7 @@
   if (level != jsonDoNotIndent) {
     return [@"\n" stringByPaddingToLength:(level + 1) withString:jsonIndentString startingAtIndex:0];
   } else {
-    return [NSString stringWithString: @""];
+    return @"";
   }
 }
 

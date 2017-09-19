@@ -26,13 +26,13 @@
 
 - (id)initWithIdentifier:(id)anObject {
 	
-	if ([super initWithIdentifier:anObject]) {
+	if (self=[super initWithIdentifier:anObject]) {
 
 		absoluteMinimumWidth = [anObject sizeWithAttributes:[NoteAttributeColumn standardDictionary]].width + 5;
 		[self setMinWidth:absoluteMinimumWidth];
+        return self;
 	}
-	
-	return self;
+	return nil;
 }
 
 + (NSDictionary*)standardDictionary {

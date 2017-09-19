@@ -32,18 +32,19 @@
 //instances this short-lived class are intended to be started only once, and then deallocated
 
 - (id)initWithEntriesToCollect:(NSArray*)wantedEntries simperiumToken:(NSString*)aSimperiumToken {
-	if ([super init]) {
+	if (self=[super init]) {
 		simperiumToken = [aSimperiumToken retain];
 		entriesToCollect = [wantedEntries retain];
 		entriesCollected = [[NSMutableArray alloc] init];
 		entriesInError = [[NSMutableArray alloc] init];
 		
 		if (![simperiumToken length] || ![entriesToCollect count]) {
-			NSLog(@"%s: missing parameters", _cmd);
+			NSLog(@"%@: missing parameters", NSStringFromSelector(_cmd));
 			return nil;
 		}
+        return self;
 	}
-	return self;
+	return nil;
 }
 
 - (NSArray*)entriesToCollect {
@@ -151,14 +152,14 @@
 			return nil;
 	}
 	NSURL *url = [fetcher requestURL];
-	int index = [[url pathComponents] indexOfObject:@"i"];
+	NSUInteger index = [[url pathComponents] indexOfObject:@"i"];
 	NSString *key;
 	if (index > 0 && index+1 < [[url pathComponents] count]) {
 		key = [[url pathComponents] objectAtIndex:(index+1)];
 	}
 
 	NSMutableDictionary *entry = [NSMutableDictionary dictionaryWithCapacity:12];
-	NSNumber *deleted = [NSNumber numberWithInt:[[rawObject objectForKey:@"deleted"] intValue]];
+	NSNumber *deleted = @([[rawObject objectForKey:@"deleted"] integerValue]);
     NSArray *systemTags = [rawObject objectForKey:@"systemTags"];
     if (!systemTags)
         systemTags = @[];
@@ -194,11 +195,11 @@
 - (void)syncResponseFetcher:(SyncResponseFetcher*)fetcher receivedData:(NSData*)data returningError:(NSString*)errString {
 	
 	if (errString) {
-		NSLog(@"%s: collector-%@ returned %@", _cmd, fetcher, errString);
+		NSLog(@"%@: collector-%@ returned %@", NSStringFromSelector(_cmd), fetcher, errString);
 		id obj = [fetcher representedObject];
 		if (obj) {
 			[entriesInError addObject:[NSDictionary dictionaryWithObjectsAndKeys: obj, @"NoteObject", 
-									   [NSNumber numberWithInt:[fetcher statusCode]], @"StatusCode", nil]];
+									   [NSNumber numberWithInteger:[fetcher statusCode]], @"StatusCode", nil]];
 		}
 	} else {
 		NSDictionary *preparedDictionary = [self preparedDictionaryWithFetcher:fetcher receivedData:data];
@@ -207,7 +208,7 @@
 			id obj = [fetcher representedObject];
 			if (obj) {
 				[entriesInError addObject: [NSDictionary dictionaryWithObjectsAndKeys: obj, @"NoteObject",
-											[NSNumber numberWithInt:[fetcher statusCode]], @"StatusCode", nil]];
+											[NSNumber numberWithInteger:[fetcher statusCode]], @"StatusCode", nil]];
 			}
 		} else {
 			if ([preparedDictionary count]) {
@@ -244,17 +245,18 @@
 //and to ensure we know what the time was for the next time we compare dates
 
 - (id)initWithEntries:(NSArray*)wantedEntries operation:(SEL)opSEL simperiumToken:(NSString *)aSimperiumToken {
-	if ([super initWithEntriesToCollect:wantedEntries simperiumToken:aSimperiumToken]) {
+	if (self=[super initWithEntriesToCollect:wantedEntries simperiumToken:aSimperiumToken]) {
 		//set creation and modification date when creating
 		//set modification date when updating
 		//need to check for success when deleting
 		if (![self respondsToSelector:opSEL]) {
-			NSLog(@"%@ doesn't respond to %s", self, opSEL);
+			NSLog(@"%@ doesn't respond to %@", self, NSStringFromSelector(opSEL));
 			return nil;
 		}
 		fetcherOpSEL = opSEL;
+        return self;
 	}
-	return self;
+	return nil;
 }
 
 - (SyncResponseFetcher*)fetcherForEntry:(id)anEntry {
@@ -304,7 +306,7 @@
 	} else {
 		NSUInteger v = [[info objectForKey:@"version"] integerValue];
 		if (v > 0) {
-			noteURL = [SimplenoteSession simperiumURLWithPath:[NSString stringWithFormat:@"/Note/i/%@/v/%u", [info objectForKey:@"key"], v] parameters:params];
+			noteURL = [SimplenoteSession simperiumURLWithPath:[NSString stringWithFormat:@"/Note/i/%@/v/%lu", [info objectForKey:@"key"], (unsigned long)v] parameters:params];
 		} else {
 			noteURL = [SimplenoteSession simperiumURLWithPath:[NSString stringWithFormat:@"/Note/i/%@", [info objectForKey:@"key"]] parameters:params];
 		}
@@ -395,7 +397,7 @@
 	
 	NSString *keyString = nil;
 	NSURL *url = [fetcher requestURL];
-	int index = [[url pathComponents] indexOfObject:@"i"];
+	NSUInteger index = [[url pathComponents] indexOfObject:@"i"];
 	if (index > 0 && index+1 < [[url pathComponents] count]) {
 		keyString = [[url pathComponents] objectAtIndex:(index+1)];
 	}
@@ -410,7 +412,7 @@
 		[syncMD setObject:keyString forKey:@"key"];
 		[syncMD setObject:[NSNumber numberWithDouble:[[NSDate dateWithTimeIntervalSince1970:[[rawObject objectForKey:@"creationDate"] doubleValue]] timeIntervalSinceReferenceDate]] forKey:@"create"];
 		[syncMD setObject:[NSNumber numberWithDouble:[[NSDate dateWithTimeIntervalSince1970:[[rawObject objectForKey:@"modificationDate"] doubleValue]] timeIntervalSinceReferenceDate]] forKey:@"modify"];
-		[syncMD setObject:[NSNumber numberWithInt:version] forKey:@"version"];
+		[syncMD setObject:@(version) forKey:@"version"];
 		[syncMD setObject:[NSNumber numberWithBool:NO] forKey:@"dirty"];
 	} else {
 		if ([fetcher statusCode] == 412) {
@@ -419,7 +421,7 @@
 			// note was too large, don't clear dirty flag
 			[syncMD setObject:[NSNumber numberWithBool:YES] forKey:@"error"];
 		}
-		[syncMD setObject:[NSNumber numberWithInt:version] forKey:@"version"];
+		[syncMD setObject:@(version) forKey:@"version"];
 	}
 	if ([fetcher representedObject]) {
 		id <SynchronizedNote> aNote = [fetcher representedObject];
@@ -477,11 +479,11 @@
 				[[[(NoteObject *)aNote delegate] delegate] contentsUpdatedForNote:aNote];
 			}
 		} else {
-			NSLog(@"%s called with unknown opSEL: %s", _cmd, fetcherOpSEL);
+			NSLog(@"%@ called with unknown opSEL: %@", NSStringFromSelector(_cmd),NSStringFromSelector(fetcherOpSEL));
 		}
 		
 	} else {
-		NSLog(@"Hmmm. Fetcher %@ doesn't have a represented object. op = %s", fetcher, fetcherOpSEL);
+		NSLog(@"Hmmm. Fetcher %@ doesn't have a represented object. op = %@", fetcher, NSStringFromSelector(fetcherOpSEL));
 	}
 	[result setObject:keyString forKey:@"key"];
 	

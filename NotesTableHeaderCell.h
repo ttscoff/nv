@@ -12,11 +12,9 @@
 @interface NotesTableHeaderCell : NSTableHeaderCell {
 }
 
-- (void)drawBorderWithFrame:(NSRect)cellFrame;
-- (void)drawGradientFromColor:(NSColor *)baseColor inRect:(NSRect)cellFrame;
-
-+ (void)releaseColors;
 + (void)setBColor:(NSColor *)inColor;
 + (void)setTxtColor:(NSColor *)inColor;
 
 @end
+
+

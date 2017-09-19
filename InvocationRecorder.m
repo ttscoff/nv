@@ -66,11 +66,13 @@
 @implementation ComparableInvocation 
 
 - (id)initWithInvocation:(NSInvocation*)anInvocation {
-	if ([super init]) {
+	if (self=[super init]) {
 		if (!(innerInvocation = [anInvocation retain]))
 			return nil;
-	}
-	return self;
+        
+        return self;
+    }
+    return nil;
 }
 - (void)dealloc {
 	[innerInvocation release];
@@ -104,7 +106,7 @@
 @implementation NSInvocation (MissingMethods)
 
 - (NSString*)description {
-	return [NSString stringWithFormat:@"%@: %s", [self target], [self selector]];
+	return [NSString stringWithFormat:@"%@: %@", [self target], NSStringFromSelector([self selector])];
 }
 
 @end

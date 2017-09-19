@@ -21,7 +21,7 @@
 
 
 - (id)init {
-	if ([super init]) {
+	if (self=[super init]) {
 		[self setNumberOfTickMarks:10];
 		[self setMinValue:0.05];
 		[self setMaxValue:4.0];
@@ -29,9 +29,9 @@
 		[self setTickMarkPosition:NSTickMarkBelow];
 		[self setAllowsTickMarkValuesOnly:NO];
 		[self setContinuous:YES];
-
+        return self;
 	}
-	return self;
+	return nil;
 }
 - (void)stopTracking:(NSPoint)lastPoint at:(NSPoint)stopPoint inView:(NSView *)controlView mouseIsUp:(BOOL)flag {
 	if (flag == YES)
@@ -62,7 +62,7 @@
 }
 
 - (id)initWithCoder:(NSCoder *)decoder {
-	if ([super initWithCoder:decoder]) {
+	if (self=[super initWithCoder:decoder]) {
 		[KeyDerivationDelaySlider setCellClass:[KeyDerivationDelaySliderCell class]];
 		NSCell *myCell = [[[KeyDerivationDelaySliderCell alloc] init] autorelease];
 		[myCell setAction:[[self cell] action]];
@@ -71,8 +71,10 @@
 		
 		if ([self cell] != myCell)
 			NSLog(@"cellular disintegration!");
+        
+        return self;
 	}
-	return self;
+	return nil;
 }
 
 + (Class)cellClass {

@@ -238,8 +238,8 @@
                     linkTitle = title;
                 }
                 [[[[AlienNoteImporter alloc] init] autorelease] importURLInBackground:theURL linkTitle:linkTitle receptionDelegate:self];
+                return YES;
             }
-            return YES;
         }else{
             if (title && (txtBody || htmlBody)) {
                 NSMutableAttributedString *attributedContents = nil;
@@ -314,7 +314,7 @@
 			if (url) {
         NSString *linkFormat = @"<%@>%s";
         NSString *pathString = [url absoluteString];
-        NSLog(@"%s",pathString);
+        NSLog(@"%@",pathString);
         if ([pathString hasSuffix:@"jpg"]   || 
             [pathString hasSuffix:@"jpeg"]  ||
             [pathString hasSuffix:@"gif"]   ||

@@ -46,7 +46,7 @@
 @implementation NotationController
 
 - (id)init {
-    if ([super init]) {
+    if (self=[super init]) {
 		directoryChangesFound = notesChanged = aliasNeedsUpdating = NO;
 		
 		allNotes = [[NSMutableArray alloc] init]; //<--the authoritative list of all memory-accessible notes
@@ -96,7 +96,7 @@
 	Boolean changed;
 	
 	if ((anErr = FSResolveAliasWithMountFlags(NULL, aliasHandle, &targetRef, &changed, 0)) == noErr) {
-	    if ([self initWithDirectoryRef:&targetRef error:&anErr]) {
+	    if (self=[self initWithDirectoryRef:&targetRef error:&anErr]) {
 		aliasNeedsUpdating = changed;
 		*err = noErr;
 		
@@ -116,7 +116,7 @@
     OSStatus anErr = noErr;
     if ((anErr = [NotationController getDefaultNotesDirectoryRef:&targetRef]) == noErr) {
 		
-		if ([self initWithDirectoryRef:&targetRef error:&anErr]) {
+		if (self=[self initWithDirectoryRef:&targetRef error:&anErr]) {
 			*err = noErr;
 			return self;
 		}
@@ -131,7 +131,7 @@
     
     *err = noErr;
     
-    if ([self init]) {
+    if (self=[self init]) {
 		aliasNeedsUpdating = YES; //we don't know if we have an alias yet
 		
 		noteDirectoryRef = *directoryRef;
@@ -169,6 +169,24 @@
 	
 	delegate = theDelegate;
 
+}
+
+- (void)mirrorAllOMToFinderTags
+{
+    if(IsMavericksOrLater&&([self currentNoteStorageFormat]!=SingleDatabaseFormat)&&(allNotes!=nil)&&(allNotes.count>0)){
+        NSUInteger mirroredCount=0;
+        for (NoteObject *note in allNotes) {
+            if(![note mirrorTags]){
+                break;
+            }
+            mirroredCount++;
+        }
+        if (mirroredCount!=allNotes.count) {
+            NSLog(@"didn't mirror every note");
+        }else{
+            [self performSelector:@selector(sortAndRedisplayNotes) withObject:nil afterDelay:2.5f];
+        }
+    }
 }
 
 - (void)upgradeDatabaseIfNecessary {
@@ -344,23 +362,30 @@ returnResult:
 
 - (BOOL)initializeJournaling {
     
-    const UInt32 maxPathSize = 8 * 1024;
-    UInt8 *convertedPath = (UInt8*)malloc(maxPathSize * sizeof(UInt8));
-    OSStatus err = noErr;
+//    const UInt32 maxPathSize = 8 * 1024;
+    //char *convertedPath;// = (UInt8*)malloc(maxPathSize * sizeof(UInt8));
+//    OSStatus err = noErr;
 	NSData *walSessionKey = [notationPrefs WALSessionKey];
     
+    NSString *cPath=nil;
     //nvALT change to store Interim Note-Changes in ~/Library/Caches/
 #if kUseCachesFolderForInterimNoteChanges
-    NSString *cPath=[self createCachesFolder];
-    if (cPath) {
-        convertedPath=[cPath UTF8String];
+    cPath=[self createCachesFolder];
 #else
-    if ((err = FSRefMakePath(&noteDirectoryRef, convertedPath, maxPathSize)) == noErr) {
+    CFURLRef myURLRef=CFURLCreateFromFSRef(kCFAllocatorDefault, &noteDirectoryRef);
+    if (myURLRef!=NULL)        {
+        cPath =[NSString stringWithString:[(NSURL *) myURLRef path]];
+        CFRelease(myURLRef);
+    }
+//    if ((err = FSRefMakePath(&noteDirectoryRef, convertedPath, maxPathSize)) == noErr) {
 #endif
+    
+    if (cPath!=nil) {
+        char *convertedPath=strdup([cPath UTF8String]);
 		//initialize the journal if necessary
-		if (!(walWriter = [[WALStorageController alloc] initWithParentFSRep:(char*)convertedPath encryptionKey:walSessionKey])) {
+		if (!(walWriter = [[WALStorageController alloc] initWithParentFSRep:convertedPath encryptionKey:walSessionKey])) {
 			//journal file probably already exists, so try to recover it
-			WALRecoveryController *walReader = [[[WALRecoveryController alloc] initWithParentFSRep:(char*)convertedPath encryptionKey:walSessionKey] autorelease];
+			WALRecoveryController *walReader = [[[WALRecoveryController alloc] initWithParentFSRep:convertedPath encryptionKey:walSessionKey] autorelease];
 			if (walReader) {
 				
 				BOOL databaseCouldNotBeFlushed = NO;
@@ -385,14 +410,16 @@ returnResult:
 				if (![walReader destroyLogFile]) {
 					//couldn't delete the log file, so we can't create a new one
 					NSLog(@"Unable to delete the old write-ahead-log file");
+                    free(convertedPath);
 					goto bail;
 				}
 				
-				if (!(walWriter = [[WALStorageController alloc] initWithParentFSRep:(char*)convertedPath encryptionKey:walSessionKey])) {
+				if (!(walWriter = [[WALStorageController alloc] initWithParentFSRep:convertedPath encryptionKey:walSessionKey])) {
 					//couldn't create a journal after recovering the old one
 					//if databaseCouldNotBeFlushed is true here, then we've potentially lost notes; perhaps exchangeobjects would be better here?
 					NSLog(@"Unable to create a new write-ahead-log after deleting the old one");
-					goto bail;
+					free(convertedPath);
+                    goto bail;
 				}
 				
 				if ([recoveredNotes count] > 0) {
@@ -408,19 +435,19 @@ returnResult:
 			} else {
 				NSLog(@"Unable to recover unsaved notes from write-ahead-log");
 				//1) should we let the user attempt to remove it without recovery?
+                free(convertedPath);
 				goto bail;
 			}
 		}
 		[walWriter setDelegate:self];
-		
+		free(convertedPath);
 		return YES;
     } else {
-		NSLog(@"FSRefMakePath error: %d", err);
+		NSLog(@"FSRefMakePath error");//: %d", err);
 		goto bail;
     }
     
 bail:
-		free(convertedPath);	
     return NO;
 }
 
@@ -492,6 +519,8 @@ bail:
 	    free(values);
 	
     } else {
+	    free(keys);
+	    free(values);
 	NSLog(@"_makeChangesInDictionary: Could not get values or keys!");
     }
 }
@@ -601,7 +630,6 @@ bail:
 	}
 	
     if (currentStorageFormat == SingleDatabaseFormat) {
-		
 		[self stopFileNotifications];
 		
 		/*if (![self initializeJournaling]) {
@@ -631,7 +659,7 @@ bail:
 	[[ODBEditor sharedODBEditor] performSelector:@selector(initializeDatabase:) withObject:notationPrefs afterDelay:0.0];
 }
 
-- (int)currentNoteStorageFormat {
+- (NSInteger)currentNoteStorageFormat {
     return [notationPrefs notesStorageFormat];
 }
 
@@ -1033,6 +1061,18 @@ bail:
     notesChanged = YES;
 }
 
+
+- (void)removeNotesAtIndexes:(NSIndexSet *)indexes{
+    //just delete the notes outright
+    if (!indexes||([indexes count]==0)) {
+        return;
+    }else if ([indexes count]>1) {
+        [self removeNotes:[self notesAtIndexes:indexes]];
+    }else{
+        [self removeNote:[self noteObjectAtFilteredIndex:[indexes firstIndex]]];
+    }
+}
+
 //the gateway methods must always show warnings, or else flash overlay window if show-warnings-pref is off
 - (void)removeNotes:(NSArray*)noteArray {
 	NSEnumerator *enumerator = [noteArray objectEnumerator];
@@ -1404,7 +1444,7 @@ bail:
 	return objs;
 }
 
-- (NoteObject*)noteObjectAtFilteredIndex:(int)noteIndex {
+- (NoteObject*)noteObjectAtFilteredIndex:(NSUInteger)noteIndex {
 	unsigned int theIndex = (unsigned int)noteIndex;
 	
 	if (theIndex < [notesListDataSource count])
@@ -1511,8 +1551,12 @@ bail:
 }
 
 - (void)regeneratePreviewsForColumn:(NSTableColumn*)col visibleFilteredRows:(NSRange)rows forceUpdate:(BOOL)force {
-	
-	float width = [col width] - [NSScroller scrollerWidthForControlSize:NSRegularControlSize];
+    float width = [col width];
+    if(IsLionOrLater){
+        width-=[NSScroller scrollerWidthForControlSize:NSRegularControlSize scrollerStyle:[NSScroller preferredScrollerStyle]];
+    }else{
+    width-=[NSScroller scrollerWidthForControlSize:NSRegularControlSize];
+    }
 	
 	if (force || roundf(width) != roundf(titleColumnWidth)) {
 		titleColumnWidth = width;
@@ -1586,18 +1630,17 @@ bail:
 - (NSString *)createCachesFolder{
     NSString *path = nil;
     NSArray *paths = NSSearchPathForDirectoriesInDomains(NSCachesDirectory, NSUserDomainMask, YES);
-    if ([paths count])
-    {
-        NSString *bundleName =
-        [[[NSBundle mainBundle] infoDictionary] objectForKey:@"CFBundleIdentifier"];
-        path = [[paths objectAtIndex:0] stringByAppendingPathComponent:bundleName];
-        NSError *theError;
-        if ((path)&&([[NSFileManager defaultManager]createDirectoryAtPath:path withIntermediateDirectories:YES attributes:nil error:&theError])) {
+    if ([paths count])    {
+        path = [[paths objectAtIndex:0] stringByAppendingPathComponent:[[[NSBundle mainBundle] infoDictionary] objectForKey:@"CFBundleIdentifier"]];
+        NSError *theError=nil;
+        if ((path!=nil)&&([[NSFileManager defaultManager]createDirectoryAtPath:path withIntermediateDirectories:YES attributes:nil error:&theError])) {
 //           NSLog(@"cache folder :>%@<",path);
             return path;
-
         }else{
-            NSLog(@"error creating cache folder :>%@<",[theError description]);
+            NSLog(@"error creating cache folder:");
+            if (theError) {
+                NSLog(@"%@",[theError description]);
+            }
         }
     }else{
         NSLog(@"Unable to find or create cache folder:\n%@", path);

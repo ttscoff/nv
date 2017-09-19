@@ -29,46 +29,45 @@ static NSString *BMNoteUUIDStringKey = @"NoteUUIDString";
 @implementation NoteBookmark
 
 - (id)initWithDictionary:(NSDictionary*)aDict {
-	if (aDict) {
-		NSString *uuidString = [aDict objectForKey:BMNoteUUIDStringKey];
-		if (uuidString) {
-			[self initWithNoteUUIDBytes:[uuidString uuidBytes] searchString:[aDict objectForKey:BMSearchStringKey]];
-		} else {
-			NSLog(@"NoteBookmark init: supplied nil uuidString");
-		}
-	} else {
-		NSLog(@"NoteBookmark init: supplied nil dictionary; couldn't init");
-		return nil;
-	}
-	return self;
+        if (aDict) {
+            NSString *uuidString = [aDict objectForKey:BMNoteUUIDStringKey];
+            if (uuidString) {
+                return (self=[self initWithNoteUUIDBytes:[uuidString uuidBytes] searchString:[aDict objectForKey:BMSearchStringKey]]);
+            } else {
+                NSLog(@"NoteBookmark init: supplied nil uuidString");
+            }
+        } else {
+            NSLog(@"NoteBookmark init: supplied nil dictionary; couldn't init");
+            
+        }
+    return nil;
 }
 
 - (id)initWithNoteUUIDBytes:(CFUUIDBytes)bytes searchString:(NSString*)aString {
-	if ([super init]) {
+	if (self=[super init]) {
 		uuidBytes = bytes;
 		searchString = [aString copy];
+        return self;
 	}
 	
-	return self;
+	return nil;
 }
 
 - (id)initWithNoteObject:(NoteObject*)aNote searchString:(NSString*)aString {
 	
-	if ([super init] && aNote) {
-		noteObject = [aNote retain];
-		searchString = [aString copy];
-		
-		CFUUIDBytes *bytes = [aNote uniqueNoteIDBytes];
-		if (!bytes) {
-			NSLog(@"NoteBookmark init: no cfuuidbytes pointer from note %@", titleOfNote(aNote));
-			return nil;
-		}
-		uuidBytes = *bytes;
-	} else {
-		NSLog(@"NoteBookmark init: supplied nil note");
-		return nil;
-	}
-	return self;
+    if (aNote) {
+        
+        CFUUIDBytes *bytes = [aNote uniqueNoteIDBytes];
+        if (!bytes) {
+            NSLog(@"NoteBookmark init: no cfuuidbytes pointer from note %@", titleOfNote(aNote));
+        }else if(self=[self initWithNoteUUIDBytes:*bytes searchString:aString]){
+            noteObject = [aNote retain];
+            return self;
+        }
+    }
+    NSLog(@"NoteBookmark init: supplied nil note");
+    [self release];
+    return nil;
 }
 
 - (void)dealloc {
@@ -133,13 +132,14 @@ static NSString *BMNoteUUIDStringKey = @"NoteUUIDString";
 @implementation BookmarksController
 
 - (id)init {
-	if ([super init]) {
+	if (self=[super init]) {
 		bookmarks = [[NSMutableArray alloc] init];
 		isSelectingProgrammatically = isRestoringSearch = NO;
 		
 		prefsController = [GlobalPrefs defaultPrefs];
+        return self;
 	}
-	return self;
+	return nil;
 }
 
 - (void)awakeFromNib {
@@ -166,7 +166,7 @@ static NSString *BMNoteUUIDStringKey = @"NoteUUIDString";
 }
 
 - (id)initWithBookmarks:(NSArray*)array {
-	if ([self init]) {
+	if (self=[self init]) {
 		unsigned int i;
 		for (i=0; i<[array count]; i++) {
 			NSDictionary *dict = [array objectAtIndex:i];
@@ -175,9 +175,9 @@ static NSString *BMNoteUUIDStringKey = @"NoteUUIDString";
 			[bookmarks addObject:bookmark];
 			[bookmark release];
 		}
+        return self;
 	}
-
-	return self;
+	return nil;
 }
 
 - (NSArray*)dictionaryReps {
@@ -356,7 +356,7 @@ static NSString *BMNoteUUIDStringKey = @"NoteUUIDString";
 		ctrlCharStr = [[NSString stringWithCharacters:&ch length:1] retain];
 	}
 	
-	return [NSString stringWithFormat:@"%@%@%@ %d", rowIndex > 17 ? ctrlCharStr : @"", rowIndex > 8 ? shiftCharStr : @"", cmdCharStr, (rowIndex % 9) + 1];
+	return [NSString stringWithFormat:@"%@%@%@ %ld", rowIndex > 17 ? ctrlCharStr : @"", rowIndex > 8 ? shiftCharStr : @"", cmdCharStr, (rowIndex % 9) + 1];
 }
 
 - (NSInteger)numberOfRowsInTableView:(NSTableView *)aTableView {
@@ -374,7 +374,7 @@ static NSString *BMNoteUUIDStringKey = @"NoteUUIDString";
 
 - (void)tableViewSelectionDidChange:(NSNotification *)aNotification {
 	if (!isRestoringSearch && !isSelectingProgrammatically) {
-		int row = [bookmarksTableView selectedRow];
+		NSInteger row = [bookmarksTableView selectedRow];
 		if (row > -1) {
 			if ([bookmarks objectAtIndex:row] != currentBookmark) {
 				[self restoreNoteBookmark:[bookmarks objectAtIndex:row] inBackground:YES];
@@ -416,7 +416,7 @@ static NSString *BMNoteUUIDStringKey = @"NoteUUIDString";
 		
 		if (row != theRow + 1 && row != theRow) {
 			NoteBookmark* selectedBookmark = nil;
-			int selRow = [bookmarksTableView selectedRow];
+			NSInteger selRow = [bookmarksTableView selectedRow];
 			if (selRow > -1) selectedBookmark = [bookmarks objectAtIndex:selRow];
 			
 			if (row < theRow)
@@ -531,11 +531,11 @@ static NSString *BMNoteUUIDStringKey = @"NoteUUIDString";
 		NSString *newString = [[appController fieldSearchString] stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];		
 		
 		NoteBookmark *bookmark = [[NoteBookmark alloc] initWithNoteObject:[appController selectedNoteObject] searchString:newString];
-		if (bookmark) {
-			
+		if (bookmark!=nil) {
 			NSUInteger existingIndex = [bookmarks indexOfObject:bookmark];
 			if (existingIndex != NSNotFound) {
 				//show them what they've already got
+                
 				NoteBookmark *existingBookmark = [bookmarks objectAtIndex:existingIndex];
 				if ([window isVisible]) [self selectBookmarkInTableView:existingBookmark];
 			} else {
@@ -544,8 +544,8 @@ static NSString *BMNoteUUIDStringKey = @"NoteUUIDString";
 				[self updateBookmarksUI];
 				if ([window isVisible]) [self selectBookmarkInTableView:bookmark];
 			}
-		}
-		[bookmark release];
+        }
+        [bookmark release];
 	} else {
 		//there are only so many numbers and modifiers
 		NSRunAlertPanel(NSLocalizedString(@"Too many bookmarks.",nil), NSLocalizedString(@"You cannot create more than 26 bookmarks. Try removing some first.",nil), NSLocalizedString(@"OK",nil), nil, NULL);
@@ -555,7 +555,7 @@ static NSString *BMNoteUUIDStringKey = @"NoteUUIDString";
 - (void)removeBookmark:(id)sender {
 	
 	NoteBookmark *bookmark = nil;
-	int row = [bookmarksTableView selectedRow];
+	NSInteger row = [bookmarksTableView selectedRow];
 	if (row > -1) {
 		bookmark = [bookmarks objectAtIndex:row];
 		[bookmarks removeObjectIdenticalTo:bookmark];

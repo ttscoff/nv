@@ -19,7 +19,7 @@
     float minKnobHeight;
     float slotAlpha;
     float knobAlpha;
-    BOOL isOverlay;
+//    BOOL isOverlay;
     BOOL fillBackground;
 }
 

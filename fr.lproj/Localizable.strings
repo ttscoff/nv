@@ -645,3 +645,16 @@
 
 /* prefix for source-URLs inserted into imported notes; e.g., "From <http://www.apple.com>: ..." */
 "From" = "De";
+
+/* Menu Item for entering  Full Screen mode */
+"Enter Full Screen" = "Enter Full Screen";
+
+/* menu item title for exiting fullscreen */
+"Exit Full Screen" = "Exit Full Screen";
+
+/* Menu Item for Insert Link */
+"Insert Link" = "Insert Link";
+
+/* Menu Item for Use Selection for Find */
+"Use Selection for Find" = "Use Selection for Find";
+

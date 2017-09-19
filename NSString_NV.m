@@ -80,7 +80,9 @@ static int dayFromAbsoluteTime(CFAbsoluteTime absTime) {
     static NSString *days[3] = { NULL };
     
     if (!timeOnlyFormatter) {
-		timeOnlyFormatter = CFDateFormatterCreate(kCFAllocatorDefault, CFLocaleCopyCurrent(), kCFDateFormatterNoStyle, kCFDateFormatterShortStyle);
+        CFLocaleRef localeRef2 = CFLocaleCopyCurrent();
+		timeOnlyFormatter = CFDateFormatterCreate(kCFAllocatorDefault, localeRef2, kCFDateFormatterNoStyle, kCFDateFormatterShortStyle);
+        CFRelease(localeRef2);
     }
     
     if (!days[ThisDay]) {
@@ -90,11 +92,12 @@ static int dayFromAbsoluteTime(CFAbsoluteTime absTime) {
     }
 
     CFStringRef dateString = CFDateFormatterCreateStringWithDate(kCFAllocatorDefault, timeOnlyFormatter, date);
-	
 	if ([[GlobalPrefs defaultPrefs] horizontalLayout]) {
 		//if today, return the time only; otherwise say "Yesterday", etc.; and this method shouldn't be called unless day != NoSpecialDay
-		if (day == PriorDay || day == NextDay)
+		if (day == PriorDay || day == NextDay){
+		CFRelease(dateString);
 			return days[day];
+        }
 		return [(id)dateString autorelease];
 	}
     
@@ -122,10 +125,12 @@ static int dayFromAbsoluteTime(CFAbsoluteTime absTime) {
 		int day = dayFromAbsoluteTime(absTime);
 		
 		if (!dateAndTimeFormatter) {
+            CFLocaleRef localeRef2 = CFLocaleCopyCurrent();
 			BOOL horiz = [[GlobalPrefs defaultPrefs] horizontalLayout];
-			dateAndTimeFormatter = CFDateFormatterCreate(kCFAllocatorDefault, CFLocaleCopyCurrent(), 
+			dateAndTimeFormatter = CFDateFormatterCreate(kCFAllocatorDefault, localeRef2,
 														 horiz ? kCFDateFormatterShortStyle : kCFDateFormatterMediumStyle, 
 														 horiz ? kCFDateFormatterNoStyle : kCFDateFormatterShortStyle);
+            CFRelease(localeRef2);
 		}
 		
 		CFDateRef date = CFDateCreate(kCFAllocatorDefault, absTime);
@@ -252,7 +257,7 @@ CFDateFormatterRef simplenoteDateFormatter(int lowPrecision) {
 	return [self stringByTrimmingCharactersInSet:[NSCharacterSet characterSetWithCharactersInString:@"./*: \t\n\r"]];
 }
 
-- (NSString*)filenameExpectingAdditionalCharCount:(int)charCount {
+- (NSString*)filenameExpectingAdditionalCharCount:(NSUInteger)charCount {
 	NSString *newfilename = self;
 	if ([self length] + charCount > 255)
 		newfilename = [self substringToIndex: 255 - charCount];
@@ -267,15 +272,6 @@ CFDateFormatterRef simplenoteDateFormatter(int lowPrecision) {
 	
 }
 
-#if MAC_OS_X_VERSION_MIN_REQUIRED < MAC_OS_X_VERSION_10_5
-- (NSString*)stringByReplacingOccurrencesOfString:(NSString*)stringToReplace withString:(NSString*)replacementString {
-	//NSLog(@"NSString_NV: %s", _cmd);
-	NSMutableString *sanitizedName = [[self mutableCopy] autorelease];
-	[sanitizedName replaceOccurrencesOfString:stringToReplace withString:replacementString options:NSLiteralSearch range:NSMakeRange(0, [sanitizedName length])];
-
-	return sanitizedName;
-}
-#endif
 
 - (NSString*)fourCharTypeString {
 	if ([[self dataUsingEncoding:NSMacOSRomanStringEncoding allowLossyConversion:YES] length] >= 4) {
@@ -314,7 +310,7 @@ CFDateFormatterRef simplenoteDateFormatter(int lowPrecision) {
 	//find the first line, whitespace or no whitespace
 	
 	NSCharacterSet *titleDelimiters = [NSCharacterSet characterSetWithCharactersInString:
-											  [NSString stringWithFormat:@"\n\r\t%C%C", (unichar)NSLineSeparatorCharacter, (unichar)NSParagraphSeparatorCharacter]];
+											  [NSString stringWithFormat:@"\n\r\t%C%C",(unichar) NSLineSeparatorCharacter, (unichar)NSParagraphSeparatorCharacter]];
 	
 	NSScanner *scanner = [NSScanner scannerWithString:self];
 	[scanner setCharactersToBeSkipped:[[[NSMutableCharacterSet alloc] init] autorelease]];
@@ -369,13 +365,13 @@ CFDateFormatterRef simplenoteDateFormatter(int lowPrecision) {
 }
 
 //the following three methods + function come courtesy of Mike Ferris' TextExtras
-+ (NSString *)tabbifiedStringWithNumberOfSpaces:(unsigned)origNumSpaces tabWidth:(unsigned)tabWidth usesTabs:(BOOL)usesTabs {
++ (NSString *)tabbifiedStringWithNumberOfSpaces:(NSInteger)origNumSpaces tabWidth:(NSInteger)tabWidth usesTabs:(BOOL)usesTabs {
 	static NSMutableString *sharedString = nil;
-	static unsigned numTabs = 0;
-    static unsigned numSpaces = 0;
+	static NSInteger numTabs = 0;
+    static NSInteger numSpaces = 0;
 	
-    int diffInTabs;
-    int diffInSpaces;
+    NSInteger diffInTabs;
+    NSInteger diffInSpaces;
 	
     // TabWidth of 0 means don't use tabs!
     if (!usesTabs || (tabWidth == 0)) {
@@ -393,7 +389,7 @@ CFDateFormatterRef simplenoteDateFormatter(int lowPrecision) {
     if (diffInTabs < 0) {
         [sharedString deleteCharactersInRange:NSMakeRange(0, -diffInTabs)];
     } else {
-        unsigned numToInsert = diffInTabs;
+        NSInteger numToInsert = diffInTabs;
         while (numToInsert > 0) {
             [sharedString replaceCharactersInRange:NSMakeRange(0, 0) withString:@"\t"];
             numToInsert--;
@@ -404,7 +400,7 @@ CFDateFormatterRef simplenoteDateFormatter(int lowPrecision) {
     if (diffInSpaces < 0) {
         [sharedString deleteCharactersInRange:NSMakeRange(numTabs, -diffInSpaces)];
     } else {
-        unsigned numToInsert = diffInSpaces;
+        NSInteger numToInsert = diffInSpaces;
         while (numToInsert > 0) {
             [sharedString replaceCharactersInRange:NSMakeRange(numTabs, 0) withString:@" "];
             numToInsert--;
@@ -416,14 +412,14 @@ CFDateFormatterRef simplenoteDateFormatter(int lowPrecision) {
     return sharedString;
 }
 
-- (unsigned)numberOfLeadingSpacesFromRange:(NSRange*)range tabWidth:(unsigned)tabWidth {
+- (NSInteger)numberOfLeadingSpacesFromRange:(NSRange*)range tabWidth:(NSInteger)tabWidth {
     // Returns number of spaces, accounting for expanding tabs.
     NSRange searchRange = (range ? *range : NSMakeRange(0, [self length]));
     unichar buff[100];
     unsigned i = 0;
-    unsigned spaceCount = 0;
+    NSInteger spaceCount = 0;
     BOOL done = NO;
-    unsigned tabW = tabWidth;
+    NSInteger tabW = tabWidth;
     NSUInteger endOfWhiteSpaceIndex = NSNotFound;
 	
     if (!range || range->length == 0) {
@@ -614,13 +610,20 @@ BOOL IsHardLineBreakUnichar(unichar uchar, NSString *str, unsigned charIndex) {
     if (self.length==1) {
         unichar ch=[self characterAtIndex:0];
         NSInteger chNum=(NSInteger)ch;
-//        NSLog(@"ch :%ld Is(:%d >%@<",chNum,(unsigned int)ch==40,self);
-        if (chNum==34){//[@"\"" isEqualToString:self]) {
+        if (chNum==34){
              *matchString=@"\"";
             return 1;
         }
-//         NSLog(@"ch is ]:%d",ch==[@"]" characterAtIndex:0]);
-        if ([[NSCharacterSet characterSetWithCharactersInString:@"([{"]characterIsMember:ch]){
+        static NSCharacterSet *leftSidePairCharacterSet;
+        if(!leftSidePairCharacterSet){
+            leftSidePairCharacterSet=[[NSCharacterSet characterSetWithCharactersInString:@"([{"] retain];
+        }
+        static NSCharacterSet *rightSidePairCharacterSet;
+        if(!rightSidePairCharacterSet){
+            rightSidePairCharacterSet=[[NSCharacterSet characterSetWithCharactersInString:@")]}"] retain];
+        }
+        
+        if ([leftSidePairCharacterSet characterIsMember:ch]){
             if (chNum==91){//[@"[" isEqualToString:self]) {
                 *matchString=@"]";
     //            return @"]";
@@ -632,7 +635,7 @@ BOOL IsHardLineBreakUnichar(unichar uchar, NSString *str, unsigned charIndex) {
     //            return @"}";
             }
             return 2;
-        }else if ([[NSCharacterSet characterSetWithCharactersInString:@")]}"]characterIsMember:ch]) {
+        }else if ([rightSidePairCharacterSet characterIsMember:ch]) {
              if (chNum==93){//if ([@"]" isEqualToString:self]) {
                 *matchString=@"[";
             }else  if (chNum==41){//if ([@")" isEqualToString:self]) {
@@ -652,17 +655,17 @@ BOOL IsHardLineBreakUnichar(unichar uchar, NSString *str, unsigned charIndex) {
 
 @implementation NSMutableString (NV)
 
-- (void)replaceTabsWithSpacesOfWidth:(int)tabWidth {
+- (void)replaceTabsWithSpacesOfWidth:(NSInteger)tabWidth {
 	NSAssert(tabWidth < 50 && tabWidth > 0, @"that's a ridiculous tab width");
 	
 	@try {
 		NSRange tabRange, nextRange = NSMakeRange(0, [self length]);
 		while ((tabRange = [self rangeOfString:@"\t" options:NSLiteralSearch range:nextRange]).location != NSNotFound) {
 			
-			int numberOfSpacesPerTab = tabWidth;
-			int locationOnLine = tabRange.location - [self lineRangeForRange:tabRange].location;
+			NSInteger numberOfSpacesPerTab = tabWidth;
+			NSUInteger locationOnLine = tabRange.location - [self lineRangeForRange:tabRange].location;
 			if (numberOfSpacesPerTab != 0) {
-				int numberOfSpacesLess = locationOnLine % numberOfSpacesPerTab;
+				NSUInteger numberOfSpacesLess = locationOnLine % numberOfSpacesPerTab;
 				numberOfSpacesPerTab = numberOfSpacesPerTab - numberOfSpacesLess;
 			}
 			//NSLog(@"loc on line: %d, numberOfSpacesPerTab: %d", locationOnLine, numberOfSpacesPerTab);
@@ -679,7 +682,7 @@ BOOL IsHardLineBreakUnichar(unichar uchar, NSString *str, unsigned charIndex) {
 			nextRange = NSMakeRange(rangeLoc, [self length] - rangeLoc);
 		}
 	} @catch (NSException *e) {
-		NSLog(@"%s got an exception: %@", _cmd, [e reason]);
+		NSLog(@"%@ got an exception: %@", NSStringFromSelector(_cmd), [e reason]);
 	}
 }
 
@@ -716,7 +719,7 @@ BOOL IsHardLineBreakUnichar(unichar uchar, NSString *str, unsigned charIndex) {
 		NSStringEncoding extendedAttrsEncoding = 0;
 		if (!aPath && fsRef && !IsZeros(fsRef, sizeof(FSRef))) {
 			NSMutableData *pathData = [NSMutableData dataWithLength:4 * 1024];
-			if (FSRefMakePath(fsRef, [pathData mutableBytes], [pathData length]) == noErr)
+			if (FSRefMakePath(fsRef, [pathData mutableBytes], (UInt32)[pathData length]) == noErr)
 				extendedAttrsEncoding = [[NSFileManager defaultManager] textEncodingAttributeOfFSPath:[pathData bytes]];
 		} else if (aPath) {
 			extendedAttrsEncoding = [[NSFileManager defaultManager] textEncodingAttributeOfFSPath:aPath];
@@ -805,11 +808,6 @@ BOOL IsHardLineBreakUnichar(unichar uchar, NSString *str, unsigned charIndex) {
 	
 }
 
-#if MAC_OS_X_VERSION_MIN_REQUIRED < MAC_OS_X_VERSION_10_5
-+ (id)newlineCharacterSet {
-	return [NSCharacterSet characterSetWithCharactersInString:[NSString stringWithFormat:@"%C%C%C",0x000A,0x000D,0x0085]];
-}
-#endif
 
 @end
 

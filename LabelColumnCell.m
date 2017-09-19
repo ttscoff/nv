@@ -23,12 +23,13 @@
 @implementation LabelColumnCell
 
 - (id)init {
-	if ([super init]) {
+	if (self=[super init]) {
 		[self setEditable:YES];
 
 		[self setFocusRingType:	NSFocusRingTypeExterior];
+        return self;
 	}
-	return self;
+	return nil;
 }
 
 - (BOOL)isScrollable {

@@ -26,19 +26,21 @@
 }
 
 - (id)initWithExistingObject:(id<SynchronizedNote>)note {
-    if ([super init]) {
+    if (self=[super init]) {
 		CFUUIDBytes *bytes = [note uniqueNoteIDBytes];
 		uniqueNoteIDBytes = *bytes;
 		syncServicesMD = [[note syncServicesMD] mutableCopy];
 		logSequenceNumber = [note logSequenceNumber];
 		//not serialized: for runtime lookup purposes only
 		originalNote = [note retain];
+    
+        return self;
     }
-    return self;
+	return nil;
 }
 
 - (id)initWithCoder:(NSCoder*)decoder {
-    if ([super init]) {
+    if (self=[super init]) {
 		
 		if ([decoder allowsKeyedCoding]) {
 			NSUInteger decodedByteCount;
@@ -51,8 +53,10 @@
 			syncServicesMD = [[decoder decodeObject] retain];
 			[decoder decodeValueOfObjCType:@encode(unsigned int) at:&logSequenceNumber];
 		}
+    
+        return self;
     }
-    return self;
+	return nil;
 }
 
 - (void)encodeWithCoder:(NSCoder *)coder {

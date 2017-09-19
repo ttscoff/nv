@@ -123,15 +123,15 @@ NSMutableDictionary *ServiceAccountDictInit(NotationPrefs *prefs, NSString* serv
 - (NSUInteger)tableIndexOfDiskUUID:(CFUUIDRef)UUIDRef;
 - (void)checkForKnownRedundantSyncConduitsAtPath:(NSString*)dbPath;
 
-+ (NSString*)pathExtensionForFormat:(int)format;
++ (NSString*)pathExtensionForFormat:(NSInteger)format;
 
 //used to view tableviews
 - (NSString*)typeStringAtIndex:(NSInteger)typeIndex;
 - (NSString*)pathExtensionAtIndex:(NSInteger)pathIndex;
 - (unsigned int)indexOfChosenPathExtension;
-- (NSString*)chosenPathExtensionForFormat:(int)format;
-- (int)typeStringsCount;
-- (int)pathExtensionsCount;
+- (NSString*)chosenPathExtensionForFormat:(NSInteger)format;
+- (NSInteger)typeStringsCount;
+- (NSInteger)pathExtensionsCount;
 
 //used to edit tableviews
 - (void)addAllowedPathExtension:(NSString*)extension;
@@ -142,7 +142,7 @@ NSMutableDictionary *ServiceAccountDictInit(NotationPrefs *prefs, NSString* serv
 - (BOOL)setExtension:(NSString*)newExtension atIndex:(unsigned int)oldIndex;
 - (BOOL)setType:(NSString*)newType atIndex:(unsigned int)oldIndex;
 
-- (BOOL)pathExtensionAllowed:(NSString*)anExtension forFormat:(int)formatID;
+- (BOOL)pathExtensionAllowed:(NSString*)anExtension forFormat:(NSInteger)formatID;
 
 //actually used while searching for files
 - (void)updateOSTypesArray;
@@ -157,6 +157,6 @@ NSMutableDictionary *ServiceAccountDictInit(NotationPrefs *prefs, NSString* serv
 
 - (void)databaseEncryptionSettingsChanged;
 - (void)syncSettingsChangedForService:(NSString*)serviceName;
-- (void)databaseSettingsChangedFromOldFormat:(int)oldFormat;
+- (void)databaseSettingsChangedFromOldFormat:(NSInteger)oldFormat;
 
 @end

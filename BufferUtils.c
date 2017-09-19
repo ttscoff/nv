@@ -241,9 +241,10 @@ CFStringRef CFStringFromBase10Integer(int quantity) {
 	if (asprintf(&buffer, "%d", quantity) < 0 || !buffer)
 		return nil;
 	
+    
 	//try to get on the fast path of __CFStringCreateImmutableFunnel3; most overhead will be in cfruntime allocation, anyway, though, so whatever.
 	CFStringEncoding encoding = CFStringGetSystemEncoding() == kCFStringEncodingMacRoman ? kCFStringEncodingMacRoman : kCFStringEncodingASCII;
-	return CFStringCreateWithCStringNoCopy(kCFAllocatorDefault, buffer, encoding, kCFAllocatorDefault);	
+	return CFAutorelease(CFStringCreateWithCStringNoCopy(kCFAllocatorDefault, buffer, encoding, kCFAllocatorDefault));
 }
 
 unsigned DumbWordCount(const void *s1, size_t len) {
@@ -402,11 +403,11 @@ CFStringRef CreateRandomizedFileName() {
 	printf("error getting process serial number: %d\n", (int)err);
 	
 	//just use the location of our memory
-	psn.lowLongOfPSN = (unsigned long)&psn;
+	psn.lowLongOfPSN = (UInt32)&psn;
     }
     
-    CFStringRef name = CFStringCreateWithFormat(kCFAllocatorDefault, NULL, CFSTR(".%lu%lu-%d-%d"), 
-						psn.highLongOfPSN, psn.lowLongOfPSN, (int)CFAbsoluteTimeGetCurrent(), sequence);
+    CFStringRef name = CFStringCreateWithFormat(kCFAllocatorDefault, NULL, CFSTR(".%u%u-%d-%d"), 
+						(unsigned int)psn.highLongOfPSN, (unsigned int)psn.lowLongOfPSN, (int)CFAbsoluteTimeGetCurrent(), sequence);
     
     return name;
 }

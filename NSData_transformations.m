@@ -105,7 +105,7 @@
 				NSLog(@"decompression failed: %s", zError(zlibError));
 				newData = nil;
 			} else if (originalSize != outSize)
-				NSLog(@"error decompressing: extracted size %u does not match original of %u", outSize, originalSize);
+				NSLog(@"error decompressing: extracted size %lu does not match original of %u", outSize, originalSize);
 		} else
 			NSLog(@"error allocating memory while decompressing");
 	} else
@@ -280,7 +280,7 @@
 //but those 1) require file paths and 2) the non-deprecated version is available only on 10.4
 
 - (NSMutableString*)newStringUsingBOMReturningEncoding:(NSStringEncoding*)encoding {
-	unsigned len = [self length];
+	NSUInteger len = [self length];
 	NSMutableString *string = nil;
 	
 	if (len % 2 != 0 || !len) {
@@ -425,11 +425,11 @@
 	}
 	//check IV and key lengths
 	if ((int)[iv length] != EVP_CIPHER_CTX_iv_length(&cipherContext)) {
-		NSLog(@"initialization vector length was wrong size: %u", [iv length]);
+		NSLog(@"initialization vector length was wrong size: %lu", (unsigned long)[iv length]);
 		return NO;
 	}
 	if ((int)[key length] != EVP_CIPHER_CTX_key_length(&cipherContext)) {
-		NSLog(@"encryption key length was wrong size: %u", [key length]);
+		NSLog(@"encryption key length was wrong size: %lu", (unsigned long)[key length]);
 		return NO;
 	}
 	
@@ -475,11 +475,11 @@
 	}
 	//check IV and key lengths
 	if ((int)[iv length] != EVP_CIPHER_CTX_iv_length(&cipherContext)) {
-		NSLog(@"initialization vector length was wrong size: %u", [iv length]);
+		NSLog(@"initialization vector length was wrong size: %lu", (unsigned long)[iv length]);
 		return NO;
 	}
 	if ((int)[key length] != EVP_CIPHER_CTX_key_length(&cipherContext)) {
-		NSLog(@"decryption key length was wrong size: %u", [key length]);
+		NSLog(@"decryption key length was wrong size: %lu", (unsigned long)[key length]);
 		return NO;
 	}
 	

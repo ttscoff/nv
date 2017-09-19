@@ -244,7 +244,7 @@ static void SNReachabilityCallback(SCNetworkReachabilityRef	target, SCNetworkCon
 		return nil;
 	}
 	
-	if ([self initWithUsername:[[prefs syncAccountForServiceName:SimplenoteServiceName] objectForKey:@"username"] 
+	if (self=[self initWithUsername:[[prefs syncAccountForServiceName:SimplenoteServiceName] objectForKey:@"username"]
 				   andPassword:[prefs syncPasswordForServiceName:SimplenoteServiceName]]) {
 		
 		//create a reachability ref to trigger a sync upon network reestablishment
@@ -257,12 +257,12 @@ static void SNReachabilityCallback(SCNetworkReachabilityRef	target, SCNetworkCon
 
 - (id)initWithUsername:(NSString*)aUserString andPassword:(NSString*)aPassString {
 	
-	if ([super init]) {
+	if (self=[super init]) {
 		lastSyncedTime = 0.0;
 		reachabilityFailed = NO;
 
 		if (![(emailAddress = [aUserString retain]) length]) {
-			NSLog(@"%s: empty email address", _cmd);
+			NSLog(@"%@: empty email address", NSStringFromSelector(_cmd));
 			return nil;
 		}
 		if (![(password = [aPassString retain]) length]) {
@@ -272,12 +272,13 @@ static void SNReachabilityCallback(SCNetworkReachabilityRef	target, SCNetworkCon
 		notesBeingModified = [[NSMutableSet alloc] init];
 		unsyncedServiceNotes = [[NSMutableSet alloc] init];
 		collectorsInProgress = [[NSMutableSet alloc] init];
+        return self;
 	}
-	return self;
+    return nil;
 }
 
 - (NSString*)description {
-	return [NSString stringWithFormat:@"SimplenoteSession<%@,%X>", emailAddress, self];
+	return [NSString stringWithFormat:@"SimplenoteSession<%@,%@>", emailAddress, self];
 }
 
 - (id)copyWithZone:(NSZone *)zone {
@@ -469,7 +470,7 @@ static void SNReachabilityCallback(SCNetworkReachabilityRef	target, SCNetworkCon
 	if ([unsyncedServiceNotes count] > 0) {
 		
 		if ([listFetcher isRunning] || [changesFetcher isRunning]) {
-			NSLog(@"%s: not pushing because a full sync index is in progress", _cmd);
+			NSLog(@"%@: not pushing because a full sync index is in progress", NSStringFromSelector(_cmd));
 			return NO;
 		}
 		
@@ -755,7 +756,7 @@ static void SNReachabilityCallback(SCNetworkReachabilityRef	target, SCNetworkCon
 	//because there could be many notes missing
 	//although notes that encountered errors normally (entriesInError w/o stopping) will potentially be duplicated anyway.
 	if ([collector collectionStoppedPrematurely]) {
-		NSLog(@"%s: not merging notes because collection was cancelled", _cmd);
+		NSLog(@"%@: not merging notes because collection was cancelled", NSStringFromSelector(_cmd));
 		return;
 	}
 	NSMutableArray *entries = [NSMutableArray arrayWithCapacity:[[collector entriesCollected] count]];
@@ -826,15 +827,16 @@ static void SNReachabilityCallback(SCNetworkReachabilityRef	target, SCNetworkCon
 	}
 		
 	if ([downloadedNotesToKeep count]) {
+		NSLog(@"%@: found %lu genuinely new notes on the server",NSStringFromSelector(_cmd), (unsigned long)[downloadedNotesToKeep count]);
 		NSLog(@"%s: found %lu genuinely new notes on the server",_cmd, (unsigned long)[downloadedNotesToKeep count]);
 		[delegate syncSession:self receivedAddedNotes:downloadedNotesToKeep];
 	}
 	if ([notesToReportModified count]) {
-		NSLog(@"%s: found %lu duplicate notes on the server",_cmd, (unsigned long)[notesToReportModified count]);
+		NSLog(@"%@: found %lu duplicate notes on the server",NSStringFromSelector(_cmd), (unsigned long)[notesToReportModified count]);
 		[delegate syncSession:self didModifyNotes:notesToReportModified];
 	}
 	if ([localNotesToUpload count] && ![collector collectionStoppedPrematurely]) {
-		NSLog(@"%s: found %lu locally unique notes",_cmd, (unsigned long)[localNotesToUpload count]);
+		NSLog(@"%@: found %lu locally unique notes",NSStringFromSelector(_cmd), (unsigned long)[localNotesToUpload count]);
 		//automatically upload the rest of the unique notes using -startCreatingNotes:
 		[self startCreatingNotes:[localNotesToUpload allObjects]];
 	}
@@ -1115,7 +1117,7 @@ static void SNReachabilityCallback(SCNetworkReachabilityRef	target, SCNetworkCon
 			}
 		}
 		if ([fetcher statusCode] == 400 || [fetcher statusCode] == 401 || [fetcher statusCode] == 404) {
-			NSLog(@"changes fetcher error code: %u", [fetcher statusCode]);
+			NSLog(@"changes fetcher error code: %ld", (long)[fetcher statusCode]);
 			[lastCV release];
 			lastCV = nil;
 			[changesFetcher autorelease];
@@ -1136,7 +1138,7 @@ static void SNReachabilityCallback(SCNetworkReachabilityRef	target, SCNetworkCon
 			[entriesDict setObject:[rawEntries objectAtIndex:i] forKey:[rawEntry objectForKey:@"id"]];
 			lastCV = [[rawEntry objectForKey:@"cv"] copy];
 		}
-		NSLog(@"remote: %u updates", [rawEntries count]);
+		NSLog(@"remote: %lu updates", (unsigned long)[rawEntries count]);
 		for (NSString *noteKey in entriesDict) {
 			NSDictionary *rawEntry = [entriesDict objectForKey:noteKey];
 			NSNumber *version = [rawEntry objectForKey:@"ev"];

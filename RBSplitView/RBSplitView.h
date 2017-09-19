@@ -173,6 +173,12 @@ typedef enum {
 // You could also draw the divider yourself at this point and return NSZeroRect.
 - (NSRect)splitView:(RBSplitView*)sender willDrawDividerInRect:(NSRect)dividerRect betweenView:(RBSplitSubview*)leading andView:(RBSplitSubview*)trailing withProposedRect:(NSRect)imageRect;
 
+
+// These methods are called after a subview is completely collapsed or expanded. adjustSubviews may or may not
+// have been called, however.
+- (void)splitView:(RBSplitView*)sender willCollapse:(RBSplitSubview*)subview;
+- (void)splitView:(RBSplitView*)sender willExpand:(RBSplitSubview*)subview;
+
 // These methods are called after a subview is completely collapsed or expanded. adjustSubviews may or may not
 // have been called, however.
 - (void)splitView:(RBSplitView*)sender didCollapse:(RBSplitSubview*)subview;

@@ -663,3 +663,7 @@
 
 /* menu item title for collapsing notes list */
 "Collapse Notes List" = "Notizliste einklappen";
+
+/* Menu Item for Use Selection for Find */
+"Use Selection for Find" = "Use Selection for Find";
+

@@ -23,11 +23,71 @@
 
 #define kMaxDataSize 4096
 
-- (BOOL)isMavericksOrLater {
-	SInt32 majorVersion, minorVersion, bugFixVersion;
-	Gestalt(gestaltSystemVersionMajor, &majorVersion);
-	Gestalt(gestaltSystemVersionMinor, &minorVersion);
-	Gestalt(gestaltSystemVersionBugFix, &bugFixVersion);
+- (NSArray *)mergedTagsForFileAtPath:(const char*)path
+{
+    NSArray *existingFinderTags=(NSArray *)[self getFinderTagsAtFSPath:path];
+    
+	NSArray *openMetaTags = (NSArray *)[self getOpenMetaTagsAtFSPath:path];
+    NSUInteger ct=0;
+    if (openMetaTags!=nil) {
+        ct=openMetaTags.count;
+    }
+    if (existingFinderTags!=nil) {
+        ct+=existingFinderTags.count;
+    }
+    if (ct>0) {
+        NSMutableSet *finalTagSet=[[NSMutableSet alloc]initWithCapacity:ct];
+        if (openMetaTags&&openMetaTags.count>0) {
+            [finalTagSet addObjectsFromArray:openMetaTags];
+        }
+        if ((existingFinderTags!=nil)&&(existingFinderTags.count>0)) {
+            [finalTagSet addObjectsFromArray:existingFinderTags];
+        }
+        NSArray *finalTags;
+        if (finalTagSet.count>0) {
+            finalTags=[NSArray arrayWithArray:[finalTagSet allObjects]];
+        }else{
+            finalTags=@[];
+        }
+        
+        [finalTagSet release];
+        return finalTags;
+    }else{
+        return @[];
+    }
+}
+
+- (id)getTagsAtFSPath:(const char*)path
+{
+	if ([[NSUserDefaults standardUserDefaults] boolForKey:@"UseFinderTags"])
+	{
+		return [self getFinderTagsAtFSPath:path];
+	}
+	else
+	{
+		return [self getOpenMetaTagsAtFSPath:path];
+	}
+}
+
+- (id)getFinderTagsAtFSPath:(const char*)path
+{
+	if (!path){
+        NSLog(@"nopath");
+        return nil;
+    }
+
+    NSString *newPath=[NSString stringWithCString:path encoding:NSUTF8StringEncoding];
+	NSURL *url = [NSURL fileURLWithPath:newPath];
+	NSArray *existingTags=nil;
+	NSError *error=nil;
+	if (![url getResourceValue:&existingTags forKey:NSURLTagNamesKey error:&error])	{
+        NSLog(@"trouble getting finder tags:%@",error);
+		return nil;
+	}
+	else
+	{
+		return existingTags;
+	}
 
 	return minorVersion >= 9;
 }
@@ -61,11 +121,11 @@
 
 	// ok, we have some data
 	NSPropertyListFormat formatFound;
-	NSString* errorString = nil;
-	id outObject = [NSPropertyListSerialization propertyListFromData:nsData mutabilityOption:kCFPropertyListImmutable format:&formatFound errorDescription:&errorString];
-	if (errorString) {
-		NSLog(@"%s: error deserializing labels: %@", _cmd, errorString);
-		[errorString autorelease];
+    NSError *err=nil;
+	id outObject = [NSPropertyListSerialization propertyListWithData:nsData options:NSPropertyListImmutable format:&formatFound error:&err];
+	if (err) {
+		NSLog(@"%@: error deserializing labels: %@", NSStringFromSelector(_cmd), err);
+//		[err autorelease];
 		return nil;
 	}
 
@@ -74,11 +134,45 @@
 }
 
 
+- (BOOL)setTags:(id)plistObject atFSPath:(const char*)path {
+	if ([[NSUserDefaults standardUserDefaults] boolForKey:@"UseFinderTags"])
+	{
+		return [self setFinderTags:plistObject atFSPath:path];
+	}
+	else
+	{
+		return [self setOpenMetaTags:plistObject atFSPath:path];
+	}
+}
+
+- (BOOL)setFinderTags:(id)plistObject atFSPath:(const char*)path
+{
+	if (!path){
+        NSLog(@"setting but no path");
+        return NO;
+    }
+	NSURL *url = [NSURL fileURLWithPath:[NSString stringWithCString:path encoding:NSUTF8StringEncoding]];
+	NSArray *tagArray = [NSArray arrayWithArray:plistObject];
+	NSError *error=nil;
+	if (![url setResourceValue:tagArray forKey:NSURLTagNamesKey error:&error])
+	{
+		NSLog(@"%@", error);
+		NSLog(@"Error setting Finder tags for %@", [url path]);
+		return NO;
+	}
+	else
+	{
+		return YES;
+	}
+}
+
+
 - (BOOL)setOpenMetaTags:(id)plistObject atFSPath:(const char*)path {
 	if (!path) return NO;
 
 	// If the object passed in has no data - is a string of length 0 or an array or dict with 0 objects, then we remove the data at the key.
 	const char* inKeyNameC;
+	const char* inKeyNameC = "com.apple.metadata:kMDItemOMUserTags";
 	if ( [self isMavericksOrLater] ) {
 		inKeyNameC = "com.apple.metadata:kMDItemUserTags";
 	} else {
@@ -93,7 +187,7 @@
 		NSString *errorString = nil;
 		dataToSendNS = [NSPropertyListSerialization dataFromPropertyList:plistObject format:kCFPropertyListBinaryFormat_v1_0 errorDescription:&errorString];
 		if (errorString) {
-			NSLog(@"%s: error serializing labels: %@", _cmd, errorString);
+			NSLog(@"%@: error serializing labels: %@", NSStringFromSelector(_cmd), errorString);
 			[errorString autorelease];
 			return NO;
 		}
@@ -109,7 +203,7 @@
 	}
 
 	if (returnVal < 0) {
-		if (errno != ENOATTR) NSLog(@"%s: couldn't set/remove attribute: %d (value '%@')", _cmd, errno, dataToSendNS);
+		if (errno != ENOATTR) NSLog(@"%@: couldn't set/remove attribute: %d (value '%@')", NSStringFromSelector(_cmd), errno, dataToSendNS);
 		return NO;
 	}
 
@@ -124,7 +218,7 @@
 
 	CFStringEncoding cfStringEncoding = CFStringConvertNSStringEncodingToEncoding(encoding);
 	if (cfStringEncoding == kCFStringEncodingInvalidId) {
-		NSLog(@"%s: encoding %lu is invalid!", _cmd, encoding);
+		NSLog(@"%@: encoding %lu is invalid!", NSStringFromSelector(_cmd), encoding);
 		return NO;
 	}
 	NSString *textEncStr = [(NSString *)CFStringConvertEncodingToIANACharSetName(cfStringEncoding) stringByAppendingFormat:@";%@",
@@ -203,5 +297,55 @@ errorReturn:
 	return path;
 }
 
+- (BOOL)createFolderAtPath:(NSString *)path{
+    return [self createFolderAtPath:path withAttributes:nil];
+}
+
+- (BOOL)createFolderAtPath:(NSString *)path withAttributes:(NSDictionary *)attributes{
+    NSError *err=nil;
+    if (![self createDirectoryAtPath:path withIntermediateDirectories:NO attributes:attributes error:&err]||(err!=nil)) {
+        NSLog(@"trouble creating directory at path:>%@<",[err description]);
+        return NO;
+    }else{
+        return YES;
+    }
+}
+
+- (NSDictionary *)attributesAtPath:(NSString *)path followLink:(BOOL)follow{
+    
+    if (follow) {
+        path=[path stringByResolvingSymlinksInPath];
+    }
+    NSError *err=nil;
+    NSDictionary *dict=[self attributesOfItemAtPath:path error:&err];
+    if ((dict!=nil)&&(err==nil)) {
+        return dict;
+    }else if (err) {
+        NSLog(@"trouble getting attributes at path:>%@<\ndict:%@",[err description],dict);
+    }
+    
+    return [NSDictionary dictionary];
+}
+
+- (NSArray *)folderContentsAtPath:(NSString *)path{
+    NSError *err=nil;
+    NSArray *arr=[self contentsOfDirectoryAtPath:path error:&err];
+    if ((arr!=nil)&&(err==nil)) {
+        return arr;
+    }else if (err) {
+        NSLog(@"trouble getting contents of path:>%@<",[err description]);
+    }
+    return @[];
+}
+
+- (BOOL)deleteFileAtPath:(NSString *)path{
+    NSError *err=nil;
+    if([self removeItemAtPath:path error:&err]&&(err==nil)){
+        return YES;
+    }else if(err){
+        NSLog(@"trouble removing file at path:>%@<",err.localizedDescription);
+    }
+    return NO;
+}
 
 @end

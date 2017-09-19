@@ -64,9 +64,7 @@ static void _CopyItemWithSelectorFromMenu(NSMenu *destMenu, NSMenu *sourceMenu, 
 		headerView = [[HeaderViewWithMenu alloc] init];
 		[headerView setTableView:self];
 		[headerView setFrame:[[self headerView] frame]];
-		//	cornerView = [[self cornerView] retain];	
-		[self setCornerView:nil];	
-		//cornerView =[[[NotesTableCornerView alloc] initWithFrame:[[self cornerView] bounds]] retain];
+
 		NSArray *columnsToDisplay = [globalPrefs visibleTableColumns];
 		allColumns = [[NSMutableArray alloc] initWithCapacity:4];
 		allColsDict = [[NSMutableDictionary alloc] initWithCapacity:4];
@@ -82,7 +80,7 @@ static void _CopyItemWithSelectorFromMenu(NSMenu *destMenu, NSMenu *sourceMenu, 
 		NSInteger (*reverseSortFunctions[])(id*, id*) = { compareTitleStringReverse, compareLabelStringReverse, compareDateModifiedReverse, 
 			compareDateCreatedReverse };
 		
-		unsigned int i;
+		NSUInteger i;
 		for (i=0; i<sizeof(colStrings)/sizeof(NSString*); i++) {
 			NoteAttributeColumn *column = [[NoteAttributeColumn alloc] initWithIdentifier:colStrings[i]];
 			[column setEditable:(colMutators[i] != NULL)];
@@ -98,7 +96,7 @@ static void _CopyItemWithSelectorFromMenu(NSMenu *destMenu, NSMenu *sourceMenu, 
 			[allColumns addObject:column];
 			[column release];
 		}
-		
+        
 		[[self noteAttributeColumnForIdentifier:NoteLabelsColumnString] setDataCell: [[[LabelColumnCell alloc] init] autorelease]];
         
 		[self _configureAttributesForCurrentLayout];
@@ -106,10 +104,10 @@ static void _CopyItemWithSelectorFromMenu(NSMenu *destMenu, NSMenu *sourceMenu, 
 		//[self setVerticalMotionCanBeginDrag:NO];
 		
 		BOOL hideHeader = (([columnsToDisplay count] == 1 && [columnsToDisplay containsObject:NoteTitleColumnString]) || [globalPrefs horizontalLayout]);
-		if (hideHeader) {
-			[[self cornerView] setFrameOrigin:NSMakePoint(-1000,-1000)];
-			[self setCornerView:nil];
-		}
+
+        [[self cornerView] setFrameOrigin:NSMakePoint(-1000,-1000)];
+        [self setCornerView:nil];
+
 		[self setHeaderView:hideHeader ? nil : headerView];
 		
 		[[self noteAttributeColumnForIdentifier:NoteTitleColumnString] setResizingMask:NSTableColumnUserResizingMask | NSTableColumnAutoresizingMask];
@@ -286,10 +284,10 @@ static void _CopyItemWithSelectorFromMenu(NSMenu *destMenu, NSMenu *sourceMenu, 
 		[[[allColumns objectAtIndex:i] dataCell] setFont:font];
 	}	
 	BOOL isOneRow = !horiz || (![globalPrefs tableColumnsShowPreview] && !ColumnIsSet(NoteLabelsColumn, [globalPrefs tableColumnsBitmap]));
-	
-	if (IsLeopardOrLater)
-		[self setSelectionHighlightStyle:isOneRow ? NSTableViewSelectionHighlightStyleRegular : NSTableViewSelectionHighlightStyleSourceList];
-	
+    if (IsLeopardOrLater){
+//        [self setSelectionHighlightStyle:NSTableViewSelectionHighlightStyleRegular];
+        [self setSelectionHighlightStyle:isOneRow ? NSTableViewSelectionHighlightStyleRegular : NSTableViewSelectionHighlightStyleSourceList];
+    }
 	NSLayoutManager *lm = [[NSLayoutManager alloc] init];
 	tableFontHeight = [lm defaultLineHeightForFont:font];
 	float h[4] = {(tableFontHeight * 3.0 + 5.0f), (tableFontHeight * 2.0 + 6.0f), (tableFontHeight + 2.0f), tableFontHeight + 2.0f};
@@ -312,14 +310,13 @@ static void _CopyItemWithSelectorFromMenu(NSMenu *destMenu, NSMenu *sourceMenu, 
 		[self abortEditing];
 		
 		//restore columns according to the current preferences
-		
 		[self restoreColumns];
-		[self updateHeaderViewForColumns];
-		
+        
 		[self _configureAttributesForCurrentLayout];
-		
-		[self updateTitleDereferencorState];
-		
+        
+        [self updateTitleDereferencorState];
+        [self updateHeaderViewForColumns];
+
 		viewMenusValid = NO;
 	}else if (([selectorString isEqualToString:SEL_STR(setShowGrid:sender:)])||([selectorString isEqualToString:SEL_STR(setAlternatingRows:sender:)]) ) {
         if (([selectorString isEqualToString:SEL_STR(setAlternatingRows:sender:)])) {
@@ -374,7 +371,7 @@ static void _CopyItemWithSelectorFromMenu(NSMenu *destMenu, NSMenu *sourceMenu, 
 			NSInteger lastRow = [self numberOfRows] - 1;
 			
 			if (ctx.pivotRowWasEdge && (pivotIndex != 0 && pivotIndex != lastRow)) {
-				pivotIndex = abs(pivotIndex - 0) < abs(pivotIndex - lastRow) ? 0 : lastRow;
+				pivotIndex = ABS(pivotIndex - 0) < ABS(pivotIndex - lastRow) ? 0 : lastRow;
 				ctx.verticalDistanceToPivotRow = 0;
 				//NSLog(@"edge pivot dislodged!");
 			}
@@ -470,7 +467,7 @@ static void _CopyItemWithSelectorFromMenu(NSMenu *destMenu, NSMenu *sourceMenu, 
 	if (oldHeader != newHeader) {
 		//[headerView setTableView:newHeader ? self : nil];
 		[self setHeaderView:newHeader];
-		[self setCornerView:newHeader ? cornerView : nil];
+		[self setCornerView: nil];
 		
 		if ([self respondsToSelector:@selector(_sizeRowHeaderToFitIfNecessary)]) {
 			//hopefully 10.5 has this
@@ -508,6 +505,19 @@ static void _CopyItemWithSelectorFromMenu(NSMenu *destMenu, NSMenu *sourceMenu, 
 		
 		if ([[globalPrefs visibleTableColumns] count] > 1) {
 			[self abortEditing];
+            if([[globalPrefs sortedTableColumnKey] isEqualToString:[column identifier]]){
+                if(![[column identifier] isEqualToString:NoteTitleColumnString]&&[[globalPrefs visibleTableColumns] containsObject:NoteTitleColumnString]){
+                    [self setStatusForSortedColumn: [self tableColumnWithIdentifier:NoteTitleColumnString]];
+                }else{
+                    NSUInteger idex=[[globalPrefs visibleTableColumns]indexOfObjectPassingTest:^BOOL(NSString *obj, NSUInteger idx, BOOL *stop) {
+                        return ![obj isEqualToString:[column identifier]];
+                    }];
+                    if(idex!=NSNotFound){
+                        [self setStatusForSortedColumn:[self tableColumnWithIdentifier:[[globalPrefs visibleTableColumns]objectAtIndex:idex]]];
+                    }
+                }                
+            }
+
 			[self removeTableColumn:column];
 			[globalPrefs removeTableColumn:[column identifier] sender:self];
 			viewMenusValid = NO;
@@ -673,11 +683,11 @@ static void _CopyItemWithSelectorFromMenu(NSMenu *destMenu, NSMenu *sourceMenu, 
 - (NSMenu *)menuForEvent:(NSEvent *)theEvent {    
 //    [[NSNotificationCenter defaultCenter] postNotificationName:@"ModTimersShouldReset" object:nil];
     NSPoint mousePoint = [self convertPoint:[theEvent locationInWindow] fromView:nil];
-    int row = [self rowAtPoint:mousePoint];
+    NSInteger row = [self rowAtPoint:mousePoint];
 	
     if (row >= 0) {
 		[self selectRowIndexes:[NSIndexSet indexSetWithIndex:row]
-		  byExtendingSelection:[[self selectedRowIndexes] containsIndex:row] && [[self selectedRowIndexes] count] > 1];
+		  byExtendingSelection:[[self selectedRowIndexes] containsIndex:(NSUInteger)row] && [[self selectedRowIndexes] count] > 1];
 	}
 	
 	if (![self numberOfSelectedRows])
@@ -781,17 +791,17 @@ static void _CopyItemWithSelectorFromMenu(NSMenu *destMenu, NSMenu *sourceMenu, 
 		[[self window] makeKeyAndOrderFront:self];
 	}
 	
-	unsigned int flags = [event modifierFlags]; 
+	NSUInteger flags = [event modifierFlags];
     if (flags & NSAlternateKeyMask) { // option click starts a drag 
 		
 		NSPoint mousePoint = [self convertPoint:[event locationInWindow] fromView:nil];
         NSPoint dragPoint = NSMakePoint(mousePoint.x - 16, mousePoint.y + 16); 
 		NSIndexSet *selectedRows = [self selectedRowIndexes];
 		
-		int row = [self rowAtPoint:mousePoint];
+		NSInteger row = [self rowAtPoint:mousePoint];
 		if (row >= 0) {
 			[self selectRowIndexes:[NSIndexSet indexSetWithIndex:row]
-			  byExtendingSelection:[selectedRows containsIndex:row] && [selectedRows count] > 1];
+			  byExtendingSelection:[selectedRows containsIndex:(NSUInteger)row] && [selectedRows count] > 1];
 			//changed selected rows:
 			selectedRows = [self selectedRowIndexes];
 		}
@@ -835,9 +845,9 @@ static void _CopyItemWithSelectorFromMenu(NSMenu *destMenu, NSMenu *sourceMenu, 
 	unichar keyChar = [theEvent firstCharacter];
 
     if (keyChar == NSNewlineCharacter || keyChar == NSCarriageReturnCharacter || keyChar == NSEnterCharacter) {
-		unsigned int sel = [self selectedRow];
+		NSInteger sel = [self selectedRow];
 		if (sel < (unsigned)[self numberOfRows] && [self numberOfSelectedRows] == 1) {
-			int colIndex = [self columnWithIdentifier:NoteTitleColumnString];
+			NSInteger colIndex = [self columnWithIdentifier:NoteTitleColumnString];
 			if (colIndex > -1) {
 				[self editColumn:colIndex row:sel withEvent:theEvent select:YES];
 			} else {
@@ -874,20 +884,20 @@ static void _CopyItemWithSelectorFromMenu(NSMenu *destMenu, NSMenu *sourceMenu, 
 		if (DOWNCHAR(keyChar) || UPCHAR(keyChar)) {
 			
 			NSIndexSet *indexes = [self selectedRowIndexes];
-			int count = [indexes count];
+			NSUInteger count = [indexes count];
 			if (count <= 1) {                 // reset affinity, since there's at most one item selected
 				affinity = 0;
 			} else if (affinity == 0) {                     // affinity not set, so take current direction
 				affinity = DOWNCHAR(keyChar) ? 1 : -1;      // down == down-document == means positive affinity
 			} else {
-				int row = -1;                           // affinity had been set, so enforce it
+				NSUInteger row = NSNotFound;                           // affinity had been set, so enforce it
 				if (DOWNCHAR(keyChar) && (affinity != 1)) {           // down not allowed here
 					row = [indexes firstIndex];
 				} else if (UPCHAR(keyChar) && (affinity != -1)) {    // up not allowed here
 					row = [indexes lastIndex];
 				}
-				if (row >= 0) {
-					int scrollTo = row - affinity;
+				if (row !=NSNotFound) {
+					NSInteger scrollTo = (NSInteger)row - affinity;
 					[self scrollRowToVisible:scrollTo];  // make sure we can see things
 					[self deselectRow:row];         // deselect the last row
 					return;     // skip further processing of the key event
@@ -924,7 +934,7 @@ enum { kNext_Tag = 'j', kPrev_Tag = 'k' };
 - (BOOL)performKeyEquivalent:(NSEvent *)theEvent {
 //   [[NSApp delegate] resetModTimers];
 //    [[NSNotificationCenter defaultCenter] postNotificationName:@"ModTimersShouldReset" object:nil];
-	unsigned mods = [theEvent modifierFlags];
+	NSUInteger mods = [theEvent modifierFlags];
 	
 	BOOL isControlKeyPressed = (mods & NSControlKeyMask) != 0 && [userDefaults boolForKey: @"UseCtrlForSwitchingNotes"];
 	BOOL isCommandKeyPressed = (mods & NSCommandKeyMask) != 0;
@@ -970,8 +980,8 @@ enum { kNext_Tag = 'j', kPrev_Tag = 'k' };
 }
 
 - (void)_incrementNoteSelectionByTag:(NSInteger)tag {
-	int rowNumber = [self selectedRow];
-	int totalNotes = [self numberOfRows];
+	NSInteger rowNumber = [self selectedRow];
+	NSInteger totalNotes = [self numberOfRows];
 	
 	if (rowNumber == -1) {
 		rowNumber = (tag == kPrev_Tag ? totalNotes - 1 : 0);
@@ -1350,7 +1360,13 @@ enum { kNext_Tag = 'j', kPrev_Tag = 'k' };
     [super drawGridInClipRect:clipRect];
 }
 
++ (BOOL)isCompatibleWithResponsiveScrolling{
+    return NO;
+}
+
 - (void)setBackgroundColor:(NSColor *)color{
+    [super setBackgroundColor:color];
+     
     if (![[color colorSpaceName] isEqualToString:@"NSNamedColorSpace"]) {
         [NotesTableHeaderCell setBColor:color];
         CGFloat fWhite;
@@ -1362,16 +1378,18 @@ enum { kNext_Tag = 'j', kPrev_Tag = 'k' };
         }else {
             fWhite -= 0.20f;
         }
-        [self setGridColor:[NSColor colorWithCalibratedWhite:fWhite alpha:0.7f]];
+        
+        [self setGridColor:[[color blendedColorWithFraction:0.18f ofColor:[self gridColor]] blendedColorWithFraction:0.26f ofColor:[NSColor colorWithCalibratedWhite:fWhite alpha:1.0f]]];
+        [self setNeedsDisplay:YES];
     }
-    [super setBackgroundColor:color];
 }
 
 # pragma mark alternating rows 
 - (void)drawBackgroundInClipRect:(NSRect)clipRect{
 	if (![self usesAlternatingRowBackgroundColors]) {
-        [[self backgroundColor]setFill];
-        NSRectFill(clipRect);
+        [super drawBackgroundInClipRect:clipRect];
+//        [[self backgroundColor]setFill];
+//        NSRectFill(clipRect);
     }else{
         NSColor *backColor=[self backgroundColor];
         NSColor *altColor;
@@ -1415,7 +1433,7 @@ enum { kNext_Tag = 'j', kPrev_Tag = 'k' };
     if (![self dataSource]) {
 		return;
 	}
-    [super highlightSelectionInClipRect:clipRect];
+        [super highlightSelectionInClipRect:clipRect];
 }
 
 @end

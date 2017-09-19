@@ -19,6 +19,10 @@
 //{
 //}
 
++ (BOOL)isCompatibleWithResponsiveScrolling{
+    return NO;
+}
+
 - (id)initWithFrame:(NSRect)frameRect{
 	if ((self=[super initWithFrame:frameRect])) {	
         fillBackground=NO;
@@ -39,15 +43,30 @@
         knobAlpha=0.45f;
 		[self setArrowsPosition:NSScrollerArrowsNone];
         
-        isOverlay=NO;        
+//        isOverlay=NO;        
 #if MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_7
         if (IsLionOrLater) {
-            isOverlay=[[self class]isCompatibleWithOverlayScrollers];
+//            isOverlay=[[self class]isCompatibleWithOverlayScrollers];
         }
 #endif
 	}
 	return self;
 }
+
+#if MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_7
++ (BOOL)isCompatibleWithOverlayScrollers {
+    return NO;
+}
+
++ (NSScrollerStyle)preferredScrollerStyle{
+//    if ([[NSScroller class]preferredScrollerStyle]==NSScrollerStyleOverlay) {
+//        
+//    }
+    return NSScrollerStyleLegacy;
+}
+
+
+#endif
 
 - (void)dealloc{
     [knobTop release];
@@ -130,9 +149,7 @@
 //    [super trackKnob:theEvent];
 //}
 
-- (NSRect)rectForPart:(NSScrollerPart)aPart;
-{
-    
+- (NSRect)rectForPart:(NSScrollerPart)aPart{    
 	switch (aPart)
 	{
 		case NSScrollerNoPart:

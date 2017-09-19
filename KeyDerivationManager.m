@@ -28,7 +28,7 @@
 	lastHashIterationCount = [notationPrefs hashIterationCount];
 	lastHashDuration = [self delayForHashIterations:lastHashIterationCount];
 	
-	if (![self init]) {
+	if (!(self=[self init])) {
 		[self release];
 		return nil;
 	}
@@ -49,7 +49,7 @@
 }
 
 - (id)init {
-	if ([super init]) {
+	if (self=[super init]) {
 		if (!view) {
 			if (![NSBundle loadNibNamed:@"KeyDerivationManager" owner:self])  {
 				NSLog(@"Failed to load KeyDerivationManager.nib");
@@ -57,9 +57,10 @@
 				return nil;
 			}
 		}
-	}
 		
-	return self;
+        return self;
+	}
+    return nil;
 }
 
 - (void)dealloc {

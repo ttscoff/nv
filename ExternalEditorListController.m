@@ -34,7 +34,7 @@ NSString *ExternalEditorsChangedNotification = @"ExternalEditorsChanged";
 @implementation ExternalEditor
 
 - (id)initWithBundleID:(NSString*)aBundleIdentifier resolvedURL:(NSURL*)aURL {
-	if ([self init]) {
+	if (self=[self init]) {
 		bundleIdentifier = [aBundleIdentifier retain];
 		resolvedURL = [aURL retain];
 		
@@ -42,11 +42,14 @@ NSString *ExternalEditorsChangedNotification = @"ExternalEditorsChanged";
 		if (!bundleIdentifier) {
 			if (!(bundleIdentifier = [[[NSBundle bundleWithPath:[aURL path]] bundleIdentifier] copy])) {
 				NSLog(@"initWithBundleID:resolvedURL: URL does not seem to point to a valid bundle");
+                [self dealloc];
 				return nil;
 			}
 		}
+        return self;
 	}
-	return self;
+    [self dealloc];
+	return nil;
 }
 
 - (BOOL)canEditNoteDirectly:(NoteObject*)aNote {
@@ -187,22 +190,24 @@ static ExternalEditorListController* sharedInstance = nil;
 }
 
 - (id)initWithUserDefaults {
-	if ([self init]) {
+	if (self=[self init]) {
 		//TextEdit is not an ODB editor, but can be used to open files directly
 		[[NSUserDefaults standardUserDefaults] registerDefaults:
 		 [NSDictionary dictionaryWithObject:[NSArray arrayWithObject:@"com.apple.TextEdit"] forKey:UserEEIdentifiersKey]];
 	
 		[self _initDefaults];
+        return self;
 	}
-	return self;
+	return nil;
 }
 
 - (id)init {
-	if ([super init]) {
+	if (self=[super init]) {
 		
-		userEditorList = [[NSMutableArray alloc] init];		
+		userEditorList = [[NSMutableArray alloc] init];
+        return self;
 	}
-	return self;
+	return nil;
 }
 
 - (void)_initDefaults {
@@ -262,10 +267,13 @@ static ExternalEditorListController* sharedInstance = nil;
 	NSOpenPanel *openPanel = [NSOpenPanel openPanel];
     [openPanel setResolvesAliases:YES];
     [openPanel setAllowsMultipleSelection:NO];
+    [openPanel setDirectoryURL:[NSURL fileURLWithPath:@"/Applications"]];
+    [openPanel setAllowedFileTypes:@[@"app"]];
     
-    if ([openPanel runModalForDirectory:@"/Applications" file:nil types:[NSArray arrayWithObject:@"app"]] == NSOKButton) {
-		if (![openPanel filename]) goto errorReturn;
-		NSURL *appURL = [NSURL fileURLWithPath:[openPanel filename]];
+    if ([openPanel runModal] == NSFileHandlingPanelOKButton) {
+		if (![[openPanel URL]path]) goto errorReturn;
+		NSURL *appURL = [openPanel URL];
+       
 		if (!appURL) goto errorReturn;
 		
 		ExternalEditor *ed = [[ExternalEditor alloc] initWithBundleID:nil resolvedURL:appURL];
@@ -278,6 +286,7 @@ static ExternalEditorListController* sharedInstance = nil;
 		}
 		
 		[self setDefaultEditor:ed];
+        [ed release];
     }
 	return;
 errorReturn:

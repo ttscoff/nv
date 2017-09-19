@@ -34,14 +34,15 @@ NSRect centeredRectInRect(NSRect rect, NSSize size);
 	NSColor *borderCol;
 	NSColor *backCol;
 	ColorSet colors;
-	NSImage *dimpleImage;
+//	NSImage *dimpleImage;
 }
 
 - (id)initWithStartColor:(NSColor*)start endColor:(NSColor*)end;
 - (id)initWithBaseColors:(id)sender;
-- (void)updateColors:(NSColor *)startColor;
-- (void)drawDividerInRect:(NSRect)aRect withDimpleRect:(NSRect)dimpleRect blendVertically:(BOOL)v;
-- (void)setBackColor:(NSColor *)inColor;
+- (void)updateColorsWithBackgroundColor:(NSColor*)backgrndColor andForegroundColor:(NSColor *)fColor;
+//- (void)updateColors:(NSColor *)startColor;
+- (void)drawDividerInRect:(NSRect)aRect withDimpleRect:(NSRect)dimpleRect blendVertically:(BOOL)isHoriz;
+//- (void)setBackColor:(NSColor *)inColor;
 
 @end
 

@@ -39,7 +39,7 @@
 	[stdoutFileHandle closeFile];
     
 	[task waitUntilExit];
-
+    [task release];
 	return outputString;
 }
 

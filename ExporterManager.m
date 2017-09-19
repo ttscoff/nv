@@ -27,36 +27,45 @@
 
 - (void)awakeFromNib {
 	
-	int storageFormat = [[[GlobalPrefs defaultPrefs] notationPrefs] notesStorageFormat];
+	NSInteger storageFormat = [[[GlobalPrefs defaultPrefs] notationPrefs] notesStorageFormat];
 	[formatSelectorPopup selectItemWithTag:storageFormat];
 }
 
 - (IBAction)formatSelectorChanged:(id)sender {
 	NSSavePanel *panel = (NSSavePanel *)[sender window];
 	
-	int storageFormat = [[formatSelectorPopup selectedItem] tag];
+	NSInteger storageFormat = [[formatSelectorPopup selectedItem] tag];
 //	[panel setRequiredFileType:[NotationPrefs pathExtensionForFormat:storageFormat]];
 }
 
-- (void)exportPanelDidEnd:(NSSavePanel *)sheet returnCode:(int)returnCode contextInfo:(void  *)contextInfo {
+void(^exportHandler)(NSInteger) =^(NSInteger returnCode) {
+    NSLog(@"panel  handlin:%ld",returnCode);
+//    NSArray *notes = (NSArray *)contextInfo;
+//    NSLog(@"notes:%@",notes);
+//    [notes release];
+};
+
+
+
+- (void)exportPanelDidEnd:(NSSavePanel *)sheet returnCode:(NSInteger)returnCode contextInfo:(void  *)contextInfo {
 	NSArray *notes = (NSArray *)contextInfo;
 	if (returnCode == NSFileHandlingPanelOKButton && notes) {
 		//write notes in chosen format
 		unsigned int i;
-		int result, storageFormat = [[formatSelectorPopup selectedItem] tag];
+		NSInteger result, storageFormat = [[formatSelectorPopup selectedItem] tag];
 		NSString *directory = nil, *filename = nil;
 		BOOL overwriteNotes = NO;
 		
 		if ([sheet isKindOfClass:[NSOpenPanel class]]) {
-			directory = [sheet filename];
+            directory = [[sheet URL]path];
 		} else {
-			filename = [[sheet filename] lastPathComponent];
-			directory = [[sheet filename] stringByDeletingLastPathComponent];
-			
+            filename=[[sheet URL]path];            
+            directory = [filename stringByDeletingLastPathComponent];
+			filename = [filename lastPathComponent];
 			NSAssert([notes count] == 1, @"We returned from a save panel with more than one note?!");
 			
 			//user wanted us to overwrite this one--otherwise dialog would have been cancelled
-			if ([[NSFileManager defaultManager] fileExistsAtPath:[sheet filename]]) overwriteNotes = YES;
+			if ([[NSFileManager defaultManager] fileExistsAtPath:[[sheet URL]path]]) overwriteNotes = YES;
 			
 			if ([filename compare:filenameOfNote([notes lastObject]) options:NSCaseInsensitiveSearch] != NSOrderedSame) {
 				//undo any POSIX-safe crap NSSavePanel gave us--otherwise FSCreateFileUnicode will fail
@@ -134,9 +143,13 @@
 		NSString *filename = filenameOfNote([notes lastObject]);
 		filename = [filename stringByDeletingPathExtension];
 		filename = [filename stringByAppendingPathExtension:[NotationPrefs pathExtensionForFormat:[[formatSelectorPopup selectedItem] tag]]];
-			
-		[savePanel beginSheetForDirectory:nil file:filename modalForWindow:window modalDelegate:self 
-						   didEndSelector:@selector(exportPanelDidEnd:returnCode:contextInfo:) contextInfo:[notes retain]];
+		
+        savePanel.nameFieldStringValue=filename;
+        [savePanel beginSheetModalForWindow:window completionHandler:^(NSInteger result) {
+            [self exportPanelDidEnd:savePanel returnCode:result contextInfo:[notes retain]];
+        }];
+        
+//		[savePanel beginSheetForDirectory:nil file:filename modalForWindow:window modalDelegate:self didEndSelector:@selector(exportPanelDidEnd:returnCode:contextInfo:) contextInfo:[notes retain]];
 		
 	} else if ([notes count] > 1) {
 		NSOpenPanel *openPanel = [NSOpenPanel openPanel];
@@ -147,9 +160,12 @@
 		[openPanel setPrompt:NSLocalizedString(@"Export",@"title of button to export notes from folder selection dialog")];
 		[openPanel setTitle:NSLocalizedString(@"Export Notes", @"title of export notes dialog")];
 		[openPanel setMessage:[NSString stringWithFormat:NSLocalizedString(@"Choose a folder into which %d notes will be exported",nil), [notes count]]];
-
-		[openPanel beginSheetForDirectory:nil file:nil types:nil modalForWindow:window modalDelegate:self 
-						   didEndSelector:@selector(exportPanelDidEnd:returnCode:contextInfo:) contextInfo:[notes retain]];
+        
+//		[openPanel beginSheetForDirectory:nil file:nil types:nil modalForWindow:window modalDelegate:self didEndSelector:@selector(exportPanelDidEnd:returnCode:contextInfo:) contextInfo:[notes retain]];
+        [openPanel beginSheetModalForWindow:window completionHandler:^(NSInteger result) {
+            [self exportPanelDidEnd:openPanel returnCode:result contextInfo:[notes retain]];
+        }];
+        
 	} else {
 		NSRunAlertPanel(NSLocalizedString(@"No notes were selected for exporting.",nil), 
 						NSLocalizedString(@"You must select at least one note to export.",nil), NSLocalizedString(@"OK",nil), NULL, NULL);

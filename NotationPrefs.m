@@ -52,7 +52,7 @@ NSMutableDictionary *ServiceAccountDictInit(NotationPrefs *prefs, NSString* serv
 }
 
 - (id)init {
-    if ([super init]) {
+    if (self=[super init]) {
 		allowedTypes = NULL;
 		
 		unsigned int i;
@@ -78,8 +78,9 @@ NSMutableDictionary *ServiceAccountDictInit(NotationPrefs *prefs, NSString* serv
 		
 		firstTimeUsed = preferencesChanged = YES;
 		
+        return self;
     }
-    return self;
+    return nil;
 }
 
 - (id)initWithCoder:(NSCoder*)decoder {
@@ -168,7 +169,7 @@ NSMutableDictionary *ServiceAccountDictInit(NotationPrefs *prefs, NSString* serv
 	 */
 	[coder encodeInt32:EPOC_ITERATION forKey:VAR_STR(epochIteration)];
 	
-	[coder encodeInt:notesStorageFormat forKey:VAR_STR(notesStorageFormat)];
+	[coder encodeInteger:notesStorageFormat forKey:VAR_STR(notesStorageFormat)];
 	[coder encodeBool:doesEncryption forKey:VAR_STR(doesEncryption)];
 	[coder encodeBool:storesPasswordInKeychain forKey:VAR_STR(storesPasswordInKeychain)];
 	[coder encodeInt:hashIterationCount forKey:VAR_STR(hashIterationCount)];
@@ -625,7 +626,7 @@ NSMutableDictionary *ServiceAccountDictInit(NotationPrefs *prefs, NSString* serv
 	NSAssert([(id)contextInfo respondsToSelector:@selector(notesStorageFormatInProgress)],
 			 @"can't get notesStorageFormatInProgress method for changing");
 
-	int newNoteStorageFormat = [(NotationPrefsViewController*)contextInfo notesStorageFormatInProgress];
+	NSInteger newNoteStorageFormat = [(NotationPrefsViewController*)contextInfo notesStorageFormatInProgress];
 	
 	if (returnCode != NSAlertAlternateReturn)
 		//didn't cancel
@@ -707,7 +708,7 @@ NSMutableDictionary *ServiceAccountDictInit(NotationPrefs *prefs, NSString* serv
 	INIT_DICT_ACCT();
 	
 	if ([self syncFrequencyInMinutesForServiceName:serviceName] != frequencyInMinutes) {
-		[accountDict setObject:[NSNumber numberWithUnsignedInt:frequencyInMinutes] forKey:@"frequency"];
+		[accountDict setObject:[NSNumber numberWithUnsignedInteger:frequencyInMinutes] forKey:@"frequency"];
 		preferencesChanged = YES;
 		[delegate syncSettingsChangedForService:serviceName];
 	}
@@ -719,7 +720,7 @@ NSMutableDictionary *ServiceAccountDictInit(NotationPrefs *prefs, NSString* serv
 	if ([self syncNotesShouldMergeForServiceName:serviceName] != shouldMerge) {
 		NSString *username = [accountDict objectForKey:@"username"];
 		if (username) {
-			NSLog(@"%s: %d, %@", _cmd, shouldMerge, username);
+			NSLog(@"%@: %d, %@",  NSStringFromSelector(_cmd), shouldMerge, username);
 			if (shouldMerge) {
 				[accountDict setObject:username forKey:@"shouldmerge"];
 			} else {
@@ -727,7 +728,7 @@ NSMutableDictionary *ServiceAccountDictInit(NotationPrefs *prefs, NSString* serv
 			}
 			preferencesChanged = YES;
 		} else {
-			NSLog(@"%s: no username found in %@", serviceName);
+			NSLog(@" no username found in %@", serviceName);
 		}
 	}
 }
@@ -810,7 +811,7 @@ NSMutableDictionary *ServiceAccountDictInit(NotationPrefs *prefs, NSString* serv
 			}	
 			if (itemRef) {
 				OSStatus err = SecKeychainItemDelete(itemRef);
-				if (err != noErr) NSLog(@"Error deleting keychain item for service %@: %d, serviceName", err);
+				if (err != noErr) NSLog(@"Error deleting keychain item for service %@: %d", serviceName, (int)err);
 				CFRelease(itemRef);
 			}
 		} else {
@@ -878,7 +879,7 @@ NSMutableDictionary *ServiceAccountDictInit(NotationPrefs *prefs, NSString* serv
     */
 }
 
-+ (NSString*)pathExtensionForFormat:(int)format {
++ (NSString*)pathExtensionForFormat:(NSInteger)format {
     switch (format) {
 	case SingleDatabaseFormat:
 	case PlainTextFormat:
@@ -897,22 +898,22 @@ NSMutableDictionary *ServiceAccountDictInit(NotationPrefs *prefs, NSString* serv
 		
 		return @"docx";
 	default:
-	    NSLog(@"storage format ID is unknown: %d", format);
+	    NSLog(@"storage format ID is unknown: %ld", format);
     }
     
     return @"";
 }
 
 //for our nstableview data source
-- (int)typeStringsCount {
+- (NSInteger)typeStringsCount {
 	if (typeStrings[notesStorageFormat])
-		return [typeStrings[notesStorageFormat] count];
+		return (NSInteger)[typeStrings[notesStorageFormat] count];
 	
 	return 0;
 }
-- (int)pathExtensionsCount {
+- (NSInteger)pathExtensionsCount {
 	if (pathExtensions[notesStorageFormat])
-	    return [pathExtensions[notesStorageFormat] count];
+	    return (NSInteger)[pathExtensions[notesStorageFormat] count];
 	
 	return 0;
 }
@@ -927,7 +928,7 @@ NSMutableDictionary *ServiceAccountDictInit(NotationPrefs *prefs, NSString* serv
 - (unsigned int)indexOfChosenPathExtension {
 	return chosenExtIndices[notesStorageFormat];
 }
-- (NSString*)chosenPathExtensionForFormat:(int)format {
+- (NSString*)chosenPathExtensionForFormat:(NSInteger)format {
 	if (chosenExtIndices[format] >= [pathExtensions[format] count])
 		return [NotationPrefs pathExtensionForFormat:format];
 	
@@ -1032,7 +1033,7 @@ NSMutableDictionary *ServiceAccountDictInit(NotationPrefs *prefs, NSString* serv
 	return YES;
 }
 
-- (BOOL)pathExtensionAllowed:(NSString*)anExtension forFormat:(int)formatID {
+- (BOOL)pathExtensionAllowed:(NSString*)anExtension forFormat:(NSInteger)formatID {
 	NSUInteger i;
     for (i=0; i<[pathExtensions[formatID] count]; i++) {
 		if ([anExtension compare:[pathExtensions[formatID] objectAtIndex:i] 

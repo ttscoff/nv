@@ -38,7 +38,7 @@ enum { BUTTON_HIDDEN, BUTTON_NORMAL, BUTTON_PRESSED };
 
 @interface DualField : NSTextField {
 	IBOutlet NSTableView *notesTable;
-	unsigned int lastLengthReplaced;
+	NSUInteger lastLengthReplaced;
 	NSString *snapbackString, *swappedOriginalString;
 	
 	NSToolTipTag docIconTag, textAreaTag, clearButtonTag;
@@ -70,6 +70,6 @@ enum { BUTTON_HIDDEN, BUTTON_NORMAL, BUTTON_PRESSED };
 
 - (void)snapback:(id)sender;
 
-- (unsigned int)lastLengthReplaced;
+- (NSUInteger)lastLengthReplaced;
 
 @end

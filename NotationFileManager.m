@@ -53,7 +53,7 @@ OSStatus CreateDirectoryIfNotPresent(FSRef *parentRef, CFStringRef subDirectoryN
 
 OSStatus CreateTemporaryFile(FSRef *parentRef, FSRef *childTempRef) {
     UniChar chars[256];
-    unsigned int nameLength = 0;
+    long nameLength = 0;
     OSStatus result = noErr;
     
     do {
@@ -241,7 +241,7 @@ static struct statfs *StatFSVolumeInfo(NotationController *controller) {
 	return controller->statfsInfo;
 }
 
-UInt32 diskUUIDIndexForNotation(NotationController *controller) {
+NSUInteger diskUUIDIndexForNotation(NotationController *controller) {
 	return controller->diskUUIDIndex;
 }
 
@@ -344,7 +344,8 @@ long BlockSizeForNotation(NotationController *controller) {
 		[openPanel setMessage:NSLocalizedString(@"Select a new location for your Notational Velocity notes.",nil)];
 		
 		if ([openPanel runModal] == NSOKButton) {
-			CFStringRef filename = (CFStringRef)[openPanel filename];
+            
+			CFStringRef filename = (CFStringRef)[[openPanel URL]path];
 			if (filename) {
 				
 				FSRef newParentRef;
@@ -416,7 +417,7 @@ terminate:
 	uniqueFilename = [[sanitizedName copy] autorelease];
 	
 	//use the note's current format if the current default format is for a database; get the "ideal" extension for that format
-	int noteFormat = [notationPrefs notesStorageFormat] || !note ? [notationPrefs notesStorageFormat] : storageFormatOfNote(note);
+	NSInteger noteFormat = [notationPrefs notesStorageFormat] || !note ? [notationPrefs notesStorageFormat] : storageFormatOfNote(note);
 	NSString *extension = [notationPrefs chosenPathExtensionForFormat:noteFormat];
 	
 	//if the note's current extension is compatible with the storage format above, then use the existing extension instead
@@ -514,7 +515,7 @@ terminate:
 }
 
 - (NSMutableData*)dataFromFileInNotesDirectory:(FSRef*)childRef forFilename:(NSString*)filename fileSize:(UInt64)givenFileSize {
-	
+    
     UInt64 fileSize = givenFileSize;
     char *notesDataPtr = NULL;
     
@@ -523,7 +524,7 @@ terminate:
 	if (noErr != err) return nil;
 	
     if ((err = FSRefReadData(childRef, BlockSizeForNotation(self), &fileSize, (void**)&notesDataPtr, noCacheMask)) != noErr) {
-		NSLog(@"%s: error %d", _cmd, err);
+		NSLog(@"%@: error %d", NSStringFromSelector(_cmd), err);
 		return nil;
 	}    
     if (!notesDataPtr)
@@ -618,7 +619,9 @@ terminate:
 		NSLog(@"notifyOfChangedTrash: error getting trash: %d", err);
 	
 	 NSString *sillyDirectory = [NSTemporaryDirectory() stringByAppendingPathComponent:[(NSString*)CreateRandomizedFileName() autorelease]];
-	 [[NSFileManager defaultManager] createDirectoryAtPath:sillyDirectory attributes:nil];
+//	 [[NSFileManager defaultManager] createDirectoryAtPath:sillyDirectory attributes:nil];
+    
+    [[NSFileManager defaultManager]createFolderAtPath:sillyDirectory];
 	 NSInteger tag = 0;
 	 [[NSWorkspace sharedWorkspace] performFileOperation:NSWorkspaceRecycleOperation source:NSTemporaryDirectory() destination:@"" 
 												   files:[NSArray arrayWithObject:[sillyDirectory lastPathComponent]] tag:&tag];

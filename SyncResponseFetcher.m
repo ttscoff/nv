@@ -52,15 +52,16 @@
 }
 
 - (id)initWithURL:(NSURL*)aURL POSTData:(NSData*)POSTData headers:(NSDictionary *)aHeaders contentType:(NSString*)contentType delegate:(id)aDelegate {
-	if ([self init]) {
+	if (self=[self init]) {
 		receivedData = [[NSMutableData alloc] init];
 		requestURL = [aURL retain];
 		delegate = aDelegate;
 		dataToSend = [POSTData retain];
 		dataToSendContentType = [contentType copy];
 		requestHeaders = [aHeaders retain];
+        return self;
 	}
-	return self;
+    return nil;
 }
 
 - (NSInvocation*)successInvocation {
@@ -88,7 +89,7 @@
 	
 	NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:requestURL cachePolicy:NSURLRequestReloadIgnoringCacheData timeoutInterval:30.0];
 	if (!request) {
-		NSLog(@"%s: Couldn't create HTTP request with URL %@", _cmd, requestURL);
+		NSLog(@"%@: Couldn't create HTTP request with URL %@", NSStringFromSelector(_cmd), requestURL);
 		return NO;
 	}
 	
@@ -118,7 +119,7 @@
 	
 	//NSLog(@"starting request for URL '%@'", requestURL);
 	if (!(urlConnection = [[NSURLConnection alloc] initWithRequest:request delegate:self])) {
-		NSLog(@"%s: Couldn't create NSURLConnection with URLRequest %@", _cmd, request);
+		NSLog(@"%@: Couldn't create NSURLConnection with URLRequest %@", NSStringFromSelector(_cmd), request);
 		isRunning = NO;
 		[self release];
 		[delegate release];
@@ -186,7 +187,7 @@
 - (void)_fetchDidFinishWithError:(NSString*)anErrString {
 	
 	if (!isRunning) {
-		NSLog(@"not processing %s because fetcher was already stopped; should not be called", _cmd);
+		NSLog(@"not processing %@ because fetcher was already stopped; should not be called", NSStringFromSelector(_cmd));
 		return;
 	}
 	//assumes that anErrString will always be provided in the case of any error, and thus indicates the presence of such

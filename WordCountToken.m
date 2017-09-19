@@ -91,7 +91,7 @@
 	inColor = [NSColor whiteColor];
 	CGFloat fWhite;		
 	fWhite = [[inColor colorUsingColorSpaceName:NSCalibratedWhiteColorSpace] whiteComponent];
-	/*if (fWhite < 0.62f) {
+	if (fWhite < 0.62f) {
 		if (fWhite<0.10f) {
 			fWhite += 0.2f;
 		}else {
@@ -107,13 +107,13 @@
 }
 
 - (void)setFldColor:(NSColor *)inColor{
-	/*if (fldColor) {
+	if (fldColor) {
 		[fldColor release];
 	}
 	inColor = [NSColor lightGrayColor];
 	CGFloat fWhite;		
 	fWhite = [[[NSColor lightGrayColor] colorUsingColorSpaceName:NSCalibratedWhiteColorSpace] whiteComponent];
-	/*if (fWhite > 0.25f) {
+	if (fWhite > 0.25f) {
 		if (fWhite>0.90f) {
 			fWhite -= 0.25f;
 		}else {
@@ -126,9 +126,9 @@
 	
 	//fldColor = [NSColor lightGrayColor];
 	[fldColor retain];
-}*/
+}
 
-/*
+
 -(void)resetCursorRects
 {
     // remove the existing cursor rects

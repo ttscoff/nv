@@ -177,7 +177,7 @@
 		[syncSession startCollectingChangedNotesWithEntries:changedNotes];
 	}
 	if ([notesToDelete count]) {
-		NSLog(@"removing %u notes", [notesToDelete count]);
+		NSLog(@"removing %lu notes", (unsigned long)[notesToDelete count]);
 		[syncSession suppressPushingForNotes:notesToDelete];
 		[self removeNotes:notesToDelete];
 		[syncSession stopSuppressingPushingForNotes:notesToDelete];
@@ -344,10 +344,10 @@
 	
 	if ([locallyAddedNotes count] || [locallyChangedNotes count] || [locallyDeletedNotes count] || [mergeNotes count] || 
 		[remotelyAddedEntries count] || [remotelyChangedNotes count] || [remotelyDeletedNotes count] || [remotelyMissingNotes count]) {
-		NSLog(@"local: %u added, %u changed, %u deleted, %u to merge", 
-			  [locallyAddedNotes count], [locallyChangedNotes count], [locallyDeletedNotes count], [mergeNotes count]);
-		NSLog(@"remote: %u added, %u changed, %u deleted, %u missing", 
-			  [remotelyAddedEntries count], [remotelyChangedNotes count], [remotelyDeletedNotes count], [remotelyMissingNotes count]);
+		NSLog(@"local: %lu added, %lu changed, %lu deleted, %lu to merge",
+			  (unsigned long)[locallyAddedNotes count], (unsigned long)[locallyChangedNotes count], (unsigned long)[locallyDeletedNotes count], (unsigned long)[mergeNotes count]);
+		NSLog(@"remote: %lu added, %lu changed, %lu deleted, %lu missing", 
+			  (unsigned long)[remotelyAddedEntries count], (unsigned long)[remotelyChangedNotes count], (unsigned long)[remotelyDeletedNotes count], (unsigned long)[remotelyMissingNotes count]);
 	}
 
 	//POST these entries to the server, with the assumption that the dates in syncServiceMD are set already
@@ -355,7 +355,7 @@
 	if (!([mergeNotes count] && [remotelyAddedEntries count])) 
 		[syncSession startCreatingNotes:locallyAddedNotes];
 	else
-		NSLog(@"not creating notes because %u mergenotes exist", [mergeNotes count]);
+		NSLog(@"not creating notes because %lu mergenotes exist", (unsigned long)[mergeNotes count]);
 	
 	[syncSession startModifyingNotes:locallyChangedNotes];
 	
@@ -472,7 +472,7 @@ ended:
 			return NO;			
 	}
 	
-	NSLog(@"%s: unhandled case (res: %d)!", _cmd, res);
+	NSLog(@"%@: unhandled case (res: %ld)!", NSStringFromSelector(_cmd), (long)res);
 	return YES;
 }
 

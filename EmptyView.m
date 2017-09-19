@@ -53,12 +53,12 @@
 	}
 }
 
-- (void)resetCursorRects {
-	[self addCursorRect:[self bounds] cursor: [NSCursor arrowCursor]];
-}
+//- (void)resetCursorRects {
+//	[self addCursorRect:[self bounds] cursor: [NSCursor arrowCursor]];
+//}
 
 - (BOOL)isOpaque {	
-	return NO;
+	return YES;
 }
 /*
 - (void)setBackgroundColor:(NSColor *)inColor{
