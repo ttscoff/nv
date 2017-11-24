@@ -218,6 +218,7 @@ void outletObjectAwoke(id sender);
 - (IBAction)togglePreview:(id)sender;
 - (IBAction)toggleSourceView:(id)sender;
 - (IBAction)savePreview:(id)sender;
+- (IBAction)openCustomPreviewFolder:(id)sender;
 - (IBAction)sharePreview:(id)sender;
 - (IBAction)lockPreview:(id)sender;
 - (IBAction)printPreview:(id)sender;

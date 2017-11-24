@@ -613,6 +613,12 @@ CA
                                     <action selector="savePreview:" target="213" id="1247"/>
                                 </connections>
                             </menuItem>
+                            <menuItem title="Open Custom CSS Folder" id="CkP-Bv-IbF" userLabel="Open Custom CSS Folder">
+                                <modifierMask key="keyEquivalentModifierMask"/>
+                                <connections>
+                                    <action selector="openCustomPreviewFolder:" target="213" id="0MZ-vd-gxk"/>
+                                </connections>
+                            </menuItem>
                             <menuItem title="Enable Markdown Completion" keyEquivalent="M" id="1385">
                                 <connections>
                                     <binding destination="1258" name="value" keyPath="values.UsesMarkdownCompletions" id="1391">
