@@ -1758,7 +1758,7 @@ force_inline id unifiedCellForNote(NotesTableView *tv, NoteObject *note, NSInteg
 
 - (void)previewUsingMarked {
 	NSWorkspace * ws = [NSWorkspace sharedWorkspace];
-	if ([[ws URLForApplicationWithBundleIdentifier:@"com.brettterpstra.marked2"] isFileURL])
+	if ([[ws URLForApplicationWithBundleIdentifier:@"com.brettterpstra.marked2"] isFileURL] || [[ws URLForApplicationWithBundleIdentifier:@"com.brettterpstra.marked-setapp"] isFileURL] || [[ws URLForApplicationWithBundleIdentifier:@"com.brettterpstra.marked2.beta"] isFileURL])
     {
 		[ws openFile:[self noteFilePath] withApplication:@"Marked 2" andDeactivate:NO];
 	} else if ([[ws URLForApplicationWithBundleIdentifier:@"com.brettterpstra.marky"] isFileURL])

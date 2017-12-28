@@ -4,6 +4,15 @@ A collaboration between Brett Terpstra (ttscoff) and David Halter (ElasticThread
 
 ![Screenshot](http://img.skitch.com/20110520-k5y4i6i3p8ciftq2dbs7rx64e7.jpg)
 
+## Contents
+
+- [About nvALT](#about-nvalt)
+- [What it is](#what-it-is)
+- [Additional Features](#additional-features)
+- [Customization](#customization)
+- [Download](#download)
+- [Credits](#credits)
+
 ## About nvALT
 
 nvALT is a fork of the original [Notational Velocity][notational] with some additional features and some interface modifications. It is a work in progress. I'm not listing it as a beta, as that would imply that it was on its way to being its own product. It's an experiment, and I hope you enjoy it!
@@ -23,12 +32,15 @@ nvALT adds:
 * Unique interface design changes
 * Fixes for a couple of bugs/annoyances
 * Customizable HTML and CSS files for the Preview window
-	* You can use Javascript in the templates to do a few neat tricks
+    * You can use Javascript in the templates to do a few neat tricks
 
 ## Customization
 
 After the first time you run the Preview window, look in `~/Library/Application Support/Notational Velocity` and you'll find two files:` template.html` and `custom.css`. If you're handy with HTML and CSS, feel free to customize these in whatever way you like. You can add Javascript as well, but you'll need to load external scripts from a url or using a full file:// path. If worst comes to worst, you can just delete or rename your customizations and the default files will be put back in place automatically.
 
+## Download
+
+More info and a download for the compiled binary can be found at [brettterpstra.com/projects/nvalt](http://brettterpstra.com/projects/nvalt/)
 
 ## Credits
 
