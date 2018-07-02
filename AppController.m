@@ -3224,7 +3224,9 @@ terminateApp:
                 }
                 [theFieldEditor setDrawsBackground:NO];
                 // [theFieldEditor setBackgroundColor:backgrndColor];
-                [theFieldEditor setTextColor:foregrndColor];
+                if ([theFieldEditor textColor] != foregrndColor) {
+                    [theFieldEditor setTextColor:foregrndColor];
+                }
                 [theFieldEditor setSelectedTextAttributes:fieldAttributes];
                 [theFieldEditor setInsertionPointColor:foregrndColor];
                 
