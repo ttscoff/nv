@@ -2118,7 +2118,6 @@
 				MACOSX_DEPLOYMENT_TARGET = 10.9;
 				OTHER_LDFLAGS = "";
 				PRODUCT_BUNDLE_IDENTIFIER = net.elasticthreads.nv;
-				VALID_ARCHS = x86_64;
 			};
 			name = Development;
 		};
@@ -2207,7 +2206,6 @@
 				RUN_CLANG_STATIC_ANALYZER = YES;
 				SDKROOT = macosx;
 				STRIP_INSTALLED_PRODUCT = NO;
-				VALID_ARCHS = x86_64;
 				VERSION_INFO_BUILDER = "David Halter";
 				WARNING_LDFLAGS = "-pg";
 				WRAPPER_EXTENSION = app;
@@ -2295,7 +2293,6 @@
 					__text,
 					Notation.launchorder,
 				);
-				VALID_ARCHS = x86_64;
 				VERSION_INFO_BUILDER = "David Halter";
 				WRAPPER_EXTENSION = app;
 				ZERO_LINK = NO;
@@ -2316,7 +2313,6 @@
 				MACOSX_DEPLOYMENT_TARGET = 10.9;
 				OTHER_LDFLAGS = "";
 				PRODUCT_BUNDLE_IDENTIFIER = net.elasticthreads.nv;
-				VALID_ARCHS = x86_64;
 			};
 			name = ForBuilding;
 		};
