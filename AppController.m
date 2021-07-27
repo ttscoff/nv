@@ -3168,7 +3168,13 @@ terminateApp:
         [self ensurePreviewIsVisible];
         [previewController saveHTML:self];
     }
-    
+
+    - (IBAction)openCustomPreviewFolder:(id)sender
+    {
+        [PreviewController createCustomFiles];
+        [[NSWorkspace sharedWorkspace] openFile:[[NSFileManager defaultManager] applicationSupportDirectory]];
+    }
+
     - (IBAction)sharePreview:(id)sender
     {
         [self ensurePreviewIsVisible];
