@@ -3,7 +3,7 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 46;
+	objectVersion = 51;
 	objects = {
 
 /* Begin PBXBuildFile section */
@@ -124,9 +124,7 @@
 		5C2CC18A134989D7006FFE56 /* nvMenuDark.png in Resources */ = {isa = PBXBuildFile; fileRef = 5C2CC189134989D7006FFE56 /* nvMenuDark.png */; };
 		5C2FAD2B1333970200FBFD34 /* ETScrollView.m in Sources */ = {isa = PBXBuildFile; fileRef = 5C2CD036132ED47900CA0D7C /* ETScrollView.m */; };
 		5C367EE91DA2C06F0043C8EC /* libcrypto.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 5C367EE81DA2C06F0043C8EC /* libcrypto.a */; };
-		5C367F3B1DA2C1470043C8EC /* libcrypto.a in CopyFiles */ = {isa = PBXBuildFile; fileRef = 5C367EE81DA2C06F0043C8EC /* libcrypto.a */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
 		5C367F3D1DA2C2B20043C8EC /* libssl.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 5C367F3C1DA2C2B20043C8EC /* libssl.a */; };
-		5C367F3E1DA2C2C30043C8EC /* libssl.a in CopyFiles */ = {isa = PBXBuildFile; fileRef = 5C367F3C1DA2C2B20043C8EC /* libssl.a */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
 		5C38E2C414223D6900131682 /* ETOverlayScroller.m in Sources */ = {isa = PBXBuildFile; fileRef = 5C38E2C314223D6900131682 /* ETOverlayScroller.m */; };
 		5C43669B1DA268500086FF84 /* Excruciatingly Useful Shortcuts.nvhelp in Resources */ = {isa = PBXBuildFile; fileRef = 5C4366951DA268500086FF84 /* Excruciatingly Useful Shortcuts.nvhelp */; };
 		5C43669C1DA268500086FF84 /* How does this thing work?.nvhelp in Resources */ = {isa = PBXBuildFile; fileRef = 5C4366971DA268500086FF84 /* How does this thing work?.nvhelp */; };
@@ -280,8 +278,6 @@
 			dstPath = "";
 			dstSubfolderSpec = 10;
 			files = (
-				5C367F3E1DA2C2C30043C8EC /* libssl.a in CopyFiles */,
-				5C367F3B1DA2C1470043C8EC /* libcrypto.a in CopyFiles */,
 				93365DE01D9AD6AA005A230B /* AutoHyperlinks.framework in CopyFiles */,
 				213623FC0B92AA6E008C0830 /* Sparkle.framework in CopyFiles */,
 			);
@@ -1471,7 +1467,7 @@
 				};
 			};
 			buildConfigurationList = 212B842709780B5000F3597F /* Build configuration list for PBXProject "Notation" */;
-			compatibilityVersion = "Xcode 3.2";
+			compatibilityVersion = "Xcode 10.0";
 			developmentRegion = English;
 			hasScannedForEncodings = 1;
 			knownRegions = (
@@ -2122,7 +2118,6 @@
 				MACOSX_DEPLOYMENT_TARGET = 10.9;
 				OTHER_LDFLAGS = "";
 				PRODUCT_BUNDLE_IDENTIFIER = net.elasticthreads.nv;
-				VALID_ARCHS = x86_64;
 			};
 			name = Development;
 		};
@@ -2211,120 +2206,12 @@
 				RUN_CLANG_STATIC_ANALYZER = YES;
 				SDKROOT = macosx;
 				STRIP_INSTALLED_PRODUCT = NO;
-				VALID_ARCHS = x86_64;
 				VERSION_INFO_BUILDER = "David Halter";
 				WARNING_LDFLAGS = "-pg";
 				WRAPPER_EXTENSION = app;
 				ZERO_LINK = NO;
 			};
 			name = Development;
-		};
-		5C45D996196C95A9004C55F8 /* ForBuilding 10.6 */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				CLANG_ANALYZER_LOCALIZABILITY_NONLOCALIZED = YES;
-				CLANG_ANALYZER_SECURITY_INSECUREAPI_STRCPY = YES;
-				CLANG_WARN_BOOL_CONVERSION = YES;
-				CLANG_WARN_CONSTANT_CONVERSION = YES;
-				CLANG_WARN_EMPTY_BODY = YES;
-				CLANG_WARN_ENUM_CONVERSION = YES;
-				CLANG_WARN_INFINITE_RECURSION = YES;
-				CLANG_WARN_INT_CONVERSION = YES;
-				CLANG_WARN_SUSPICIOUS_MOVE = YES;
-				CLANG_WARN_UNREACHABLE_CODE = YES;
-				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
-				DEAD_CODE_STRIPPING = YES;
-				DEPLOYMENT_POSTPROCESSING = YES;
-				ENABLE_STRICT_OBJC_MSGSEND = YES;
-				FRAMEWORK_SEARCH_PATHS = (
-					"$(inherited)",
-					"$(FRAMEWORK_SEARCH_PATHS_QUOTED_1)",
-					"$(FRAMEWORK_SEARCH_PATHS_QUOTED_2)",
-					"$(DEVELOPER_FRAMEWORKS_DIR)",
-				);
-				FRAMEWORK_SEARCH_PATHS_QUOTED_1 = "\"$(SYSTEM_LIBRARY_DIR)/Frameworks/Quartz.framework/Versions/A/Frameworks\"";
-				FRAMEWORK_SEARCH_PATHS_QUOTED_2 = "\"$(SRCROOT)\"";
-				GCC_DEBUGGING_SYMBOLS = full;
-				GCC_ENABLE_CPP_EXCEPTIONS = NO;
-				GCC_ENABLE_CPP_RTTI = NO;
-				GCC_FAST_MATH = YES;
-				GCC_GENERATE_DEBUGGING_SYMBOLS = NO;
-				GCC_NO_COMMON_BLOCKS = YES;
-				GCC_PFE_FILE_C_DIALECTS = "c objective-c";
-				GCC_PRECOMPILE_PREFIX_HEADER = YES;
-				GCC_PREFIX_HEADER = Notation_Prefix.pch;
-				GCC_THREADSAFE_STATICS = NO;
-				GCC_TREAT_NONCONFORMANT_CODE_ERRORS_AS_WARNINGS = YES;
-				GCC_TREAT_WARNINGS_AS_ERRORS = NO;
-				GCC_VERSION = "";
-				GCC_WARN_64_TO_32_BIT_CONVERSION = NO;
-				GCC_WARN_ABOUT_GLOBAL_CONSTRUCTORS = NO;
-				GCC_WARN_ABOUT_MISSING_FIELD_INITIALIZERS = YES;
-				GCC_WARN_ABOUT_MISSING_NEWLINE = YES;
-				GCC_WARN_ABOUT_MISSING_PROTOTYPES = YES;
-				GCC_WARN_ABOUT_POINTER_SIGNEDNESS = YES;
-				GCC_WARN_ABOUT_RETURN_TYPE = YES;
-				GCC_WARN_ALLOW_INCOMPLETE_PROTOCOL = NO;
-				GCC_WARN_CHECK_SWITCH_STATEMENTS = YES;
-				GCC_WARN_HIDDEN_VIRTUAL_FUNCTIONS = YES;
-				GCC_WARN_INHIBIT_ALL_WARNINGS = YES;
-				GCC_WARN_INITIALIZER_NOT_FULLY_BRACKETED = YES;
-				GCC_WARN_MISSING_PARENTHESES = YES;
-				GCC_WARN_MULTIPLE_DEFINITION_TYPES_FOR_SELECTOR = NO;
-				GCC_WARN_NON_VIRTUAL_DESTRUCTOR = YES;
-				GCC_WARN_SHADOW = NO;
-				GCC_WARN_SIGN_COMPARE = YES;
-				GCC_WARN_TYPECHECK_CALLS_TO_PRINTF = YES;
-				GCC_WARN_UNDECLARED_SELECTOR = YES;
-				GCC_WARN_UNINITIALIZED_AUTOS = YES;
-				GCC_WARN_UNKNOWN_PRAGMAS = NO;
-				GCC_WARN_UNUSED_FUNCTION = YES;
-				GCC_WARN_UNUSED_LABEL = YES;
-				GCC_WARN_UNUSED_PARAMETER = NO;
-				GCC_WARN_UNUSED_VALUE = YES;
-				GCC_WARN_UNUSED_VARIABLE = YES;
-				HEADER_SEARCH_PATHS = (
-					ICU/icu,
-					"$(PROJECT_DIR)/library/**",
-				);
-				INFOPLIST_FILE = Info.plist;
-				LIBRARY_SEARCH_PATHS = /usr/local/Cellar/openssl/1.0.2/lib/;
-				MACOSX_DEPLOYMENT_TARGET = 10.9;
-				PRIVATE_HEADERS_FOLDER_PATH = "$(CONTENTS_FOLDER_PATH)/PrivateHeaders";
-				PRODUCT_NAME = nvALT;
-				SDKROOT = macosx;
-				SECTORDER_FLAGS = (
-					"-sectorder",
-					__TEXT,
-					__text,
-					Notation.launchorder,
-					"-e",
-					start,
-				);
-				VALID_ARCHS = x86_64;
-				VERSION_INFO_BUILDER = "David Halter";
-				WRAPPER_EXTENSION = app;
-				ZERO_LINK = NO;
-			};
-			name = "ForBuilding 10.6";
-		};
-		5C45D997196C95A9004C55F8 /* ForBuilding 10.6 */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				CLANG_ENABLE_MODULES = NO;
-				CODE_SIGN_IDENTITY = "Mac Developer";
-				COMBINE_HIDPI_IMAGES = YES;
-				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
-				DEVELOPMENT_TEAM = 47TRS7H4BH;
-				ENABLE_STRICT_OBJC_MSGSEND = NO;
-				LD_RUNPATH_SEARCH_PATHS = "";
-				LIBRARY_SEARCH_PATHS = "$(PROJECT_DIR)";
-				MACOSX_DEPLOYMENT_TARGET = 10.9;
-				OTHER_LDFLAGS = "";
-				PRODUCT_BUNDLE_IDENTIFIER = net.elasticthreads.nv;
-				VALID_ARCHS = x86_64;
-			};
-			name = "ForBuilding 10.6";
 		};
 		5C9CB58B134A7F0400073277 /* ForBuilding */ = {
 			isa = XCBuildConfiguration;
@@ -2406,7 +2293,6 @@
 					__text,
 					Notation.launchorder,
 				);
-				VALID_ARCHS = x86_64;
 				VERSION_INFO_BUILDER = "David Halter";
 				WRAPPER_EXTENSION = app;
 				ZERO_LINK = NO;
@@ -2427,7 +2313,6 @@
 				MACOSX_DEPLOYMENT_TARGET = 10.9;
 				OTHER_LDFLAGS = "";
 				PRODUCT_BUNDLE_IDENTIFIER = net.elasticthreads.nv;
-				VALID_ARCHS = x86_64;
 			};
 			name = ForBuilding;
 		};
@@ -2438,7 +2323,6 @@
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				5C9CB58C134A7F0400073277 /* ForBuilding */,
-				5C45D997196C95A9004C55F8 /* ForBuilding 10.6 */,
 				212B842409780B5000F3597F /* Development */,
 			);
 			defaultConfigurationIsVisible = 0;
@@ -2448,7 +2332,6 @@
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				5C9CB58B134A7F0400073277 /* ForBuilding */,
-				5C45D996196C95A9004C55F8 /* ForBuilding 10.6 */,
 				212B842809780B5000F3597F /* Development */,
 			);
 			defaultConfigurationIsVisible = 0;
