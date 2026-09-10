@@ -1,13 +1,7 @@
-# nvALT — dangduc fork
+# nvALT
 
-nvALT is a macOS notes app with editable source and read-only Markdown, Textile, HTML, and Org previews.
+nvALT is a macOS notes app with editable syntax-highlighted source and read-only Markdown, Textile, HTML, and Org previews.
 This fork of [ttscoff/nv](https://github.com/ttscoff/nv) adds multiple windows, fuzzy search, native macOS controls, and automatic backups.
-
-Every window keeps the notes list above the editor. All windows share one notes library.
-
-A fresh installation uses Fuzzy search and a monospace body font.
-The title, tags, and Source/Preview header rows start hidden.
-Existing font and visibility preferences remain unchanged.
 
 ![Full nvALT window with editable note source, hidden header rows, and its shadow against a neutral background](docs/screenshots/readme-source.png)
 
@@ -15,40 +9,29 @@ Existing font and visibility preferences remain unchanged.
 
 | Area | Upstream nvALT | This fork |
 | --- | --- | --- |
-| Windows | One main notes window. | Multiple windows share one library. Each window has its own search, selection, sort order, and scroll position. |
-| Layout | Stacked or side-by-side panes. | The notes list always stays above the editor. Each window saves its divider height. |
-| Controls | Custom window controls and a combined search/title field. | One search field fills the title bar. Optional body fields edit the title and tags. |
-| Search | The combined field also shows the selected title. | Fuzzy searches complete note sources. Literal title matches appear first, followed by native fuzzy order. Exact remains available. |
-| Appearance | Legacy window controls and color schemes. | Native macOS controls and a notes list that follows system light and dark modes. The editor also supports custom colors. |
+| Windows | One main notes window. | Multiple windows, one shared notes list. |
+| Layout | The notes list is stacked or side-by-side panes. | The notes list is stacked. |
+| Search | Exact match strings on note titles. | Fuzzy searches on note title and text. Exact remains available. |
+| Appearance | Legacy window controls and color schemes. | Native macOS controls and a notes list that follows system light and dark modes. |
+| Editor | Editable rich-text in Markdown, Textile, and HTML(?). | Editable source with syntax-highlighting and readonly rich-text previews  in MD, Textile, HTML, Org|
 
-Saved side-by-side layouts restore as stacked panes. The fork retains note links, tags, source import/export, and custom editor fonts.
+When migrating to this fork: Saved side-by-side layouts restore as stacked panes. The fork retains note links, tags, source import/export, and custom editor fonts.
 
 ### Multiple windows
 
 Each window can show a different note or search. Edits to the same note appear in all windows that show that note. Undo and Redo share the history for that note, including committed title and tag edits.
 
-The app restores open windows and their saved views after a restart. A library change applies to all windows.
+The app restores open windows and their saved views after a restart. A change to the notes library applies to all windows.
 
 ![Two windows with independent searches and selections in one library](docs/screenshots/readme-windows.png)
 
 ### Search
 
-Choose **Fuzzy** or **Exact** from the search-field menu. Each window keeps its own mode.
+Choose **Fuzzy** or **Exact** from the search-field menu.
 Fuzzy matches characters in order, so `mtg` can match `meeting`. It searches titles, tags, and complete committed source text.
 Double quotes require a contiguous phrase. Spaces and colons separate terms, and other punctuation remains literal.
 
-Literal title matches appear first. The full fuzzy list follows in the order returned by `fzf-native`.
-A note can appear in both groups. Either row opens the same note.
-If you select both occurrences, bulk actions process that note once.
-Column sorting changes the title group. The fuzzy group keeps its native order.
-
-Fuzzy search runs in the background. Return waits for a complete result before opening a note or creating from an unmatched query.
-Exact retains the earlier substring search over titles, tags, and bodies.
-Older saved windows and bookmarks without a search mode restore as Exact.
-
-After a successful search, the list uses its full height.
-A delayed **Searching…** message appears while a search is pending.
-Failed searches show an error and **Retry Search**.
+Literal title matches appear first. The full fuzzy list follows in the order returned by [`dangduc/fzf-native`](https://github.com/dangduc/fzf-native).
 
 ![Fuzzy search results above the source editor](docs/screenshots/readme-search.png)
 
@@ -63,13 +46,11 @@ Hidden rows release space to the body. Showing the notes list restores each wind
 **Note > Rename** and **Note > Tag** reveal hidden fields before editing.
 Tags offer completion from the library.
 
-Source, preview, and syntax commands work with hidden header rows.
-The notes list follows system light and dark appearance, with optional alternating rows.
+The notes list follows system light and dark appearance.
 The editor can follow the system appearance or use custom colors and fonts.
 Choose **View > Color Schemes > Follow System Appearance** for system editor colors.
 **User Scheme** uses separate custom light and dark colors and switches with the macOS appearance.
 **Preferences > Fonts & Colors** contains both groups, each with search highlight, foreground text, and background colors.
-Existing custom colors become the light group.
 
 ![Dark appearance with a native search field and notes list](docs/screenshots/readme-dark.png)
 
@@ -135,8 +116,6 @@ The `nvalt://make` action accepts `txt`; its `html` and `url` import parameters 
 You can type or paste HTML source and select the HTML viewer. Rendered HTML export remains available.
 
 ## Build and run
-
-The [official nvALT download](https://brettterpstra.com/projects/nvalt/) contains upstream nvALT, without these fork changes.
 
 The build requires full Xcode. Command Line Tools alone are insufficient.
 The bundled MultiMarkdown executable and OpenSSL archive require an Intel build. Apple Silicon Macs need Rosetta.
