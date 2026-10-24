@@ -65,7 +65,7 @@ NSMutableDictionary *ServiceAccountDictInit(NotationPrefs *prefs, NSString* serv
 		storesPasswordInKeychain = secureTextEntry = doesEncryption = NO;
 		syncServiceAccounts = [[NSMutableDictionary alloc] init];
 		seenDiskUUIDEntries = [[NSMutableArray alloc] init];
-		notesStorageFormat = SingleDatabaseFormat;
+		notesStorageFormat = PlainTextFormat;
 		hashIterationCount = DEFAULT_HASH_ITERATIONS;
 		keyLengthInBits = DEFAULT_KEY_LENGTH;
 		baseBodyFont = [[[GlobalPrefs defaultPrefs] noteBodyFont] retain];
@@ -140,6 +140,7 @@ NSMutableDictionary *ServiceAccountDictInit(NotationPrefs *prefs, NSString* serv
 				pathExtensions[i] = [[NotationPrefs defaultPathExtensionsForFormat:i] retain];
 			chosenExtIndices[i] = [decoder decodeIntForKey:[VAR_STR(chosenExtIndices) stringByAppendingFormat:@".%d",i]];
 		}
+		[self ensureMarkdownPathExtension];
 		
 		if (!(syncServiceAccounts = [[decoder decodeObjectForKey:VAR_STR(syncServiceAccounts)] retain]))
 			syncServiceAccounts = [[NSMutableDictionary alloc] init];
@@ -246,7 +247,7 @@ NSMutableDictionary *ServiceAccountDictInit(NotationPrefs *prefs, NSString* serv
 	case SingleDatabaseFormat:
 	    return [NSMutableArray arrayWithCapacity:0];
 	case PlainTextFormat: 
-	    return [NSMutableArray arrayWithObjects:@"txt", @"text", @"utf8", @"taskpaper", nil];
+	    return [NSMutableArray arrayWithObjects:@"md", @"txt", @"text", @"utf8", @"taskpaper", nil];
 	case RTFTextFormat: 
 	    return [NSMutableArray arrayWithObjects:@"rtf", nil];
 	case HTMLFormat:
@@ -260,6 +261,37 @@ NSMutableDictionary *ServiceAccountDictInit(NotationPrefs *prefs, NSString* serv
     }
     
     return [NSMutableArray arrayWithCapacity:0];
+}
+
+- (void)ensureMarkdownPathExtension {
+	NSArray *existing = pathExtensions[PlainTextFormat];
+	if (!existing)
+		return;
+	NSMutableArray *extensions = [existing isKindOfClass:[NSMutableArray class]] ? (NSMutableArray *)existing : [[existing mutableCopy] autorelease];
+	if (extensions != pathExtensions[PlainTextFormat]) {
+		[pathExtensions[PlainTextFormat] release];
+		pathExtensions[PlainTextFormat] = [extensions retain];
+	}
+
+	NSUInteger index;
+	for (index = 0; index < [extensions count]; index++) {
+		if ([[extensions objectAtIndex:index] caseInsensitiveCompare:@"md"] == NSOrderedSame)
+			return;
+	}
+
+	NSString *chosen = nil;
+	if (chosenExtIndices[PlainTextFormat] < [extensions count])
+		chosen = [extensions objectAtIndex:chosenExtIndices[PlainTextFormat]];
+	BOOL preferMarkdown = (!chosen
+						   || [chosen caseInsensitiveCompare:@"txt"] == NSOrderedSame
+						   || [chosen caseInsensitiveCompare:@"text"] == NSOrderedSame
+						   || [chosen caseInsensitiveCompare:@"utf8"] == NSOrderedSame);
+	[extensions insertObject:@"md" atIndex:0];
+	if (preferMarkdown)
+		chosenExtIndices[PlainTextFormat] = 0;
+	else
+		chosenExtIndices[PlainTextFormat] += 1;
+	preferencesChanged = YES;
 }
 
 - (BOOL)preferencesChanged {
@@ -858,7 +890,7 @@ NSMutableDictionary *ServiceAccountDictInit(NotationPrefs *prefs, NSString* serv
 	case SingleDatabaseFormat:
 	case PlainTextFormat:
 	    
-	    return @"txt";
+	    return @"md";
 	case RTFTextFormat:
 	    
 	    return @"rtf";

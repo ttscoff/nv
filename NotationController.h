@@ -175,6 +175,8 @@ typedef struct _NoteCatalogEntry {
 - (NSIndexSet*)indexesOfNotes:(NSArray*)noteSet;
 - (NSUInteger)indexInFilteredListForNoteIdenticalTo:(NoteObject*)note;
 - (NSUInteger)totalNoteCount;
+- (NSArray *)notes;
+- (NSString *)notesDirectoryPath;
 
 - (void)scheduleUpdateListForAttribute:(NSString*)attribute;
 - (NoteAttributeColumn*)sortColumn;

@@ -78,6 +78,7 @@
 - (IBAction)changedKeychainSettings:(id)sender;
 - (IBAction)changedFileDeletionWarningSettings:(id)sender;
 - (IBAction)changedFileStorageFormat:(id)sender;
+- (IBAction)convertNotesToMarkdown:(id)sender;
 - (IBAction)changePassphrase:(id)sender;
 - (IBAction)changedSecureTextEntry:(id)sender;
 - (IBAction)removeFromKeychain:(id)sender;

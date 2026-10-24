@@ -240,6 +240,8 @@ void outletObjectAwoke(id sender);
 - (void)toggleStatusItem:(NSNotification *)notification;
 - (void)setUpStatusBarItem;
 - (NSArray *)referenceLinksInString:(NSString *)contentString;
+- (void)offerMarkdownConversionIfNeeded;
+- (IBAction)convertNotesToMarkdown:(id)sender;
 //- (IBAction)testThing:(id)sender;
 #if MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_7
 - (void)postToggleToolbar:(NSNumber *)boolNum;

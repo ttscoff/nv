@@ -509,6 +509,7 @@ void outletObjectAwoke(id sender) {
 	 @selector(setAutoCompleteSearches:sender:),@selector(setUseETScrollbarsOnLion:sender:), nil];   //when to tell notationcontroller to build its title-prefix connections
 	
 	[self performSelector:@selector(runDelayedUIActionsAfterLaunch) withObject:nil afterDelay:0.0];
+	[self performSelector:@selector(offerMarkdownConversionIfNeeded) withObject:nil afterDelay:0.6];
     
 	
     

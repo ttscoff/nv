@@ -1486,6 +1486,14 @@ bail:
 	return [allNotes count];
 }
 
+- (NSArray *)notes {
+	return [[allNotes copy] autorelease];
+}
+
+- (NSString *)notesDirectoryPath {
+	return [[NSFileManager defaultManager] pathWithFSRef:&noteDirectoryRef];
+}
+
 - (NoteAttributeColumn*)sortColumn {
 	return sortColumn;
 }

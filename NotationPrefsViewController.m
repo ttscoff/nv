@@ -25,7 +25,7 @@
 #import "PassphrasePicker.h"
 #import "PassphraseChanger.h"
 #import "NSFileManager_NV.h"
-//#import "AppController.h"
+#import "AppController.h"
 
 @implementation FileKindListView 
 
@@ -88,6 +88,32 @@
 	[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(initializeControls) name:NotationPrefsDidChangeNotification object:nil];
 
     [self initializeControls];
+	[self addMarkdownConversionButton];
+}
+
+- (void)addMarkdownConversionButton {
+	NSView *storageView = [storageFormatPopupButton superview];
+	if (!storageView || [storageView viewWithTag:7301])
+		return;
+	NSButton *button = [[NSButton alloc] initWithFrame:NSZeroRect];
+	[button setBezelStyle:NSBezelStyleRounded];
+	[button setButtonType:NSButtonTypeMomentaryPushIn];
+	[button setTitle:NSLocalizedString(@"Convert to Markdown", @"Notes storage button")];
+	[button setTag:7301];
+	[button setTarget:self];
+	[button setAction:@selector(convertNotesToMarkdown:)];
+	[button sizeToFit];
+	NSRect frame = [button frame];
+	frame.origin = NSMakePoint(42, 14);
+	frame.size.width = MAX(frame.size.width + 16, 180);
+	[button setFrame:frame];
+	[button setAutoresizingMask:NSViewMaxXMargin | NSViewMaxYMargin];
+	[storageView addSubview:button];
+	[button release];
+}
+
+- (IBAction)convertNotesToMarkdown:(id)sender {
+	[(AppController *)[NSApp delegate] convertNotesToMarkdown:sender];
 }
 
 - (BOOL)tableView:(NSTableView *)aTableView shouldEditTableColumn:(NSTableColumn *)aTableColumn row:(NSInteger)rowIndex {
