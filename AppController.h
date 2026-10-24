@@ -83,6 +83,7 @@
     IBOutlet LinkingEditor *textView;
 	IBOutlet EmptyView *editorStatusView;
 	IBOutlet NSMenuItem *sparkleUpdateItem;
+	id sparkleController;
     IBOutlet NSWindow *window;
 	IBOutlet NSPanel *syncWaitPanel;
 	IBOutlet NSProgressIndicator *syncWaitSpinner;
@@ -215,6 +216,7 @@ void outletObjectAwoke(id sender);
 - (void)popWordCount:(BOOL)showIt;
 - (void)popPreview:(BOOL)showIt;
 - (IBAction)previewNoteWithMarked:(id)sender;
+- (IBAction)openMarkedStreamingPreview:(id)sender;
 - (IBAction)togglePreview:(id)sender;
 - (IBAction)toggleSourceView:(id)sender;
 - (IBAction)savePreview:(id)sender;

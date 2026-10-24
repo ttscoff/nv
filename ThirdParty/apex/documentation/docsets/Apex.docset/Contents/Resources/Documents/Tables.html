@@ -1,0 +1,1781 @@
+<!DOCTYPE html>
+<html lang="en">
+
+  <head>
+
+      <meta charset="UTF-8">
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <meta name="generator" content="Apex 1.1.12">
+      <title>Document</title>
+      <style>
+        /* GitHub-style syntax highlighting for Pygments and Skylighting */
+        /* Don't apply background to wrapper when code highlighting is enabled - let default styles handle it */
+        .code-highlighted .highlight, .code-highlighted .sourceCode { background: inherit; border-radius: 6px; padding: 16px; overflow-x: auto; }
+        .highlight pre, .sourceCode pre { margin: 0; padding: 0; background: transparent; }
+        .highlight code, .sourceCode code { font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, monospace; font-size: 12px; line-height: 1.45; }
+        /* Pygments classes */
+        .highlight .k { color: #d73a49; font-weight: 600; } /* Keyword */
+        .highlight .kt { color: #d73a49; } /* Keyword.Type */
+        .highlight .kd { color: #d73a49; font-weight: 600; } /* Keyword.Declaration */
+        .highlight .kn { color: #d73a49; } /* Keyword.Namespace */
+        .highlight .kp { color: #d73a49; } /* Keyword.Pseudo */
+        .highlight .kr { color: #d73a49; font-weight: 600; } /* Keyword.Reserved */
+        .highlight .n { color: #6f42c1; } /* Name */
+        .highlight .na { color: #6f42c1; } /* Name.Attribute */
+        .highlight .nc { color: #6f42c1; font-weight: 600; } /* Name.Class */
+        .highlight .no { color: #005cc5; } /* Name.Constant */
+        .highlight .nd { color: #6f42c1; font-weight: 600; } /* Name.Decorator */
+        .highlight .ni { color: #800080; } /* Name.Entity */
+        .highlight .ne { color: #990000; font-weight: 600; } /* Name.Exception */
+        .highlight .nf { color: #6f42c1; font-weight: 600; } /* Name.Function */
+        .highlight .nl { color: #6f42c1; } /* Name.Label */
+        .highlight .nn { color: #555; } /* Name.Namespace */
+        .highlight .nt { color: #22863a; } /* Name.Tag */
+        .highlight .nv { color: #e36209; } /* Name.Variable */
+        .highlight .s { color: #032f62; } /* String */
+        .highlight .sb { color: #032f62; } /* String.Backtick */
+        .highlight .sc { color: #032f62; } /* String.Char */
+        .highlight .sd { color: #032f62; } /* String.Doc */
+        .highlight .s2 { color: #032f62; } /* String.Double */
+        .highlight .se { color: #032f62; } /* String.Escape */
+        .highlight .sh { color: #032f62; } /* String.Heredoc */
+        .highlight .si { color: #032f62; } /* String.Interpol */
+        .highlight .sx { color: #032f62; } /* String.Other */
+        .highlight .sr { color: #032f62; } /* String.Regex */
+        .highlight .s1 { color: #032f62; } /* String.Single */
+        .highlight .ss { color: #032f62; } /* String.Symbol */
+        .highlight .c { color: #6a737d; font-style: italic; } /* Comment */
+        .highlight .c1 { color: #6a737d; font-style: italic; } /* Comment.Single */
+        .highlight .cm { color: #6a737d; font-style: italic; } /* Comment.Multiline */
+        .highlight .cp { color: #6a737d; font-weight: 600; } /* Comment.Preproc */
+        .highlight .cs { color: #6a737d; font-weight: 600; font-style: italic; } /* Comment.Special */
+        .highlight .m { color: #005cc5; } /* Literal.Number */
+        .highlight .mb { color: #005cc5; } /* Literal.Number.Bin */
+        .highlight .mf { color: #005cc5; } /* Literal.Number.Float */
+        .highlight .mh { color: #005cc5; } /* Literal.Number.Hex */
+        .highlight .mi { color: #005cc5; } /* Literal.Number.Integer */
+        .highlight .il { color: #005cc5; } /* Literal.Number.Integer.Long */
+        .highlight .mo { color: #005cc5; } /* Literal.Number.Oct */
+        .highlight .o { color: #d73a49; } /* Operator */
+        .highlight .ow { color: #d73a49; } /* Operator.Word */
+        .highlight .p { color: #24292e; } /* Punctuation */
+        .highlight .w { color: #e1e4e8; } /* Text.Whitespace */
+        /* Skylighting classes */
+        .sourceCode .kw { color: #d73a49; font-weight: 600; } /* Keyword */
+        .sourceCode .dt { color: #6f42c1; } /* DataType */
+        .sourceCode .dv { color: #005cc5; } /* DecVal */
+        .sourceCode .bn { color: #005cc5; } /* BaseN */
+        .sourceCode .fl { color: #005cc5; } /* Float */
+        .sourceCode .ch { color: #032f62; } /* Char */
+        .sourceCode .st { color: #032f62; } /* String */
+        .sourceCode .co { color: #6a737d; font-style: italic; } /* Comment */
+        .sourceCode .ot { color: #22863a; } /* Other */
+        .sourceCode .al { color: #e36209; font-weight: 600; } /* Alert */
+        .sourceCode .fu { color: #6f42c1; font-weight: 600; } /* Function */
+        .sourceCode .re { color: #032f62; } /* RegionMarker */
+        .sourceCode .er { color: #d73a49; font-weight: 600; } /* Error */
+        .sourceCode .cf { color: #d73a49; font-weight: 600; } /* ControlFlow */
+        .sourceCode .op { color: #d73a49; } /* Operator */
+        .sourceCode .pp { color: #6a737d; } /* Preprocessor */
+        .sourceCode .at { color: #005cc5; } /* Attribute */
+        .sourceCode .do { color: #6a737d; font-style: italic; } /* Documentation */
+        .sourceCode .an { color: #6a737d; font-weight: 600; } /* Annotation */
+        .sourceCode .cv { color: #6a737d; font-weight: 600; font-style: italic; } /* CommentVar */
+        .sourceCode .in { color: #6a737d; } /* Information */
+        .sourceCode .wa { color: #e36209; font-weight: 600; } /* Warning */
+        .sourceCode .im { color: #d73a49; } /* Import */
+        .sourceCode .bu { color: #005cc5; } /* BuiltIn */
+        .sourceCode .ex { color: #6f42c1; } /* Extension */
+        .sourceCode .va { color: #e36209; } /* Variable */
+        .sourceCode .ss { color: #032f62; } /* SpecialString */
+        .sourceCode .sc { color: #032f62; } /* SpecialChar */
+        .sourceCode .vs { color: #032f62; } /* VerbatimString */
+        .sourceCode .il { color: #005cc5; } /* Special */
+        /* Line numbers (Skylighting) */
+        .sourceCode.numberSource .sourceCode { counter-reset: line; }
+        .sourceCode.numberSource .sourceCode > span { position: relative; left: -4em; counter-increment: line; }
+        .sourceCode.numberSource .sourceCode > span > a:first-child::before { content: counter(line); position: relative; left: -1em; text-align: right; vertical-align: baseline; border: none; display: inline-block; min-width: 1em; padding-right: 0.5em; color: #aaa; }
+      </style>
+      <style>
+        body {
+          font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
+          line-height: 1.6;
+          max-width: 800px;
+          margin: 2rem auto;
+          padding: 0 1rem;
+          color: #333;
+        }
+        pre { background: #f5f5f5; padding: 1rem; overflow-x: auto; }
+        code { background: #f0f0f0; padding: 0.2em 0.4em; border-radius: 3px; }
+        blockquote { border-left: 4px solid #ddd; margin: 0; padding-left: 1rem; color: #666; }
+        table { border-collapse: collapse; width: 100%%; }
+        th, td { border: 1px solid #ddd; padding: 0.5rem; }
+        th { background: #f5f5f5; }
+        tfoot td { background: #e8e8e8; }
+        figure.table-figure { width: fit-content; margin: 1em 0; }
+        figure.table-figure table { width: auto; }
+        figcaption { text-align: center; font-weight: bold; font-size: 0.8em; }
+        .page-break { page-break-after: always; }
+        .callout { padding: 1rem; margin: 1rem 0; border-left: 4px solid; }
+        .callout-note { border-color: #3b82f6; background: #eff6ff; }
+        .callout-warning { border-color: #f59e0b; background: #fffbeb; }
+        .callout-tip { border-color: #10b981; background: #f0fdf4; }
+        .callout-danger { border-color: #ef4444; background: #fef2f2; }
+        ins { background: #d4fcbc; text-decoration: none; }
+        del { background: #fbb6c2; text-decoration: line-through; }
+        mark { background: #fff3cd; }
+        .smallcaps { font-variant: small-caps; }
+        .underline { text-decoration: underline; }
+        span.mark { background: #fff3cd; }
+        .hidden { display: none; }
+        .quarto-xref { font-variant: normal; }
+        .critic.comment { background: #e7e7e7; color: #666; font-style: italic; }
+        .mkhashtag { color: #666; }
+        .mkstyledtag {
+          display: inline-block;
+          background: #e0e0e0;
+          padding: 3px 9px;
+          border-radius: 20px;
+          font-size: 0.9em;
+          line-height: 1.4;
+          color: #333;
+          margin: 0 2px;
+        }
+      </style>
+        <meta name="paginate" content="symbols"/>
+      <meta name="highlight-language-only" content="true"/>
+      <meta name="code-line-numbers" content="false"/>
+      <meta name="code-highlight" content="pygments"/>
+      <meta name="sup-sub" content="true"/>
+      <meta name="relaxed-tables" content="true"/>
+      <meta name="includes" content="true"/>
+      <meta name="autolink" content="true"/>
+      <meta name="pretty" content="false"/>
+      <meta name="standalone" content="false"/>
+      <meta name="mode" content="unified"/>
+      <meta name="markdown-in-html" content="true"/>
+      <meta name="image-captions" content="true"/>
+      <meta name="wikilink-extension" content="html"/>
+      <meta name="wikilink-space" content="hyphen"/>
+      <meta name="wikilinks" content="true"/>
+      <meta name="widont" content="true"/>
+      <meta name="plugins" content="true"/>
+      <meta name="id-format" content="gfm"/>
+
+  <style>
+:root {
+  /* border-box width of the fixed sidebar; body offset includes a small gap */
+  --sidebar-width: 250px;
+  --sidebar-offset: 270px;
+}
+
+/* Base styles — override Apex standalone centering (max-width + margin: auto) */
+body {
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  font-size: 17px;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+    "Helvetica Neue", Arial, sans-serif;
+  line-height: 1.65;
+  color: #1e293b;
+  background-color: #fff;
+  max-width: none;
+  width: auto;
+  margin: 2rem 2rem 2rem var(--sidebar-offset);
+  padding: 0 1rem;
+  box-sizing: border-box;
+}
+
+/* Sidebar / Main TOC - wider on larger screens */
+.main-toc,
+.sidebar {
+  position: fixed;
+  left: 0;
+  top: 0;
+  box-sizing: border-box;
+  width: var(--sidebar-width);
+  min-width: var(--sidebar-width);
+  max-width: var(--sidebar-width);
+  height: 100vh;
+  overflow-y: auto;
+  background: #1e293b;
+  color: rgba(255, 255, 255, 0.9);
+  border-right: 2px solid rgba(255, 255, 255, 0.1);
+  padding: 24px 20px 130px;
+  font-size: 14px;
+  z-index: 100;
+  box-shadow: 4px 0 24px rgba(0, 0, 0, 0.08);
+  transition: transform 0.3s ease;
+}
+
+.main-toc ul,
+.sidebar ul {
+  list-style: none;
+  padding-left: 0;
+  margin: 0;
+  padding-bottom: 80px;
+}
+
+.main-toc ul::after,
+.sidebar ul::after {
+  content: "";
+  display: block;
+  height: 80px;
+}
+
+.main-toc li,
+.sidebar li {
+  margin: 0.25em 0;
+}
+
+.main-toc a,
+.sidebar a {
+  color: rgba(255, 255, 255, 0.85);
+  text-decoration: none;
+  display: block;
+  padding: 6px 12px;
+  border-radius: 4px;
+  transition: all 0.15s ease;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.main-toc a:hover,
+.sidebar a:hover {
+  background: #334155;
+  color: #fff;
+}
+
+.sidebar a.active {
+  color: #0ea5e9;
+  font-weight: 500;
+}
+
+/* Hamburger menu button */
+.hamburger-menu {
+  display: none;
+  position: fixed;
+  top: 12px;
+  left: 12px;
+  z-index: 200;
+  background: #1e293b;
+  border: 2px solid rgba(255, 255, 255, 0.1);
+  border-radius: 6px;
+  padding: 10px;
+  cursor: pointer;
+  color: rgba(255, 255, 255, 0.9);
+  font-size: 20px;
+  line-height: 1;
+  box-sizing: border-box;
+  width: 44px;
+  height: 44px;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+  transition: all 0.2s ease;
+  opacity: 0.2;
+}
+
+.hamburger-menu:hover {
+  background: #334155;
+  color: #fff;
+  opacity: 1;
+}
+
+/* Move hamburger to the right of the sidebar when menu is open */
+.hamburger-menu.active {
+  left: calc(var(--sidebar-width) + 12px);
+}
+
+.hamburger-menu.active {
+  background: #0ea5e9;
+}
+
+.hamburger-menu::before {
+  content: "☰";
+}
+
+.hamburger-menu.active::before {
+  content: "✕";
+}
+
+/* Mobile menu overlay */
+.mobile-menu-overlay {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: 150;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.3s ease, visibility 0.3s ease;
+}
+
+.mobile-menu-overlay.active {
+  opacity: 1;
+  visibility: visible;
+}
+
+/* Page TOC */
+.page-toc {
+  background: #f9f9f9;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  padding: 1rem;
+  margin: 1.5rem 0;
+}
+
+.page-toc ul {
+  list-style: none;
+  padding-left: 0;
+  margin: 0;
+}
+
+.page-toc > ul {
+  padding-left: 0;
+}
+
+.page-toc li {
+  margin: 0.25em 0;
+}
+
+.page-toc a {
+  color: #0066cc;
+  text-decoration: none;
+  display: block;
+  padding: 0.25em 0.5em;
+  border-radius: 3px;
+}
+
+.page-toc a:hover {
+  background: #e0e0e0;
+  color: #004499;
+}
+
+.page-toc ul ul {
+  list-style: none;
+  padding-left: 1.5em;
+  margin-top: 0.25em;
+  margin-left: 0;
+}
+
+.page-toc ul ul ul {
+  padding-left: 1.5em;
+}
+
+.page-toc ul ul a {
+  font-size: 0.9em;
+  color: #555;
+}
+
+.page-toc ul ul ul a {
+  font-size: 0.85em;
+  color: #666;
+}
+
+/* Floating TOC */
+.floating-toc {
+  position: fixed;
+  top: 0;
+  left: var(--sidebar-offset);
+  right: 0;
+  z-index: 50;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.2s ease, visibility 0.2s ease;
+  pointer-events: none;
+  display: flex;
+  justify-content: flex-end;
+  padding-right: 2rem;
+}
+
+.floating-toc.visible {
+  opacity: 1;
+  visibility: visible;
+  pointer-events: auto;
+}
+
+.floating-toc-container {
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(10px);
+  border-bottom: 1px solid #ddd;
+  border-radius: 0 0 12px 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  width: fit-content;
+  max-width: 400px;
+  min-width: 200px;
+  overflow: hidden;
+  transition: max-height 0.3s ease;
+}
+
+.floating-toc-header {
+  padding: 8px 16px;
+  cursor: pointer;
+  user-select: none;
+  font-size: 14px;
+  font-weight: 500;
+  color: #1e293b;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.floating-toc-header:hover {
+  background: rgba(0, 0, 0, 0.02);
+}
+
+.floating-toc-content {
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.3s ease;
+}
+
+.floating-toc-container:hover .floating-toc-content {
+  max-height: 70vh;
+  overflow-y: auto;
+}
+
+.floating-toc-content ul {
+  list-style: none;
+  padding: 8px 16px 16px;
+  margin: 0;
+}
+
+.floating-toc-content li {
+  margin: 0.1em 0;
+}
+
+.floating-toc-content a {
+  color: #0066cc;
+  text-decoration: none;
+  display: block;
+  padding: 0.2em 0.5em;
+  border-radius: 4px;
+  font-size: 13px;
+  transition: background 0.15s ease;
+}
+
+.floating-toc-content a:hover {
+  background: #e0e0e0;
+  color: #004499;
+}
+
+.floating-toc-content ul ul {
+  padding-left: 1.2em;
+  margin-top: 0;
+  margin-bottom: 0;
+}
+
+.floating-toc-content ul ul ul {
+  margin-top: 0;
+  margin-bottom: 0;
+}
+
+.floating-toc-content ul ul a {
+  font-size: 12px;
+  color: #555;
+}
+
+.floating-toc-content ul ul ul a {
+  font-size: 11px;
+  color: #666;
+}
+
+/* Smooth scrolling */
+html {
+  scroll-behavior: smooth;
+}
+
+/* Code blocks */
+code {
+  background: #f0f0f0;
+  padding: 0.2em 0.4em;
+  border-radius: 3px;
+  font-family: "Monaco", "Menlo", "Ubuntu Mono", monospace;
+  font-size: 0.9em;
+  margin: 0 0.1em;
+}
+
+pre {
+  background: #f5f5f5;
+  padding: 1rem;
+  overflow-x: auto;
+  border-radius: 4px;
+  margin: 1em 0;
+}
+
+pre code {
+  background: none;
+  padding: 0;
+  margin: 0;
+}
+
+/* Rouge syntax highlighting - GitHub theme, scoped to .highlight containers */
+.highlight {
+  color: #24292e;
+}
+
+.highlight .c {
+  color: #6a737d;
+  font-style: italic;
+} /* Comment */
+.highlight .err {
+  color: #a61717;
+  background-color: #e3d2d2;
+} /* Error */
+.highlight .k {
+  color: #d73a49;
+  font-weight: bold;
+} /* Keyword */
+.highlight .l {
+  color: #032f62;
+} /* Literal */
+.highlight .n {
+  color: #24292e;
+} /* Name */
+.highlight .o {
+  color: #d73a49;
+} /* Operator */
+.highlight .p {
+  color: #24292e;
+} /* Punctuation */
+.highlight .cm {
+  color: #6a737d;
+  font-style: italic;
+} /* Comment.Multiline */
+.highlight .cp {
+  color: #6a737d;
+  font-weight: bold;
+} /* Comment.Preproc */
+.highlight .c1 {
+  color: #6a737d;
+  font-style: italic;
+} /* Comment.Single */
+.highlight .cs {
+  color: #6a737d;
+  font-weight: bold;
+  font-style: italic;
+} /* Comment.Special */
+.highlight .gd {
+  color: #24292e;
+  background-color: #ffeef0;
+} /* Generic.Deleted */
+.highlight .ge {
+  color: #24292e;
+  font-style: italic;
+} /* Generic.Emph */
+.highlight .gr {
+  color: #aa0000;
+} /* Generic.Error */
+.highlight .gh {
+  color: #999999;
+  font-weight: bold;
+} /* Generic.Heading */
+.highlight .gi {
+  color: #24292e;
+  background-color: #f0fff4;
+} /* Generic.Inserted */
+.highlight .go {
+  color: #888888;
+} /* Generic.Output */
+.highlight .gp {
+  color: #555555;
+} /* Generic.Prompt */
+.highlight .gs {
+  font-weight: bold;
+} /* Generic.Strong */
+.highlight .gu {
+  color: #aaaaaa;
+} /* Generic.Subheading */
+.highlight .gt {
+  color: #aa0000;
+} /* Generic.Traceback */
+.highlight .kc {
+  color: #d73a49;
+  font-weight: bold;
+} /* Keyword.Constant */
+.highlight .kd {
+  color: #d73a49;
+  font-weight: bold;
+} /* Keyword.Declaration */
+.highlight .kn {
+  color: #d73a49;
+  font-weight: bold;
+} /* Keyword.Namespace */
+.highlight .kp {
+  color: #d73a49;
+  font-weight: bold;
+} /* Keyword.Pseudo */
+.highlight .kr {
+  color: #d73a49;
+  font-weight: bold;
+} /* Keyword.Reserved */
+.highlight .kt {
+  color: #d73a49;
+  font-weight: bold;
+} /* Keyword.Type */
+.highlight .ld {
+  color: #032f62;
+} /* Literal.Date */
+.highlight .m {
+  color: #005cc5;
+} /* Literal.Number */
+.highlight .s {
+  color: #032f62;
+} /* Literal.String */
+.highlight .na {
+  color: #6f42c1;
+} /* Name.Attribute */
+.highlight .nb {
+  color: #005cc5;
+} /* Name.Builtin */
+.highlight .nc {
+  color: #6f42c1;
+  font-weight: bold;
+} /* Name.Class */
+.highlight .no {
+  color: #005cc5;
+} /* Name.Constant */
+.highlight .nd {
+  color: #6f42c1;
+  font-weight: bold;
+} /* Name.Decorator */
+.highlight .ni {
+  color: #800080;
+} /* Name.Entity */
+.highlight .ne {
+  color: #990000;
+  font-weight: bold;
+} /* Name.Exception */
+.highlight .nf {
+  color: #6f42c1;
+} /* Name.Function */
+.highlight .nl {
+  color: #990000;
+} /* Name.Label */
+.highlight .nn {
+  color: #555555;
+} /* Name.Namespace */
+.highlight .nx {
+  color: #6f42c1;
+} /* Name.Other */
+.highlight .py {
+  color: #990000;
+} /* Name.Property */
+.highlight .nt {
+  color: #22863a;
+} /* Name.Tag */
+.highlight .nv {
+  color: #e36209;
+} /* Name.Variable */
+.highlight .ow {
+  color: #d73a49;
+  font-weight: bold;
+} /* Operator.Word */
+.highlight .w {
+  color: #bbbbbb;
+} /* Text.Whitespace */
+.highlight .mf {
+  color: #005cc5;
+} /* Literal.Number.Float */
+.highlight .mh {
+  color: #005cc5;
+} /* Literal.Number.Hex */
+.highlight .mi {
+  color: #005cc5;
+} /* Literal.Number.Integer */
+.highlight .mo {
+  color: #005cc5;
+} /* Literal.Number.Oct */
+.highlight .sb {
+  color: #032f62;
+} /* Literal.String.Backtick */
+.highlight .sc {
+  color: #032f62;
+} /* Literal.String.Char */
+.highlight .sd {
+  color: #032f62;
+} /* Literal.String.Doc */
+.highlight .s2 {
+  color: #032f62;
+} /* Literal.String.Double */
+.highlight .se {
+  color: #032f62;
+} /* Literal.String.Escape */
+.highlight .sh {
+  color: #032f62;
+} /* Literal.String.Heredoc */
+.highlight .si {
+  color: #032f62;
+} /* Literal.String.Interpol */
+.highlight .sx {
+  color: #032f62;
+} /* Literal.String.Other */
+.highlight .sr {
+  color: #22863a;
+} /* Literal.String.Regex */
+.highlight .s1 {
+  color: #032f62;
+} /* Literal.String.Single */
+.highlight .ss {
+  color: #032f62;
+} /* Literal.String.Symbol */
+.highlight .bp {
+  color: #005cc5;
+} /* Name.Builtin.Pseudo */
+.highlight .vc {
+  color: #e36209;
+} /* Name.Variable.Class */
+.highlight .vg {
+  color: #e36209;
+} /* Name.Variable.Global */
+.highlight .vi {
+  color: #e36209;
+} /* Name.Variable.Instance */
+.highlight .il {
+  color: #005cc5;
+} /* Literal.Number.Integer.Long */
+
+/* Additional Rouge token classes that may be used */
+.highlight .token {
+  color: #5670a0;
+}
+.highlight .token.list {
+  color: #546e9f;
+}
+.highlight .token.punctuation {
+  color: #3e8dad;
+}
+.highlight .token.list.punctuation {
+  color: #e05b78;
+}
+.highlight .token.content {
+  padding: 0;
+}
+
+/* Nested lists in page content */
+ul ul,
+ol ol,
+ul ol,
+ol ul {
+  padding-left: 1.5em;
+  margin-top: 0.25em;
+}
+
+/* Page footer */
+.page-footer {
+  background: #f5f5f5;
+  border-top: 1px solid #ddd;
+  padding: 1.5rem;
+  margin-top: 3rem;
+  color: #666;
+  font-size: 0.9em;
+}
+
+.page-footer p {
+  margin: 0.5em 0;
+}
+
+.page-footer a {
+  color: #0066cc;
+  text-decoration: none;
+}
+
+.page-footer a:hover {
+  text-decoration: underline;
+}
+
+/* Mobile responsive */
+@media (max-width: 768px) {
+  .hamburger-menu {
+    display: flex;
+  }
+
+  .main-toc,
+  .sidebar {
+    transform: translateX(-100%);
+    z-index: 175;
+  }
+
+  .main-toc.mobile-open,
+  .sidebar.mobile-open {
+    transform: translateX(0);
+  }
+
+  body {
+    margin: 2rem 1rem;
+  }
+
+  .floating-toc {
+    left: 0;
+  }
+}
+
+</style></head>
+
+  <body class="code-highlighted">
+<div class="floating-toc" id="floating-toc">
+  <div class="floating-toc-container">
+    <div class="floating-toc-header">
+      <span>Table of Contents 🔻</span>
+    </div>
+    <div class="floating-toc-content" id="floating-toc-content">
+      <!-- Content will be populated by JavaScript -->
+    </div>
+  </div>
+</div>
+
+<button class="hamburger-menu" id="hamburger-menu" aria-label="Toggle navigation"></button>
+<div class="mobile-menu-overlay" id="mobile-menu-overlay"></div>
+
+<nav class="main-toc"><ul><li><a href="Home.html">Home</a></li><li><a href="Getting-Started.html">Getting Started</a></li><li><a href="Installation.html">Installation</a></li><li><a href="Usage.html">Usage</a></li><li><a href="Syntax.html">Syntax</a></li><li><a href="Callouts.html">Callouts</a></li><li><a href="Tables.html">Tables</a></li><li><a href="Inline-Attribute-Lists.html">Inline Attribute Lists</a></li><li><a href="Modes.html">Modes</a></li><li><a href="Quarto-Mode.html">Quarto Mode</a></li><li><a href="Command-Line-Options.html">Command Line Options</a></li><li><a href="Rendering-Markdown-In-Terminal.html">Rendering Markdown in the Terminal</a></li><li><a href="Generating-Man-Pages.html">Generating Man Pages</a></li><li><a href="Multi-File-Documents.html">Multi-file Documents</a></li><li><a href="Citations.html">Citations</a></li><li><a href="Indices.html">Indices</a></li><li><a href="Metadata-Transforms.html">Metadata Transforms</a></li><li><a href="Pandoc-Integration.html">Integrating with Pandoc</a></li><li><a href="Using-Apex-with-Jekyll.html">Using Apex with Jekyll</a></li><li><a href="Header-IDs.html">Header IDs</a></li><li><a href="C-API.html">C API</a></li><li><a href="Writing-Tests.html">Writing Tests</a></li><li><a href="Xcode-Integration.html">Xcode Integration</a></li><li><a href="Examples.html">Examples</a></li><li><a href="Plugins.html">Plugins</a></li><li><a href="Filters.html">Filters</a></li><li><a href="Troubleshooting.html">Troubleshooting</a></li><li><a href="Credits.html">Credits</a></li></ul></nav>
+
+    <h1 id="tables">
+      Tables
+    </h1>
+<nav class="page-toc" id="page-toc-top"><ul><li><a href="#tables">Tables</a><ul><li><a href="#standard-pipe-tables">Standard Pipe&nbsp;Tables</a></li><li><a href="#relaxed-tables">Relaxed&nbsp;Tables</a></li><li><a href="#grid-tables-pandoc-style">Grid Tables&nbsp;(Pandoc-style)</a></li><li><a href="#headerless-tables">Headerless&nbsp;Tables</a><ul><li><a href="#row-header-columns">Row Header&nbsp;Columns</a></li></ul></li><li><a href="#inline-tables-from-csvtsv">Inline Tables from&nbsp;CSV/TSV</a><ul><li><a href="#fenced-csvtsv-tables">Fenced CSV/TSV&nbsp;Tables</a></li><li><a href="#alignment-rows-in-csvtsv-tables">Alignment Rows in CSV/TSV&nbsp;Tables</a></li><li><a href="#table-markers">&lt;!--TABLE--&gt;&nbsp;Markers</a></li></ul></li><li><a href="#column-spans">Column&nbsp;Spans</a><ul><li><a href="#consecutive-pipes">Consecutive&nbsp;Pipes</a></li><li><a href="#marker">&lt;&lt;&nbsp;Marker</a></li></ul></li><li><a href="#row-spans">Row&nbsp;Spans</a></li><li><a href="#combined-row-and-column-spans">Combined Row and Column&nbsp;Spans</a></li><li><a href="#individual-cell-alignment">Individual Cell&nbsp;Alignment</a></li><li><a href="#table-footers-tfoot">Table Footers&nbsp;(tfoot)</a></li><li><a href="#table-captions">Table&nbsp;Captions</a><ul><li><a href="#multimarkdown-style-captions">MultiMarkdown-Style&nbsp;Captions</a></li><li><a href="#pandoc-style-captions">Pandoc-Style&nbsp;Captions</a></li><li><a href="#pandoc-table-attributes-extension">Pandoc Table Attributes&nbsp;Extension</a></li><li><a href="#caption-position">Caption&nbsp;Position</a></li></ul></li><li><a href="#inline-attribute-lists-ials-for-tables">Inline Attribute Lists (IALs)&nbsp;for&nbsp;Tables</a><ul><li><a href="#ials-after-tables">IALs After&nbsp;Tables</a></li><li><a href="#ials-in-table-captions">IALs in Table&nbsp;Captions</a></li></ul></li><li><a href="#complete-example">Complete&nbsp;Example</a></li><li><a href="#see-also">See&nbsp;Also</a></li></ul></li></ul></nav>
+
+    <p>
+      Apex supports comprehensive table syntax including standard pipe tables, CSV/TSV tables, and advanced features like column/row spans, per-cell alignment, captions, and IAL attributes.
+    </p>
+
+    <h2 id="standard-pipe-tables">
+      Standard Pipe&nbsp;Tables
+    </h2>
+
+    <p>
+      Basic pipe table syntax with header row and separator:
+    </p>
+
+    <div class="highlight">
+<pre><span></span>| Header 1 | Header 2 | Header 3 |
+| -------- | <span class=\"emoji\">:------:</span> | -------: |
+| Left     |  Center  |    Right |
+| Data     |   Data   |     Data |
+    </pre>
+  </div>
+
+  <p>
+    Column alignment is specified in the separator row:
+  </p>
+
+  <ul>
+
+    <li>
+<code>:---</code> or <code>---</code> - Left (default)
+    </li>
+
+    <li>
+<code><span class=\"emoji\">:---:</span></code> - Center
+    </li>
+
+    <li>
+<code>---:</code> - Right
+    </li>
+
+  </ul>
+
+  <h2 id="relaxed-tables">
+    Relaxed&nbsp;Tables
+  </h2>
+
+  <p>
+    In <strong>unified</strong> and <strong>kramdown</strong> modes, tables don’t require separator rows:
+  </p>
+
+  <div class="highlight">
+<pre><span></span>one | two | three
+1 | 2 | 3
+4 | 5 | 6
+  </pre>
+</div>
+
+<p>
+  This automatically becomes a table. See <a href="Modes.html">Modes</a> for details.
+</p>
+
+<h2 id="grid-tables-pandoc-style">
+  Grid Tables&nbsp;(Pandoc-style)
+</h2>
+
+<p>
+  Pandoc <strong>grid tables</strong> use ASCII border rows instead of pipe separators. Enable with <code>--grid-tables</code> or disable explicitly with <code>--no-grid-tables</code> (disabled by default in unified mode).
+</p>
+
+<div class="highlight">
+<pre><span></span>+---------------+---------------+
+| Fruit         | Price         |
++:=============+==============:+
+| Bananas       | $1.34         |
+| Oranges       | $2.10         |
++---------------+---------------+
+</pre>
+</div>
+
+<p>
+  <strong>Features supported:</strong>
+</p>
+
+<ul>
+
+  <li>
+    Header rows (<code>+===+</code> separator)
+  </li>
+
+  <li>
+    Column alignment from <code>:</code> markers in border rows (<code>+:===+</code>, <code>+===:+</code>, <code>+:===:+</code>)
+  </li>
+
+  <li>
+    Multiline cells (including lists and other block markdown in cells)
+  </li>
+
+  <li>
+    Full-row colspan (single cell spanning the table width)
+  </li>
+
+  <li>
+    Nested grids inside colspan cells
+  </li>
+
+  <li>
+    Partial in-row separators (<code>| Label +---+---+</code> patterns) with rowspan/colspan
+    <strong>Notes:</strong>
+  </li>
+
+  <li>
+    Grid tables require a blank line before and after the table block (same as pipe tables).
+  </li>
+
+  <li>
+    Lines inside fenced code blocks are never converted.
+  </li>
+
+  <li>
+    Complex layouts may differ slightly from Pandoc; see <a href="Limitations-and-Roadmap.html">Limitations and Roadmap</a>.
+  </li>
+
+</ul>
+
+<h2 id="headerless-tables">
+  Headerless&nbsp;Tables
+</h2>
+
+<p>
+  Apex supports tables that start with alignment rows (separator rows) without header rows. The alignment specified in the separator row is automatically applied to all columns:
+</p>
+
+<div class="highlight">
+<pre><span></span>|  |  |  |
+| --- | --- | --- |
+| a   | b   | c   |
+| 1   | 2   | 3   |
+</pre>
+</div>
+
+<p>
+  Alignment specifiers work as usual:
+</p>
+
+<div class="highlight">
+<pre><span></span>|  |  |  |
+|:---|<span class=\"emoji\">:---:</span>|---:|
+| left | center | right |
+</pre>
+</div>
+
+<p>
+  In this case, the first row (the alignment row) specifies the column alignment, and all subsequent data rows inherit that alignment. The empty header row that would normally be required is automatically handled.
+</p>
+
+<h3 id="row-header-columns">
+  Row Header&nbsp;Columns
+</h3>
+
+<p>
+  You can mark the <strong>first column</strong> as a row-header column by starting the header row with an <strong>empty first cell</strong>:
+</p>
+
+<div class="highlight">
+<pre><span></span>|   | Header 1 | Header 2 |
+| Row 1 | data 1.1 | data 1.2 |
+| Row 2 | data 2.1 | data 2.2 |
+</pre>
+</div>
+
+<p>
+  When the first header cell is empty (for example, <code>| |</code> or <code>|   |</code>), Apex will:
+</p>
+
+<ul>
+
+  <li>
+    Treat the rest of the header row as usual column headers.
+  </li>
+
+  <li>
+    Render the first cell of each body row as a <strong>row header</strong> using <code>&lt;th scope=&quot;row&quot;&gt;Row 1&lt;/th&gt;</code>, <code>&lt;th scope=&quot;row&quot;&gt;Row 2&lt;/th&gt;</code>, etc.
+    Notes:
+  </li>
+
+  <li>
+    The row-header behavior only applies to the <strong>first column</strong> and only when the <strong>first header cell is empty</strong>.
+  </li>
+
+  <li>
+    Tables that start with <code>|data|data|</code> or <code>data|data</code> do <strong>not</strong> enable row headers.
+  </li>
+
+  <li>
+    This works together with all other table features (relaxed tables, headerless tables, colspans/rowspans, captions, etc.).
+  </li>
+
+</ul>
+
+<h2 id="inline-tables-from-csvtsv">
+  Inline Tables from&nbsp;CSV/TSV
+</h2>
+
+<p>
+  In addition to regular pipe tables, Apex can convert inline CSV/TSV text into tables.
+</p>
+
+<h3 id="fenced-csvtsv-tables">
+  Fenced CSV/TSV&nbsp;Tables
+</h3>
+
+<p>
+  Use a fenced code block with the info string <code>table</code>. The delimiter is detected automatically:
+</p>
+
+<ul>
+
+  <li>
+    If any non-blank line contains a <strong>tab</strong>, the block is treated as TSV.
+  </li>
+
+  <li>
+    Otherwise, if any non-blank line contains a <strong>comma</strong>, the block is treated as CSV.
+  </li>
+
+  <li>
+    If no tabs or commas are found, the block is left unchanged as a normal <code>table</code>-info code block (useful for showing literal CSV/TSV).
+  </li>
+
+</ul>
+
+<div class="highlight">
+<pre><span></span><span class="sb">```table</span>
+<span class="s">header 1,header 2,header 3</span>
+<span class="s">data 1,data 2,data 3</span>
+<span class="s">,,data 2c</span>
+<span class="sb">```</span>
+</pre>
+</div>
+
+<p>
+  You can also use TSV with real tab characters:
+</p>
+
+<div class="highlight">
+<pre><span></span><span class="sb">```table</span>
+<span class="s">col1	col2	col3</span>
+<span class="s">val1	val2	val3</span>
+<span class="sb">```</span>
+</pre>
+</div>
+
+<h3 id="alignment-rows-in-csvtsv-tables">
+  Alignment Rows in CSV/TSV&nbsp;Tables
+</h3>
+
+<p>
+  CSV/TSV inline tables can specify column alignment using a row of <strong>alignment keywords</strong>:
+</p>
+
+<div class="highlight">
+<pre><span></span><span class="sb">```table</span>
+<span class="s">H1,H2,H3</span>
+<span class="s">left,center,right</span>
+<span class="s">a,b,c</span>
+<span class="sb">```</span>
+</pre>
+</div>
+
+<p>
+  The alignment row is not rendered as data; it is converted to the equivalent Markdown alignment row:
+</p>
+
+<ul>
+
+  <li>
+<code>left</code> → <code>:---</code>
+  </li>
+
+  <li>
+<code>center</code> → <code><span class=\"emoji\">:---:</span></code>
+  </li>
+
+  <li>
+<code>right</code> → <code>---:</code>
+  </li>
+
+  <li>
+<code>auto</code> → <code>---</code>
+    If the first row contains only alignment keywords, it becomes a <strong>headless table</strong>: the alignment row is emitted first and all following rows become body rows. If there is <strong>no alignment row at all</strong>, Apex emits a default <code>---</code> separator row so that relaxed/headless table handling still works as expected.
+  </li>
+
+</ul>
+
+<h3 id="table-markers">
+<code>&lt;!--TABLE--&gt;</code>&nbsp;Markers
+</h3>
+
+<p>
+  You can also start an inline CSV/TSV table with an HTML comment:
+</p>
+
+<div class="highlight">
+<pre><span></span>&lt;!--TABLE--&gt;
+header 1,header 2,header 3
+data 1,data 2,data 3
+,,data 2c
+</pre>
+</div>
+
+<table>
+
+  <thead>
+
+    <tr>
+
+      <th>
+<code>| </code> consumes the following <strong>contiguous non-blank lines</strong> as table data (stopping at the first blank line)
+      </th>
+
+      <th>
+        applies the same delimiter detection and optional alignment-row handling
+      </th>
+
+      <th>
+        and converts the block into a table. If no tabs or commas are found
+      </th>
+
+      <th>
+        the comment and lines are left unchanged.
+      </th>
+
+    </tr>
+
+  </thead>
+
+</table>
+
+<h2 id="column-spans">
+  Column&nbsp;Spans
+</h2>
+
+<p>
+  Column spans allow a cell to span multiple columns. There are two ways to create column spans:
+</p>
+
+<h3 id="consecutive-pipes">
+  Consecutive&nbsp;Pipes
+</h3>
+
+<p>
+  Use consecutive pipes with no content between them to create column spans. Place the consecutive pipes after the cell content, and they will cause that cell to span the specified number of additional columns:
+</p>
+
+<div class="highlight">
+<pre><span></span>|        | Table  | Has   | Colspans       |
+| ------ | ------ | ---   | -------------- |
+| row 1                 ||| colspan        |
+| row 2  | span 2        || &amp;larr; colspan |
+</pre>
+</div>
+
+<ul>
+
+  <li>
+<code>| &lt;&lt; |</code> (2 consecutive pipes) causes the previous cell to span 2 columns total (its own column plus 1 additional)
+  </li>
+
+  <li>
+<code>| &lt;&lt; | &lt;&lt; |</code> (3 consecutive pipes) causes the previous cell to span 3 columns total (its own column plus 2 additional)
+  </li>
+
+  <li>
+<code>| &lt;&lt; | &lt;&lt; | &lt;&lt; |</code> (4 consecutive pipes) causes the previous cell to span 4 columns total (its own column plus 3 additional)
+    In the first row above, <code>| &lt;&lt; | &lt;&lt; |</code> after “colspan” causes “colspan” to span across 3 columns total. In the second row, <code>| &lt;&lt; |</code> after “cell” causes “cell” to span across 2 columns total (its own column plus the next column).
+  </li>
+
+</ul>
+
+<h3 `| ` consumes the following **contiguous non-blank lines** as table data (stopping at the first blank line) id="marker">
+<code>&lt;&lt;</code>&nbsp;Marker
+</h3>
+
+<p>
+  You can also use the <code>&lt;&lt;</code> marker in a cell to force a colspan without using consecutive pipes. This allows whitespace and table alignment in the Markdown source:
+</p>
+
+<div class="highlight">
+<pre><span></span>| A   | B   | C   |
+| --- | --- | --- |
+| D   | &lt;&lt;  | &lt;&lt;  |
+</pre>
+</div>
+
+<p>
+  The <code>&lt;&lt;</code> marker creates a column span just like consecutive pipes, but allows you to maintain proper table alignment and add whitespace for readability in your source Markdown. Each <code>&lt;&lt;</code> marker in a cell indicates that cell is part of a colspan from the previous cell. In the example above, <code>D</code> spans 3 columns total (its own column plus the 2 columns containing <code>&lt;&lt;</code> markers).
+  To include a <strong>literal</strong> <code>&lt;&lt;</code> in a table cell (without creating a colspan), escape the first <code>&lt;</code> with a backslash: <code>\&lt;&lt;</code>. The backslash-plus-less-than is treated as an escaped <code>&lt;</code>, so <code>\&lt;&lt;</code> is rendered as the two characters <code>&lt;&lt;</code> and does not trigger colspan behavior. For text plus literal <code>&lt;&lt;</code> (e.g. “raw &lt;&lt;”), use <code>raw \&lt;&lt;</code> so the cell is not treated as a colspan and the column is preserved.
+  <strong>Note:</strong> Blank cells containing whitespace (like <code>|     |</code> or <code>|   |</code>) are rendered as empty cells, <strong>not</strong> as column spans. Only cells with no whitespace and no content between consecutive pipes (like <code>| &lt;&lt; |</code> or <code>| &lt;&lt; | &lt;&lt; |</code>) create column spans.
+</p>
+
+<h2 applies the same delimiter detection and optional alignment-row handling id="row-spans">
+  Row&nbsp;Spans
+</h2>
+
+<p>
+  Row spans allow a cell to span multiple rows. Use the <code>^^</code> marker to create a row span:
+</p>
+
+<div class="highlight">
+<pre><span></span>| A   | B   |
+| --- | --- |
+| C   | D   |
+| ^^  | E   |
+</pre>
+</div>
+
+<p>
+  The <code>^^</code> marker creates a row span on the cell above. In this example, the cell containing “C” spans two rows.
+  Consecutive <code>^^</code> markers stack to create larger row spans:
+</p>
+
+<div class="highlight">
+<pre><span></span>| A   | B   | C   |
+| --- | --- | --- |
+| X   | Y   | Z   |
+| ^^  | W   | V   |
+| ^^  | U   | T   |
+</pre>
+</div>
+
+<p>
+  Here, the cell “X” spans three rows total.
+</p>
+
+<h2 and converts the block into a table. If no tabs or commas are found id="combined-row-and-column-spans">
+  Combined Row and Column&nbsp;Spans
+</h2>
+
+<p>
+  You can mix rowspans and colspans in the same table to create more complex layouts:
+</p>
+
+<div class="highlight">
+<pre><span></span>| Department  | Employee | Q1-Q2 Average | Q3     | Q4  | Overall |
+| ----------- | -------- | ------------- | ------ | --- | ------- |
+| Engineering | Alice    | 93.5          | 94     | 96  | 94.25   |
+| ^^          | Bob      | 89.0          | 87     | 91  | 89.00   |
+| Marketing   | Charlie  | 92.0          | Absent |     | 92.00   |
+| Sales       | Diana    | 87.5          | 88     | 90  | 88.50   |
+| ^^          | Eve      | 93.0          | 95     | 93  | 93.50   |
+</pre>
+</div>
+
+<p>
+  Here <code>^^</code> creates rowspans for the <code>Department</code> column. The example demonstrates how rowspans work with regular data rows.
+</p>
+
+<h2 the comment and lines are left unchanged. id="individual-cell-alignment">
+  Individual Cell&nbsp;Alignment
+</h2>
+
+<p>
+  Table cells can be aligned individually using colons, similar to Jekyll Spaceship. This allows you to override the default column alignment on a per-cell basis:
+</p>
+
+<div class="highlight">
+<pre><span></span>| Header | Header | Header |
+| --- | --- | --- |
+| :Left | Center: | <span class=\"emoji\">:Center:</span> |
+| Right: | Normal | :Left |
+</pre>
+</div>
+
+<p>
+  Alignment syntax:
+</p>
+
+<ul>
+
+  <li>
+<code>:Text</code> or <code>: Text</code> - Left align (leading colon)
+  </li>
+
+  <li>
+<code>Text:</code> or <code>Text :</code> - Right align (trailing colon)
+  </li>
+
+  <li>
+<code><span class=\"emoji\">:Text:</span></code> or <code>: Text :</code> - Center align (both colons)
+    The colons are removed from the output, and the alignment is applied via CSS <code>text-align</code> styles. Escaped colons (<code>\:</code>) are not treated as alignment markers.
+    Cell-level alignment overrides the column-level alignment specified in the separator row.
+  </li>
+
+</ul>
+
+<h2 id="table-footers-tfoot">
+  Table Footers&nbsp;(tfoot)
+</h2>
+
+<p>
+  You can create table footers using a row where every cell contains only <code>===</code> (three or more equals, with optional extra <code>=</code> and whitespace). This row acts as a <strong>footer divider</strong>:
+</p>
+
+<div class="highlight">
+<pre><span></span>| h1  |  h2   | h3  |
+| --- | <span class=\"emoji\">:---:</span> | --- |
+| d1  |  d2   | d3  |
+| d1  |  d2   | d3  |
+| === |  ===  | === |
+| d-4 |  d-5  | d-6 |
+</pre>
+</div>
+
+<p>
+  The <code>===</code> row is treated as a footer divider and is removed from the output. All following rows are rendered inside <code>&lt;tfoot&gt;</code>.
+  The footer separator must appear after all body rows. Once the <code>===</code> row is encountered, all subsequent rows until the end of the table (or a blank line) are treated as footer rows.
+</p>
+
+<h2 id="table-captions">
+  Table&nbsp;Captions
+</h2>
+
+<p>
+  Tables can have captions that appear before or after the table. Apex supports multiple caption formats:
+</p>
+
+<h3 id="multimarkdown-style-captions">
+  MultiMarkdown-Style&nbsp;Captions
+</h3>
+
+<p>
+  Captions in square brackets:
+</p>
+
+<div class="highlight">
+<pre><span></span>[Table Caption]
+
+| A   | B   |
+| --- | --- |
+| C   | D   |
+</pre>
+</div>
+
+<p>
+  Captions can appear <strong>before or after</strong> a table. They must be contiguous with the table (no other content between them), but a blank line is allowed:
+</p>
+
+<div class="highlight">
+<pre><span></span>| A   | B   |
+| --- | --- |
+| C   | D   |
+
+[Caption after table]
+</pre>
+</div>
+
+<h3 id="pandoc-style-captions">
+  Pandoc-Style&nbsp;Captions
+</h3>
+
+<p>
+  Pandoc-style <code> [Caption</code> lines are also supported:]
+</p>
+
+<div class="highlight">
+<pre><span></span>| A   | B   |
+| --- | --- |
+| C   | D   |
+
+Table: Caption after table
+</pre>
+</div>
+
+<p>
+  Pandoc-style <code> [Caption</code> lines are normalized to <code>[Caption]</code> before parsing, so they work with the same caption rendering as MultiMarkdown captions.]
+</p>
+
+<h3 id="pandoc-table-attributes-extension">
+  Pandoc Table Attributes&nbsp;Extension
+</h3>
+
+<p>
+  Apex supports Pandoc’s <code>table_attributes</code> extension using the <code>: Caption</code> syntax:
+</p>
+
+<div class="highlight">
+<pre><span></span>| Key | Value |
+| --- | <span class=\"emoji\">:---:</span> |
+| one |   1   |
+| two |   2   |
+
+: Key value table {#table-id .testing key=&quot;value&quot;}
+</pre>
+</div>
+
+<p>
+  The <code>: Caption</code> format (with optional IAL attributes) is recognized when it appears immediately before or after a table. IAL attributes in the caption are extracted and applied to the table element itself.
+  <strong>Note:</strong> The <code>: Caption</code> syntax only works when adjacent to a table to avoid conflicts with definition list syntax. If a line starting with <code>:</code> is not next to a table, it will be processed as a definition list item.
+</p>
+
+<h3 id="caption-position">
+  Caption&nbsp;Position
+</h3>
+
+<p>
+  By default, captions appear <strong>below</strong> the table. Use the <code>--captions above</code> option to place captions above the table instead. The <code>--captions below</code> option (or default) places them below. See <a href="Command-Line-Options.html">Command Line Options</a> for details.
+</p>
+
+<h2 id="inline-attribute-lists-ials-for-tables">
+  Inline Attribute Lists (IALs)&nbsp;for&nbsp;Tables
+</h2>
+
+<p>
+  Tables support Inline Attribute Lists (IALs) for adding HTML attributes like IDs, classes, and custom key-value pairs. See <a href="Inline-Attribute-Lists.html">Inline Attribute Lists</a> for complete IAL syntax documentation.
+</p>
+
+<h3 id="ials-after-tables">
+  IALs After&nbsp;Tables
+</h3>
+
+<p>
+  Tables can have IALs applied on a separate line after the table:
+</p>
+
+<div class="highlight">
+<pre><span></span>| Key | Value |
+| --- | <span class=\"emoji\">:---:</span> |
+| one |   1   |
+| two |   2   |
+
+{: <span class="ni">#data</span>-table .striped .bordered}
+</pre>
+</div>
+
+<p>
+  This applies the attributes to the <code>&lt;table&gt;</code> element:
+</p>
+
+<div class="highlight">
+<pre><span></span><span class="p">&lt;</span><span class="nt">table</span> <span class="na">id</span><span class="o">=</span><span class="s">&quot;data-table&quot;</span> <span class="na">class</span><span class="o">=</span><span class="s">&quot;striped bordered&quot;</span><span class="p">&gt;</span>
+  <span class="cm">&lt;!-- table content --&gt;</span>
+<span class="p">&lt;/</span><span class="nt">table</span><span class="p">&gt;</span>
+</pre>
+</div>
+
+<p>
+  Apex supports both Kramdown-style IALs (<code>{: #id .class}</code>) and Pandoc-style IALs without the colon (<code>{#id .class}</code>):
+</p>
+
+<div class="highlight">
+<pre><span></span>| Key | Value |
+| --- | <span class=\"emoji\">:---:</span> |
+| one |   1   |
+| two |   2   |
+
+{#table-id .my-class key=&quot;value&quot;}
+</pre>
+</div>
+
+<h3 id="ials-in-table-captions">
+  IALs in Table&nbsp;Captions
+</h3>
+
+<p>
+  When using Pandoc-style captions with the <code>: Caption</code> syntax, IAL attributes in the caption are extracted and applied to the table:
+</p>
+
+<div class="highlight">
+<pre><span></span>| Key | Value |
+| --- | <span class=\"emoji\">:---:</span> |
+| one |   1   |
+| two |   2   |
+
+: Key value table {#table-id .testing key=&quot;value&quot;}
+</pre>
+</div>
+
+<p>
+  This is equivalent to:
+</p>
+
+<div class="highlight">
+<pre><span></span>| Key | Value |
+| --- | <span class=\"emoji\">:---:</span> |
+| one |   1   |
+| two |   2   |
+
+{: <span class="ni">#table</span>-id .testing key=&quot;value&quot;}
+</pre>
+</div>
+
+<p>
+  Both Kramdown-style IALs (<code>{: #id .class}</code>) and Pandoc-style IALs without the colon (<code>{#id .class}</code>) are supported in table captions.
+</p>
+
+<h2 id="complete-example">
+  Complete&nbsp;Example
+</h2>
+
+<p>
+  Here’s a comprehensive example combining multiple advanced features:
+</p>
+
+<div class="highlight">
+<pre><span></span>[Employee Performance Q4 2025]
+| Department  | Employee | Q1-Q2 Average | Q3     | Q4  | Overall |
+| ----------- | -------- | ------------- | ------ | --- | ------- |
+| Engineering | Alice    | 93.5          | 94     | 96  | 94.25   |
+| ^^          | Bob      | 89.0          | 87     | 91  | 89.00   |
+| Marketing   | Charlie  | 92.0          | Absent ||| 92.00   |
+| Sales       | Diana    | 87.5          | 88     | 90  | 88.50   |
+| ^^          | Eve      | 93.0          | 95     | 93  | 93.50   |
+| === | === | === | === | === | === |
+| Total ||| <span class=\"emoji\">:Center:</span> ||| 92.05 |
+
+{: .performance-table <span class="ni">#q4</span>-results .striped}
+</pre>
+</div>
+
+<p>
+  This example demonstrates:
+</p>
+
+<ul>
+
+  <li>
+    <strong>Caption</strong>: <code>[Employee Performance Q4 2025]</code> before the table
+  </li>
+
+  <li>
+    <strong>Row spans</strong>: <code>^^</code> markers create rowspans for the Department column
+  </li>
+
+  <li>
+    <strong>Column spans</strong>: Consecutive pipes (<code>| &lt;&lt; | &lt;&lt; |</code>) in the “Absent” row create a colspan spanning the Q4 column
+  </li>
+
+  <li>
+    <strong>Per-cell alignment</strong>: <code><span class=\"emoji\">:Center:</span></code> in the footer row overrides column alignment
+  </li>
+
+  <li>
+    <strong>Table footer</strong>: <code>===</code> row creates a footer section
+  </li>
+
+  <li>
+    <strong>IAL attributes</strong>: <code>{: .performance-table #q4-results .striped}</code> applies classes and ID to the table
+  </li>
+
+</ul>
+
+<h2 id="see-also">
+  See&nbsp;Also
+</h2>
+
+<ul>
+
+  <li>
+    <a href="Syntax.html">Syntax</a> - General syntax documentation
+  </li>
+
+  <li>
+    <a href="Inline-Attribute-Lists.html">Inline Attribute Lists</a> - Complete IAL syntax reference
+  </li>
+
+  <li>
+    <a href="Command-Line-Options.html">Command Line Options</a> - Table-related command-line options
+  </li>
+
+  <li>
+    <a href="Modes.html">Modes</a> - Table features available in different modes
+  </li>
+
+</ul>
+
+<script>
+// Hamburger menu functionality
+(function() {
+  function initHamburgerMenu() {
+    var hamburger = document.getElementById('hamburger-menu');
+    var sidebar = document.querySelector('.main-toc, .sidebar');
+    var overlay = document.getElementById('mobile-menu-overlay');
+
+    if (!hamburger || !sidebar) return;
+
+    function toggleMenu() {
+      var isOpen = sidebar.classList.contains('mobile-open');
+      if (isOpen) {
+        sidebar.classList.remove('mobile-open');
+        hamburger.classList.remove('active');
+        if (overlay) overlay.classList.remove('active');
+      } else {
+        sidebar.classList.add('mobile-open');
+        hamburger.classList.add('active');
+        if (overlay) overlay.classList.add('active');
+      }
+    }
+
+    hamburger.addEventListener('click', function(e) {
+      e.stopPropagation();
+      toggleMenu();
+    });
+
+    if (overlay) {
+      overlay.addEventListener('click', function() {
+        toggleMenu();
+      });
+    }
+
+    // Close menu when clicking on a sidebar link (mobile only)
+    if (window.innerWidth <= 768) {
+      var sidebarLinks = sidebar.querySelectorAll('a');
+      sidebarLinks.forEach(function(link) {
+        link.addEventListener('click', function() {
+          setTimeout(function() {
+            sidebar.classList.remove('mobile-open');
+            hamburger.classList.remove('active');
+            if (overlay) overlay.classList.remove('active');
+          }, 100);
+        });
+      });
+    }
+
+    // Close menu on window resize if going to desktop
+    window.addEventListener('resize', function() {
+      if (window.innerWidth > 768) {
+        sidebar.classList.remove('mobile-open');
+        hamburger.classList.remove('active');
+        if (overlay) overlay.classList.remove('active');
+      }
+    });
+  }
+
+  // Initialize when DOM is ready
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initHamburgerMenu);
+  } else {
+    initHamburgerMenu();
+  }
+})();
+
+</script>
+<script>
+  (function() {
+    // Clone the page TOC for floating TOC
+    function initFloatingTOC() {
+      var pageTOC = document.getElementById('page-toc-top');
+      var floatingTOCContent = document.getElementById('floating-toc-content');
+      var floatingTOC = document.getElementById('floating-toc');
+
+      if (!pageTOC || !floatingTOCContent || !floatingTOC) return;
+
+      // Clone the TOC structure
+      var tocClone = pageTOC.cloneNode(true);
+      tocClone.id = 'floating-toc-clone';
+      floatingTOCContent.appendChild(tocClone);
+
+      // Update all links to use smooth scrolling
+      var allTOCLinks = document.querySelectorAll('.page-toc a, .floating-toc-content a');
+      allTOCLinks.forEach(function(link) {
+        link.addEventListener('click', function(e) {
+          var href = this.getAttribute('href');
+          if (href && href.startsWith('#')) {
+            e.preventDefault();
+            var targetId = href.substring(1);
+            var targetElement = document.getElementById(targetId);
+            if (targetElement) {
+              var offset = 20; // Offset from top
+
+              // Function to calculate absolute position from document top
+              function getAbsoluteTop(element) {
+                var top = 0;
+                while (element) {
+                  top += element.offsetTop;
+                  element = element.offsetParent;
+                }
+                return top;
+              }
+
+              var absoluteTop = getAbsoluteTop(targetElement);
+              var scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+              var offsetPosition = absoluteTop - offset;
+
+              // Only scroll if we're not already at the target position
+              if (Math.abs(scrollTop - offsetPosition) > 10) {
+                window.scrollTo({
+                  top: Math.max(0, offsetPosition),
+                  behavior: 'smooth'
+                });
+              }
+
+              // Update URL hash without triggering scroll
+              if (history.pushState) {
+                history.pushState(null, null, href);
+              }
+            }
+          }
+        });
+      });
+
+      // Handle scroll to show/hide floating TOC
+      var tocTop = pageTOC.getBoundingClientRect().top + window.pageYOffset;
+      var tocBottom = tocTop + pageTOC.offsetHeight;
+
+      function updateFloatingTOC() {
+        var scrollY = window.pageYOffset || document.documentElement.scrollTop;
+
+        if (scrollY > tocBottom) {
+          floatingTOC.classList.add('visible');
+        } else {
+          floatingTOC.classList.remove('visible');
+        }
+      }
+
+      // Throttle scroll events
+      var ticking = false;
+      window.addEventListener('scroll', function() {
+        if (!ticking) {
+          window.requestAnimationFrame(function() {
+            updateFloatingTOC();
+            ticking = false;
+          });
+          ticking = true;
+        }
+      });
+
+      // Initial check
+      updateFloatingTOC();
+    }
+
+    // Initialize when DOM is ready
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', initFloatingTOC);
+    } else {
+      initFloatingTOC();
+    }
+  })();
+</script>
+<footer class="page-footer"><p>Copyright 2025 Brett Terpstra, All Rights Reserved | MIT License</p></footer></body>
+
+</html>
+

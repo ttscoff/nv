@@ -585,6 +585,12 @@ CA
                                     <action selector="previewNoteWithMarked:" target="213" id="1440"/>
                                 </connections>
                             </menuItem>
+                            <menuItem title="Open Marked Streaming Preview" id="NVStreamPrev1">
+                                <modifierMask key="keyEquivalentModifierMask"/>
+                                <connections>
+                                    <action selector="openMarkedStreamingPreview:" target="213" id="NVStreamAct1"/>
+                                </connections>
+                            </menuItem>
                             <menuItem title="Toggle Source View" keyEquivalent="u" id="1240">
                                 <connections>
                                     <action selector="toggleSourceView:" target="213" id="1246"/>
@@ -958,6 +964,12 @@ CA
                     <modifierMask key="keyEquivalentModifierMask" control="YES" command="YES"/>
                     <connections>
                         <action selector="previewNoteWithMarked:" target="213" id="oGv-W1-Si9"/>
+                    </connections>
+                </menuItem>
+                <menuItem title="Open Marked Streaming Preview" id="NVStreamPrev2">
+                    <modifierMask key="keyEquivalentModifierMask"/>
+                    <connections>
+                        <action selector="openMarkedStreamingPreview:" target="213" id="NVStreamAct2"/>
                     </connections>
                 </menuItem>
                 <menuItem title="Enable Markdown Completion" keyEquivalent="M" id="1425">

@@ -1,0 +1,541 @@
+.TH "NAME" "1" "1 January 1970" ""
+
+.SH NAME
+
+.PP
+apex\-plugins \- Apex plugin system for extending Markdown processing
+
+.SH DESCRIPTION
+
+.PP
+Apex supports a lightweight plugin system that lets you add new syntax and post\-processing behavior without patching the core. Plugins can be small scripts (Ruby, Python, etc.) or simple declarative regex rules defined in YAML.
+
+.PP
+Plugins are disabled by default so Apex's performance and behavior are unchanged unless you explicitly opt in.
+
+.SH ENABLING PLUGINS
+
+.SS Command\-line flags
+
+.IP \(bu 2
+\f[B]Enable plugins\f[]: \fRapex \-\-plugins input.md\f[]
+
+.IP \(bu 2
+\f[B]Disable plugins\f[]: \fRapex \-\-no\-plugins input.md\f[]
+
+.SS Metadata keys
+
+.PP
+In the document's front matter, any of these keys are recognized (case\-insensitive):
+
+.IP \(bu 2
+\fRplugins\f[]
+
+.IP \(bu 2
+\fRenable\-plugins\f[]
+
+.IP \(bu 2
+\fRenable_plugins\f[]
+
+.PP
+Example:
+
+.PP
+.nf
+\fR
+\-\-\-
+title: Plugin demo
+plugins: true
+\-\-\-
+
+\f[]
+.fi
+
+.SS Precedence
+
+.PP
+If metadata enables or disables plugins, you can still override it from the CLI:
+
+.IP \(bu 2
+\fR\-\-plugins\f[] forces plugins \f[B]on\f[]
+
+.IP \(bu 2
+\fR\-\-no\-plugins\f[] forces plugins \f[B]off\f[]
+
+.PP
+CLI flags always win over metadata.
+
+.SH PLUGIN LOCATIONS
+
+.PP
+Plugins are discovered from two locations, in this order:
+
+.IP "1." 4
+\f[B]Project\-local plugins\f[]
+
+.IP \(bu 2
+Directory: \fR.apex/plugins/\f[] in the same project as your documents
+
+.IP \(bu 2
+Structure: one subdirectory per plugin, for example:
+
+.IP \(bu 2
+\fR.apex/plugins/kbd/plugin.yml\f[]
+
+.IP \(bu 2
+\fR.apex/plugins/kbd/kbd_plugin.rb\f[]
+
+.IP "2." 4
+\f[B]Global (user) plugins\f[]
+
+.IP \(bu 2
+If \fR$XDG_CONFIG_HOME\f[] is set: \fR$XDG_CONFIG_HOME/apex/plugins/\f[]
+
+.IP \(bu 2
+Otherwise: \fR~/.config/apex/plugins/\f[]
+
+.IP \(bu 2
+Same structure: one subdirectory per plugin
+
+.PP
+\f[B]Plugin IDs must be unique.\f[] If a project plugin and a global plugin share the same \fRid\f[], the project plugin wins and the global one is ignored.
+
+.SH PROCESSING PHASES
+
+.PP
+Apex exposes several phases in its pipeline. Plugins can hook into one or more phases:
+
+.IP \(bu 2
+\f[B]\fRpre_parse\f[]\f[]
+
+.IP \(bu 2
+Runs on the raw Markdown text before it is parsed.
+
+.IP \(bu 2
+Good for: custom syntax (e.g. \fRAPEX_LIQUID_TAG_0\f[]), textual rewrites, adding/removing markup before Apex sees it
+
+.IP \(bu 2
+\f[B]\fRpost_render\f[]\f[]
+
+.IP \(bu 2
+Runs on the final HTML output after Apex finishes rendering.
+
+.IP \(bu 2
+Good for: wrapping elements in spans/divs, adding CSS classes, simple HTML post\-processing (e.g. turning \fR:emoji:\f[] into \fR<span>\f[])
+
+.PP
+Internally, plugins for each phase are run in a deterministic order:
+
+.IP "1." 4
+Sorted by priority (lower numbers first; default is \fR100\f[]).
+
+.IP "2." 4
+Ties broken by plugin \fRid\f[] (lexicographically).
+
+.SH PLUGIN MANIFEST
+
+.PP
+Each plugin is defined by a manifest file:
+
+.IP \(bu 2
+\f[B]File name\f[]: \fRplugin.yml\f[]
+
+.IP \(bu 2
+\f[B]Location\f[]: inside the plugin's directory
+
+.PP
+At minimum, a plugin needs:
+
+.PP
+.nf
+\fR
+\-\-\-
+id: my\-plugin
+phase: pre_parse           # or post_render
+priority: 100              # optional, lower runs earlier
+\-\-\-
+
+\f[]
+.fi
+
+.PP
+From there, you choose one of two plugin types:
+
+.IP \(bu 2
+\f[B]External handler plugin\f[] \- Runs an external command (Ruby, Python, shell, etc.). Declared with a \fRhandler.command\f[] field.
+
+.IP \(bu 2
+\f[B]Declarative regex plugin\f[] \- No external code; in\-process regex search/replace. Declared with \fRpattern\f[] and \fRreplacement\f[] fields.
+
+.PP
+You can't mix both styles in a single plugin; if \fRhandler.command\f[] is present, the plugin is treated as external.
+
+.SS Metadata fields
+
+.PP
+To support plugin directories, automatic installation, and future auto\-update tools, Apex understands several optional metadata fields in \fRplugin.yml\f[]:
+
+.IP \(bu 2
+\f[B]\fRtitle\f[]\f[]: Short, human\-friendly name for the plugin
+
+.IP \(bu 2
+\f[B]\fRauthor\f[]\f[]: Free\-form author string
+
+.IP \(bu 2
+\f[B]\fRdescription\f[]\f[]: One\-two sentence description of what the plugin does
+
+.IP \(bu 2
+\f[B]\fRhomepage\f[]\f[]: Informational URL where users can learn more about the plugin
+
+.IP \(bu 2
+\f[B]\fRrepo\f[]\f[]: Canonical Git URL for the plugin repository, used by Apex when installing plugins
+
+.IP \(bu 2
+\f[B]\fRpost_install\f[]\f[]: Optional command that Apex will run after cloning the plugin during \fR\-\-install\-plugin\f[]
+
+.PP
+Only \fRid\f[], \fRphase\f[], and either \fRhandler.command\f[] (for external plugins) or \fRpattern\f[]/\fRreplacement\f[] (for declarative plugins) are required for execution.
+
+.SH EXTERNAL HANDLER PLUGINS
+
+.PP
+An external handler plugin defines a command to run, which receives JSON on stdin and writes the transformed text to stdout.
+
+.SS Manifest example
+
+.PP
+.nf
+\fR
+\-\-\-
+id: kbd
+title: Keyboard Shortcuts
+author: Brett Terpstra
+description: Render APEX_LIQUID_TAG_1 key combos to HTML
+homepage: https://github.com/ApexMarkdown/apex\-kbd\-plugin
+repo: https://github.com/ApexMarkdown/apex\-kbd\-plugin.git
+phase: pre_parse
+priority: 100
+timeout_ms: 0        # optional
+handler:
+  command: "ruby kbd_plugin.rb"
+\-\-\-
+
+\f[]
+.fi
+
+.SS JSON protocol
+
+.PP
+For text phases (\fRpre_parse\f[], \fRpost_render\f[]), Apex sends your command a JSON object on stdin:
+
+.PP
+.nf
+\fR
+{
+  "version": 1,
+  "plugin_id": "kbd",
+  "phase": "pre_parse",
+  "text": "raw or rendered text here"
+}
+
+\f[]
+.fi
+
+.PP
+Your plugin should:
+
+.IP "1." 4
+Read all of stdin.
+
+.IP "2." 4
+Parse the JSON.
+
+.IP "3." 4
+Transform the \fRtext\f[] field.
+
+.IP "4." 4
+Print the new text only to stdout (no extra JSON, headers, or logging).
+
+.PP
+If your plugin fails, times out, or prints nothing, Apex will treat it as a no\-op and continue gracefully.
+
+.SH DECLARATIVE REGEX PLUGINS
+
+.PP
+For many cases, you don't need a script at all. A declarative regex plugin uses \fRregex.h\f[] inside Apex for fast in\-process search/replace.
+
+.SS Manifest example
+
+.PP
+.nf
+\fR
+\-\-\-
+id: emoji\-span
+title: Emoji span wrapper
+author: Brett Terpstra
+description: Wrap :emoji: markers in a span for styling
+homepage: https://github.com/ApexMarkdown/apex\-emoji\-plugin
+repo: https://github.com/ApexMarkdown/apex\-emoji\-plugin.git
+phase: post_render
+pattern: "(:[a\-zA\-Z0\-9_+\-]+:)"
+replacement: "<span class=\e"emoji\e">$1</span>"
+flags: "i"          # optional: e.g. i, m, s
+priority: 200
+timeout_ms: 0
+\-\-\-
+
+\f[]
+.fi
+
+.IP \(bu 2
+\f[B]\fRpattern\f[]\f[]: POSIX regular expression (compiled via \fRregcomp\f[]).
+
+.IP \(bu 2
+\f[B]\fRreplacement\f[]\f[]: Replacement string with capture groups like \fR$1\f[], \fR$2\f[], etc. Runs repeatedly across the text until no more matches.
+
+.IP \(bu 2
+\f[B]\fRflags\f[]\f[] (optional): Currently supports \fRi\f[] (case\-insensitive), \fRm\f[] (multi\-line), \fRs\f[] (dot matches newline).
+
+.PP
+This is ideal when you only need straightforward pattern substitution and performance matters.
+
+.SH PLUGIN BUNDLES
+
+.PP
+Sometimes it is convenient for a single repository to provide multiple related plugins as a bundle. Apex supports a bundle syntax in \fRplugin.yml\f[] when built with full YAML (libyaml) support.
+
+.SS Bundle structure
+
+.PP
+A bundle manifest has:
+
+.IP \(bu 2
+Top\-level metadata that applies to the bundle as a whole.
+
+.IP \(bu 2
+A \fRbundle:\f[] key whose value is a YAML sequence (array) of per\-plugin configs.
+
+.PP
+Example:
+
+.PP
+.nf
+\fR
+\-\-\-
+id: documentation
+title: Documentation helpers
+author: Brett Terpstra
+description: A bundle of documentation\-related helpers
+homepage: https://github.com/ApexMarkdown/apex\-plugin\-documentation
+repo: https://github.com/ApexMarkdown/apex\-plugin\-documentation.git
+bundle:
+  \- id: kbd
+    title: Keyboard Shortcuts
+    description: Render APEX_LIQUID_TAG_2 key combos to HTML <kbd> elements
+    phase: pre_parse
+    priority: 100
+    handler:
+      command: "ruby kbd_plugin.rb"
+  \- id: menubar
+    title: Menubar Paths
+    description: Render APEX_LIQUID_TAG_3 to a styled menu path
+    phase: pre_parse
+    handler:
+      command: "ruby menubar_plugin.rb"
+\-\-\-
+
+\f[]
+.fi
+
+.PP
+Apex will treat this as three distinct plugins: \fRkbd\f[], \fRmenubar\f[], and \fRprefspane\f[], all sourced from the same repository and manifest.
+
+.SH ENVIRONMENT VARIABLES
+
+.PP
+When Apex runs an external handler plugin, it sets:
+
+.IP \(bu 2
+\f[B]\fRAPEX_PLUGIN_DIR\f[]\f[]
+
+.IP \(bu 2
+Filesystem path to the plugin's directory (where \fRplugin.yml\f[] lives).
+
+.IP \(bu 2
+Useful for loading sidecar files, templates, etc.
+
+.IP \(bu 2
+\f[B]\fRAPEX_SUPPORT_DIR\f[]\f[]
+
+.IP \(bu 2
+Base support directory: \fR$XDG_CONFIG_HOME/apex/support/\f[] or \fR~/.config/apex/support/\f[]
+
+.IP \(bu 2
+For each plugin, Apex creates: \fRAPEX_SUPPORT_DIR/<plugin\-id>/\f[]
+
+.IP \(bu 2
+You can safely write caches, logs, or temporary files there.
+
+.IP \(bu 2
+\f[B]\fRAPEX_FILE_PATH\f[]\f[]
+
+.IP \(bu 2
+When Apex is invoked on a file, this is the original path that was passed on the command line.
+
+.IP \(bu 2
+When Apex reads from stdin, \fRAPEX_FILE_PATH\f[] is set to the current \fRbase_directory\f[] (if one was set) or an empty string.
+
+.PP
+All of these variables apply only during the external command's execution and are restored afterward.
+
+.SH INSTALLING PLUGINS
+
+.PP
+Apex can install plugins directly from a central directory or from Git URLs.
+
+.SS Listing available plugins
+
+.PP
+.nf
+\fR
+apex \-\-list\-plugins
+
+\f[]
+.fi
+
+.PP
+This command fetches the plugin directory and prints a listing of installed and available plugins.
+
+.SS Installing a plugin
+
+.PP
+The \fR\-\-install\-plugin\f[] command accepts three types of arguments:
+
+.IP "1." 4
+\f[B]Plugin ID from the directory\f[] (recommended for curated plugins):
+apex \-\-install\-plugin kbd
+
+
+.IP "2." 4
+\f[B]Full Git URL\f[] (for plugins not in the directory):
+apex \-\-install\-plugin https://github.com/ttscoff/apex\-plugin\-kbd.git
+
+
+.IP "3." 4
+\f[B]GitHub shorthand\f[] (\fRuser/repo\f[] format):
+apex \-\-install\-plugin ttscoff/apex\-plugin\-kbd
+
+
+.PP
+When installing from a direct Git URL or GitHub shorthand (i.e., anything outside the curated directory), Apex will prompt for confirmation since plugins execute unverified code.
+
+.SS Uninstalling a plugin
+
+.PP
+.nf
+\fR
+apex \-\-uninstall\-plugin kbd
+
+\f[]
+.fi
+
+.PP
+The \fR\-\-uninstall\-plugin\f[] command verifies that the plugin directory exists, prompts for confirmation, and removes the plugin's directory. Support data under \fR.../apex/support/<plugin\-id>/\f[] is left intact.
+
+.PP
+This command only works for plugins installed in the user plugin directory. Project\-local plugins (in \fR.apex/plugins/\f[]) must be removed manually.
+
+.SH EXAMPLES
+
+.SS Example: \fRkbd\f[] liquid tag plugin
+
+.PP
+This example shows how to support a liquid\-style \fRAPEX_LIQUID_TAG_4\f[] syntax, turning key combos into \fR<kbd>\f[] markup.
+
+.SS Directory layout
+
+.PP
+.nf
+\fR
+\&.apex/
+  plugins/
+    kbd/
+      plugin.yml
+      kbd_plugin.rb
+
+\f[]
+.fi
+
+.SS \fRplugin.yml\f[]
+
+.PP
+.nf
+\fR
+\-\-\-
+id: kbd
+title: Keyboard Shortcuts
+author: Brett Terpstra
+description: Render APEX_LIQUID_TAG_5 key combos to HTML <kbd> elements
+homepage: https://github.com/ApexMarkdown/apex\-kbd\-plugin
+repo: https://github.com/ApexMarkdown/apex\-kbd\-plugin.git
+phase: pre_parse
+priority: 100
+timeout_ms: 0
+handler:
+  command: "ruby kbd_plugin.rb"
+\-\-\-
+
+\f[]
+.fi
+
+.PP
+The Ruby script reads JSON from stdin, extracts \fRtext\f[], replaces each \fRAPEX_LIQUID_TAG_6\f[] occurrence with properly formatted \fR<kbd>\f[] HTML, and prints the full transformed text to stdout.
+
+.SS Example: \fR:emoji:\f[] span plugin (declarative)
+
+.PP
+This plugin turns \fR:emoji:\f[] tokens in the final HTML into \fR<span class="emoji">:emoji:</span>\f[].
+
+.SS \fRplugin.yml\f[]
+
+.PP
+.nf
+\fR
+\-\-\-
+id: emoji\-span
+title: Emoji span wrapper
+author: Brett Terpstra
+description: Wrap :emoji: markers in a span for styling
+homepage: https://github.com/ApexMarkdown/apex\-emoji\-plugin
+repo: https://github.com/ApexMarkdown/apex\-emoji\-plugin.git
+phase: post_render
+pattern: "(:[a\-zA\-Z0\-9_+\-]+:)"
+replacement: "<span class=\e"emoji\e">$1</span>"
+flags: "i"
+priority: 200
+timeout_ms: 0
+\-\-\-
+
+\f[]
+.fi
+
+.PP
+Because this is a declarative plugin, no external command is run. Apex compiles the regex and runs the replacements internally.
+
+.SH SEE ALSO
+
+.PP
+\f[B]apex\f[](1), \f[B]apex\-config\f[](5)
+
+.PP
+For complete documentation, see the Apex Wiki (https://github.com/ttscoff/apex/wiki).
+
+.SH AUTHOR
+
+.PP
+Brett Terpstra
+
+.SH COPYRIGHT
+
+.PP
+Copyright (c) 2025 Brett Terpstra. Licensed under MIT License.

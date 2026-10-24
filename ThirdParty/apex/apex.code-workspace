@@ -1,0 +1,38 @@
+{
+	"folders": [
+		{
+			"path": "."
+		},
+		{
+			"path": "../apex-ruby"
+		},
+		{
+			"path": "../apex.wiki"
+		},
+		{
+			"path": "../apex-plugin-kbd"
+		},
+		{
+			"path": "../apex-plugin-md-fixup"
+		},
+		{
+			"path": "../apex-plugins"
+		},
+		{
+			"path": "../apex-filters"
+		},
+		{
+			"path": "../apex-filter-delink"
+		},
+		{
+			"path": "../apex-filter-title"
+		},
+		{
+			"path": "../apex-filter-uppercase"
+		},
+		{
+			"path": "../apex-filter-unwrap"
+		}
+	],
+	"settings": {}
+}

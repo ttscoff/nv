@@ -1,0 +1,48 @@
+<h1 id="test-document-with-citations">Test Document with Citations</h1>
+<p>This is a test document with various citation styles.</p>
+<h2 id="pandoc-citations">Pandoc Citations</h2>
+<p>Blah blah <span class="citation"
+data-cites="doe99 smith2000 smith2004">(Doe 1999; Jane Smith 2000,
+2004)</span>.</p>
+<p>See <span class="citation" data-cites="doe99">Doe (1999)</span>,
+pp. 33-35 and <em>passim</em>.</p>
+<p>Smith says blah <span class="citation"
+data-cites="smith04">(2004)</span>.</p>
+<p><span class="citation" data-cites="smith04">John Smith (2004)</span>
+says blah.</p>
+<p><span class="citation" data-cites="smith04">John Smith (2004,
+33)</span> says blah.</p>
+<h2 id="multimarkdown-citations">MultiMarkdown Citations</h2>
+<p>This is a statement that should be attributed to its
+source[p. 23][#Doe:2006].</p>
+<p>This is a statement that should be attributed to its
+source[][#Doe:2006].</p>
+<p>As per Doe.[#John Doe. <em>A Totally Fake Book 1</em>. Vanity Press,
+2006.]</p>
+<h2 id="mmark-citations">mmark Citations</h2>
+<p>This references <span class="citation"
+data-cites="RFC2535">(<strong>RFC2535?</strong>)</span> and [@!RFC1034]
+(normative).</p>
+<p>Multiple citations: <span class="citation"
+data-cites="RFC1034 RFC1035">(<strong>RFC1034?</strong>;
+<strong>RFC1035?</strong>)</span>.</p>
+<p>Combined reference: <span class="citation"
+data-cites="RFC1034">(<strong>STD3?</strong>)</span>.</p>
+<h2 id="references-section">References Section</h2>
+<!-- REFERENCES -->
+<div id="refs" class="references csl-bib-body hanging-indent"
+data-entry-spacing="0" role="list">
+<div id="ref-doe99" class="csl-entry" role="listitem">
+Doe, John. 1999. <span>“Article Title.”</span> <em>Journal Name</em> 1:
+1–10.
+</div>
+<div id="ref-smith2000" class="csl-entry" role="listitem">
+Smith, Jane. 2000. <em>Book Title</em>. Publisher.
+</div>
+<div id="ref-smith2004" class="csl-entry" role="listitem">
+———. 2004. <span>“Another Article.”</span> <em>Journal</em> 2: 20–30.
+</div>
+<div id="ref-smith04" class="csl-entry" role="listitem">
+Smith, John. 2004. <em>Some Book</em>. Publisher.
+</div>
+</div>

@@ -1,0 +1,11 @@
+---
+id: emoji-span
+description: Wrap :emoji: markers in a span for styling
+phase: post_render
+# Require non-alnum boundaries so timecodes like 1:00:55:00 and foo:smile:bar are left alone.
+pattern: "([^[:alnum:]]|^)(:[[:alnum:]_+-]+:)([^[:alnum:]]|$)"
+replacement: "$1<span class=\"emoji\">$2</span>$3"
+flags: "i"
+priority: 200
+timeout_ms: 0
+---

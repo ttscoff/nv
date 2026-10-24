@@ -1,0 +1,7 @@
+build/
+build-release/
+release/
+.git/
+.github/
+*.tar.gz
+*.sha256

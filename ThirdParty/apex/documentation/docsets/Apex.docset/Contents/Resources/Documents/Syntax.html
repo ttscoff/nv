@@ -1,0 +1,4222 @@
+<!DOCTYPE html>
+<html lang="en">
+
+  <head>
+
+      <meta charset="UTF-8">
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <meta name="generator" content="Apex 1.1.12">
+      <title>Document</title>
+      <style>
+        /* GitHub-style syntax highlighting for Pygments and Skylighting */
+        /* Don't apply background to wrapper when code highlighting is enabled - let default styles handle it */
+        .code-highlighted .highlight, .code-highlighted .sourceCode { background: inherit; border-radius: 6px; padding: 16px; overflow-x: auto; }
+        .highlight pre, .sourceCode pre { margin: 0; padding: 0; background: transparent; }
+        .highlight code, .sourceCode code { font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, monospace; font-size: 12px; line-height: 1.45; }
+        /* Pygments classes */
+        .highlight .k { color: #d73a49; font-weight: 600; } /* Keyword */
+        .highlight .kt { color: #d73a49; } /* Keyword.Type */
+        .highlight .kd { color: #d73a49; font-weight: 600; } /* Keyword.Declaration */
+        .highlight .kn { color: #d73a49; } /* Keyword.Namespace */
+        .highlight .kp { color: #d73a49; } /* Keyword.Pseudo */
+        .highlight .kr { color: #d73a49; font-weight: 600; } /* Keyword.Reserved */
+        .highlight .n { color: #6f42c1; } /* Name */
+        .highlight .na { color: #6f42c1; } /* Name.Attribute */
+        .highlight .nc { color: #6f42c1; font-weight: 600; } /* Name.Class */
+        .highlight .no { color: #005cc5; } /* Name.Constant */
+        .highlight .nd { color: #6f42c1; font-weight: 600; } /* Name.Decorator */
+        .highlight .ni { color: #800080; } /* Name.Entity */
+        .highlight .ne { color: #990000; font-weight: 600; } /* Name.Exception */
+        .highlight .nf { color: #6f42c1; font-weight: 600; } /* Name.Function */
+        .highlight .nl { color: #6f42c1; } /* Name.Label */
+        .highlight .nn { color: #555; } /* Name.Namespace */
+        .highlight .nt { color: #22863a; } /* Name.Tag */
+        .highlight .nv { color: #e36209; } /* Name.Variable */
+        .highlight .s { color: #032f62; } /* String */
+        .highlight .sb { color: #032f62; } /* String.Backtick */
+        .highlight .sc { color: #032f62; } /* String.Char */
+        .highlight .sd { color: #032f62; } /* String.Doc */
+        .highlight .s2 { color: #032f62; } /* String.Double */
+        .highlight .se { color: #032f62; } /* String.Escape */
+        .highlight .sh { color: #032f62; } /* String.Heredoc */
+        .highlight .si { color: #032f62; } /* String.Interpol */
+        .highlight .sx { color: #032f62; } /* String.Other */
+        .highlight .sr { color: #032f62; } /* String.Regex */
+        .highlight .s1 { color: #032f62; } /* String.Single */
+        .highlight .ss { color: #032f62; } /* String.Symbol */
+        .highlight .c { color: #6a737d; font-style: italic; } /* Comment */
+        .highlight .c1 { color: #6a737d; font-style: italic; } /* Comment.Single */
+        .highlight .cm { color: #6a737d; font-style: italic; } /* Comment.Multiline */
+        .highlight .cp { color: #6a737d; font-weight: 600; } /* Comment.Preproc */
+        .highlight .cs { color: #6a737d; font-weight: 600; font-style: italic; } /* Comment.Special */
+        .highlight .m { color: #005cc5; } /* Literal.Number */
+        .highlight .mb { color: #005cc5; } /* Literal.Number.Bin */
+        .highlight .mf { color: #005cc5; } /* Literal.Number.Float */
+        .highlight .mh { color: #005cc5; } /* Literal.Number.Hex */
+        .highlight .mi { color: #005cc5; } /* Literal.Number.Integer */
+        .highlight .il { color: #005cc5; } /* Literal.Number.Integer.Long */
+        .highlight .mo { color: #005cc5; } /* Literal.Number.Oct */
+        .highlight .o { color: #d73a49; } /* Operator */
+        .highlight .ow { color: #d73a49; } /* Operator.Word */
+        .highlight .p { color: #24292e; } /* Punctuation */
+        .highlight .w { color: #e1e4e8; } /* Text.Whitespace */
+        /* Skylighting classes */
+        .sourceCode .kw { color: #d73a49; font-weight: 600; } /* Keyword */
+        .sourceCode .dt { color: #6f42c1; } /* DataType */
+        .sourceCode .dv { color: #005cc5; } /* DecVal */
+        .sourceCode .bn { color: #005cc5; } /* BaseN */
+        .sourceCode .fl { color: #005cc5; } /* Float */
+        .sourceCode .ch { color: #032f62; } /* Char */
+        .sourceCode .st { color: #032f62; } /* String */
+        .sourceCode .co { color: #6a737d; font-style: italic; } /* Comment */
+        .sourceCode .ot { color: #22863a; } /* Other */
+        .sourceCode .al { color: #e36209; font-weight: 600; } /* Alert */
+        .sourceCode .fu { color: #6f42c1; font-weight: 600; } /* Function */
+        .sourceCode .re { color: #032f62; } /* RegionMarker */
+        .sourceCode .er { color: #d73a49; font-weight: 600; } /* Error */
+        .sourceCode .cf { color: #d73a49; font-weight: 600; } /* ControlFlow */
+        .sourceCode .op { color: #d73a49; } /* Operator */
+        .sourceCode .pp { color: #6a737d; } /* Preprocessor */
+        .sourceCode .at { color: #005cc5; } /* Attribute */
+        .sourceCode .do { color: #6a737d; font-style: italic; } /* Documentation */
+        .sourceCode .an { color: #6a737d; font-weight: 600; } /* Annotation */
+        .sourceCode .cv { color: #6a737d; font-weight: 600; font-style: italic; } /* CommentVar */
+        .sourceCode .in { color: #6a737d; } /* Information */
+        .sourceCode .wa { color: #e36209; font-weight: 600; } /* Warning */
+        .sourceCode .im { color: #d73a49; } /* Import */
+        .sourceCode .bu { color: #005cc5; } /* BuiltIn */
+        .sourceCode .ex { color: #6f42c1; } /* Extension */
+        .sourceCode .va { color: #e36209; } /* Variable */
+        .sourceCode .ss { color: #032f62; } /* SpecialString */
+        .sourceCode .sc { color: #032f62; } /* SpecialChar */
+        .sourceCode .vs { color: #032f62; } /* VerbatimString */
+        .sourceCode .il { color: #005cc5; } /* Special */
+        /* Line numbers (Skylighting) */
+        .sourceCode.numberSource .sourceCode { counter-reset: line; }
+        .sourceCode.numberSource .sourceCode > span { position: relative; left: -4em; counter-increment: line; }
+        .sourceCode.numberSource .sourceCode > span > a:first-child::before { content: counter(line); position: relative; left: -1em; text-align: right; vertical-align: baseline; border: none; display: inline-block; min-width: 1em; padding-right: 0.5em; color: #aaa; }
+      </style>
+      <style>
+        body {
+          font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
+          line-height: 1.6;
+          max-width: 800px;
+          margin: 2rem auto;
+          padding: 0 1rem;
+          color: #333;
+        }
+        pre { background: #f5f5f5; padding: 1rem; overflow-x: auto; }
+        code { background: #f0f0f0; padding: 0.2em 0.4em; border-radius: 3px; }
+        blockquote { border-left: 4px solid #ddd; margin: 0; padding-left: 1rem; color: #666; }
+        table { border-collapse: collapse; width: 100%%; }
+        th, td { border: 1px solid #ddd; padding: 0.5rem; }
+        th { background: #f5f5f5; }
+        tfoot td { background: #e8e8e8; }
+        figure.table-figure { width: fit-content; margin: 1em 0; }
+        figure.table-figure table { width: auto; }
+        figcaption { text-align: center; font-weight: bold; font-size: 0.8em; }
+        .page-break { page-break-after: always; }
+        .callout { padding: 1rem; margin: 1rem 0; border-left: 4px solid; }
+        .callout-note { border-color: #3b82f6; background: #eff6ff; }
+        .callout-warning { border-color: #f59e0b; background: #fffbeb; }
+        .callout-tip { border-color: #10b981; background: #f0fdf4; }
+        .callout-danger { border-color: #ef4444; background: #fef2f2; }
+        ins { background: #d4fcbc; text-decoration: none; }
+        del { background: #fbb6c2; text-decoration: line-through; }
+        mark { background: #fff3cd; }
+        .smallcaps { font-variant: small-caps; }
+        .underline { text-decoration: underline; }
+        span.mark { background: #fff3cd; }
+        .hidden { display: none; }
+        .quarto-xref { font-variant: normal; }
+        .critic.comment { background: #e7e7e7; color: #666; font-style: italic; }
+        .mkhashtag { color: #666; }
+        .mkstyledtag {
+          display: inline-block;
+          background: #e0e0e0;
+          padding: 3px 9px;
+          border-radius: 20px;
+          font-size: 0.9em;
+          line-height: 1.4;
+          color: #333;
+          margin: 0 2px;
+        }
+      </style>
+        <meta name="paginate" content="symbols"/>
+      <meta name="highlight-language-only" content="true"/>
+      <meta name="code-line-numbers" content="false"/>
+      <meta name="code-highlight" content="pygments"/>
+      <meta name="sup-sub" content="true"/>
+      <meta name="relaxed-tables" content="true"/>
+      <meta name="includes" content="true"/>
+      <meta name="autolink" content="true"/>
+      <meta name="pretty" content="false"/>
+      <meta name="standalone" content="false"/>
+      <meta name="mode" content="unified"/>
+      <meta name="markdown-in-html" content="true"/>
+      <meta name="image-captions" content="true"/>
+      <meta name="wikilink-extension" content="html"/>
+      <meta name="wikilink-space" content="hyphen"/>
+      <meta name="wikilinks" content="true"/>
+      <meta name="widont" content="true"/>
+      <meta name="plugins" content="true"/>
+      <meta name="id-format" content="gfm"/>
+
+  <style>
+:root {
+  /* border-box width of the fixed sidebar; body offset includes a small gap */
+  --sidebar-width: 250px;
+  --sidebar-offset: 270px;
+}
+
+/* Base styles — override Apex standalone centering (max-width + margin: auto) */
+body {
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  font-size: 17px;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+    "Helvetica Neue", Arial, sans-serif;
+  line-height: 1.65;
+  color: #1e293b;
+  background-color: #fff;
+  max-width: none;
+  width: auto;
+  margin: 2rem 2rem 2rem var(--sidebar-offset);
+  padding: 0 1rem;
+  box-sizing: border-box;
+}
+
+/* Sidebar / Main TOC - wider on larger screens */
+.main-toc,
+.sidebar {
+  position: fixed;
+  left: 0;
+  top: 0;
+  box-sizing: border-box;
+  width: var(--sidebar-width);
+  min-width: var(--sidebar-width);
+  max-width: var(--sidebar-width);
+  height: 100vh;
+  overflow-y: auto;
+  background: #1e293b;
+  color: rgba(255, 255, 255, 0.9);
+  border-right: 2px solid rgba(255, 255, 255, 0.1);
+  padding: 24px 20px 130px;
+  font-size: 14px;
+  z-index: 100;
+  box-shadow: 4px 0 24px rgba(0, 0, 0, 0.08);
+  transition: transform 0.3s ease;
+}
+
+.main-toc ul,
+.sidebar ul {
+  list-style: none;
+  padding-left: 0;
+  margin: 0;
+  padding-bottom: 80px;
+}
+
+.main-toc ul::after,
+.sidebar ul::after {
+  content: "";
+  display: block;
+  height: 80px;
+}
+
+.main-toc li,
+.sidebar li {
+  margin: 0.25em 0;
+}
+
+.main-toc a,
+.sidebar a {
+  color: rgba(255, 255, 255, 0.85);
+  text-decoration: none;
+  display: block;
+  padding: 6px 12px;
+  border-radius: 4px;
+  transition: all 0.15s ease;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.main-toc a:hover,
+.sidebar a:hover {
+  background: #334155;
+  color: #fff;
+}
+
+.sidebar a.active {
+  color: #0ea5e9;
+  font-weight: 500;
+}
+
+/* Hamburger menu button */
+.hamburger-menu {
+  display: none;
+  position: fixed;
+  top: 12px;
+  left: 12px;
+  z-index: 200;
+  background: #1e293b;
+  border: 2px solid rgba(255, 255, 255, 0.1);
+  border-radius: 6px;
+  padding: 10px;
+  cursor: pointer;
+  color: rgba(255, 255, 255, 0.9);
+  font-size: 20px;
+  line-height: 1;
+  box-sizing: border-box;
+  width: 44px;
+  height: 44px;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+  transition: all 0.2s ease;
+  opacity: 0.2;
+}
+
+.hamburger-menu:hover {
+  background: #334155;
+  color: #fff;
+  opacity: 1;
+}
+
+/* Move hamburger to the right of the sidebar when menu is open */
+.hamburger-menu.active {
+  left: calc(var(--sidebar-width) + 12px);
+}
+
+.hamburger-menu.active {
+  background: #0ea5e9;
+}
+
+.hamburger-menu::before {
+  content: "☰";
+}
+
+.hamburger-menu.active::before {
+  content: "✕";
+}
+
+/* Mobile menu overlay */
+.mobile-menu-overlay {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: 150;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.3s ease, visibility 0.3s ease;
+}
+
+.mobile-menu-overlay.active {
+  opacity: 1;
+  visibility: visible;
+}
+
+/* Page TOC */
+.page-toc {
+  background: #f9f9f9;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  padding: 1rem;
+  margin: 1.5rem 0;
+}
+
+.page-toc ul {
+  list-style: none;
+  padding-left: 0;
+  margin: 0;
+}
+
+.page-toc > ul {
+  padding-left: 0;
+}
+
+.page-toc li {
+  margin: 0.25em 0;
+}
+
+.page-toc a {
+  color: #0066cc;
+  text-decoration: none;
+  display: block;
+  padding: 0.25em 0.5em;
+  border-radius: 3px;
+}
+
+.page-toc a:hover {
+  background: #e0e0e0;
+  color: #004499;
+}
+
+.page-toc ul ul {
+  list-style: none;
+  padding-left: 1.5em;
+  margin-top: 0.25em;
+  margin-left: 0;
+}
+
+.page-toc ul ul ul {
+  padding-left: 1.5em;
+}
+
+.page-toc ul ul a {
+  font-size: 0.9em;
+  color: #555;
+}
+
+.page-toc ul ul ul a {
+  font-size: 0.85em;
+  color: #666;
+}
+
+/* Floating TOC */
+.floating-toc {
+  position: fixed;
+  top: 0;
+  left: var(--sidebar-offset);
+  right: 0;
+  z-index: 50;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.2s ease, visibility 0.2s ease;
+  pointer-events: none;
+  display: flex;
+  justify-content: flex-end;
+  padding-right: 2rem;
+}
+
+.floating-toc.visible {
+  opacity: 1;
+  visibility: visible;
+  pointer-events: auto;
+}
+
+.floating-toc-container {
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(10px);
+  border-bottom: 1px solid #ddd;
+  border-radius: 0 0 12px 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  width: fit-content;
+  max-width: 400px;
+  min-width: 200px;
+  overflow: hidden;
+  transition: max-height 0.3s ease;
+}
+
+.floating-toc-header {
+  padding: 8px 16px;
+  cursor: pointer;
+  user-select: none;
+  font-size: 14px;
+  font-weight: 500;
+  color: #1e293b;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.floating-toc-header:hover {
+  background: rgba(0, 0, 0, 0.02);
+}
+
+.floating-toc-content {
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.3s ease;
+}
+
+.floating-toc-container:hover .floating-toc-content {
+  max-height: 70vh;
+  overflow-y: auto;
+}
+
+.floating-toc-content ul {
+  list-style: none;
+  padding: 8px 16px 16px;
+  margin: 0;
+}
+
+.floating-toc-content li {
+  margin: 0.1em 0;
+}
+
+.floating-toc-content a {
+  color: #0066cc;
+  text-decoration: none;
+  display: block;
+  padding: 0.2em 0.5em;
+  border-radius: 4px;
+  font-size: 13px;
+  transition: background 0.15s ease;
+}
+
+.floating-toc-content a:hover {
+  background: #e0e0e0;
+  color: #004499;
+}
+
+.floating-toc-content ul ul {
+  padding-left: 1.2em;
+  margin-top: 0;
+  margin-bottom: 0;
+}
+
+.floating-toc-content ul ul ul {
+  margin-top: 0;
+  margin-bottom: 0;
+}
+
+.floating-toc-content ul ul a {
+  font-size: 12px;
+  color: #555;
+}
+
+.floating-toc-content ul ul ul a {
+  font-size: 11px;
+  color: #666;
+}
+
+/* Smooth scrolling */
+html {
+  scroll-behavior: smooth;
+}
+
+/* Code blocks */
+code {
+  background: #f0f0f0;
+  padding: 0.2em 0.4em;
+  border-radius: 3px;
+  font-family: "Monaco", "Menlo", "Ubuntu Mono", monospace;
+  font-size: 0.9em;
+  margin: 0 0.1em;
+}
+
+pre {
+  background: #f5f5f5;
+  padding: 1rem;
+  overflow-x: auto;
+  border-radius: 4px;
+  margin: 1em 0;
+}
+
+pre code {
+  background: none;
+  padding: 0;
+  margin: 0;
+}
+
+/* Rouge syntax highlighting - GitHub theme, scoped to .highlight containers */
+.highlight {
+  color: #24292e;
+}
+
+.highlight .c {
+  color: #6a737d;
+  font-style: italic;
+} /* Comment */
+.highlight .err {
+  color: #a61717;
+  background-color: #e3d2d2;
+} /* Error */
+.highlight .k {
+  color: #d73a49;
+  font-weight: bold;
+} /* Keyword */
+.highlight .l {
+  color: #032f62;
+} /* Literal */
+.highlight .n {
+  color: #24292e;
+} /* Name */
+.highlight .o {
+  color: #d73a49;
+} /* Operator */
+.highlight .p {
+  color: #24292e;
+} /* Punctuation */
+.highlight .cm {
+  color: #6a737d;
+  font-style: italic;
+} /* Comment.Multiline */
+.highlight .cp {
+  color: #6a737d;
+  font-weight: bold;
+} /* Comment.Preproc */
+.highlight .c1 {
+  color: #6a737d;
+  font-style: italic;
+} /* Comment.Single */
+.highlight .cs {
+  color: #6a737d;
+  font-weight: bold;
+  font-style: italic;
+} /* Comment.Special */
+.highlight .gd {
+  color: #24292e;
+  background-color: #ffeef0;
+} /* Generic.Deleted */
+.highlight .ge {
+  color: #24292e;
+  font-style: italic;
+} /* Generic.Emph */
+.highlight .gr {
+  color: #aa0000;
+} /* Generic.Error */
+.highlight .gh {
+  color: #999999;
+  font-weight: bold;
+} /* Generic.Heading */
+.highlight .gi {
+  color: #24292e;
+  background-color: #f0fff4;
+} /* Generic.Inserted */
+.highlight .go {
+  color: #888888;
+} /* Generic.Output */
+.highlight .gp {
+  color: #555555;
+} /* Generic.Prompt */
+.highlight .gs {
+  font-weight: bold;
+} /* Generic.Strong */
+.highlight .gu {
+  color: #aaaaaa;
+} /* Generic.Subheading */
+.highlight .gt {
+  color: #aa0000;
+} /* Generic.Traceback */
+.highlight .kc {
+  color: #d73a49;
+  font-weight: bold;
+} /* Keyword.Constant */
+.highlight .kd {
+  color: #d73a49;
+  font-weight: bold;
+} /* Keyword.Declaration */
+.highlight .kn {
+  color: #d73a49;
+  font-weight: bold;
+} /* Keyword.Namespace */
+.highlight .kp {
+  color: #d73a49;
+  font-weight: bold;
+} /* Keyword.Pseudo */
+.highlight .kr {
+  color: #d73a49;
+  font-weight: bold;
+} /* Keyword.Reserved */
+.highlight .kt {
+  color: #d73a49;
+  font-weight: bold;
+} /* Keyword.Type */
+.highlight .ld {
+  color: #032f62;
+} /* Literal.Date */
+.highlight .m {
+  color: #005cc5;
+} /* Literal.Number */
+.highlight .s {
+  color: #032f62;
+} /* Literal.String */
+.highlight .na {
+  color: #6f42c1;
+} /* Name.Attribute */
+.highlight .nb {
+  color: #005cc5;
+} /* Name.Builtin */
+.highlight .nc {
+  color: #6f42c1;
+  font-weight: bold;
+} /* Name.Class */
+.highlight .no {
+  color: #005cc5;
+} /* Name.Constant */
+.highlight .nd {
+  color: #6f42c1;
+  font-weight: bold;
+} /* Name.Decorator */
+.highlight .ni {
+  color: #800080;
+} /* Name.Entity */
+.highlight .ne {
+  color: #990000;
+  font-weight: bold;
+} /* Name.Exception */
+.highlight .nf {
+  color: #6f42c1;
+} /* Name.Function */
+.highlight .nl {
+  color: #990000;
+} /* Name.Label */
+.highlight .nn {
+  color: #555555;
+} /* Name.Namespace */
+.highlight .nx {
+  color: #6f42c1;
+} /* Name.Other */
+.highlight .py {
+  color: #990000;
+} /* Name.Property */
+.highlight .nt {
+  color: #22863a;
+} /* Name.Tag */
+.highlight .nv {
+  color: #e36209;
+} /* Name.Variable */
+.highlight .ow {
+  color: #d73a49;
+  font-weight: bold;
+} /* Operator.Word */
+.highlight .w {
+  color: #bbbbbb;
+} /* Text.Whitespace */
+.highlight .mf {
+  color: #005cc5;
+} /* Literal.Number.Float */
+.highlight .mh {
+  color: #005cc5;
+} /* Literal.Number.Hex */
+.highlight .mi {
+  color: #005cc5;
+} /* Literal.Number.Integer */
+.highlight .mo {
+  color: #005cc5;
+} /* Literal.Number.Oct */
+.highlight .sb {
+  color: #032f62;
+} /* Literal.String.Backtick */
+.highlight .sc {
+  color: #032f62;
+} /* Literal.String.Char */
+.highlight .sd {
+  color: #032f62;
+} /* Literal.String.Doc */
+.highlight .s2 {
+  color: #032f62;
+} /* Literal.String.Double */
+.highlight .se {
+  color: #032f62;
+} /* Literal.String.Escape */
+.highlight .sh {
+  color: #032f62;
+} /* Literal.String.Heredoc */
+.highlight .si {
+  color: #032f62;
+} /* Literal.String.Interpol */
+.highlight .sx {
+  color: #032f62;
+} /* Literal.String.Other */
+.highlight .sr {
+  color: #22863a;
+} /* Literal.String.Regex */
+.highlight .s1 {
+  color: #032f62;
+} /* Literal.String.Single */
+.highlight .ss {
+  color: #032f62;
+} /* Literal.String.Symbol */
+.highlight .bp {
+  color: #005cc5;
+} /* Name.Builtin.Pseudo */
+.highlight .vc {
+  color: #e36209;
+} /* Name.Variable.Class */
+.highlight .vg {
+  color: #e36209;
+} /* Name.Variable.Global */
+.highlight .vi {
+  color: #e36209;
+} /* Name.Variable.Instance */
+.highlight .il {
+  color: #005cc5;
+} /* Literal.Number.Integer.Long */
+
+/* Additional Rouge token classes that may be used */
+.highlight .token {
+  color: #5670a0;
+}
+.highlight .token.list {
+  color: #546e9f;
+}
+.highlight .token.punctuation {
+  color: #3e8dad;
+}
+.highlight .token.list.punctuation {
+  color: #e05b78;
+}
+.highlight .token.content {
+  padding: 0;
+}
+
+/* Nested lists in page content */
+ul ul,
+ol ol,
+ul ol,
+ol ul {
+  padding-left: 1.5em;
+  margin-top: 0.25em;
+}
+
+/* Page footer */
+.page-footer {
+  background: #f5f5f5;
+  border-top: 1px solid #ddd;
+  padding: 1.5rem;
+  margin-top: 3rem;
+  color: #666;
+  font-size: 0.9em;
+}
+
+.page-footer p {
+  margin: 0.5em 0;
+}
+
+.page-footer a {
+  color: #0066cc;
+  text-decoration: none;
+}
+
+.page-footer a:hover {
+  text-decoration: underline;
+}
+
+/* Mobile responsive */
+@media (max-width: 768px) {
+  .hamburger-menu {
+    display: flex;
+  }
+
+  .main-toc,
+  .sidebar {
+    transform: translateX(-100%);
+    z-index: 175;
+  }
+
+  .main-toc.mobile-open,
+  .sidebar.mobile-open {
+    transform: translateX(0);
+  }
+
+  body {
+    margin: 2rem 1rem;
+  }
+
+  .floating-toc {
+    left: 0;
+  }
+}
+
+</style></head>
+
+  <body class="code-highlighted">
+<div class="floating-toc" id="floating-toc">
+  <div class="floating-toc-container">
+    <div class="floating-toc-header">
+      <span>Table of Contents 🔻</span>
+    </div>
+    <div class="floating-toc-content" id="floating-toc-content">
+      <!-- Content will be populated by JavaScript -->
+    </div>
+  </div>
+</div>
+
+<button class="hamburger-menu" id="hamburger-menu" aria-label="Toggle navigation"></button>
+<div class="mobile-menu-overlay" id="mobile-menu-overlay"></div>
+
+<nav class="main-toc"><ul><li><a href="Home.html">Home</a></li><li><a href="Getting-Started.html">Getting Started</a></li><li><a href="Installation.html">Installation</a></li><li><a href="Usage.html">Usage</a></li><li><a href="Syntax.html">Syntax</a></li><li><a href="Callouts.html">Callouts</a></li><li><a href="Tables.html">Tables</a></li><li><a href="Inline-Attribute-Lists.html">Inline Attribute Lists</a></li><li><a href="Modes.html">Modes</a></li><li><a href="Quarto-Mode.html">Quarto Mode</a></li><li><a href="Command-Line-Options.html">Command Line Options</a></li><li><a href="Rendering-Markdown-In-Terminal.html">Rendering Markdown in the Terminal</a></li><li><a href="Generating-Man-Pages.html">Generating Man Pages</a></li><li><a href="Multi-File-Documents.html">Multi-file Documents</a></li><li><a href="Citations.html">Citations</a></li><li><a href="Indices.html">Indices</a></li><li><a href="Metadata-Transforms.html">Metadata Transforms</a></li><li><a href="Pandoc-Integration.html">Integrating with Pandoc</a></li><li><a href="Using-Apex-with-Jekyll.html">Using Apex with Jekyll</a></li><li><a href="Header-IDs.html">Header IDs</a></li><li><a href="C-API.html">C API</a></li><li><a href="Writing-Tests.html">Writing Tests</a></li><li><a href="Xcode-Integration.html">Xcode Integration</a></li><li><a href="Examples.html">Examples</a></li><li><a href="Plugins.html">Plugins</a></li><li><a href="Filters.html">Filters</a></li><li><a href="Troubleshooting.html">Troubleshooting</a></li><li><a href="Credits.html">Credits</a></li></ul></nav>
+
+    <h1 id="syntax-reference">
+      Syntax&nbsp;Reference
+    </h1>
+<nav class="page-toc" id="page-toc-top"><ul><li><a href="#syntax-reference">Syntax&nbsp;Reference</a><ul><li><a href="#basic-markdown">Basic&nbsp;Markdown</a><ul><li><a href="#headers">Headers</a></li><li><a href="#emphasis">Emphasis</a></li><li><a href="#strikethrough">Strikethrough</a></li><li><a href="#superscript-and-subscript">Superscript and&nbsp;Subscript</a></li><li><a href="#lists">Lists</a></li><li><a href="#links-and-images">Links&nbsp;and&nbsp;Images</a></li><li><a href="#image-captions-figure-figcaption">Image captions (figure /&nbsp;figcaption)</a></li><li><a href="#code">Code</a></li><li><a href="#blockquotes">Blockquotes</a></li><li><a href="#horizontal-rules">Horizontal&nbsp;Rules</a></li></ul></li><li><a href="#tables">Tables</a><ul><li><a href="#quick-reference">Quick&nbsp;Reference</a></li><li><a href="#basic-example">Basic&nbsp;Example</a></li></ul></li><li><a href="#footnotes">` and ` ` (default in unified/MMD).>Footnotes</a><ul><li><a href="#reference-style">Reference&nbsp;Style</a></li><li><a href="#inline-style-kramdown">Inline Style&nbsp;(Kramdown)</a></li><li><a href="#inline-style-multimarkdown">Inline Style&nbsp;(MultiMarkdown)</a></li></ul></li><li><a href="#definition-lists">Definition&nbsp;Lists</a></li><li><a href="#citations">Citations</a><ul><li><a href="#pandoc-citation-syntax">Pandoc Citation&nbsp;Syntax</a></li><li><a href="#multimarkdown-citation-syntax">MultiMarkdown Citation&nbsp;Syntax</a></li><li><a href="#mmark-citation-syntax">mmark Citation&nbsp;Syntax</a></li><li><a href="#bibliography">Bibliography</a></li></ul></li><li><a href="#indices">Indices</a><ul><li><a href="#mmark-index-syntax">mmark Index&nbsp;Syntax</a></li><li><a href="#textindex-syntax">TextIndex&nbsp;Syntax</a></li><li><a href="#leanpub-index-syntax">Leanpub Index&nbsp;Syntax</a></li><li><a href="#index-generation">Index&nbsp;Generation</a></li></ul></li><li><a href="#math">Math</a></li><li><a href="#wiki-links">Wiki&nbsp;Links</a><ul><li><a href="#syntax">Syntax</a></li><li><a href="#conversion-process">Conversion&nbsp;Process</a></li><li><a href="#space-handling-options">Space Handling&nbsp;Options</a></li><li><a href="#file-extensions">File&nbsp;Extensions</a></li><li><a href="#examples">Examples</a></li></ul></li><li><a href="#critic-markup">Critic&nbsp;Markup</a></li><li><a href="#callouts">Callouts</a></li><li><a href="#file-includes">File&nbsp;Includes</a><ul><li><a href="#generatesinglehtmlrb">generate_single_html.rb</a></li><li><a href="#generateappdocsrb">generate_app_docs.rb</a></li><li><a href="#generateappdocsairb">generate_app_docs_ai.rb</a></li></ul></li><li><a href="#requirements">Requirements</a></li><li><a href="#directory-structure">Directory&nbsp;Structure</a></li><li><a href="#how-it-works">How&nbsp;It&nbsp;Works</a><ul><li><a href="#standard-documentation-generation">Standard Documentation&nbsp;Generation</a></li><li><a href="#ai-transformation-workflow">AI Transformation&nbsp;Workflow</a></li><li><a href="#custom-csvtsv-delimiters-in-includes">Custom CSV/TSV Delimiters in&nbsp;Includes</a></li><li><a href="#address-syntax-for-file-includes">Address Syntax for File&nbsp;Includes</a></li><li><a href="#address-syntax-for-file-includes">Address Syntax for File&nbsp;Includes</a></li></ul></li><li><a href="#metadata">Metadata</a><ul><li><a href="#yaml-front-matter">YAML Front&nbsp;Matter</a></li><li><a href="#multimarkdown-metadata">MultiMarkdown&nbsp;Metadata</a></li><li><a href="#pandoc-title-block">Pandoc Title&nbsp;Block</a></li><li><a href="#metadata-variables">Metadata&nbsp;Variables</a></li></ul></li><li><a href="#abbreviations">Abbreviations</a></li><li><a href="#inline-attribute-lists-ial">Inline Attribute Lists&nbsp;(IAL)</a></li><li><a href="#table-of-contents">Table of&nbsp;Contents</a></li><li><a href="#smart-typography">Smart&nbsp;Typography</a></li><li><a href="#github-emoji">GitHub&nbsp;Emoji</a></li><li><a href="#special-markers">Special&nbsp;Markers</a></li><li><a href="#html">HTML</a><ul><li><a href="#markdown-inside-html-blocks">Markdown Inside HTML&nbsp;Blocks</a></li><li><a href="#pandoc-fenced-divs">Pandoc Fenced&nbsp;Divs</a></li></ul></li><li><a href="#related">Related</a></li></ul></li><li><a href="#index-section">Index</a></li></ul></nav>
+
+    <p>
+      This page documents all syntax features available in <strong>unified mode</strong>. For mode-specific syntax, see <a href="Modes.html">Modes</a>.
+    </p>
+
+    <h2 id="basic-markdown">
+      Basic&nbsp;Markdown
+    </h2>
+
+    <h3 id="headers">
+      Headers
+    </h3>
+
+    <p>
+      <strong>ATX-style headers:</strong>
+    </p>
+
+    <div class="highlight">
+<pre><span></span><span class="gh"># H1</span>
+<span class="gu">## H2</span>
+<span class="gu">### H3</span>
+<span class="gu">#### H4</span>
+<span class="gu">##### H5</span>
+<span class="gu">###### H6</span>
+    </pre>
+  </div>
+
+  <p>
+    <strong>Setext-style headers:</strong>
+  </p>
+
+  <div class="highlight">
+<pre><span></span><span class="gh">H1 Alternative</span>
+<span class="gh">==============</span>
+
+<span class="gu">H2 Alternative</span>
+<span class="gu">--------------</span>
+  </pre>
+</div>
+
+<p>
+  <strong>Multi-line setext headers (<abbr title="MultiMarkdown">MMD</abbr> 6):</strong>
+  Setext headers can span multiple lines before the underline. This is supported in <strong>unified</strong> and <strong>MultiMarkdown</strong> modes:
+</p>
+
+<div class="highlight">
+<pre><span></span>This is
+a multi-line
+<span class="gh">setext header</span>
+<span class="gh">========</span>
+
+Another
+header
+with
+multiple
+<span class="gu">lines</span>
+<span class="gu">--------</span>
+</pre>
+</div>
+
+<h3 id="emphasis">
+  Emphasis
+</h3>
+
+<div class="highlight">
+<pre><span></span><span class="ge">*italic*</span>
+<span class="ge">_italic_</span>
+<span class="gs">**bold**</span>
+<span class="gs">__bold__</span>
+***bold italic***
+___bold italic___
+</pre>
+</div>
+
+<h3 id="strikethrough">
+  Strikethrough
+</h3>
+
+<p>
+  GFM-style strikethrough uses paired tildes:
+</p>
+
+<div class="highlight">
+<pre><span></span><span class="gd">~~strikethrough text~~</span>
+</pre>
+</div>
+
+<p>
+  This renders as <code>&lt;del&gt;strikethrough text&lt;/del&gt;</code> in <abbr title="Hypertext Markup Language">HTML</abbr>. Strikethrough is enabled by default in <strong>GFM</strong> and <strong>unified</strong> modes. In other modes, use <code>--strikethrough</code> to enable it, or <code>--no-strikethrough</code> to disable it in GFM or unified mode.
+  <strong>Note:</strong> When using <code>--proofreader</code>, <code>~~text~~</code> is converted to CriticMarkup deletion syntax (<code>&lt;del class=&quot;critic&quot;&gt;text&lt;/del&gt;</code>) before strikethrough processing.
+</p>
+
+<h3 id="superscript-and-subscript">
+  Superscript and&nbsp;Subscript
+</h3>
+
+<p>
+  MultiMarkdown-style superscript and subscript syntax:
+</p>
+
+<div class="highlight">
+<pre><span></span>H~2~O          # H₂O (subscript - tildes within word)
+m^2             # m² (superscript)
+x^2 + y^2       # x² + y²
+H~2~SO~4~       # H₂SO₄ (multiple subscripts within word)
+~h2o~           # &lt;u&gt;h2o&lt;/u&gt; (underline - tildes at word boundaries)
+</pre>
+</div>
+
+<p>
+  <strong>Syntax rules:</strong>
+</p>
+
+<ul>
+
+  <li>
+    The <code>^</code> character creates superscript for the text immediately following it. The superscript stops at the first space, punctuation, or newline.
+  </li>
+
+  <li>
+    The <code>~</code> character creates subscript when used <strong>within a word/identifier</strong> with paired tildes (e.g., <code>H~2~O</code>). The subscript ends at the second tilde.
+  </li>
+
+  <li>
+    When tildes are at word boundaries (e.g., <code>~text~</code>), they create underline instead of subscript. This prevents interference with underline/strikethrough syntax.
+    <strong>Examples:</strong>
+  </li>
+
+</ul>
+
+<div class="highlight">
+<pre><span></span>Water: H~2~O           # H₂O (subscript - tildes within word)
+Area: m^2              # m² (superscript)
+Formula: E = mc^2      # E = mc² (superscript)
+Chemical: H~2~SO~4~    # H₂SO₄ (multiple subscripts within word)
+~h2o~                  # &lt;u&gt;h2o&lt;/u&gt; (underline - tildes at word boundaries)
+</pre>
+</div>
+
+<p>
+  This feature is enabled by default in <strong>MultiMarkdown</strong> and <strong>unified</strong> modes. In other modes, use the <code>--sup-sub</code> flag to enable it. Use <code>--no-sup-sub</code> to disable it in unified or MultiMarkdown modes.
+</p>
+
+<h3 id="lists">
+  Lists
+</h3>
+
+<p>
+  <strong>Unordered:</strong>
+</p>
+
+<div class="highlight">
+<pre><span></span><span class="k">-</span><span class="w"> </span>Item 1
+<span class="k">-</span><span class="w"> </span>Item 2
+<span class="w">  </span><span class="k">-</span><span class="w"> </span>Nested item
+<span class="w">  </span><span class="k">-</span><span class="w"> </span>Another nested
+<span class="k">-</span><span class="w"> </span>Item 3
+</pre>
+</div>
+
+<p>
+  <strong>Ordered:</strong>
+</p>
+
+<div class="highlight">
+<pre><span></span><span class="k">1.</span> First item
+<span class="k">2.</span> Second item
+
+<span class="w">   </span><span class="k">1.</span> Nested item
+<span class="w">   </span><span class="k">2.</span> Another nested
+<span class="k">3.</span> Third item
+</pre>
+</div>
+
+<p>
+  <strong>Mixed Markers (Unified &amp; MultiMarkdown modes):</strong>
+  In unified and MultiMarkdown modes, you can mix different list marker types at the same indentation level. The list will inherit the type from the first item:
+</p>
+
+<div class="highlight">
+<pre><span></span><span class="k">1.</span> First numbered item
+<span class="k">*</span><span class="w"> </span>Second item (becomes numbered)
+<span class="k">*</span><span class="w"> </span>Third item (becomes numbered)
+
+<span class="k">*</span><span class="w"> </span>First bullet item
+<span class="k">1.</span> Second item (becomes bullet)
+<span class="k">2.</span> Third item (becomes bullet)
+</pre>
+</div>
+
+<p>
+  By default, CommonMark and GFM modes create separate lists when marker types change. Use <code>--mixed-lists</code> to enable this behavior in other modes, or <code>--no-mixed-lists</code> to disable it in unified/MultiMarkdown modes.
+  <strong>Alpha Lists (Unified mode):</strong>
+  In unified mode, you can use alphabetic markers for ordered lists:
+</p>
+
+<div class="highlight">
+<pre><span></span>&lt;!-- apex-alpha-list-lower --&gt;
+
+<span class="k">1.</span>  First item
+<span class="k">2.</span>  Second item
+<span class="k">3.</span>  Third item
+
+&lt;!-- apex-alpha-list-upper --&gt;
+
+<span class="k">1.</span>  First item (uppercase)
+<span class="k">2.</span>  Second item (uppercase)
+<span class="k">3.</span>  Third item (uppercase)
+</pre>
+</div>
+
+<p>
+  Alpha lists are automatically converted to <abbr title="Hypertext Markup Language">HTML</abbr> with <code>style=&quot;list-style-type: lower-alpha&quot;</code> or <code>style=&quot;list-style-type: upper-alpha&quot;</code>. This feature is enabled by default in unified mode. Use <code>--alpha-lists</code> to enable in other modes, or <code>--no-alpha-lists</code> to disable in unified mode.
+  <strong>Task Lists:</strong>
+</p>
+
+<div class="highlight">
+<pre><span></span><span class="k">- [ ]</span> Todo item
+<span class="k">- [x]</span> Completed item
+<span class="k">- [ ]</span> Another todo
+</pre>
+</div>
+
+<h3 id="links-and-images">
+  Links&nbsp;and&nbsp;Images
+</h3>
+
+<p>
+  <strong>Standard Markdown links:</strong>
+</p>
+
+<div class="highlight">
+<pre><span></span>[<span class="nt">Link text</span>](<span class="na">https://example.com</span>)
+[<span class="nt">Link with title</span>](<span class="na">https://example.com &quot;Title&quot;</span>)
+</pre>
+</div>
+
+<p>
+  <strong>Link titles with different quote styles (<abbr title="MultiMarkdown">MMD</abbr> 6):</strong>
+  Link and image titles can use single quotes, double quotes, or parentheses. This is supported in <strong>unified</strong> and <strong>MultiMarkdown</strong> modes:
+</p>
+
+<div class="highlight">
+<pre><span></span>[<span class="nt">Link with double quotes</span>](<span class="na">https://example.com &quot;Title&quot;</span>)
+[<span class="nt">Link with single quotes</span>](<span class="na">https://example.com &#39;Title&#39;</span>)
+[<span class="nt">Link with parentheses</span>](<span class="na">https://example.com (Title</span>))
+</pre>
+</div>
+
+<p>
+  <strong>Images:</strong>
+</p>
+
+<div class="highlight">
+<pre><span></span>![<span class="nt">Alt text</span>](<span class="na">image.png</span>)
+![<span class="nt">Alt with title</span>](<span class="na">image.png &quot;Image title&quot;</span>)
+</pre>
+</div>
+
+<h3 id="image-captions-figure-figcaption">
+  Image captions (figure /&nbsp;figcaption)
+</h3>
+
+<p>
+  In <strong>unified</strong> and <strong>MultiMarkdown</strong> modes, Apex can wrap images in semantic <code>&lt;figure&gt;</code> elements with <code>&lt;figcaption&gt;</code> when caption text is available. Caption text is chosen as follows:
+</p>
+
+<ol>
+
+  <li>
+    <strong><code>caption=&quot;TEXT&quot;</code> attribute</strong> (IAL) — If present, this is always used as the figcaption and the image is wrapped in <code>&lt;figure&gt;</code>, <strong>even when image captions are otherwise disabled</strong> (see below).
+  </li>
+
+  <li>
+    <strong>Title attribute</strong> — If the image has a title (e.g. <code>&quot;Image title&quot;</code> in the link), that becomes the caption when image captions are enabled.
+  </li>
+
+  <li>
+    <strong>Alt text</strong> — If there is no title, alt text is used as the caption when image captions are enabled (unless <code>--title-captions-only</code> is set).
+    If both title and alt are empty and there is no <code>caption=&quot;&quot;</code> attribute, the image is left as a plain <code>&lt;img&gt;</code> tag.
+    <strong>Example (unified / MultiMarkdown with image captions enabled):</strong>
+    Input:
+  </li>
+
+</ol>
+
+<div class="highlight">
+<pre><span></span>![<span class="nt">Alt only</span>](<span class="na">photo.png</span>)
+![<span class="nt">With title</span>](<span class="na">figure.png &quot;Figure caption&quot;</span>)
+![](plain.png)
+</pre>
+</div>
+
+<p>
+  Output:
+</p>
+
+<div class="highlight">
+<pre><span></span><span class="p">&lt;</span><span class="nt">figure</span><span class="p">&gt;&lt;</span><span class="nt">img</span> <span class="na">src</span><span class="o">=</span><span class="s">&quot;photo.png&quot;</span> <span class="na">alt</span><span class="o">=</span><span class="s">&quot;Alt only&quot;</span><span class="p">&gt;&lt;</span><span class="nt">figcaption</span><span class="p">&gt;</span>Alt only<span class="p">&lt;/</span><span class="nt">figcaption</span><span class="p">&gt;&lt;/</span><span class="nt">figure</span><span class="p">&gt;</span>
+<span class="p">&lt;</span><span class="nt">figure</span><span class="p">&gt;&lt;</span><span class="nt">img</span> <span class="na">src</span><span class="o">=</span><span class="s">&quot;figure.png&quot;</span> <span class="na">alt</span><span class="o">=</span><span class="s">&quot;With title&quot;</span> <span class="na">title</span><span class="o">=</span><span class="s">&quot;Figure caption&quot;</span><span class="p">&gt;&lt;</span><span class="nt">figcaption</span><span class="p">&gt;</span>Figure caption<span class="p">&lt;/</span><span class="nt">figcaption</span><span class="p">&gt;&lt;/</span><span class="nt">figure</span><span class="p">&gt;</span>
+<span class="p">&lt;</span><span class="nt">img</span> <span class="na">src</span><span class="o">=</span><span class="s">&quot;plain.png&quot;</span> <span class="na">alt</span><span class="o">=</span><span class="s">&quot;&quot;</span><span class="p">&gt;</span>
+</pre>
+</div>
+
+<p>
+  <strong>Explicit caption via IAL (<code>caption=&quot;&quot;</code>):</strong>
+  You can set the figcaption explicitly with the <code>caption</code> attribute in an inline attribute list. This <strong>always</strong> produces <code>&lt;figure&gt;&lt;figcaption&gt;...&lt;/figcaption&gt;&lt;/figure&gt;</code> for that image, regardless of the <code>--image-captions</code> flag. The <code>caption</code> attribute is not emitted on the final <code>&lt;img&gt;</code> tag (it is used only for the figcaption).
+</p>
+
+<div class="highlight">
+<pre><span></span>![<span class="nt">Screenshot</span>](<span class="na">screen.png</span>)
+![<span class="nt">Logo</span>](<span class="na">logo.png</span>)
+</pre>
+</div>
+
+<p>
+  Output (even with <code>--no-image-captions</code>):
+</p>
+
+<div class="highlight">
+<pre><span></span><span class="p">&lt;</span><span class="nt">figure</span><span class="p">&gt;&lt;</span><span class="nt">img</span> <span class="na">src</span><span class="o">=</span><span class="s">&quot;screen.png&quot;</span> <span class="na">alt</span><span class="o">=</span><span class="s">&quot;Screenshot&quot;</span><span class="p">&gt;&lt;</span><span class="nt">figcaption</span><span class="p">&gt;</span>App window in dark mode<span class="p">&lt;/</span><span class="nt">figcaption</span><span class="p">&gt;&lt;/</span><span class="nt">figure</span><span class="p">&gt;</span>
+<span class="p">&lt;</span><span class="nt">figure</span><span class="p">&gt;&lt;</span><span class="nt">img</span> <span class="na">id</span><span class="o">=</span><span class="s">&quot;logo&quot;</span> <span class="na">src</span><span class="o">=</span><span class="s">&quot;logo.png&quot;</span> <span class="na">alt</span><span class="o">=</span><span class="s">&quot;Logo&quot;</span><span class="p">&gt;&lt;</span><span class="nt">figcaption</span><span class="p">&gt;</span>Company logo<span class="p">&lt;/</span><span class="nt">figcaption</span><span class="p">&gt;&lt;/</span><span class="nt">figure</span><span class="p">&gt;</span>
+</pre>
+</div>
+
+<p>
+  <strong>Caption options:</strong>
+</p>
+
+<table>
+
+  <thead>
+
+    <tr>
+
+      <th>
+        Option
+      </th>
+
+      <th>
+        Effect
+      </th>
+
+    </tr>
+
+  </thead>
+
+  <tbody>
+
+    <tr>
+
+      <td>
+<code>--image-captions</code>
+      </td>
+
+      <td>
+        Enable wrapping images with title/alt in <code>&lt;figure&gt;</code> and <code>&lt;figcaption&gt;</code> (default in unified/<abbr title="MultiMarkdown">MMD</abbr>).
+      </td>
+
+    </tr>
+    <tr>
+
+      <td>
+<code>--no-image-captions</code>
+      </td>
+
+      <td>
+        Disable automatic captions from title/alt. Images with <code>caption=&quot;&quot;</code> in IAL still get figures.
+      </td>
+
+    </tr>
+    <tr>
+
+      <td>
+<code>--title-captions-only</code>
+      </td>
+
+      <td>
+        Only add captions for images that have a <strong>title</strong> attribute; ignore alt for captions. Implies <code>--image-captions</code>. You do not need to pass both.
+      </td>
+
+    </tr>
+    <tr>
+
+      <td>
+<code>--no-title-captions-only</code>
+      </td>
+
+      <td>
+        Use title or alt for captions (default).
+      </td>
+
+    </tr>
+  </tbody>
+
+</table>
+
+<ul>
+
+  <li>
+    <strong>CLI:</strong> e.g. <code>--no-image-captions</code>, <code>--title-captions-only</code>
+  </li>
+
+  <li>
+    <strong>Metadata:</strong> <code>image-captions: true|false</code>, <code>title-captions-only: true|false</code> (or snake_case <code>title_captions_only</code>) in YAML/<abbr title="MultiMarkdown">MMD</abbr> metadata.
+    <strong>Image titles with different quote styles (<abbr title="MultiMarkdown">MMD</abbr> 6):</strong>
+  </li>
+
+</ul>
+
+<div class="highlight">
+<pre><span></span>![<span class="nt">Image</span>](<span class="na">image.png &quot;Double quote title&quot;</span>)
+![<span class="nt">Image</span>](<span class="na">image.png &#39;Single quote title&#39;</span>)
+![<span class="nt">Image</span>](<span class="na">image.png (Parentheses title</span>))
+</pre>
+</div>
+
+<p>
+  <strong>Retina / @2x images (srcset):</strong>
+  In <strong>unified</strong> and <strong>MultiMarkdown</strong> modes, you can add <code>@2x</code> to image attributes to generate a <code>srcset</code> for retina displays. The 2x variant is assumed to have the same path with <code>@2x</code> inserted before the file extension (e.g. <code>icon.png</code> → <code>icon@2x.png</code>).
+  <strong>Inline:</strong>
+</p>
+
+<div class="highlight">
+<pre><span></span>![<span class="nt">Alt</span>](<span class="na">img/icon.png </span>)
+![<span class="nt">Alt</span>](<span class="na">img/icon.png </span>)
+![<span class="nt">Alt</span>](<span class="na">img/icon.png </span>)
+</pre>
+</div>
+
+<p>
+  <strong>Reference-style:</strong>
+</p>
+
+<div class="highlight">
+<pre><span></span>![<span class="nt">Logo</span>](<span class="na">https://example.com/badge.png?size=250x83</span>)
+</pre>
+</div>
+
+<p>
+  <strong>With IAL:</strong> You can also use <code>@2x</code> in an inline attribute list after the image:
+</p>
+
+<div class="highlight">
+<pre><span></span>![<span class="nt">Alt</span>](<span class="na">img/icon.png</span>)
+![<span class="nt">Alt</span>](<span class="na">img/icon.png</span>)
+</pre>
+</div>
+
+<p>
+  Output includes both <code>src</code> and <code>srcset</code> so browsers can choose the appropriate resolution:
+</p>
+
+<div class="highlight">
+<pre><span></span><span class="p">&lt;</span><span class="nt">img</span> <span class="na">src</span><span class="o">=</span><span class="s">&quot;img/icon.png&quot;</span> <span class="na">srcset</span><span class="o">=</span><span class="s">&quot;img/icon.png 1x, img/icon@2x.png 2x&quot;</span> <span class="na">alt</span><span class="o">=</span><span class="s">&quot;Alt&quot;</span><span class="p">&gt;</span>
+</pre>
+</div>
+
+<p>
+  <strong>Multi-format images (WebP, AVIF, auto, video):</strong> Apex supports additional attributes for modern image formats, automatic format discovery, and video URLs. See <a href="Multi-Format-Images.html">Multi-Format Images</a> for full documentation.
+  <strong>Terminal output (<code>-t terminal</code> / <code>-t terminal256</code>):</strong> Standard <code>![alt](url)</code> image syntax is rendered inline when stdout is a TTY and a viewer is available (<code>imgcat</code> on iTerm2, otherwise <code>chafa</code>, <code>catimg</code>, or <code>viu</code>). With pagination (<code>-p</code> / <code>paginate: true</code>), inline graphics protocols may bypass the pager; use <strong><code>--paginate-symbols</code></strong> or <strong><code>paginate: symbols</code></strong> for pager-friendly chafa ANSI art. See <a href="Rendering-Markdown-In-Terminal.html">Rendering Markdown in the Terminal</a>.
+  <strong>Reference-style links and images:</strong>
+  Reference-style links and images also support all three quote styles for titles:
+</p>
+
+<div class="highlight">
+<pre><span></span>[<span class="nt">Link text</span>][<span class="nl">ref1</span>]
+![Image][img1]
+
+[<span class="nl">ref1</span>]: <span class="na">https://example.com &quot;Reference title&quot;</span>
+[<span class="nl">ref2</span>]: <span class="na">https://example.com &#39;Reference title&#39;</span>
+[<span class="nl">ref3</span>]: <span class="na">https://example.com (Reference title)</span>
+
+[<span class="nl">img1</span>]: <span class="na">image.png &quot;Image title&quot;</span>
+[<span class="nl">img2</span>]: <span class="na">image.png &#39;Image title&#39;</span>
+[<span class="nl">img3</span>]: <span class="na">image.png (Image title)</span>
+</pre>
+</div>
+
+<p>
+  <strong>Image attributes on reference definitions:</strong>
+  In <strong>unified</strong>, <strong>MultiMarkdown</strong>, and <strong>Kramdown</strong> modes, you can put attributes (e.g. <code>width=250 height=83</code> or <code>@2x</code>) after the URL in an image reference definition. A space after the URL separates the URL from the attributes; the URL is not encoded, so query parameters (e.g. <code>?size=250x83</code>) are preserved.
+</p>
+
+<div class="highlight">
+<pre><span></span>![<span class="nt">Logo</span>](<span class="na">https://example.com/badge.png?size=250x83</span>)
+</pre>
+</div>
+
+<p>
+  These attributes are applied to every image that uses that reference, including images inside fenced divs (::: … :::) and other markdown=“1” regions.
+  <strong>Bear image attribute comments:</strong>
+  Apex recognizes the JSON metadata comments that Bear places immediately after
+  images. This works in <strong>CommonMark</strong>, <strong>GFM</strong>, <strong>MultiMarkdown</strong>, and
+  <strong>unified</strong> modes:
+</p>
+
+<div class="highlight">
+<pre><span></span>![](emperor-1.jpg)&lt;!-- {&quot;width&quot;:259} --&gt;
+</pre>
+</div>
+
+<p>
+  With raw <abbr title="Hypertext Markup Language">HTML</abbr> enabled, this produces:
+</p>
+
+<div class="highlight">
+<pre><span></span><span class="p">&lt;</span><span class="nt">img</span> <span class="na">src</span><span class="o">=</span><span class="s">&quot;emperor-1.jpg&quot;</span> <span class="na">alt</span><span class="o">=</span><span class="s">&quot;&quot;</span> <span class="na">width</span><span class="o">=</span><span class="s">&quot;259&quot;</span><span class="p">&gt;</span><span class="cm">&lt;!-- {&quot;width&quot;:259} --&gt;</span>
+</pre>
+</div>
+
+<p>
+  The comment must be on the same line as the image. It may touch the image or
+  be separated by spaces or tabs. Apex preserves the original comment; when raw
+  <abbr title="Hypertext Markup Language">HTML</abbr> is disabled, the current safe-<abbr title="Hypertext Markup Language">HTML</abbr> handling still applies.
+  Bear comments also work with reference-style images:
+</p>
+
+<div class="highlight">
+<pre><span></span>![<span class="nt">Default</span>](<span class="na">emperor.jpg</span>)
+![<span class="nt">Larger</span>](<span class="na">emperor.jpg</span>)&lt;!-- {&quot;width&quot;:320} --&gt;
+
+ &lt;!-- {&quot;width&quot;:259,&quot;height&quot;:194} --&gt;
+</pre>
+</div>
+
+<p>
+  Attributes on the reference definition apply to every image using that
+  reference. A comment on an explicit <code>![alt][id]</code> use applies only to that
+  instance and overrides conflicting definition attributes.
+  Allowed keys are <code>width</code>, <code>height</code>, <code>style</code>, <code>class</code>, <code>id</code>, <code>rel</code>, and
+<code>title</code>. Unsupported keys are ignored. Malformed JSON does not apply
+  attributes, and the comment remains in the output. See
+  <a href="Inline-Attribute-Lists#bear-image-attribute-comments">Inline Attribute Lists</a>
+  for complete rules and examples.
+  <strong>URL handling (images and links):</strong>
+</p>
+
+<ul>
+
+  <li>
+    URLs that contain a protocol (e.g. <code>http://</code>, <code>https://</code>) are not URL-encoded by Apex. Query parameters and special characters (e.g. <code>?</code>, <code>&amp;</code>, <code>=</code>) in such URLs are left as-is in the output.
+  </li>
+
+  <li>
+    In image syntax (inline or reference definition), a space after the URL starts the attribute list. So the URL is everything before the first space that is followed by an attribute (e.g. <code>key=value</code> or <code>@2x</code>). Use this to keep query strings intact while adding width, height, or other attributes.
+    <strong>Autolinks:</strong>
+    Apex can automatically convert URLs and email addresses into clickable links. Autolinking is enabled by default in <strong>GFM</strong>, <strong>MultiMarkdown</strong>, <strong>Kramdown</strong>, and <strong>unified</strong> modes. It is disabled by default in <strong>CommonMark</strong> mode.
+    <strong>Angle-bracket autolinks:</strong>
+  </li>
+
+</ul>
+
+<div class="highlight">
+<pre><span></span>&lt;https://example.com&gt;
+&lt;http://example.com&gt;
+&lt;mailto:user@example.com&gt;
+</pre>
+</div>
+
+<p>
+  <strong>Bare URL autolinks:</strong>
+</p>
+
+<div class="highlight">
+<pre><span></span>Visit https://example.com for more info.
+Check out http://example.com too.
+</pre>
+</div>
+
+<p>
+  <strong>Email autolinks:</strong>
+</p>
+
+<div class="highlight">
+<pre><span></span>Contact me@example.com for details.
+Send to user@example.com.
+</pre>
+</div>
+
+<p>
+  <strong>Important notes:</strong>
+</p>
+
+<ul>
+
+  <li>
+    Autolinks are <strong>not</strong> processed inside code spans (<code>`code`</code>) or code blocks (<code> </code> ```)
+  </li>
+
+  <li>
+    Use <code>--autolink</code> to enable autolinking in modes where it’s disabled by default
+  </li>
+
+  <li>
+    Use <code>--no-autolink</code> to disable autolinking in modes where it’s enabled by default
+  </li>
+
+  <li>
+    Angle-bracket autolinks (<code>&lt;url&gt;</code>) are converted to standard Markdown links during preprocessing
+  </li>
+
+  <li>
+    Bare URLs and email addresses are also converted to Markdown links during preprocessing
+  </li>
+
+</ul>
+
+<h3 id="code">
+  Code
+</h3>
+
+<p>
+  <strong>Inline code:</strong>
+</p>
+
+<div class="highlight">
+<pre><span></span>Use <span class="sb">`code`</span> in text.
+</pre>
+</div>
+
+<p>
+  <strong>Fenced code blocks:</strong>
+</p>
+
+<div class="highlight">
+<pre><span></span><span class="sb">```python</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">hello</span><span class="p">():</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Hello, World!&quot;</span><span class="p">)</span>
+<span class="sb">```</span>
+</pre>
+</div>
+
+<p>
+  <strong>Indented code blocks:</strong>
+</p>
+
+<div class="highlight">
+<pre><span></span>    def hello():
+        print(&quot;Hello, World!&quot;)
+</pre>
+</div>
+
+<p>
+  <strong>Syntax highlighting:</strong>
+  Apex supports external syntax highlighting via the <code>--code-highlight</code> flag. When enabled, fenced code blocks are processed by external tools (Pygments, Skylighting, or Shiki) to produce colorized <abbr title="Hypertext Markup Language">HTML</abbr> or ANSI output.
+  <strong>Usage:</strong>
+</p>
+
+<div class="highlight">
+<pre><span></span>apex<span class="w"> </span>document.md<span class="w"> </span>--code-highlight<span class="w"> </span>pygments
+apex<span class="w"> </span>document.md<span class="w"> </span>--code-highlight<span class="w"> </span>skylighting
+apex<span class="w"> </span>document.md<span class="w"> </span>--code-highlight<span class="w"> </span>shiki
+</pre>
+</div>
+
+<p>
+  <strong>Features:</strong>
+</p>
+
+<ul>
+
+  <li>
+    Language-aware highlighting based on code block language specifiers
+  </li>
+
+  <li>
+    Auto-detection when no language is specified (where supported)
+  </li>
+
+  <li>
+    Line numbers support with <code>--code-line-numbers</code> flag (Pygments and Skylighting)
+  </li>
+
+  <li>
+    Automatic <abbr title="Cascading Style Sheets">CSS</abbr> inclusion in standalone mode (GitHub-style theme)
+  </li>
+
+  <li>
+    Terminal output can use external ANSI highlighters for code blocks
+    When processed with <code>--code-highlight pygments</code>, the code block is sent to Pygments (<code>pygmentize</code>) and replaced with highlighted <abbr title="Hypertext Markup Language">HTML</abbr> (or ANSI, in terminal modes) containing syntax classes and colors. <code>--code-highlight skylighting</code> uses <code>skylighting</code> for <abbr title="Hypertext Markup Language">HTML</abbr> or ANSI output. <code>--code-highlight shiki</code> uses the Shiki CLI (<code>@shikijs/cli</code>) to produce <abbr title="Hypertext Markup Language">HTML</abbr> or ANSI output depending on the selected <code>-t/--to</code> format.
+    <strong>Theming:</strong>
+    Use <code>--code-highlight-theme THEME</code> (or metadata <code>code-highlight-theme</code> / <code>code_highlight_theme</code>) to select a syntax highlighting theme:
+  </li>
+
+  <li>
+    With <strong>Pygments</strong>, <code>THEME</code> is a Pygments style name used in both <abbr title="Hypertext Markup Language">HTML</abbr> and terminal/terminal256 output.
+  </li>
+
+  <li>
+    With <strong>Skylighting</strong>, <code>THEME</code> is a Skylighting style name used in both <abbr title="Hypertext Markup Language">HTML</abbr> and ANSI terminal output.
+  </li>
+
+  <li>
+    With <strong>Shiki</strong>, <code>THEME</code> is a Shiki theme ID used in both <abbr title="Hypertext Markup Language">HTML</abbr> and ANSI output.
+    Run <code>apex --list-themes</code> to see built-in themes for Pygments and Skylighting and a pointer to bundled Shiki themes.
+    <strong>Notes:</strong>
+  </li>
+
+  <li>
+    Only fenced code blocks (with triple backticks) are highlighted. Indented code blocks are not processed by external highlighters.
+  </li>
+
+</ul>
+
+<h3 id="blockquotes">
+  Blockquotes
+</h3>
+
+<div class="highlight">
+<pre><span></span><span class="k">&gt; </span><span class="ge">This is a quote.</span>
+<span class="k">&gt; </span><span class="ge">It can span multiple lines.</span>
+<span class="k">&gt;</span>
+<span class="ge">&gt; &gt; Nested quotes are supported.</span>
+</pre>
+</div>
+
+<p>
+  <strong>Lists and definition lists in blockquotes:</strong>
+  Blockquotes can contain lists and definition lists:
+</p>
+
+<div class="highlight">
+<pre><span></span><span class="k">&gt; </span><span class="ge">1. First item</span>
+<span class="k">&gt; </span><span class="ge">2. Second item</span>
+<span class="k">&gt;</span>
+<span class="ge">&gt; - Unordered item</span>
+<span class="k">&gt; </span><span class="ge">- Another item</span>
+<span class="k">&gt;</span>
+<span class="ge">&gt; Term</span>
+<span class="k">&gt; </span><span class="ge">: Definition</span>
+</pre>
+</div>
+
+<p>
+  Nested blockquotes also support these features:
+</p>
+
+<div class="highlight">
+<pre><span></span><span class="k">&gt; </span><span class="ge">&gt; Nested quote</span>
+<span class="k">&gt; </span><span class="ge">&gt; 1. List item</span>
+<span class="k">&gt; </span><span class="ge">&gt; Term</span>
+<span class="k">&gt; </span><span class="ge">&gt; : Definition</span>
+</pre>
+</div>
+
+<h3 Option id="horizontal-rules">
+  Horizontal&nbsp;Rules
+</h3>
+
+<div class="highlight">
+<pre><span></span>---
+***
+___
+</pre>
+</div>
+
+<h2 Effect id="tables">
+  Tables
+</h2>
+
+<p>
+  Apex supports comprehensive table syntax including standard pipe tables, CSV/TSV tables, and advanced features. For complete table documentation, see <a href="Tables.html">Tables</a>.
+</p>
+
+<h3 id="quick-reference">
+  Quick&nbsp;Reference
+</h3>
+
+<ul>
+
+  <li>
+    <strong>Standard pipe tables</strong> with column alignment (<code>:---</code>, <code><span class=\"emoji\">:---:</span></code>, <code>---:</code>)
+  </li>
+
+  <li>
+    <strong>Relaxed tables</strong> (no separator row required in unified/kramdown modes)
+  </li>
+
+  <li>
+    <strong>Grid tables</strong> (Pandoc <code>+---+</code> syntax; opt-in with <code>--grid-tables</code>, disable with <code>--no-grid-tables</code>)
+  </li>
+
+  <li>
+    <strong>Headerless tables</strong> with alignment rows
+  </li>
+
+  <li>
+    <strong>Row header columns</strong> (first column as row header)
+  </li>
+
+  <li>
+    <strong>Inline CSV/TSV tables</strong> from fenced code blocks or <code>&lt;!--TABLE--&gt;</code> markers
+  </li>
+
+  <li>
+    <strong>Column spans</strong> using empty cells or <code>&lt;&lt;</code> marker
+  </li>
+
+  <li>
+    <strong>Row spans</strong> using <code>^^</code> marker
+  </li>
+
+  <li>
+    <strong>Table footers</strong> using <code>===</code> separator rows
+  </li>
+
+  <li>
+    <strong>Individual cell alignment</strong> using colons (<code>:Left</code>, <code>Center:</code>, <code><span class=\"emoji\">:Center:</span></code>)
+  </li>
+
+  <li>
+    <strong>Table captions</strong> in multiple formats (<code>[Caption]</code>, <code>Table: Caption</code>, <code>: Caption</code>)
+  </li>
+
+  <li>
+    <strong>Inline Attribute Lists (IALs)</strong> for adding IDs, classes, and custom attributes to tables
+  </li>
+
+</ul>
+
+<h3 `--image-captions` id="basic-example">
+  Basic&nbsp;Example
+</h3>
+
+<div class="highlight">
+<pre><span></span>| Header 1 | Header 2 | Header 3 |
+| -------- | <span class=\"emoji\">:------:</span> | -------: |
+| Left     |  Center  |    Right |
+| Data     |   Data   |     Data |
+</pre>
+</div>
+
+<p>
+  Column alignment: <code>:---</code> (left, default), <code><span class=\"emoji\">:---:</span></code> (center), <code>---:</code> (right).
+  For detailed documentation of all advanced table features including rowspan, colspan, per-cell alignment, captions, IALs, and other advanced syntax, see <a href="Tables.html">Tables</a>.
+</p>
+
+<h2 Enable wrapping images with title/alt in `<figure id="footnotes">
+  ` and `
+  <figcaption>
+    ` (default in unified/<abbr title="MultiMarkdown">MMD</abbr>).>Footnotes
+  </h2>
+
+  <h3 id="reference-style">
+    Reference&nbsp;Style
+  </h3>
+
+  <div class="highlight">
+<pre><span></span>Here&#39;s a footnote[^1] and another[^note].
+
+[<span class="nl">^1</span>]: <span class="na">First footnote content.</span>
+[<span class="nl">^note</span>]: <span class="na">Second footnote with custom ID.</span>
+  </pre>
+</div>
+
+<h3 id="inline-style-kramdown">
+  Inline Style&nbsp;(Kramdown)
+</h3>
+
+<div class="highlight">
+<pre><span></span>This is a footnote[^fn1].
+</pre>
+</div>
+
+<h3 id="inline-style-multimarkdown">
+  Inline Style&nbsp;(MultiMarkdown)
+</h3>
+
+<div class="highlight">
+<pre><span></span>This is a footnote[^fn2].
+</pre>
+</div>
+
+<h2 id="definition-lists">
+  Definition&nbsp;Lists
+</h2>
+
+<div class="highlight">
+<pre><span></span>Term
+: Definition text with <span class="gs">**Markdown**</span> support
+
+Apple
+: A fruit
+: A company
+
+Term with multiple definitions
+: First definition
+: Second definition
+</pre>
+</div>
+
+<p>
+  <strong>Definition lists in blockquotes:</strong>
+  Definition lists work inside blockquotes, including nested blockquotes:
+</p>
+
+<div class="highlight">
+<pre><span></span><span class="k">&gt; </span><span class="ge">Term 1</span>
+<span class="k">&gt; </span><span class="ge">: Definition 1</span>
+<span class="k">&gt; </span><span class="ge">Term 2</span>
+<span class="k">&gt; </span><span class="ge">: Definition 2</span>
+
+<span class="k">&gt; </span><span class="ge">&gt; Nested blockquote</span>
+<span class="k">&gt; </span><span class="ge">&gt; Term</span>
+<span class="k">&gt; </span><span class="ge">&gt; : Definition</span>
+</pre>
+</div>
+
+<p>
+  This allows you to create quoted definitions and maintain proper nesting structure.
+</p>
+
+<h2 `--no-image-captions` id="citations">
+  Citations
+</h2>
+
+<p>
+  <strong>Note:</strong> Citations are supported in <strong>MultiMarkdown</strong> and <strong>unified</strong> modes. A bibliography file must be provided via <code>--bibliography</code> flag or document metadata.
+</p>
+
+<h3 Disable automatic captions from title/alt. Images with `caption=""` in IAL still get figures. id="pandoc-citation-syntax">
+  Pandoc Citation&nbsp;Syntax
+</h3>
+
+<p>
+  <strong>Basic citation:</strong>
+</p>
+
+<div class="highlight">
+<pre><span></span>See [@doe99] for details.
+</pre>
+</div>
+
+<p>
+  <strong>Multiple citations:</strong>
+</p>
+
+<div class="highlight">
+<pre><span></span>See [@doe99; <span class="ni">@smith2000</span>; <span class="ni">@smith2004</span>] for more information.
+</pre>
+</div>
+
+<p>
+  <strong>Author in text:</strong>
+</p>
+
+<div class="highlight">
+<pre><span></span><span class="ni">@smith04</span> says blah.
+</pre>
+</div>
+
+<p>
+  <strong>Author suppressed:</strong>
+</p>
+
+<div class="highlight">
+<pre><span></span>Smith says blah [-@smith04].
+</pre>
+</div>
+
+<p>
+  <strong>With locator:</strong>
+</p>
+
+<div class="highlight">
+<pre><span></span><span class="ni">@smith04</span> [p. 33] says blah.
+</pre>
+</div>
+
+<h3 id="multimarkdown-citation-syntax">
+  MultiMarkdown Citation&nbsp;Syntax
+</h3>
+
+<p>
+  <strong>Basic citation:</strong>
+</p>
+
+<div class="highlight">
+<pre><span></span>This is a statement[#Doe:2006].
+</pre>
+</div>
+
+<p>
+  <strong>With locator:</strong>
+</p>
+
+<div class="highlight">
+<pre><span></span>This is a statement[p. 23][#Doe:2006].
+</pre>
+</div>
+
+<p>
+  <strong>Inline citation:</strong>
+</p>
+
+<div class="highlight">
+<pre><span></span>As per Doe.[#John Doe. <span class="ge">*A Totally Fake Book 1*</span>. Vanity Press, 2006.]
+</pre>
+</div>
+
+<h3 `--title-captions-only` id="mmark-citation-syntax">
+  mmark Citation&nbsp;Syntax
+</h3>
+
+<p>
+  <strong>Basic citation:</strong>
+</p>
+
+<div class="highlight">
+<pre><span></span>This references [@RFC2535].
+</pre>
+</div>
+
+<p>
+  <strong>Normative citation:</strong>
+</p>
+
+<div class="highlight">
+<pre><span></span>This references [@!RFC1034] (normative).
+</pre>
+</div>
+
+<p>
+  <strong>Multiple citations:</strong>
+</p>
+
+<div class="highlight">
+<pre><span></span>Multiple citations: [@RFC1034;@RFC1035].
+</pre>
+</div>
+
+<p>
+  <strong>Combined reference:</strong>
+</p>
+
+<div class="highlight">
+<pre><span></span>Combined reference: [@RFC1034@STD3].
+</pre>
+</div>
+
+<h3 Only add captions for images that have a **title** attribute; ignore alt for captions. Implies `--image-captions`. You do not need to pass both. id="bibliography">
+  Bibliography
+</h3>
+
+<p>
+  Bibliography is automatically generated from cited entries and inserted at the <code>&lt;!-- REFERENCES --&gt;</code> marker or appended to the end of the document.
+  <strong>Bibliography marker:</strong>
+</p>
+
+<div class="highlight">
+<pre><span></span><span class="gu">## References</span>
+
+&lt;!-- REFERENCES --&gt;
+</pre>
+</div>
+
+<p>
+  <strong>Bibliography in metadata:</strong>
+</p>
+
+<div class="highlight">
+<pre><span></span>---
+<span class="gu">bibliography: references.bib</span>
+<span class="gu">---</span>
+
+See [@doe99] for details.
+</pre>
+</div>
+
+<p>
+  <strong>Multiple bibliography files:</strong>
+</p>
+
+<div class="highlight">
+<pre><span></span>---
+bibliography:
+<span class="w">  </span><span class="k">-</span><span class="w"> </span>refs1.bib
+<span class="gu">  - refs2.bib</span>
+<span class="gu">---</span>
+</pre>
+</div>
+
+<p>
+  For complete documentation of citations and bibliography, see <a href="Citations.html">Citations</a>.
+</p>
+
+<h2 id="indices">
+  Indices
+</h2>
+
+<p>
+  <strong>Note:</strong> Indices are supported in <strong>MultiMarkdown</strong> and <strong>unified</strong> modes. Enabled by default in these modes.
+</p>
+
+<h3 `--no-title-captions-only` id="mmark-index-syntax">
+  mmark Index&nbsp;Syntax
+</h3>
+
+<p>
+  <strong>Basic index entry:</strong>
+</p>
+
+<div class="highlight">
+<pre><span></span>This is about protocols &lt;!--IDX:idxref-0--&gt;.
+</pre>
+</div>
+
+<p>
+  <strong>Sub-item entry:</strong>
+</p>
+
+<div class="highlight">
+<pre><span></span>HTTP/1.1 &lt;!--IDX:idxref-1--&gt; is a protocol version.
+</pre>
+</div>
+
+<p>
+  <strong>Primary entry (bold in index):</strong>
+</p>
+
+<div class="highlight">
+<pre><span></span>This is a primary topic &lt;!--IDX:idxref-2--&gt;.
+</pre>
+</div>
+
+<p>
+  <strong>Multiple entries:</strong>
+</p>
+
+<div class="highlight">
+<pre><span></span>Protocols &lt;!--IDX:idxref-3--&gt; and implementations &lt;!--IDX:idxref-4--&gt; are important.
+</pre>
+</div>
+
+<h3 Use title or alt for captions (default). id="textindex-syntax">
+  TextIndex&nbsp;Syntax
+</h3>
+
+<p>
+  <strong>Basic syntax (indexes preceding word):</strong>
+</p>
+
+<div class="highlight">
+<pre><span></span>Most mechanical keyboard firmware&lt;!--IDX:idxref-5--&gt; supports key combinations.
+</pre>
+</div>
+
+<p>
+  <strong>Explicit term:</strong>
+</p>
+
+<div class="highlight">
+<pre><span></span>This uses [key combinations]&lt;!--IDX:idxref-6--&gt; for indexing.
+</pre>
+</div>
+
+<p>
+  <strong>With parameters:</strong>
+</p>
+
+<div class="highlight">
+<pre><span></span>Term&lt;!--IDX:idxref-7--&gt;
+</pre>
+</div>
+
+<h3 id="leanpub-index-syntax">
+  Leanpub Index&nbsp;Syntax
+</h3>
+
+<p>
+  Leanpub (Markua) index syntax uses <code>&lt;!--IDX:idxref-8--&gt;</code> to mark index entries. See the <a href="https://help.leanpub.com/en/articles/6961502-how-to-create-an-index-in-a-leanpub-book">Leanpub index documentation</a>.
+  <strong>Basic index entry:</strong>
+</p>
+
+<div class="highlight">
+<pre><span></span>Call me Ishmael&lt;!--IDX:idxref-9--&gt;
+</pre>
+</div>
+
+<p>
+  <strong>Entries under headings (hierarchical):</strong>
+</p>
+
+<div class="highlight">
+<pre><span></span>Niagara&lt;!--IDX:idxref-10--&gt; is a waterfall.
+</pre>
+</div>
+
+<p>
+  <strong>Sort form:</strong>
+</p>
+
+<div class="highlight">
+<pre><span></span>Sabbath&lt;!--IDX:idxref-11--&gt; afternoon.
+</pre>
+</div>
+
+<h3 id="index-generation">
+  Index&nbsp;Generation
+</h3>
+
+<p>
+  The index is automatically generated at the end of the document or at the <code>&lt;!--INDEX--&gt;</code> marker if present:
+</p>
+
+<div class="highlight">
+<pre><span></span><span class="gh"># Document</span>
+
+This is about protocols &lt;!--IDX:idxref-12--&gt;.
+
+&lt;!--INDEX--&gt;
+
+More content after the index.
+</pre>
+</div>
+
+<p>
+  <strong>Index features:</strong>
+</p>
+
+<ul>
+
+  <li>
+    Entries are sorted alphabetically
+  </li>
+
+  <li>
+    Can be grouped by first letter (default)
+  </li>
+
+  <li>
+    Sub-items are nested under main terms
+  </li>
+
+  <li>
+    Primary entries are marked (typically bold)
+  </li>
+
+  <li>
+    Each entry links back to its location in the document
+    <strong>Suppress index:</strong>
+    Use <code>--no-index</code> to suppress index generation while still creating index markers.
+  </li>
+
+</ul>
+
+<h2 id="math">
+  Math
+</h2>
+
+<p>
+  <strong>Inline math:</strong>
+</p>
+
+<div class="highlight">
+<pre><span></span>The equation $E = mc^2$ is famous.
+</pre>
+</div>
+
+<p>
+  <strong>Display math:</strong>
+</p>
+
+<div class="highlight">
+<pre><span></span>$$
+\int_{-\infty}^{\infty} e^{-x^2} dx = \sqrt{\pi}
+$$
+</pre>
+</div>
+
+<p>
+  Math is wrapped in spans with appropriate classes for MathJax or KaTeX.
+</p>
+
+<h2 id="wiki-links">
+  Wiki&nbsp;Links
+</h2>
+
+<p>
+  <strong>Note:</strong> Wiki links are <strong>disabled by default</strong> in all modes. Use <code>--wikilinks</code> to enable.
+  Wiki links use double square brackets <code>[[...]]</code> to create links to other pages. They’re converted to standard <abbr title="Hypertext Markup Language">HTML</abbr> <code>&lt;a&gt;</code> tags with URLs generated from the page name.
+</p>
+
+<h3 id="syntax">
+  Syntax
+</h3>
+
+<div class="highlight">
+<pre><span></span>[[Page Name]]                   # Link to page
+[[Page Name|Display Text]]      # Custom display text
+[[Page Name#Section]]           # Link to section
+[[Page Name#Section|Display]]   # Custom display with section
+</pre>
+</div>
+
+<h3 id="conversion-process">
+  Conversion&nbsp;Process
+</h3>
+
+<p>
+  Wiki links are converted to <abbr title="Hypertext Markup Language">HTML</abbr> links through the following process:
+</p>
+
+<ol>
+
+  <li>
+    <strong>Page name extraction</strong>: The text between <code>[[</code> and <code>]]</code> is parsed
+  </li>
+
+  <li>
+    <strong>Display text</strong>: If a pipe <code>|</code> is present, text after the pipe becomes the link text; otherwise, the page name is used
+  </li>
+
+  <li>
+    <strong>Section anchor</strong>: If a hash <code>#</code> is present in the page name, it’s extracted as a section anchor
+  </li>
+
+  <li>
+    <strong>URL generation</strong>: The page name is converted to a URL based on configuration options:
+    <ul>
+
+      <li>
+        <strong>Space handling</strong>: Spaces in page names are converted according to <code>--wikilink-space</code> mode (default: <code>dash</code>)
+      </li>
+
+      <li>
+        <strong>Extension</strong>: A file extension can be added via <code>--wikilink-extension</code> (default: none)
+      </li>
+
+    </ul>
+
+  </li>
+
+</ol>
+
+<h3 id="space-handling-options">
+  Space Handling&nbsp;Options
+</h3>
+
+<p>
+  The <code>--wikilink-space</code> option controls how spaces in page names are converted:
+</p>
+
+<ul>
+
+  <li>
+    <strong><code>dash</code></strong> (default): Spaces become dashes
+    <ul>
+
+      <li>
+<code>[[Home Page]]</code> → <code>href=&quot;Home-Page&quot;</code>
+      </li>
+
+    </ul>
+
+  </li>
+
+  <li>
+    <strong><code>none</code></strong>: Spaces are removed
+    <ul>
+
+      <li>
+<code>[[Home Page]]</code> → <code>href=&quot;HomePage&quot;</code>
+      </li>
+
+    </ul>
+
+  </li>
+
+  <li>
+    <strong><code>underscore</code></strong>: Spaces become underscores
+    <ul>
+
+      <li>
+<code>[[Home Page]]</code> → <code>href=&quot;Home_Page&quot;</code>
+      </li>
+
+    </ul>
+
+  </li>
+
+  <li>
+    <strong><code>space</code></strong>: Spaces are kept (URL-encoded as <code>%20</code>)
+    <ul>
+
+      <li>
+<code>[[Home Page]]</code> → <code>href=&quot;Home%20Page&quot;</code>
+      </li>
+
+    </ul>
+
+  </li>
+
+</ul>
+
+<h3 id="file-extensions">
+  File&nbsp;Extensions
+</h3>
+
+<p>
+  The <code>--wikilink-extension</code> option adds a file extension to generated URLs:
+</p>
+
+<ul>
+
+  <li>
+<code>--wikilink-extension html</code> → <code>href=&quot;Page.html&quot;</code>
+  </li>
+
+  <li>
+<code>--wikilink-extension md</code> → <code>href=&quot;Page.md&quot;</code>
+  </li>
+
+  <li>
+    The dot is added automatically if not provided
+  </li>
+
+</ul>
+
+<h3 id="examples">
+  Examples
+</h3>
+
+<p>
+  <strong>Basic usage:</strong>
+</p>
+
+<div class="highlight">
+<pre><span></span>apex<span class="w"> </span>document.md<span class="w"> </span>--wikilinks
+</pre>
+</div>
+
+<p>
+  <strong>Input:</strong>
+</p>
+
+<div class="highlight">
+<pre><span></span>See [[Main Page]] for details.
+Or visit [[Main Page|the main page]] with custom text.
+Link to [[Main Page#Introduction]] for a specific section.
+</pre>
+</div>
+
+<p>
+  <strong>Output (default - dash mode, no extension):</strong>
+</p>
+
+<div class="highlight">
+<pre><span></span><span class="p">&lt;</span><span class="nt">p</span><span class="p">&gt;</span>See <span class="p">&lt;</span><span class="nt">a</span> <span class="na">href</span><span class="o">=</span><span class="s">&quot;Main-Page&quot;</span><span class="p">&gt;</span>Main Page<span class="p">&lt;/</span><span class="nt">a</span><span class="p">&gt;</span> for details.<span class="p">&lt;/</span><span class="nt">p</span><span class="p">&gt;</span>
+<span class="p">&lt;</span><span class="nt">p</span><span class="p">&gt;</span>Or visit <span class="p">&lt;</span><span class="nt">a</span> <span class="na">href</span><span class="o">=</span><span class="s">&quot;Main-Page&quot;</span><span class="p">&gt;</span>the main page<span class="p">&lt;/</span><span class="nt">a</span><span class="p">&gt;</span> with custom text.<span class="p">&lt;/</span><span class="nt">p</span><span class="p">&gt;</span>
+<span class="p">&lt;</span><span class="nt">p</span><span class="p">&gt;</span>Link to <span class="p">&lt;</span><span class="nt">a</span> <span class="na">href</span><span class="o">=</span><span class="s">&quot;Main-Page#Introduction&quot;</span><span class="p">&gt;</span>Main Page<span class="p">&lt;/</span><span class="nt">a</span><span class="p">&gt;</span> for a specific section.<span class="p">&lt;/</span><span class="nt">p</span><span class="p">&gt;</span>
+</pre>
+</div>
+
+<p>
+  <strong>With extension and space mode:</strong>
+</p>
+
+<div class="highlight">
+<pre><span></span>apex<span class="w"> </span>document.md<span class="w"> </span>--wikilinks<span class="w"> </span>--wikilink-space<span class="w"> </span>dash<span class="w"> </span>--wikilink-extension<span class="w"> </span>html
+</pre>
+</div>
+
+<p>
+  <strong>Input:</strong>
+</p>
+
+<div class="highlight">
+<pre><span></span>See [[Home Page]] for details.
+</pre>
+</div>
+
+<p>
+  <strong>Output:</strong>
+</p>
+
+<div class="highlight">
+<pre><span></span><span class="p">&lt;</span><span class="nt">p</span><span class="p">&gt;</span>See <span class="p">&lt;</span><span class="nt">a</span> <span class="na">href</span><span class="o">=</span><span class="s">&quot;Home-Page.html&quot;</span><span class="p">&gt;</span>Home Page<span class="p">&lt;/</span><span class="nt">a</span><span class="p">&gt;</span> for details.<span class="p">&lt;/</span><span class="nt">p</span><span class="p">&gt;</span>
+</pre>
+</div>
+
+<p>
+  <strong>With underscore mode:</strong>
+</p>
+
+<div class="highlight">
+<pre><span></span>apex<span class="w"> </span>document.md<span class="w"> </span>--wikilinks<span class="w"> </span>--wikilink-space<span class="w"> </span>underscore
+</pre>
+</div>
+
+<p>
+  <strong>Input:</strong>
+</p>
+
+<div class="highlight">
+<pre><span></span>See [[User Guide]] for help.
+</pre>
+</div>
+
+<p>
+  <strong>Output:</strong>
+</p>
+
+<div class="highlight">
+<pre><span></span><span class="p">&lt;</span><span class="nt">p</span><span class="p">&gt;</span>See <span class="p">&lt;</span><span class="nt">a</span> <span class="na">href</span><span class="o">=</span><span class="s">&quot;User_Guide&quot;</span><span class="p">&gt;</span>User Guide<span class="p">&lt;/</span><span class="nt">a</span><span class="p">&gt;</span> for help.<span class="p">&lt;/</span><span class="nt">p</span><span class="p">&gt;</span>
+</pre>
+</div>
+
+<p>
+  For complete option details, see <a href="Command-Line-Options#--wikilinks">Command Line Options</a>.
+</p>
+
+<h2 id="critic-markup">
+  Critic&nbsp;Markup
+</h2>
+
+<p>
+  Track changes and annotations. Apex supports the standard CriticMarkup forms, and also provides a simple <code>++insert++</code> shorthand for <abbr title="Hypertext Markup Language">HTML</abbr> <code>&lt;ins&gt;</code> tags (see below).
+</p>
+
+<div class="highlight">
+<pre><span></span>&lt;ins class=&quot;critic&quot;&gt;addition&lt;/ins&gt;              # Added text
+&lt;del class=&quot;critic&quot;&gt;deletion&lt;/del&gt;              # Deleted text
+&lt;del class=&quot;critic break&quot;&gt;old text&lt;/del&gt;&lt;ins class=&quot;critic break&quot;&gt;new text&lt;/ins&gt;    # Substitution
+&lt;mark class=&quot;critic&quot;&gt;highlighted&lt;/mark&gt;           # Highlighted text
+&lt;span class=&quot;critic comment&quot;&gt;comment text&lt;/span&gt;         # Comment/annotation
+</pre>
+</div>
+
+<p>
+  In addition to the curly-brace CriticMarkup form for insertions, you can use a plain <code>++insert++</code> shorthand:
+</p>
+
+<div class="highlight">
+<pre><span></span>+insert++                   # Renders as &lt;ins&gt;insert&lt;/ins&gt;
+This is &lt;ins&gt;important&lt;/ins&gt; text. # Inline insertion
+</pre>
+</div>
+
+<blockquote>
+
+  <p>
+    Note: <code>++insert++</code> is a convenience syntax for <code>&lt;ins&gt;…&lt;/ins&gt;</code> and is independent of CriticMarkup’s <code>&lt;ins class=&quot;critic&quot;&gt;...&lt;/ins&gt;</code> form.
+    See <a href="Command-Line-Options.html">Command Line Options</a> for <code>--accept</code> and <code>--reject</code> modes.
+  </p>
+
+</blockquote>
+
+<h2 id="callouts">
+  Callouts
+</h2>
+
+<p>
+  Bear/Obsidian/Xcode Playground syntax:
+</p>
+
+<div class="highlight">
+<pre><span></span><span class="k">&gt; </span><span class="ge">[!NOTE] Title</span>
+<span class="k">&gt; </span><span class="ge">This is a note callout</span>
+
+<span class="k">&gt; </span><span class="ge">[!WARNING] Be Careful</span>
+<span class="k">&gt; </span><span class="ge">Warning content</span>
+
+<span class="k">&gt; </span><span class="ge">[!TIP] Pro Tip</span>
+<span class="k">&gt; </span><span class="ge">Helpful advice</span>
+
+<span class="k">&gt; </span><span class="ge">[!DANGER] Critical</span>
+<span class="k">&gt; </span><span class="ge">Dangerous operation</span>
+
+<span class="k">&gt; </span><span class="ge">[!INFO] Information</span>
+<span class="k">&gt; </span><span class="ge">Informational content</span>
+</pre>
+</div>
+
+<p>
+  <strong>Collapsible callouts:</strong>
+</p>
+
+<div class="highlight">
+<pre><span></span><span class="k">&gt; </span><span class="ge">[!NOTE]+ Expandable</span>
+<span class="k">&gt; </span><span class="ge">Defaults to open</span>
+
+<span class="k">&gt; </span><span class="ge">[!NOTE]- Collapsed</span>
+<span class="k">&gt; </span><span class="ge">Defaults to closed</span>
+</pre>
+</div>
+
+<h2 id="file-includes">
+  File&nbsp;Includes
+</h2>
+
+<p>
+  <strong>Marked syntax:</strong>
+</p>
+
+<div class="highlight">
+<pre><span></span>      # Include and process Markdown
+      # Include as code block
+     # Include raw <abbr title="Hypertext Markup Language">HTML</abbr>
+</pre>
+</div>
+
+<p>
+  <strong>MultiMarkdown transclusion:</strong>
+</p>
+
+<div class="highlight">
+<pre><span></span>{{file.md}}      # Include file
+{{file.*}}       # Prefer file.html, file.md, file.txt, file.tex (in that order)
+<span class="gh"># Apex Documentation Generators</span>
+
+This directory contains scripts to generate documentation from the Apex wiki.
+
+<span class="gu">## Scripts</span>
+
+<span class="gu">### `generate_docset.rb`</span>
+
+Generates Dash docsets for Apex documentation.
+
+<span class="gs">**Usage:**</span>
+```bash
+./generate_docset.rb [single|multi]
+</pre>
+</div>
+
+<ul>
+
+  <li>
+<code>single</code> - Generate single-page CLI options docset (ApexCLI.docset)
+  </li>
+
+  <li>
+<code>multi</code> - Generate multi-page docset from wiki files (Apex.docset, default)
+  </li>
+
+</ul>
+
+<p>
+  <strong>Output:</strong>
+</p>
+
+<ul>
+
+  <li>
+    Docsets are generated in <code>docsets/</code> directory
+  </li>
+
+  <li>
+    The script automatically clones the wiki from GitHub and cleans up after running
+  </li>
+
+</ul>
+
+<h3 id="generatesinglehtmlrb">
+<code>generate_single_html.rb</code>
+</h3>
+
+<p>
+  Generates a single <abbr title="Hypertext Markup Language">HTML</abbr> file with all wiki pages, using JavaScript to show/hide pages.
+</p>
+
+<p>
+  <strong>Usage:</strong>
+</p>
+
+<div class="highlight">
+<pre><span></span>./generate_single_html.rb
+</pre>
+</div>
+
+<p>
+  <strong>Output:</strong>
+</p>
+
+<ul>
+
+  <li>
+    <abbr title="Hypertext Markup Language">HTML</abbr> file is generated in <code>html/apex-docs.html</code>
+  </li>
+
+  <li>
+    The script automatically clones the wiki from GitHub and cleans up after running
+  </li>
+
+</ul>
+
+<h3 id="generateappdocsrb">
+<code>generate_app_docs.rb</code>
+</h3>
+
+<p>
+  Generates app-focused documentation from pre-transformed Markdown files. This script reads from <code>app-transformed/</code> and generates a single <abbr title="Hypertext Markup Language">HTML</abbr> file suitable for embedding in apps like Marked.app.
+</p>
+
+<p>
+  <strong>Usage:</strong>
+</p>
+
+<div class="highlight">
+<pre><span></span>./generate_app_docs.rb
+</pre>
+</div>
+
+<p>
+  <strong>Output:</strong>
+</p>
+
+<ul>
+
+  <li>
+    <abbr title="Hypertext Markup Language">HTML</abbr> file is generated in <code>html/apex-app-docs.html</code>
+  </li>
+
+  <li>
+    Settings table is generated in <code>app-settings-table.md</code>
+  </li>
+
+  <li>
+    Uses pre-transformed files from <code>app-transformed/</code> directory
+  </li>
+
+</ul>
+
+<p>
+  <strong>Note:</strong> This script requires pre-transformed Markdown files. See “AI Transformation Workflow” below for how to create them.
+</p>
+
+<h3 id="generateappdocsairb">
+<code>generate_app_docs_ai.rb</code>
+</h3>
+
+<p>
+  Uses AI (via cursor-agent or similar) to transform CLI-focused documentation into app-focused documentation. This script can automatically transform wiki pages by replacing CLI references with app Settings references.
+</p>
+
+<p>
+  <strong>Usage:</strong>
+</p>
+
+<div class="highlight">
+<pre><span></span>./generate_app_docs_ai.rb
+</pre>
+</div>
+
+<p>
+  <strong>Requirements:</strong>
+</p>
+
+<ul>
+
+  <li>
+<code>cursor-agent</code> or similar AI agent tool
+  </li>
+
+  <li>
+<code>transform_for_app.md</code> file (copy from <code>transform_for_app.example.md</code>)
+  </li>
+
+</ul>
+
+<p>
+  <strong>Output:</strong>
+</p>
+
+<ul>
+
+  <li>
+    Transformed Markdown files in <code>app-transformed/</code> directory
+  </li>
+
+  <li>
+    <abbr title="Hypertext Markup Language">HTML</abbr> file is generated in <code>html/apex-app-docs.html</code>
+  </li>
+
+  <li>
+    Settings table is generated in <code>app-settings-table.md</code>
+  </li>
+
+</ul>
+
+<p>
+  <strong>Note:</strong> This script requires manual setup. See “AI Transformation Workflow” below.
+</p>
+
+<h2 id="requirements">
+  Requirements
+</h2>
+
+<ul>
+
+  <li>
+    Ruby
+  </li>
+
+  <li>
+    Apex binary (in PATH or in <code>../build-release/apex</code>)
+  </li>
+
+  <li>
+<code>sqlite3</code> gem (for multi-page docset): <code>gem install sqlite3</code>
+  </li>
+
+  <li>
+<code>mmd2cheatset</code> (for single-page docset): Should be at <code>~/Desktop/Code/mmd2cheatset/mmd2cheatset.rb</code>
+  </li>
+
+  <li>
+    Git (for cloning the wiki)
+  </li>
+
+</ul>
+
+<h2 id="directory-structure">
+  Directory&nbsp;Structure
+</h2>
+
+<pre><code class="highlight ">documentation/
+├── generate_docset.rb           # Dash docset generator
+├── generate_single_html.rb      # Single &lt;abbr title="Hypertext Markup Language"&gt;HTML&lt;/abbr&gt; file generator
+├── generate_app_docs.rb         # App docs generator (uses pre-transformed files)
+├── generate_app_docs_ai.rb      # AI-powered app docs transformer
+├── transform_for_app.example.md # Example transformation instructions
+├── docsets/                     # Generated docsets (gitignored)
+│   ├── Apex.docset
+│   └── ApexCLI.docset
+├── html/                        # Generated &lt;abbr title="Hypertext Markup Language"&gt;HTML&lt;/abbr&gt; files (gitignored)
+│   ├── apex-docs.html
+│   └── apex-app-docs.html
+├── app-transformed/             # Transformed Markdown files (gitignored)
+│   ├── Syntax.md
+│   ├── Modes.md
+│   ├── Plugins.md
+│   └── ...
+└── app-settings-table.md        # Generated settings reference table
+</code></pre>
+
+<h2 id="how-it-works">
+  How&nbsp;It&nbsp;Works
+</h2>
+
+<h3 id="standard-documentation-generation">
+  Standard Documentation&nbsp;Generation
+</h3>
+
+<p>
+  The standard scripts (<code>generate_docset.rb</code> and <code>generate_single_html.rb</code>):
+</p>
+
+<ol>
+
+  <li>
+    Clone the wiki from <code>https://github.com/ApexMarkdown/apex.wiki.git</code> into <code>apex.wiki/</code>
+  </li>
+
+  <li>
+    Process the wiki files
+  </li>
+
+  <li>
+    Generate the output
+  </li>
+
+  <li>
+    Clean up by removing the cloned wiki directory
+  </li>
+
+</ol>
+
+<p>
+  This ensures the latest version of the wiki is always used and no local wiki clone is required.
+</p>
+
+<h3 id="ai-transformation-workflow">
+  AI Transformation&nbsp;Workflow
+</h3>
+
+<p>
+  The app-focused documentation uses a hybrid approach:
+</p>
+
+<ol>
+
+  <li>
+    <strong>Manual Transformation (Recommended)</strong>
+    <ul>
+
+      <li>
+        Copy <code>transform_for_app.example.md</code> to <code>transform_for_app.md</code>
+      </li>
+
+      <li>
+        Edit <code>transform_for_app.md</code> to match your app’s settings structure
+      </li>
+
+      <li>
+        Manually transform wiki pages using the instructions in <code>transform_for_app.md</code>
+      </li>
+
+      <li>
+        Save transformed files to <code>app-transformed/</code> directory
+      </li>
+
+      <li>
+        Run <code>generate_app_docs.rb</code> to generate the <abbr title="Hypertext Markup Language">HTML</abbr>
+      </li>
+
+    </ul>
+
+  </li>
+
+  <li>
+    <strong>AI-Powered Transformation (Experimental)</strong>
+    <ul>
+
+      <li>
+        Copy <code>transform_for_app.example.md</code> to <code>transform_for_app.md</code>
+      </li>
+
+      <li>
+        Edit <code>transform_for_app.md</code> if needed for your app
+      </li>
+
+      <li>
+        Ensure <code>cursor-agent</code> or similar AI tool is available
+      </li>
+
+      <li>
+        Run <code>generate_app_docs_ai.rb</code> to automatically transform files
+      </li>
+
+      <li>
+        Review and edit the generated files in <code>app-transformed/</code> as needed
+      </li>
+
+      <li>
+        Run <code>generate_app_docs.rb</code> to generate the <abbr title="Hypertext Markup Language">HTML</abbr>
+      </li>
+
+    </ul>
+
+  </li>
+
+</ol>
+
+<p>
+  <strong>Transformation Instructions:</strong>
+</p>
+
+<p>
+  The <code>transform_for_app.example.md</code> file contains comprehensive instructions for transforming CLI-focused documentation to app-focused documentation. Key transformations include:
+</p>
+
+<ul>
+
+  <li>
+    Replace CLI flags (<code>--flag</code>) with Settings references (<code>Settings-&gt;Category-&gt;Setting Name</code>)
+  </li>
+
+  <li>
+    Remove command-line examples (code blocks showing <code>apex</code> commands)
+  </li>
+
+  <li>
+    Remove links to “Command Line Options” page
+  </li>
+
+  <li>
+    Add app-specific instructions (e.g., “Marked will automatically detect…”)
+  </li>
+
+  <li>
+    Page-specific transformations for Multi-File-Documents, Plugins, Modes, etc.
+  </li>
+
+</ul>
+
+<p>
+  <strong>Example:</strong>
+</p>
+
+<p>
+  <strong>Before (CLI-focused):</strong>
+</p>
+
+<blockquote>
+
+  <p>
+    Use the <code>--plugins</code> flag to enable plugins:
+  </p>
+
+  <div class="highlight">
+<pre><span></span>apex<span class="w"> </span>document.md<span class="w"> </span>--plugins
+  </pre>
+</div>
+
+</blockquote>
+
+<p>
+  <strong>After (App-focused):</strong>
+</p>
+
+<blockquote>
+
+  <p>
+    Enable plugins by checking <strong>Settings-&gt;Processor-&gt;Include Plugins</strong>.
+  </p>
+
+</blockquote>
+
+<p>
+  <strong>Important Notes:</strong>
+</p>
+
+<ul>
+
+  <li>
+    The <code>app-transformed/</code> directory and <code>transform_for_app.md</code> are gitignored
+  </li>
+
+  <li>
+    This allows you to maintain app-specific documentation without committing it to the public repo
+  </li>
+
+  <li>
+    The example file (<code>transform_for_app.example.md</code>) is tracked in git as a template
+    # Glob include (first matching .md file)
+    {{c?de.py}}      # ? wildcard (e.g. resolves to code.py)
+  </li>
+
+</ul>
+
+<pre><code class="highlight ">
+`{{file.*}}` implements MultiMarkdown-style wildcard resolution, trying common extensions in a preferred order.
+Patterns containing `*`, `?`, `[]`, or `{}` are treated as glob patterns and resolved relative to the current transclude base (see metadata `transclude base`).
+**iA Writer syntax:**
+```markdown
+/image.png       # Intelligent include (detects type)
+/code.py         # Auto-detects as code block
+/document.md     # Auto-detects as Markdown
+</code></pre>
+
+<p>
+  CSV and TSV files automatically convert to tables.
+</p>
+
+<h3 id="custom-csvtsv-delimiters-in-includes">
+  Custom CSV/TSV Delimiters in&nbsp;Includes
+</h3>
+
+<p>
+  CSV and TSV includes default to comma (CSV) or tab (TSV), but you can override the delimiter per include.
+  <strong>Marked (<code>&lt;&lt;[...]</code>) embedded override:</strong>
+</p>
+
+<div class="highlight">
+<pre><span></span>                 # shorthand single-character delimiter
+       # verbose form
+</pre>
+</div>
+
+<p>
+  <strong>MultiMarkdown transclusion (<code>{{...}}</code>) embedded override:</strong>
+</p>
+
+<div class="highlight">
+<pre><span></span>{{data.csv{;}}}
+{{data.csv{delimiter=;}}}
+</pre>
+</div>
+
+<p>
+  <strong>iA Writer (<code>/file</code>) override (space optional):</strong>
+</p>
+
+<div class="highlight">
+<pre><span></span>/data.csv{;}
+/data.csv {;}
+/data.csv{delimiter=;}
+/data.csv {delimiter=;}
+</pre>
+</div>
+
+<p>
+  Use <code>\\t</code> as a literal tab escape in verbose form when needed:
+</p>
+
+<div class="highlight">
+<pre><span></span>/data.csv{delimiter=\t}
+</pre>
+</div>
+
+<h3 id="address-syntax-for-file-includes">
+  Address Syntax for File&nbsp;Includes
+</h3>
+
+<p>
+  File includes support mmark-style address syntax to include specific line ranges or sections. This works with <code>{{file}}</code> and <code>&lt;&lt;[file]</code>, <code>&lt;&lt;(file)</code>, <code>&lt;&lt;{file}</code> syntaxes, but <strong>not</strong> with iA Writer <code>/file</code> syntax.
+  <strong>Line number ranges:</strong>
+</p>
+
+<div class="highlight">
+<pre><span></span>{{file.md}}[3,5]        # Include lines 3 to 5 (exclusive of 5)
+{{file.md}}[3,]         # Include from line 3 to end of file
+       # Include lines 1 to 10 in Marked syntax
+       # Include lines 5 to 15 in code block
+</pre>
+</div>
+
+<p>
+  <strong>Regular expression ranges:</strong>
+</p>
+
+<div class="highlight">
+<pre><span></span>{{file.md}}[/START/,/END/]     # Include lines between regex matches
+{{file.md}}[/&lt;sup&gt;##&lt;/sup&gt; /,/&lt;sup&gt;##&lt;/sup&gt; /]     # Include between heading markers
+   # Include from function to closing brace
+</pre>
+</div>
+
+<p>
+  <strong>Prefix option:</strong>
+</p>
+
+<div class="highlight">
+<pre><span></span>{{file.md}}[3,5;prefix=&quot;C: &quot;]   # Prefix each line with &quot;C: &quot;
+{{code.py}}[1,10;prefix=&quot;  &quot;]  # Indent included lines
+</pre>
+</div>
+
+<p>
+  <strong>Combined examples:</strong>
+</p>
+
+<div class="highlight">
+<pre><span></span><span class="gh"># Include lines 10-20 with prefix</span>
+{{example.py}}[10,20;prefix=&quot;    &quot;]
+
+<span class="gh"># Include from regex match to end</span>
+{{config.md}}[/&lt;sup&gt;##&lt;/sup&gt; Config/,]
+
+<span class="gh"># Include between patterns with prefix</span>
+{{script.sh}}[/# START/,/# END/;prefix=&quot;# &quot;]
+</pre>
+</div>
+
+<p>
+  <strong>Notes:</strong>
+</p>
+
+<ul>
+
+  <li>
+    Line numbers are 1-based
+  </li>
+
+  <li>
+    End line is exclusive (e.g., <code>[3,5]</code> includes lines 3 and 4, not 5)
+  </li>
+
+  <li>
+    Regex patterns use POSIX extended regular expressions
+  </li>
+
+  <li>
+    If start pattern is not found, empty content is returned
+  </li>
+
+  <li>
+    If end pattern is not found, content from start to end of file is included
+  </li>
+
+  <li>
+    Prefix is applied to each included line
+  </li>
+
+</ul>
+
+<h3 id="address-syntax-for-file-includes">
+  Address Syntax for File&nbsp;Includes
+</h3>
+
+<p>
+  Apex supports mmark-style address syntax for specifying line ranges and applying prefixes to included files. This works with <code>{{file}}</code> and <code>&lt;&lt;[file]</code> syntaxes (but not iA Writer <code>/file</code> syntax).
+  <strong>Line number ranges:</strong>
+</p>
+
+<div class="highlight">
+<pre><span></span>{{file.md}}[3,5]      # Include lines 3 to 5 (exclusive of 5)
+{{file.md}}[3,]       # Include from line 3 to end of file
+     # Include lines 1 to 10
+     # Include lines 5 to 15 from code file
+</pre>
+</div>
+
+<p>
+  <strong>Regular expression ranges:</strong>
+</p>
+
+<div class="highlight">
+<pre><span></span>{{file.md}}[/START/,/END/]           # Include lines between regex matches
+{{file.md}}[/&lt;sup&gt;##&lt;/sup&gt; Section/,/&lt;sup&gt;##&lt;/sup&gt; /]     # Include from section to next section
+            # Include between BEGIN and END markers
+</pre>
+</div>
+
+<p>
+  <strong>Prefix option:</strong>
+</p>
+
+<div class="highlight">
+<pre><span></span>{{file.md}}[3,5;prefix=&quot;C: &quot;]         # Prefix each line with &quot;C: &quot;
+{{file.md}}[prefix=&quot;&gt; &quot;]              # Prefix all lines with &quot;&gt; &quot;
+      # Prefix with 4 spaces (indentation)
+</pre>
+</div>
+
+<p>
+  <strong>Combined examples:</strong>
+</p>
+
+<div class="highlight">
+<pre><span></span>{{config.py}}[/def setup/,/&lt;sup&gt;def&lt;/sup&gt; /;prefix=&quot;# &quot;]
+<span class="gh"># Includes lines from &quot;def setup&quot; to next &quot;def&quot;, with &quot;# &quot; prefix</span>
+
+&gt; 
+<span class="k">&gt; </span><span class="ge">**Usage:**</span>
+<span class="k">&gt; </span><span class="ge">```bash</span>
+<span class="k">&gt; </span><span class="ge">./generate_docset.rb [single|multi]</span>
+<span class="k">&gt; </span><span class="ge">```</span>
+&gt; 
+<span class="k">&gt; </span><span class="ge">- `single` - Generate single-page CLI options docset (ApexCLI.docset)</span>
+<span class="k">&gt; </span><span class="ge">- `multi` - Generate multi-page docset from wiki files (Apex.docset, default)</span>
+&gt; 
+<span class="k">&gt; </span><span class="ge">**Output:**</span>
+
+<span class="gh"># Includes lines 10-20 with blockquote prefix</span>
+</pre>
+</div>
+
+<p>
+  <strong>Notes:</strong>
+</p>
+
+<ul>
+
+  <li>
+    Line numbers are 1-based
+  </li>
+
+  <li>
+    End line is exclusive (e.g., <code>[3,5]</code> includes lines 3 and 4, not 5)
+  </li>
+
+  <li>
+    Regex patterns use POSIX extended regular expressions
+  </li>
+
+  <li>
+    Prefix is applied to each included line
+  </li>
+
+  <li>
+    Address syntax does not apply to iA Writer syntax (<code>/file</code>)
+  </li>
+
+</ul>
+
+<h2 id="metadata">
+  Metadata
+</h2>
+
+<h3 id="yaml-front-matter">
+  YAML Front&nbsp;Matter
+</h3>
+
+<div class="highlight">
+<pre><span></span><span class="nn">---</span>
+<span class="nt">title</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">My Document</span>
+<span class="nt">author</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">John Doe</span>
+<span class="nt">date</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">2025-12-06</span>
+<span class="nn">---</span>
+</pre>
+</div>
+
+<h3 id="multimarkdown-metadata">
+  MultiMarkdown&nbsp;Metadata
+</h3>
+
+<div class="highlight">
+<pre><span></span>Title: My Document
+Author: John Doe
+Date: 2025-12-06
+</pre>
+</div>
+
+<h3 id="pandoc-title-block">
+  Pandoc Title&nbsp;Block
+</h3>
+
+<div class="highlight">
+<pre><span></span>% My Document
+% John Doe
+% 2025-12-06
+</pre>
+</div>
+
+<h3 id="metadata-variables">
+  Metadata&nbsp;Variables
+</h3>
+
+<p>
+  Use <code>[%key]</code> to insert metadata values anywhere:
+</p>
+
+<div class="highlight">
+<pre><span></span>---
+title: Apex Guide
+<span class="gu">version: 0.1.0</span>
+<span class="gu">---</span>
+
+<span class="gh"># [%title]</span>
+
+Version: [%version]
+</pre>
+</div>
+
+<p>
+  You can also transform metadata values using the <code>[%key:transform]</code> syntax. See <a href="Metadata-Transforms.html">Metadata Transforms</a> for a complete guide to available transforms.
+  <strong>External Metadata Sources:</strong>
+  Metadata can also be loaded from external files or specified on the command line:
+</p>
+
+<ul>
+
+  <li>
+    <strong><code>--meta-file FILE</code></strong>: Load metadata from an external file (YAML, <abbr title="MultiMarkdown">MMD</abbr>, or Pandoc format, auto-detected)
+  </li>
+
+  <li>
+    <strong><code>--meta KEY=VALUE</code></strong>: Set metadata from the command line (supports multiple flags and comma-separated pairs)
+    Metadata precedence (highest to lowest):
+  </li>
+
+  <li>
+    Command-line metadata (<code>--meta</code>)
+  </li>
+
+  <li>
+    Document metadata (in the document)
+  </li>
+
+  <li>
+    File metadata (<code>--meta-file</code>)
+    <strong>Reusable Metadata Files:</strong>
+    You can create reusable metadata files for common settings like language and quotes language. This is especially useful for maintaining consistent settings across multiple documents.
+    <strong>Example metadata file (<code>lang-fr.yml</code>):</strong>
+  </li>
+
+</ul>
+
+<div class="highlight">
+<pre><span></span><span class="nn">---</span>
+<span class="nt">language</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">fr</span>
+<span class="nt">quoteslanguage</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">french</span>
+<span class="nn">---</span>
+</pre>
+</div>
+
+<p>
+  <strong>Note:</strong> In YAML, keys with spaces must be quoted (e.g., <code>&quot;Quotes Language&quot;: french</code>). Since Apex normalizes metadata keys (removes spaces, case-insensitive), you can use keys without spaces for cleaner YAML syntax. Both <code>quoteslanguage</code> and <code>&quot;Quotes Language&quot;</code> will work.
+  <strong>Example metadata file (<code>lang-de.mmd</code>):</strong>
+</p>
+
+<pre><code class="highlight ">Language: de
+Quotes Language: german
+</code></pre>
+
+<p>
+  <strong>Note:</strong> MultiMarkdown format allows spaces in keys, so <code>Quotes Language</code> works without quotes.
+  <strong>Usage:</strong>
+</p>
+
+<div class="highlight">
+<pre><span></span><span class="c1"># Use French language settings for all documents</span>
+apex<span class="w"> </span>document1.md<span class="w"> </span>--meta-file<span class="w"> </span>lang-fr.yml
+apex<span class="w"> </span>document2.md<span class="w"> </span>--meta-file<span class="w"> </span>lang-fr.yml
+</pre>
+</div>
+
+<p>
+  <strong>Benefits:</strong>
+</p>
+
+<ul>
+
+  <li>
+    <strong>Consistency</strong>: Ensure all documents use the same language settings
+  </li>
+
+  <li>
+    <strong>Reusability</strong>: Define language and quotes language once, use across many documents
+  </li>
+
+  <li>
+    <strong>Maintainability</strong>: Update language settings in one place
+  </li>
+
+  <li>
+    <strong>Automatic fallback</strong>: If <code>Quotes Language</code> is not specified, it automatically uses the <code>language</code> value
+    <strong>Controlling Command-Line Options via Metadata:</strong>
+    Most command-line options can be controlled via metadata, allowing per-document configuration. Boolean options accept <code>true</code>/<code>false</code>, <code>yes</code>/<code>no</code>, or <code>1</code>/<code>0</code> (case-insensitive). String options use the value directly.
+    <strong>Example:</strong>
+  </li>
+
+</ul>
+
+<div class="highlight">
+<pre><span></span><span class="nn">---</span>
+<span class="nt">indices</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">false</span>
+<span class="nt">wikilinks</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">true</span>
+<span class="nt">bibliography</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">references.bib</span>
+<span class="nt">title</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">My Research Paper</span>
+<span class="nt">pretty</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">true</span>
+<span class="nt">standalone</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">true</span>
+<span class="nn">---</span>
+</pre>
+</div>
+
+<p>
+  This enables batch processing where each file can have its own configuration. See <a href="Command-Line-Options.html">Command Line Options</a> for complete documentation of metadata options and which options can be controlled via metadata.
+</p>
+
+<h2 id="abbreviations">
+  Abbreviations
+</h2>
+
+<p>
+  <strong>Classic <abbr title="MultiMarkdown">MMD</abbr> syntax:</strong>
+</p>
+
+<div class="highlight">
+<pre><span></span><abbr title="Hypertext Markup Language">HTML</abbr> and <abbr title="Cascading Style Sheets">CSS</abbr> are essential.
+</pre>
+</div>
+
+<p>
+  <strong><abbr title="MultiMarkdown">MMD</abbr> 6 reference syntax:</strong>
+</p>
+
+<div class="highlight">
+<pre><span></span>Using <abbr title="MultiMarkdown">MMD</abbr> here and <abbr title="MultiMarkdown">MMD</abbr> again.
+</pre>
+</div>
+
+<p>
+  <strong><abbr title="MultiMarkdown">MMD</abbr> 6 inline syntax:</strong>
+</p>
+
+<div class="highlight">
+<pre><span></span>This is <abbr title="Markdown">MD</abbr> and <abbr title="Cascading Style Sheets">CSS</abbr>.
+</pre>
+</div>
+
+<h2 id="inline-attribute-lists-ial">
+  Inline Attribute Lists&nbsp;(IAL)
+</h2>
+
+<p>
+  Kramdown and Pandoc syntax for adding <abbr title="Hypertext Markup Language">HTML</abbr> attributes (IDs, classes, and custom key-value pairs) to Markdown elements.
+  Apex supports both <strong>Kramdown-style IALs</strong> (<code>{: ...}</code>) and <strong>Pandoc-style IALs</strong> (<code>{#id .class}</code>). Both formats work identically throughout the document.
+  <strong>Block-level IALs</strong> appear on the line immediately after the element:
+</p>
+
+<div class="highlight">
+<pre><span></span><span class="gh"># Header</span>
+
+{: <span class="ni">#custom</span>-id}
+
+<span class="gh"># Another Header</span>
+
+{#custom-id-2 .highlight}
+
+Paragraph with class.
+
+{: .important}
+
+<span class="gu">## Another Header</span>
+
+{: <span class="ni">#section</span>-2 .highlight title=&quot;Section Title&quot; lang=&quot;en&quot;}
+</pre>
+</div>
+
+<p>
+  <strong>Inline IALs</strong> appear immediately after the element within the paragraph:
+</p>
+
+<div class="highlight">
+<pre><span></span>Here&#39;s a [<span class="nt">styled link</span>](<span class="na">url</span>){:.button} with a class.
+
+Here&#39;s a [<span class="nt">Pandoc-style link</span>](<span class="na">url</span>){#link-id .button} with attributes.
+
+This has <span class="gs">**bold text**</span>{:.bold-style} and <span class="ge">*italic text*</span>{:.italic-style}.
+</pre>
+</div>
+
+<p>
+  <strong>Key-value pairs</strong> allow custom attributes:
+</p>
+
+<div class="highlight">
+<pre><span></span>Paragraph.
+
+{: title=&quot;Important Note&quot; lang=&quot;en&quot; data-custom=&quot;value&quot;}
+
+[<span class="nt">Link</span>](<span class="na">url</span>){:rel=&quot;nofollow&quot; target=&quot;_blank&quot;}
+</pre>
+</div>
+
+<p>
+  <strong>Attribute List Definitions (ALDs)</strong> define reusable attribute sets:
+</p>
+
+<div class="highlight">
+<pre><span></span><span class="gh"># Header 1</span>
+
+{:my-style}
+
+<span class="gh"># Header 2</span>
+
+{:my-style}
+</pre>
+</div>
+
+<p>
+  <strong>ALD references can be combined with additional attributes</strong> in the same IAL. Additional attributes override or extend the ALD:
+</p>
+
+<div class="highlight">
+<pre><span></span><span class="gh"># Heading 1</span>
+
+{:base-style}
+
+<span class="gh"># Heading 2</span>
+
+{:base-style .class3}
+
+<span class="gh"># Heading 3</span>
+
+{:base-style <span class="ni">#override</span>-id}
+
+<span class="gh"># Heading 4</span>
+
+{:base-style .class3 rel=&quot;nofollow&quot;}
+</pre>
+</div>
+
+<p>
+  <strong>Behavior:</strong>
+</p>
+
+<ul>
+
+  <li>
+    <strong>Classes</strong>: Additional classes are appended to the ALD classes
+  </li>
+
+  <li>
+    <strong>IDs</strong>: If an ID is specified in the IAL, it overrides the ALD’s ID
+  </li>
+
+  <li>
+    <strong>Key-value attributes</strong>: If a key exists in both ALD and IAL, the IAL value overrides the ALD value
+    For complete documentation with examples, see <a href="Inline-Attribute-Lists.html">Inline Attribute Lists</a>.
+  </li>
+
+</ul>
+
+<h2 id="table-of-contents">
+  Table of&nbsp;Contents
+</h2>
+
+<p>
+  Multiple marker formats:
+</p>
+
+<div class="highlight">
+<pre><span></span>&lt;!--TOC--&gt;              # Basic TOC
+&lt;!--TOC max2 min1--&gt;    # With depth control
+{{TOC}}                 # <abbr title="MultiMarkdown">MMD</abbr> style
+{{TOC:2-4}}            # With range
+{:toc}                  # Kramdown IAL marker (uses same TOC engine)
+</pre>
+</div>
+
+<p>
+  Bare TOC markers use heading levels 1 through 3 by default. You can change that
+  default with <code>--toc-min-max MIN,MAX</code> or the corresponding metadata/config
+  setting. Marker syntax with an explicit range, such as <code>{{TOC:2-4}}</code>, overrides
+  the default.
+  Use <code>-t toc</code> to extract a Markdown unordered-list TOC from headings without
+  placing a TOC marker in the source document.
+  Headings with the <code>.no_toc</code> class are excluded from the generated TOC:
+</p>
+
+<div class="highlight">
+<pre><span></span><span class="gh"># Contents</span>
+
+{:.no_toc}
+
+{:toc}
+</pre>
+</div>
+
+<h2 id="smart-typography">
+  Smart&nbsp;Typography
+</h2>
+
+<p>
+  Automatic conversion:
+</p>
+
+<ul>
+
+  <li>
+<code>&quot;text&quot;</code> → <code>&quot;text&quot;</code> (smart quotes)
+  </li>
+
+  <li>
+<code>'text'</code> → <code>'text'</code> (smart apostrophes)
+  </li>
+
+  <li>
+<code>--</code> → <code>–</code> (en dash)
+  </li>
+
+  <li>
+<code>---</code> → <code>—</code> (em dash)
+  </li>
+
+  <li>
+<code>...</code> → <code>…</code> (ellipsis)
+  </li>
+
+  <li>
+<code>&lt;&lt;</code> → <code>«</code> (left guillemet)
+  </li>
+
+  <li>
+<code>&gt;&gt;</code> → <code>»</code> (right guillemet)
+  </li>
+
+</ul>
+
+<h2 id="github-emoji">
+  GitHub&nbsp;Emoji
+</h2>
+
+<div class="highlight">
+<pre><span></span>Success! <span class=\"emoji\">:rocket:</span> <span class=\"emoji\">:tada:</span> <span class=\"emoji\">:sparkles:</span>
+I <span class=\"emoji\">:heart:</span> Markdown!
+</pre>
+</div>
+
+<p>
+  Supports 350+ GitHub emoji, converted to Unicode characters.
+</p>
+
+<h2 id="special-markers">
+  Special&nbsp;Markers
+</h2>
+
+<p>
+  <strong>Page breaks:</strong>
+</p>
+
+<div class="highlight">
+<pre><span></span>&lt;div class=&quot;mkpagebreak manualbreak&quot; title=&quot;Page break created by marker&quot; data-description=&quot;PAGE (Marker)&quot; style=&quot;page-break-after:always&quot;&gt;&lt;span style=&quot;display:none&quot;&gt;&amp;nbsp;&lt;/span&gt;&lt;/div&gt;
+
+            # <abbr title="Hypertext Markup Language">HTML</abbr> comment style
+
+&lt;div class=&quot;mkpagebreak manualbreak&quot; title=&quot;Page break created by marker&quot; data-description=&quot;PAGE (Marker)&quot; style=&quot;page-break-after:always&quot;&gt;&lt;span style=&quot;display:none&quot;&gt;&amp;nbsp;&lt;/span&gt;&lt;/div&gt;
+
+         # Kramdown style
+</pre>
+</div>
+
+<p>
+  <strong>Autoscroll pauses:</strong>
+</p>
+
+<div class="highlight">
+<pre><span></span>&lt;div class=&quot;autoscroll-pause&quot; data-pause=&quot;5&quot;&gt;&lt;/div&gt;          # Pause for 5 seconds
+</pre>
+</div>
+
+<p>
+  <strong>End-of-block marker:</strong>
+</p>
+
+<div class="highlight">
+<pre><span></span><span class="k">-</span><span class="w"> </span>Item 1
+
+​
+
+<span class="k">-</span><span class="w"> </span>Item 2
+</pre>
+</div>
+
+<p>
+  Forces list separation.
+</p>
+
+<h2 id="html">
+  <abbr title="Hypertext Markup Language">HTML</abbr>
+</h2>
+
+<p>
+  Raw <abbr title="Hypertext Markup Language">HTML</abbr> is supported (when <code>unsafe</code> option is enabled, which is default):
+</p>
+
+<div class="highlight">
+<pre><span></span>&lt;div class=&quot;custom&quot;&gt;
+  &lt;p&gt;This is raw <abbr title="Hypertext Markup Language">HTML</abbr> inside Markdown.&lt;/p&gt;
+&lt;/div&gt;
+</pre>
+</div>
+
+<h3 id="markdown-inside-html-blocks">
+  Markdown Inside <abbr title="Hypertext Markup Language">HTML</abbr>&nbsp;Blocks
+</h3>
+
+<p>
+  By default, Markdown inside <abbr title="Hypertext Markup Language">HTML</abbr> blocks is <strong>not</strong> parsed unless the <abbr title="Hypertext Markup Language">HTML</abbr> block contains blank lines. This follows the CommonMark specification:
+</p>
+
+<ul>
+
+  <li>
+    <strong><abbr title="Hypertext Markup Language">HTML</abbr> blocks without blank lines</strong>: Content is treated as raw <abbr title="Hypertext Markup Language">HTML</abbr> and Markdown is not parsed
+    <div class="highlight">
+<pre><span></span>&lt;div&gt;**This is not bold**&lt;/div&gt;
+    </pre>
+  </div>
+
+  Output: <code>&lt;div&gt;**This is not bold**&lt;/div&gt;</code>
+</li>
+
+<li>
+  <strong><abbr title="Hypertext Markup Language">HTML</abbr> blocks with blank lines</strong>: Content can be parsed as Markdown
+  <div class="highlight">
+<pre><span></span>&lt;div&gt;
+
+<span class="gs">**This is bold**</span>
+
+&lt;/div&gt;
+  </pre>
+</div>
+
+Output: <code>&lt;div&gt;&lt;p&gt;&lt;strong&gt;This is bold&lt;/strong&gt;&lt;/p&gt;&lt;/div&gt;</code>
+To explicitly enable Markdown parsing inside <abbr title="Hypertext Markup Language">HTML</abbr> blocks, use the <code>markdown</code> attribute (GFM extension):
+</li>
+
+</ul>
+
+<div class="highlight">
+<pre><span></span>&lt;div&gt;&lt;h2&gt;This is a heading&lt;/h2&gt;
+&lt;ul&gt;
+&lt;li&gt;List item&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/div&gt;
+</pre>
+</div>
+
+<p>
+  The <code>markdown</code> attribute accepts:
+</p>
+
+<ul>
+
+  <li>
+<code>markdown=&quot;1&quot;</code> or <code>markdown=&quot;block&quot;</code> - Parse block-level Markdown
+  </li>
+
+  <li>
+<code>markdown=&quot;span&quot;</code> - Parse inline Markdown only
+  </li>
+
+</ul>
+
+<h3 id="pandoc-fenced-divs">
+  Pandoc Fenced&nbsp;Divs
+</h3>
+
+<p>
+  Apex supports Pandoc’s fenced divs extension, which allows you to create <abbr title="Hypertext Markup Language">HTML</abbr> <code>&lt;div&gt;</code> elements with attributes using a special fence syntax. This feature is available in <strong>unified mode only</strong> and is enabled by default.
+  <strong>Basic syntax:</strong>
+</p>
+
+<div class="highlight">
+<pre><span></span>&lt;div id=&quot;special&quot; class=&quot;sidebar&quot;&gt;&lt;p&gt;Here is a paragraph.&lt;/p&gt;
+&lt;p&gt;And another.&lt;/p&gt;
+&lt;/div&gt;
+</pre>
+</div>
+
+<p>
+  <strong>Opening fences:</strong>
+</p>
+
+<ul>
+
+  <li>
+    Must contain at least 3 consecutive colons (<code>:::</code>)
+  </li>
+
+  <li>
+    Must have attributes (ID, classes, or custom attributes)
+  </li>
+
+  <li>
+    Attributes can optionally be followed by another string of consecutive colons
+    <strong>Closing fences:</strong>
+  </li>
+
+  <li>
+    Must contain at least 3 consecutive colons (<code>:::</code>)
+  </li>
+
+  <li>
+    No attributes needed
+  </li>
+
+  <li>
+    Number of colons doesn’t need to match the opening fence
+    <strong>Attributes:</strong>
+    Attributes use the same syntax as fenced code blocks:
+  </li>
+
+  <li>
+<code>{#id}</code> - ID attribute
+  </li>
+
+  <li>
+<code>{.class}</code> - Class attribute (can have multiple)
+  </li>
+
+  <li>
+<code>key=&quot;value&quot;</code> - Custom attributes with quoted values
+  </li>
+
+  <li>
+<code>key='value'</code> - Custom attributes with single quotes
+  </li>
+
+  <li>
+    Single unbraced word is treated as a class name
+    <strong>Examples:</strong>
+  </li>
+
+</ul>
+
+<div class="highlight">
+<pre><span></span>&lt;div id=&quot;mydiv&quot; class=&quot;container&quot;&gt;&lt;p&gt;Content here&lt;/p&gt;
+&lt;/div&gt;
+
+&lt;div class=&quot;sidebar&quot;&gt;&lt;p&gt;Single unbraced word becomes a class&lt;/p&gt;
+&lt;/div&gt;
+
+&lt;div id=&quot;special&quot; class=&quot;warning important&quot; key=&quot;value&quot;&gt;&lt;p&gt;Div with ID, multiple classes, and custom attribute&lt;/p&gt;
+&lt;/div&gt;
+
+&lt;div id=&quot;special&quot; class=&quot;sidebar&quot;&gt;&lt;p&gt;Trailing colons after attributes are allowed&lt;/p&gt;
+&lt;/div&gt;
+</pre>
+</div>
+
+<p>
+  <strong>Nested divs:</strong>
+  Fenced divs can be nested. Opening fences must have attributes:
+</p>
+
+<div class="highlight">
+<pre><span></span>&lt;div class=&quot;Warning&quot;&gt;&lt;p&gt;This is a warning.&lt;/p&gt;
+&lt;div class=&quot;Danger&quot;&gt;&lt;p&gt;This is a warning within a warning.&lt;/p&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+</pre>
+</div>
+
+<p>
+  <strong>Block types:</strong>
+  By default, fenced divs create <code>&lt;div&gt;</code> elements. You can specify different <abbr title="Hypertext Markup Language">HTML</abbr> block elements using the <code>&gt;blocktype</code> syntax:
+</p>
+
+<div class="highlight">
+<pre><span></span>&lt;aside class=&quot;sidebar&quot; markdown=&quot;1&quot;&gt;
+This creates an &lt;aside&gt; element instead of a &lt;div&gt;.
+&lt;/aside&gt;
+&lt;article id=&quot;post&quot; class=&quot;main&quot; markdown=&quot;1&quot;&gt;
+This creates an &lt;article&gt; element.
+&lt;/article&gt;
+&lt;section class=&quot;container&quot; markdown=&quot;1&quot;&gt;
+This creates a &lt;section&gt; element.
+&lt;/section&gt;```
+
+<span class="gs">**Common block types:**</span>
+<span class="k">-</span><span class="w"> </span><span class="sb">`&gt;div`</span> - Default, creates a <span class="sb">`&lt;div&gt;`</span> element
+<span class="k">-</span><span class="w"> </span><span class="sb">`&gt;aside`</span> - Creates an <span class="sb">`&lt;aside&gt;`</span> element (sidebars, callouts)
+<span class="k">-</span><span class="w"> </span><span class="sb">`&gt;article`</span> - Creates an <span class="sb">`&lt;article&gt;`</span> element (main content)
+<span class="k">-</span><span class="w"> </span><span class="sb">`&gt;section`</span> - Creates a <span class="sb">`&lt;section&gt;`</span> element (document sections)
+<span class="k">-</span><span class="w"> </span><span class="sb">`&gt;details`</span> - Creates a <span class="sb">`&lt;details&gt;`</span> element (collapsible content)
+<span class="k">-</span><span class="w"> </span><span class="sb">`&gt;summary`</span> - Creates a <span class="sb">`&lt;summary&gt;`</span> element (for use inside <span class="sb">`&lt;details&gt;`</span>)
+<span class="gs">**Nested block types:**</span>
+You can nest different block types:
+```markdown
+&lt;details class=&quot;warning&quot;&gt;&lt;summary&gt;&lt;p&gt;This is a summary&lt;/p&gt;
+&lt;/summary&gt;
+This is the content of the details block
+&lt;/details&gt;
+
+&lt;section class=&quot;outer&quot;&gt;&lt;p&gt;Outer section content.&lt;/p&gt;
+&lt;aside class=&quot;inner&quot;&gt;&lt;p&gt;Inner aside content.&lt;/p&gt;
+&lt;/aside&gt;
+&lt;p&gt;More outer content.&lt;/p&gt;
+&lt;/section&gt;
+</pre>
+</div>
+
+<p>
+  <strong>Block type with unbraced class:</strong>
+  The block type syntax works with unbraced class names:
+</p>
+
+<div class="highlight">
+<pre><span></span>&lt;aside class=&quot;Warning&quot;&gt;&lt;p&gt;Warning content here&lt;/p&gt;
+&lt;/aside&gt;
+</pre>
+</div>
+
+<p>
+  This creates <code>&lt;aside class=&quot;Warning&quot;&gt;...&lt;/aside&gt;</code>.
+  <strong>Note:</strong> Fenced divs should be separated by blank lines from preceding and following blocks for best results.
+  <strong>Control:</strong>
+</p>
+
+<ul>
+
+  <li>
+    Use <code>--divs</code> to explicitly enable (default in unified mode)
+  </li>
+
+  <li>
+    Use <code>--no-divs</code> to disable fenced divs processing
+  </li>
+
+</ul>
+
+<h2 id="related">
+  Related
+</h2>
+
+<ul>
+
+  <li>
+    <a href="Modes.html">Modes</a> - Which syntax is available in each mode
+  </li>
+
+  <li>
+    <a href="Header-IDs.html">Header IDs</a> - Automatic header ID generation
+  </li>
+
+  <li>
+    <a href="Command-Line-Options.html">Command Line Options</a> - Feature flags including <code>--[no-]autolink</code>, <code>--[no-]mixed-lists</code>, <code>--[no-]alpha-lists</code>, <code>--[no-]sup-sub</code>, and <code>--[no-]divs</code>
+  </li>
+
+</ul>
+
+<h1 id="index-section">
+  Index
+</h1>
+
+<div class="index">
+
+  <dl>
+
+    <dt>
+      H
+    </dt>
+
+    <dd>
+
+      <ul>
+
+        <li>
+
+          HTTP <a class="index-return" href="#idxref-1"><sup>[go]</sup></a>
+          <ul>
+
+            <li>
+
+              HTTP/1.1 <a class="index-return" href="#idxref-1"><sup>[go]</sup></a>
+            </li>
+
+          </ul>
+
+        </li>
+
+      </ul>
+
+    </dd>
+
+  </dl>
+
+  <dl>
+
+    <dt>
+      I
+    </dt>
+
+    <dd>
+
+      <ul>
+
+        <li>
+
+          Implementation <a class="index-return" href="#idxref-4"><sup>[go]</sup></a>
+        </li>
+
+        <li>
+
+          Ishmael <a class="index-return" href="#idxref-9"><sup>[go]</sup></a>
+        </li>
+
+      </ul>
+
+    </dd>
+
+  </dl>
+
+  <dl>
+
+    <dt>
+      K
+    </dt>
+
+    <dd>
+
+      <ul>
+
+        <li>
+
+          key combinations <a class="index-return" href="#idxref-6"><sup>[go]</sup></a>
+        </li>
+
+      </ul>
+
+    </dd>
+
+  </dl>
+
+  <dl>
+
+    <dt>
+      M
+    </dt>
+
+    <dd>
+
+      <ul>
+
+        <li>
+
+          Most mechanical keyboard firmware <a class="index-return" href="#idxref-5"><sup>[go]</sup></a>
+        </li>
+
+      </ul>
+
+    </dd>
+
+  </dl>
+
+  <dl>
+
+    <dt>
+      N
+    </dt>
+
+    <dd>
+
+      <ul>
+
+        <li>
+
+          Niagara <a class="index-return" href="#idxref-10"><sup>[go]</sup></a>
+          <ul>
+
+            <li>
+
+              cataract <a class="index-return" href="#idxref-10"><sup>[go]</sup></a>
+            </li>
+
+          </ul>
+
+        </li>
+
+      </ul>
+
+    </dd>
+
+  </dl>
+
+  <dl>
+
+    <dt>
+      P
+    </dt>
+
+    <dd>
+
+      <ul>
+
+        <li>
+
+          Primary Topic <strong> <a class="index-return" href="#idxref-2"><sup>[go]</sup></a></strong>
+          <ul>
+
+            <li>
+
+              Sub Topic <a class="index-return" href="#idxref-2"><sup>[go]</sup></a>
+            </li>
+
+          </ul>
+
+        </li>
+
+        <li>
+
+          Protocol <a class="index-return" href="#idxref-0"><sup>[go]</sup></a>
+        </li>
+
+        <li>
+
+          Protocol <a class="index-return" href="#idxref-3"><sup>[go]</sup></a>
+        </li>
+
+        <li>
+
+          Protocol <a class="index-return" href="#idxref-12"><sup>[go]</sup></a>
+        </li>
+
+      </ul>
+
+    </dd>
+
+  </dl>
+
+  <dl>
+
+    <dt>
+      S
+    </dt>
+
+    <dd>
+
+      <ul>
+
+        <li>
+
+          Sabbath, the <a class="index-return" href="#idxref-11"><sup>[go]</sup></a>
+        </li>
+
+      </ul>
+
+    </dd>
+
+  </dl>
+
+  <dl>
+
+    <dt>
+      T
+    </dt>
+
+    <dd>
+
+      <ul>
+
+        <li>
+
+          term <a class="index-return" href="#idxref-8"><sup>[go]</sup></a>
+        </li>
+
+        <li>
+
+          Term <a class="index-return" href="#idxref-7"><sup>[go]</sup></a>
+          <ul>
+
+            <li>
+
+              param2 <a class="index-return" href="#idxref-7"><sup>[go]</sup></a>
+            </li>
+
+          </ul>
+
+        </li>
+
+      </ul>
+
+    </dd>
+
+  </dl>
+
+</div>
+
+<script>
+// Hamburger menu functionality
+(function() {
+  function initHamburgerMenu() {
+    var hamburger = document.getElementById('hamburger-menu');
+    var sidebar = document.querySelector('.main-toc, .sidebar');
+    var overlay = document.getElementById('mobile-menu-overlay');
+
+    if (!hamburger || !sidebar) return;
+
+    function toggleMenu() {
+      var isOpen = sidebar.classList.contains('mobile-open');
+      if (isOpen) {
+        sidebar.classList.remove('mobile-open');
+        hamburger.classList.remove('active');
+        if (overlay) overlay.classList.remove('active');
+      } else {
+        sidebar.classList.add('mobile-open');
+        hamburger.classList.add('active');
+        if (overlay) overlay.classList.add('active');
+      }
+    }
+
+    hamburger.addEventListener('click', function(e) {
+      e.stopPropagation();
+      toggleMenu();
+    });
+
+    if (overlay) {
+      overlay.addEventListener('click', function() {
+        toggleMenu();
+      });
+    }
+
+    // Close menu when clicking on a sidebar link (mobile only)
+    if (window.innerWidth <= 768) {
+      var sidebarLinks = sidebar.querySelectorAll('a');
+      sidebarLinks.forEach(function(link) {
+        link.addEventListener('click', function() {
+          setTimeout(function() {
+            sidebar.classList.remove('mobile-open');
+            hamburger.classList.remove('active');
+            if (overlay) overlay.classList.remove('active');
+          }, 100);
+        });
+      });
+    }
+
+    // Close menu on window resize if going to desktop
+    window.addEventListener('resize', function() {
+      if (window.innerWidth > 768) {
+        sidebar.classList.remove('mobile-open');
+        hamburger.classList.remove('active');
+        if (overlay) overlay.classList.remove('active');
+      }
+    });
+  }
+
+  // Initialize when DOM is ready
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initHamburgerMenu);
+  } else {
+    initHamburgerMenu();
+  }
+})();
+
+</script>
+<script>
+  (function() {
+    // Clone the page TOC for floating TOC
+    function initFloatingTOC() {
+      var pageTOC = document.getElementById('page-toc-top');
+      var floatingTOCContent = document.getElementById('floating-toc-content');
+      var floatingTOC = document.getElementById('floating-toc');
+
+      if (!pageTOC || !floatingTOCContent || !floatingTOC) return;
+
+      // Clone the TOC structure
+      var tocClone = pageTOC.cloneNode(true);
+      tocClone.id = 'floating-toc-clone';
+      floatingTOCContent.appendChild(tocClone);
+
+      // Update all links to use smooth scrolling
+      var allTOCLinks = document.querySelectorAll('.page-toc a, .floating-toc-content a');
+      allTOCLinks.forEach(function(link) {
+        link.addEventListener('click', function(e) {
+          var href = this.getAttribute('href');
+          if (href && href.startsWith('#')) {
+            e.preventDefault();
+            var targetId = href.substring(1);
+            var targetElement = document.getElementById(targetId);
+            if (targetElement) {
+              var offset = 20; // Offset from top
+
+              // Function to calculate absolute position from document top
+              function getAbsoluteTop(element) {
+                var top = 0;
+                while (element) {
+                  top += element.offsetTop;
+                  element = element.offsetParent;
+                }
+                return top;
+              }
+
+              var absoluteTop = getAbsoluteTop(targetElement);
+              var scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+              var offsetPosition = absoluteTop - offset;
+
+              // Only scroll if we're not already at the target position
+              if (Math.abs(scrollTop - offsetPosition) > 10) {
+                window.scrollTo({
+                  top: Math.max(0, offsetPosition),
+                  behavior: 'smooth'
+                });
+              }
+
+              // Update URL hash without triggering scroll
+              if (history.pushState) {
+                history.pushState(null, null, href);
+              }
+            }
+          }
+        });
+      });
+
+      // Handle scroll to show/hide floating TOC
+      var tocTop = pageTOC.getBoundingClientRect().top + window.pageYOffset;
+      var tocBottom = tocTop + pageTOC.offsetHeight;
+
+      function updateFloatingTOC() {
+        var scrollY = window.pageYOffset || document.documentElement.scrollTop;
+
+        if (scrollY > tocBottom) {
+          floatingTOC.classList.add('visible');
+        } else {
+          floatingTOC.classList.remove('visible');
+        }
+      }
+
+      // Throttle scroll events
+      var ticking = false;
+      window.addEventListener('scroll', function() {
+        if (!ticking) {
+          window.requestAnimationFrame(function() {
+            updateFloatingTOC();
+            ticking = false;
+          });
+          ticking = true;
+        }
+      });
+
+      // Initial check
+      updateFloatingTOC();
+    }
+
+    // Initialize when DOM is ready
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', initFloatingTOC);
+    } else {
+      initFloatingTOC();
+    }
+  })();
+</script>
+<footer class="page-footer"><p>Copyright 2025 Brett Terpstra, All Rights Reserved | MIT License</p></footer></body>
+
+</html>
+

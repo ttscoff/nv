@@ -21,34 +21,32 @@ static const char nvSymbolSet[] = "!@#$%^&*()-+=?/<>";
 
 + (NSString*)passwordWithOptions:(NVPasswordOptions)options length:(NSUInteger)len
 {
-    char source[1024];
-    source[0] = 0;
-    
-    if (0 != (options & knvPasswordNumeric))
-        (void)strlcat(source, nvDecimalSet, sizeof(source));
-    if (0 != (options & knvPasswordAlpha))
-        (void)strlcat(source, nvLowerCaseSet, sizeof(source));
-    if (0 != (options & knvPasswordMixedCase))
-        (void)strlcat(source, nvUpperCaseSet, sizeof(source));
-    if (0 != (options & knvPasswordSymbol))
-        (void)strlcat(source, nvSymbolSet, sizeof(source));
-    
-    // Fill the buffer
-    size_t i = strlen(source);
-    size_t srclen = sizeof(source)-1 - i;
-    (void)strlcpy(&source[i], source, srclen);
-    
-    char gen[len+1];
+    char source[1024] = {0};
+
+    if (options & knvPasswordNumeric)    strlcat(source, nvDecimalSet, sizeof(source));
+    if (options & knvPasswordAlpha)      strlcat(source, nvLowerCaseSet, sizeof(source));
+    if (options & knvPasswordMixedCase)  strlcat(source, nvUpperCaseSet, sizeof(source));
+    if (options & knvPasswordSymbol)     strlcat(source, nvSymbolSet, sizeof(source));
+
+    size_t srclen = strlen(source);
+    if (srclen == 0 || len == 0) {
+        return @"";
+    }
+    if (!(options & knvPasswordDuplicates) && len > srclen) {
+        len = srclen;
+    }
+
+    char gen[len + 1];
     gen[0] = 0;
-    srclen = strlen(source);
-    for (i = 0; i < len; ++i) {
+
+    for (size_t i = 0; i < len; ++i) {
         char c;
         do {
-            c = source[arc4random() % srclen];
-        } while (0 == (options & knvPasswordDuplicates) && NULL != strchr(gen, c));
-        
+            c = source[arc4random_uniform((uint32_t)srclen)];
+        } while ((!(options & knvPasswordDuplicates)) && strchr(gen, c) != NULL);
+
         gen[i] = c;
-        gen[i+1] = 0;
+        gen[i + 1] = 0;
     }
 
     return ([NSString stringWithCString:gen encoding:NSASCIIStringEncoding]);

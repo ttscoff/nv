@@ -1,0 +1,4 @@
+# Test concordance for Apex TextIndex support
+widget	gadget
+=MacBook	"Apple laptop"
+config(uration)?s?\b	|firmware

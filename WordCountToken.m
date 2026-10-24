@@ -47,7 +47,7 @@
 		alignStyle = [[NSMutableParagraphStyle alloc] init];
 		[alignStyle setAlignment:NSCenterTextAlignment];
 	}
-	NSDictionary *options = [NSDictionary dictionaryWithObjectsAndKeys:alignStyle, NSParagraphStyleAttributeName, [NSFont fontWithName:@"Helvetica" size:8.0f],NSFontAttributeName,txtColor,NSForegroundColorAttributeName, nil];
+	NSDictionary *options = [NSDictionary dictionaryWithObjectsAndKeys:alignStyle, NSParagraphStyleAttributeName, [NSFont systemFontOfSize:[NSFont smallSystemFontSize]],NSFontAttributeName,txtColor,NSForegroundColorAttributeName, nil];
 //	NSAttributedString *theStr = [NSAttributedString initWithString:text attributes:options];
 	//[self setAttributedStringValue:theStr];
 	NSRect labelRect = [text boundingRectWithSize:[self bounds].size options:nil attributes:options];

@@ -1,0 +1,377 @@
+cheatsheet do
+	title 'Apex Command Line Options'
+	docset_file_name 'ApexCLI'
+	keyword 'apex'
+	introduction <<-'END'
+Complete reference for all Apex command-line flags and options.
+END
+	category do
+		id 'Command Line Options'
+		entry do
+			name 'Help'
+			command '-h'
+			command '--help'
+
+			notes %(Display help message and exit)
+		end
+		entry do
+			name 'Version'
+			command '-v'
+			command '--version'
+
+			notes %(Display version information and exit)
+		end
+		entry do
+			name 'Progress'
+			command '--[no-]progress'
+
+			notes %(Show progress indicator during processing)
+		end
+		entry do
+			name 'Combine'
+			command '--combine'
+
+			notes %(Concatenate Markdown files into a single stream)
+		end
+		entry do
+			name 'MMD Merge'
+			command '--mmd-merge'
+
+			notes %(Merge files from MultiMarkdown index files)
+		end
+		entry do
+			name 'Mode'
+			command '-m'
+			command '--mode MODE'
+
+			notes %(Set processor mode (commonmark, gfm, mmd, kramdown, unified))
+		end
+		entry do
+			name 'Output'
+			command '-o'
+			command '--output FILE'
+
+			notes %(Write output to a file instead of stdout)
+		end
+		entry do
+			name 'Standalone'
+			command '-s'
+			command '--standalone'
+
+			notes %(Generate complete HTML document)
+		end
+		entry do
+			name 'Style'
+			command '--style FILE'
+			command '--css FILE'
+
+			notes %(Link to a CSS file in document head)
+		end
+		entry do
+			name 'Embed CSS'
+			command '--embed-css'
+
+			notes %(Embed CSS file contents into style tag)
+		end
+		entry do
+			name 'Script'
+			command '--script VALUE'
+
+			notes %(Inject script tags (mermaid, mathjax, katex, etc.))
+		end
+		entry do
+			name 'Title'
+			command '--title TITLE'
+
+			notes %(Set the document title)
+		end
+		entry do
+			name 'Pretty'
+			command '--pretty'
+
+			notes %(Pretty-print HTML with indentation)
+		end
+		entry do
+			name 'ARIA'
+			command '--aria'
+
+			notes %(Add ARIA labels and accessibility attributes)
+		end
+		entry do
+			name 'Plugins'
+			command '--plugins'
+			command '--no-plugins'
+
+			notes %(Enable or disable plugin processing)
+		end
+		entry do
+			name 'List Plugins'
+			command '--list-plugins'
+
+			notes %(List installed and available plugins)
+		end
+		entry do
+			name 'Install Plugin'
+			command '--install-plugin ID-or-URL'
+
+			notes %(Install a plugin by ID or URL)
+		end
+		entry do
+			name 'Uninstall Plugin'
+			command '--uninstall-plugin ID'
+
+			notes %(Uninstall a locally installed plugin)
+		end
+		entry do
+			name 'ID Format'
+			command '--id-format FORMAT'
+
+			notes %(Set header ID generation format (gfm, mmd, kramdown))
+		end
+		entry do
+			name 'No IDs'
+			command '--no-ids'
+
+			notes %(Disable automatic header ID generation)
+		end
+		entry do
+			name 'Header Anchors'
+			command '--header-anchors'
+
+			notes %(Generate anchor tags instead of id attributes)
+		end
+		entry do
+			name 'Relaxed Tables'
+			command '--relaxed-tables'
+
+			notes %(Enable relaxed table parsing)
+		end
+		entry do
+			name 'No Relaxed Tables'
+			command '--no-relaxed-tables'
+
+			notes %(Disable relaxed table parsing)
+		end
+		entry do
+			name 'Captions'
+			command '--captions POSITION'
+
+			notes %(Control table caption position (above, below))
+		end
+		entry do
+			name 'No Tables'
+			command '--no-tables'
+
+			notes %(Disable table support entirely)
+		end
+		entry do
+			name 'Alpha Lists'
+			command '--[no-]alpha-lists'
+
+			notes %(Control alphabetic list markers (a., b., c.))
+		end
+		entry do
+			name 'Mixed Lists'
+			command '--[no-]mixed-lists'
+
+			notes %(Control mixed list marker types)
+		end
+		entry do
+			name 'No Footnotes'
+			command '--no-footnotes'
+
+			notes %(Disable footnote support)
+		end
+		entry do
+			name 'No Smart'
+			command '--no-smart'
+
+			notes %(Disable smart typography)
+		end
+		entry do
+			name 'No Math'
+			command '--no-math'
+
+			notes %(Disable math support)
+		end
+		entry do
+			name 'Autolink'
+			command '--[no-]autolink'
+
+			notes %(Control automatic linking of URLs and email addresses)
+		end
+		entry do
+			name 'Obfuscate Emails'
+			command '--obfuscate-emails'
+
+			notes %(Obfuscate email links by hex-encoding)
+		end
+		entry do
+			name 'Includes'
+			command '--includes'
+			command '--no-includes'
+
+			notes %(Enable or disable file inclusion features)
+		end
+		entry do
+			name 'Embed Images'
+			command '--embed-images'
+
+			notes %(Embed local images as base64 data URLs)
+		end
+		entry do
+			name 'Base Dir'
+			command '--base-dir DIR'
+
+			notes %(Set base directory for resolving relative paths)
+		end
+		entry do
+			name 'Transforms'
+			command '--[no-]transforms'
+
+			notes %(Control metadata variable transforms)
+		end
+		entry do
+			name 'Meta File'
+			command '--meta-file FILE'
+
+			notes %(Load metadata from external file)
+		end
+		entry do
+			name 'Meta'
+			command '--meta KEY=VALUE'
+
+			notes %(Set metadata from command line)
+		end
+		entry do
+			name 'Bibliography'
+			command '--bibliography FILE'
+
+			notes %(Specify bibliography file (BibTeX, CSL JSON, CSL YAML))
+		end
+		entry do
+			name 'CSL'
+			command '--csl FILE'
+
+			notes %(Specify Citation Style Language file)
+		end
+		entry do
+			name 'No Bibliography'
+			command '--no-bibliography'
+
+			notes %(Suppress bibliography output)
+		end
+		entry do
+			name 'Link Citations'
+			command '--link-citations'
+
+			notes %(Link citations to bibliography entries)
+		end
+		entry do
+			name 'Show Tooltips'
+			command '--show-tooltips'
+
+			notes %(Enable tooltips on citations when hovering)
+		end
+		entry do
+			name 'Concordance'
+			command '--concordance FILE'
+
+			notes %(TextIndex concordance TSV file; enables indices; can be used multiple times)
+		end
+		entry do
+			name 'Indices'
+			command '--indices'
+
+			notes %(Enable index processing)
+		end
+		entry do
+			name 'No Indices'
+			command '--no-indices'
+
+			notes %(Disable index processing entirely)
+		end
+		entry do
+			name 'No Index'
+			command '--no-index'
+
+			notes %(Suppress index generation while creating markers)
+		end
+		entry do
+			name 'Hardbreaks'
+			command '--hardbreaks'
+
+			notes %(Treat newlines as hard breaks (GFM style))
+		end
+		entry do
+			name 'Sup Sub'
+			command '--[no-]sup-sub'
+
+			notes %(Control MultiMarkdown-style superscript and subscript)
+		end
+		entry do
+			name 'Divs'
+			command '--[no-]divs'
+
+			notes %(Control Pandoc fenced divs syntax)
+		end
+		entry do
+			name 'Spans'
+			command '--[no-]spans'
+
+			notes %(Control Pandoc-style bracketed spans)
+		end
+		entry do
+			name 'Emoji'
+			command '--[no-]emoji'
+
+			notes %(Enable or disable :name: emoji replacement)
+		end
+		entry do
+			name 'Emoji Autocorrect'
+			command '--[no-]emoji-autocorrect'
+
+			notes %(Control emoji name autocorrect)
+		end
+		entry do
+			name 'Unsafe'
+			command '--[no-]unsafe'
+
+			notes %(Control whether raw HTML is allowed)
+		end
+		entry do
+			name 'Wikilinks'
+			command '--[no-]wikilinks'
+
+			notes %(Control wiki link syntax)
+		end
+		entry do
+			name 'Wikilink Space'
+			command '--wikilink-space MODE'
+
+			notes %(Control how spaces in wiki links are handled)
+		end
+		entry do
+			name 'Wikilink Extension'
+			command '--wikilink-extension EXT'
+
+			notes %(Add file extension to wiki link URLs)
+		end
+		entry do
+			name 'Accept'
+			command '--accept'
+
+			notes %(Accept all Critic Markup changes)
+		end
+		entry do
+			name 'Reject'
+			command '--reject'
+
+			notes %(Reject all Critic Markup changes)
+		end
+	end
+
+	notes <<-'END'
+For complete documentation, see the Apex wiki at https://github.com/ApexMarkdown/apex/wiki
+END
+end

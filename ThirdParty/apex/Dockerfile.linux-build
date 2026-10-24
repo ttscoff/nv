@@ -1,0 +1,15 @@
+# Dockerfile for testing Linux builds locally
+# Matches the GitHub Actions ubuntu-latest environment
+
+FROM ubuntu:latest
+
+# Install build dependencies
+RUN apt-get update && apt-get install -y \
+    build-essential \
+    cmake \
+    git \
+    libyaml-dev \
+    pkg-config \
+    && rm -rf /var/lib/apt/lists/*
+
+WORKDIR /workspace

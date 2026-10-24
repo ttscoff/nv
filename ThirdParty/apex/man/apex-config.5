@@ -1,0 +1,455 @@
+.TH "NAME" "1" "1 January 1970" ""
+
+.SH NAME
+
+.PP
+apex\-config \- Apex configuration file format
+
+.SH DESCRIPTION
+
+.PP
+Apex supports flexible configuration through metadata files that allow you to define defaults once and reuse them across many documents, while still allowing per\-document and per\-invocation overrides.
+
+.PP
+Configuration can come from three main sources:
+
+.IP "1." 4
+\f[B]Global configuration file\f[] \- \fR$XDG_CONFIG_HOME/apex/config.yml\f[] or \fR~/.config/apex/config.yml\f[]
+
+.IP "2." 4
+\f[B]External metadata files\f[] \- Any file passed via \fR\-\-meta\-file\f[]
+
+.IP "3." 4
+\f[B]Per\-document metadata\f[] \- YAML, MultiMarkdown, or Pandoc\-style metadata in the document
+
+.PP
+Command\-line flags always override configuration file settings.
+
+.SH GLOBAL CONFIG FILE
+
+.PP
+When you run \f[B]apex\f[](1) without an explicit \fR\-\-meta\-file\f[], Apex automatically checks for a global configuration file:
+
+.IP \(bu 2
+If \fR$XDG_CONFIG_HOME\f[] is set: \fR$XDG_CONFIG_HOME/apex/config.yml\f[]
+
+.IP \(bu 2
+Otherwise: \fR~/.config/apex/config.yml\f[]
+
+.PP
+If the file exists, Apex loads it as if you had passed it via \fR\-\-meta\-file\f[], and merges its metadata with the document and any \fR\-\-meta\f[] command\-line metadata.
+
+.PP
+This makes \fRconfig.yml\f[] ideal for defining project\-agnostic defaults such as:
+
+.IP \(bu 2
+Default \fRmode\f[] (e.g. \fRunified\f[], \fRgfm\f[], \fRmmd\f[])
+
+.IP \(bu 2
+Default \fRlanguage\f[] and \fRquoteslanguage\f[]
+
+.IP \(bu 2
+Common feature flags (\fRpretty\f[], \fRstandalone\f[], \fRindices\f[], \fRwikilinks\f[], etc.)
+
+.IP \(bu 2
+Default bibliography style
+
+.SS Example \fRconfig.yml\f[]
+
+.PP
+.nf
+\fR
+\-\-\-
+# Default processor mode and output style
+mode: unified
+standalone: true
+pretty: true
+# Locale and quotation style
+language: en
+quoteslanguage: english
+# Common feature flags
+autolink: true
+includes: true
+relaxed\-tables: true
+sup\-sub: true
+# Index and bibliography defaults
+indices: true
+group\-index\-by\-letter: true
+bibliography: references.bib
+csl: apa.csl
+# Syntax highlighting (optional)
+code\-highlight: pygments
+code\-line\-numbers: true
+highlight\-language\-only: true
+\-\-\-
+
+\f[]
+.fi
+
+.SH EXTERNAL METADATA FILES
+
+.PP
+For project\-specific or task\-specific configurations, use \fR\-\-meta\-file\f[] to point to a reusable metadata file:
+
+.PP
+.nf
+\fR
+apex document.md \-\-meta\-file project\-defaults.yml
+
+\f[]
+.fi
+
+.PP
+These files use the same metadata keys as \fRconfig.yml\f[] and document front matter.
+
+.SS Example project config
+
+.PP
+.nf
+\fR
+\-\-\-
+mode: unified
+standalone: true
+pretty: true
+# Project\-specific bibliography
+bibliography: project\-refs.bib
+csl: chicago\-note\-bibliography.csl
+# Enable wiki links and relaxed tables for this project
+wikilinks: true
+relaxed\-tables: true
+\-\-\-
+
+\f[]
+.fi
+
+.SH PER\-DOCUMENT METADATA
+
+.PP
+Each document can define its own metadata in YAML, MultiMarkdown, or Pandoc formats. Apex extracts this metadata before processing, merges it with any file/config metadata, and then applies it to options.
+
+.SS YAML front matter example
+
+.PP
+.nf
+\fR
+\-\-\-
+title: My Research Paper
+author: Jane Doe
+mode: unified
+standalone: true
+pretty: true
+indices: false
+wikilinks: true
+bibliography: references.bib
+language: en
+quoteslanguage: english
+\-\-\-
+# Introduction
+\&...
+
+\f[]
+.fi
+
+.SS MultiMarkdown metadata example
+
+.PP
+.nf
+\fR
+Title: My Research Paper
+Author: Jane Doe
+Mode: unified
+Standalone: true
+Pretty: true
+Indices: false
+WikiLinks: true
+Bibliography: references.bib
+Language: en
+Quotes Language: english
+# Introduction
+\&...
+
+\f[]
+.fi
+
+.PP
+Apex normalizes keys (case\-insensitive, ignores spaces and dashes), so \fRQuotes Language\f[], \fRquoteslanguage\f[], and \fRquotes\-language\f[] are treated equivalently.
+
+.SH PRECEDENCE AND MERGING
+
+.PP
+When Apex builds the final configuration for a run, it merges all sources in this order:
+
+.IP "1." 4
+\f[B]File metadata\f[] (lowest precedence)
+
+.IP \(bu 2
+Global \fRconfig.yml\f[] if present and no explicit \fR\-\-meta\-file\f[] was given
+
+.IP \(bu 2
+Any metadata file provided via \fR\-\-meta\-file\f[]
+
+.IP "2." 4
+\f[B]Document metadata\f[]
+
+.IP \(bu 2
+YAML/MultiMarkdown/Pandoc metadata inside the document
+
+.IP "3." 4
+\f[B]Command\-line metadata\f[]
+
+.IP \(bu 2
+Values passed via \fR\-\-meta KEY=VALUE\f[]
+
+.IP "4." 4
+\f[B]Command\-line flags\f[]
+
+.IP \(bu 2
+Flags like \fR\-\-mode\f[], \fR\-\-pretty\f[], \fR\-\-no\-tables\f[], etc.
+
+.PP
+Later sources override earlier ones. In practice:
+
+.IP \(bu 2
+A document can override defaults from \fRconfig.yml\f[] or \fR\-\-meta\-file\f[]
+
+.IP \(bu 2
+\fR\-\-meta\f[] values can override both document and file metadata
+
+.IP \(bu 2
+Explicit CLI flags still behave as final overrides where applicable
+
+.PP
+\f[B]Note:\f[] If \fRmode\f[] is specified in metadata (file or document), Apex resets options to that mode's defaults before applying other metadata keys, so the mode behaves as if you had passed it on the command line first.
+
+.SH CONFIGURATION KEYS
+
+.PP
+Configuration keys correspond closely to Apex command\-line options. Most options can be controlled via metadata in \fRconfig.yml\f[], \fR\-\-meta\-file\f[] files, or per\-document metadata.
+
+.SS Boolean options
+
+.PP
+Boolean keys accept any of the following values (case\-insensitive):
+
+.IP \(bu 2
+\fRtrue\f[] / \fRfalse\f[]
+
+.IP \(bu 2
+\fRyes\f[] / \fRno\f[]
+
+.IP \(bu 2
+\fR1\f[] / \fR0\f[]
+
+.PP
+\f[B]Supported boolean keys include:\f[]
+
+.IP \(bu 2
+\fRindices\f[] \- Enable index processing
+
+.IP \(bu 2
+\fRwikilinks\f[] \- Enable wiki link syntax (\fR[[Page]]\f[])
+
+.IP \(bu 2
+\fRwikilink\-sanitize\f[] \- Sanitize wiki link URLs (lowercase, remove apostrophes, clean non\-alphanumeric)
+
+.IP \(bu 2
+\fRincludes\f[] \- Enable file inclusion
+
+.IP \(bu 2
+\fRrelaxed\-tables\f[] \- Enable relaxed table parsing
+
+.IP \(bu 2
+\fRalpha\-lists\f[] \- Enable alphabetic list markers
+
+.IP \(bu 2
+\fRmixed\-lists\f[] \- Allow mixing list marker types at the same level
+
+.IP \(bu 2
+\fRsup\-sub\f[] \- Enable MultiMarkdown\-style superscript/subscript
+
+.IP \(bu 2
+\fRautolink\f[] \- Enable automatic URL/email linking
+
+.IP \(bu 2
+\fRtransforms\f[] \- Enable metadata transforms (\fR[%key:transform]\f[])
+
+.IP \(bu 2
+\fRunsafe\f[] \- Allow raw HTML in output
+
+.IP \(bu 2
+\fRtables\f[] \- Enable/disable table support
+
+.IP \(bu 2
+\fRfootnotes\f[] \- Enable/disable footnote support
+
+.IP \(bu 2
+\fRsmart\f[] \- Enable/disable smart typography
+
+.IP \(bu 2
+\fRmath\f[] \- Enable/disable math support
+
+.IP \(bu 2
+\fRids\f[] \- Enable/disable automatic header IDs
+
+.IP \(bu 2
+\fRheader\-anchors\f[] \- Use \fR<a>\f[] anchors instead of plain \fRid\f[] attributes
+
+.IP \(bu 2
+\fRembed\-images\f[] \- Enable base64 image embedding
+
+.IP \(bu 2
+\fRlink\-citations\f[] \- Link citations to bibliography entries
+
+.IP \(bu 2
+\fRshow\-tooltips\f[] \- Add tooltips to citations
+
+.IP \(bu 2
+\fRsuppress\-bibliography\f[] \- Suppress bibliography output
+
+.IP \(bu 2
+\fRsuppress\-index\f[] \- Suppress index output while still creating markers
+
+.IP \(bu 2
+\fRgroup\-index\-by\-letter\f[] \- Group index entries alphabetically
+
+.IP \(bu 2
+\fRobfuscate\-emails\f[] \- Hex\-encode \fRmailto:\f[] links and visible email addresses
+
+.IP \(bu 2
+\fRpretty\f[] \- Pretty\-print HTML
+
+.IP \(bu 2
+\fRstandalone\f[] \- Generate a full HTML document (\fR<html>\f[], \fR<head>\f[], \fR<body>\f[])
+
+.IP \(bu 2
+\fRhardbreaks\f[] \- Treat newlines as \fR<br>\f[]
+
+.IP \(bu 2
+\fRplugins\f[] \- Enable plugin processing (see \f[B]apex\-plugins\f[](7))
+
+.IP \(bu 2
+\fRcode\-line\-numbers\f[] \- Include line numbers in syntax\-highlighted code blocks
+
+.IP \(bu 2
+\fRhighlight\-language\-only\f[] \- Only highlight code blocks that have a language specified
+
+.SS String options
+
+.PP
+String keys take a free\-form string value (sometimes with a constrained set of options):
+
+.IP \(bu 2
+\fRmode\f[]
+
+.IP \(bu 2
+Values: \fRcommonmark\f[], \fRgfm\f[], \fRmmd\f[]/\fRmultimarkdown\f[], \fRkramdown\f[], \fRunified\f[]
+
+.IP \(bu 2
+\fRid\-format\f[]
+
+.IP \(bu 2
+Values: \fRgfm\f[], \fRmmd\f[], \fRkramdown\f[]
+
+.IP \(bu 2
+\fRtitle\f[]
+
+.IP \(bu 2
+Document title (used especially in standalone mode)
+
+.IP \(bu 2
+\fRstyle\f[] / \fRcss\f[]
+
+.IP \(bu 2
+Stylesheet path for standalone documents
+
+.IP \(bu 2
+\fRbase\-dir\f[]
+
+.IP \(bu 2
+Base directory used for resolving relative paths (images, includes, etc.)
+
+.IP \(bu 2
+\fRbibliography\f[]
+
+.IP \(bu 2
+Path to a bibliography file (\fR.bib\f[], \fR.json\f[], \fR.yml\f[], \fR.yaml\f[])
+
+.IP \(bu 2
+\fRcsl\f[]
+
+.IP \(bu 2
+Path to a CSL style file
+
+.IP \(bu 2
+\fRlanguage\f[]
+
+.IP \(bu 2
+BCP 47 or similar language tag (e.g. \fRen\f[], \fRen\-US\f[], \fRfr\f[]); sets the HTML \fRlang\f[] attribute
+
+.IP \(bu 2
+\fRquoteslanguage\f[] / \fRQuotes Language\f[]
+
+.IP \(bu 2
+Human\-readable language name used for quote styling (e.g. \fRenglish\f[], \fRfrench\f[], \fRgerman\f[])
+
+.IP \(bu 2
+\fRcode\-highlight\f[]
+
+.IP \(bu 2
+External syntax highlighting tool: \fRpygments\f[] (or \fRp\f[]/\fRpyg\f[]), \fRskylighting\f[] (or \fRs\f[]/\fRsky\f[]), \fRshiki\f[] (or \fRsh\f[]), or \fRfalse\f[]/\fRnone\f[] to disable
+
+.IP \(bu 2
+\fRcode\-highlight\-theme\f[] / \fRcode_highlight_theme\f[]
+
+.IP \(bu 2
+Preferred syntax highlighting theme/style name. Maps to Pygments styles, Skylighting styles, or Shiki themes in both HTML and terminal/ANSI output. Use \fRapex \-\-list\-themes\f[] for an overview of built\-in themes.
+
+.PP
+You can also use arbitrary keys for your own templates and transforms; Apex simply passes them through to the metadata system so they can be referenced via \fR[%key]\f[] and \fR[%key:transform]\f[].
+
+.SH EXAMPLES
+
+.PP
+A typical setup might look like this:
+
+.IP "1." 4
+\f[B]Global defaults\f[] in \fRconfig.yml\f[] for your overall writing style and locale.
+
+.IP "2." 4
+\f[B]Project config\f[] via \fR\-\-meta\-file project.yml\f[] for bibliography and project\-specific settings.
+
+.IP "3." 4
+\f[B]Per\-document metadata\f[] for title, author, and any exceptions to the defaults.
+
+.IP "4." 4
+Occasional \f[B]CLI overrides\f[] for ad\-hoc one\-off changes (e.g. \fR\-\-mode gfm\f[] for a specific run).
+
+.PP
+Because all three configuration layers use the same metadata keys, you can gradually refine behavior without repeating yourself:
+
+.IP \(bu 2
+Put long\-lived, cross\-project settings in \fRconfig.yml\f[]
+
+.IP \(bu 2
+Put project\-scoped settings in \fR\-\-meta\-file\f[] configs
+
+.IP \(bu 2
+Put document\-specific settings in front matter
+
+.SH SEE ALSO
+
+.PP
+\f[B]apex\f[](1), \f[B]apex\-plugins\f[](7)
+
+.PP
+For complete documentation, see the Apex Wiki (https://github.com/ttscoff/apex/wiki).
+
+.SH AUTHOR
+
+.PP
+Brett Terpstra
+
+.SH COPYRIGHT
+
+.PP
+Copyright (c) 2025 Brett Terpstra. Licensed under MIT License.

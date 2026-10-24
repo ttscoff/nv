@@ -41,6 +41,8 @@ static NSString *DirectoryAliasKey = @"DirectoryAlias";
 static NSString *AutoCompleteSearchesKey = @"AutoCompleteSearches";
 static NSString *NoteAttributesVisibleKey = @"NoteAttributesVisible";
 static NSString *TableFontSizeKey = @"TableFontPointSize";
+static NSString *NVFontSizeEpochKey = @"NVFontSizeEpoch";
+static BOOL upgradedLegacyBodyFont = NO;
 static NSString *TableSortColumnKey = @"TableSortColumn";
 static NSString *TableIsReverseSortedKey = @"TableIsReverseSorted";
 static NSString *TableColumnsHaveBodyPreviewKey = @"TableColumnsHaveBodyPreview";
@@ -107,9 +109,9 @@ NSString *HotKeyAppToFrontName = @"bring Notational Velocity to the foreground";
 @implementation GlobalPrefs
 
 static void sendCallbacksForGlobalPrefs(GlobalPrefs* self, SEL selector, id originalSender) {
-    // FIXME
 	if (originalSender != self) {
-		self->runCallbacksIMP(self, @selector(notifyCallbacksForSelector:excludingSender:), 
+		typedef void (*NVPrefsCallback)(id, SEL, SEL, id);
+		((NVPrefsCallback)self->runCallbacksIMP)(self, @selector(notifyCallbacksForSelector:excludingSender:),
 							 selector, originalSender);
 	}
 }
@@ -164,7 +166,7 @@ static void sendCallbacksForGlobalPrefs(GlobalPrefs* self, SEL selector, id orig
             [NSNumber numberWithBool:NO], UsesMarkdownCompletions,
 
 			[NSArchiver archivedDataWithRootObject:
-			 [NSFont fontWithName:@"Helvetica" size:12.0f]], NoteBodyFontKey,
+			 [GlobalPrefs regularSystemFont]], NoteBodyFontKey,
 			
 			[NSArchiver archivedDataWithRootObject:[NSColor blackColor]], ForegroundTextColorKey,
 			[NSArchiver archivedDataWithRootObject:[NSColor whiteColor]], BackgroundTextColorKey,
@@ -172,14 +174,36 @@ static void sendCallbacksForGlobalPrefs(GlobalPrefs* self, SEL selector, id orig
 			[NSArchiver archivedDataWithRootObject:
 			 [NSColor colorWithCalibratedRed:0.945 green:0.702 blue:0.702 alpha:1.0f]], SearchTermHighlightColorKey,
 			
-			[NSNumber numberWithFloat:[NSFont smallSystemFontSize]], TableFontSizeKey, 
+			[NSNumber numberWithFloat:[NSFont systemFontSize]], TableFontSizeKey, 
 			[NSArray arrayWithObjects:NoteTitleColumnString, NoteDateModifiedColumnString, nil], NoteAttributesVisibleKey,
 			NoteDateModifiedColumnString, TableSortColumnKey,
 			[NSNumber numberWithBool:YES], TableIsReverseSortedKey, nil]];
 		
 		autoCompleteSearches = [defaults boolForKey:AutoCompleteSearchesKey];
+		[self _upgradeLegacyFontSizesIfNeeded];
 	}
 	return self;
+}
+
++ (NSFont *)regularSystemFont {
+	return [NSFont systemFontOfSize:[NSFont systemFontSize]];
+}
+
++ (BOOL)fontIsLegacyBodyDefault:(NSFont *)font {
+	if (!font || ![font isKindOfClass:[NSFont class]])
+		return NO;
+	NSString *name = [font fontName];
+	BOOL helvetica = [name isEqualToString:@"Helvetica"] || [name isEqualToString:@"Helvetica-Regular"];
+	return helvetica && fabs([font pointSize] - 12.0) < 0.01;
+}
+
+- (void)_upgradeLegacyFontSizesIfNeeded {
+	if ([defaults integerForKey:NVFontSizeEpochKey] >= 1)
+		return;
+	/* Old list sizes were the small system font (11) and a hardcoded "regular" of 12. */
+	float size = [defaults floatForKey:TableFontSizeKey];
+	if (fabsf(size - (float)[NSFont smallSystemFontSize]) < 0.01f || fabsf(size - 12.0f) < 0.01f)
+		[defaults setFloat:[NSFont systemFontSize] forKey:TableFontSizeKey];
 }
 
 + (GlobalPrefs *)defaultPrefs {
@@ -587,6 +611,19 @@ BOOL ColorsEqualWith8BitChannels(NSColor *c1, NSColor *c2) {
 - (void)resolveNoteBodyFontFromNotationPrefsFromSender:(id)sender {
 	
 	NSFont *prefsFont = [notationPrefs baseBodyFont];
+	if ([defaults integerForKey:NVFontSizeEpochKey] < 1) {
+		NSFont *regular = [GlobalPrefs regularSystemFont];
+		BOOL legacyDatabaseFont = [GlobalPrefs fontIsLegacyBodyDefault:prefsFont];
+		if (legacyDatabaseFont) {
+			[notationPrefs setBaseBodyFont:regular];
+			prefsFont = regular;
+		}
+		[self noteBodyFont];
+		if (legacyDatabaseFont || upgradedLegacyBodyFont)
+			[self setNoteBodyFont:regular sender:sender];
+		upgradedLegacyBodyFont = NO;
+		[defaults setInteger:1 forKey:NVFontSizeEpochKey];
+	}
 	if (prefsFont) {
 		NSFont *noteFont = [self noteBodyFont];
 		
@@ -649,6 +686,12 @@ BOOL ColorsEqualWith8BitChannels(NSColor *c1, NSColor *c2) {
 			triedOnce = YES;
 			[defaults removeObjectForKey:NoteBodyFontKey];
 			goto retry;
+		}
+		if ([defaults integerForKey:NVFontSizeEpochKey] < 1 && [GlobalPrefs fontIsLegacyBodyDefault:noteBodyFont]) {
+			[noteBodyFont release];
+			noteBodyFont = [[GlobalPrefs regularSystemFont] retain];
+			[defaults setObject:[NSArchiver archivedDataWithRootObject:noteBodyFont] forKey:NoteBodyFontKey];
+			upgradedLegacyBodyFont = YES;
 		}
 	}
 	

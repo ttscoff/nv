@@ -491,9 +491,37 @@ static CFStringRef SynchronizedNoteKeyDescription(const void *value) {
 
 	return value ? (CFStringRef)[NSString uuidStringWithBytes:*(CFUUIDBytes*)value] : NULL;
 }
+
+/*
+ CFHashBytes from http://www.opensource.apple.com/source/CF/CF-1153.18/CFUtilities.c
+ The symbol is no longer exported from CoreFoundation.
+ */
+#define ELF_STEP(B) T1 = (H << 4) + B; T2 = T1 & 0xF0000000; if (T2) T1 ^= (T2 >> 24); T1 &= (~T2); H = T1;
+
+static CFHashCode NVCFHashBytes(const uint8_t *bytes, CFIndex length) {
+	UInt32 H = 0, T1, T2;
+	SInt32 rem = (SInt32)length;
+	while (3 < rem) {
+		ELF_STEP(bytes[length - rem]);
+		ELF_STEP(bytes[length - rem + 1]);
+		ELF_STEP(bytes[length - rem + 2]);
+		ELF_STEP(bytes[length - rem + 3]);
+		rem -= 4;
+	}
+	switch (rem) {
+		case 3:  ELF_STEP(bytes[length - 3]);
+		case 2:  ELF_STEP(bytes[length - 2]);
+		case 1:  ELF_STEP(bytes[length - 1]);
+		case 0:  ;
+	}
+	return H;
+}
+
+#undef ELF_STEP
+
 static CFHashCode SynchronizedNoteHash(const void * o) {
 	
-	return CFHashBytes(o, sizeof(CFUUIDBytes));
+	return NVCFHashBytes(o, sizeof(CFUUIDBytes));
 }
 static Boolean SynchronizedNoteIsEqual(const void *o, const void *p) {
 	

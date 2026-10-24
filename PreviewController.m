@@ -17,34 +17,24 @@
 #import "BTTransparentScroller.h"
 #import "NSFileManager_NV.h"
 #import "NSFileManager+DirectoryLocations.h"
+#import <Security/Security.h>
 
 #define kDefaultMarkupPreviewVisible @"markupPreviewVisible"
 
-@interface NSString (MIMEAdditions)
-+ (NSString*)MIMEBoundary;
-+ (NSString*)multipartMIMEStringWithDictionary:(NSDictionary*)dict;
-@end
+static NSString * const NVMarkedShareKeychainService = @"net.elasticthreads.nv.marked-share";
+static NSString * const NVMarkedShareTokenAccount = @"api_token";
+static NSString * const NVMarkedShareDeviceAccount = @"device_key";
+static NSString * const NVMarkedShareAPIURL = @"https://share.markedapp.com/api/v1/documents";
+static NSString * const NVMarkedShareConnectURL = @"https://share.markedapp.com/auth/marked?return_to=nvalt%3A%2F%2Fshare-auth%2Fcallback&label=nvALT";
+static const NSUInteger NVMarkedShareMaxBodyBytes = 500000;
 
-@implementation NSString (MIMEAdditions)
-//this returns a unique boundary which is used in constructing the multipart MIME body of the POST request
-+ (NSString*)MIMEBoundary
-{
-    static NSString* MIMEBoundary = nil;
-    if(!MIMEBoundary)
-        MIMEBoundary = [[NSString alloc] initWithFormat:@"----_=_nvALT_%@_=_----",[[NSProcessInfo processInfo] globallyUniqueString]];
-    return MIMEBoundary;
-}
-//this create a correctly structured multipart MIME body for the POST request from a dictionary
-+ (NSString*)multipartMIMEStringWithDictionary:(NSDictionary*)dict
-{
-    NSMutableString* result = [NSMutableString string];
-    for (NSString* key in dict)
-    {
-        [result appendFormat:@"--%@\nContent-Disposition: form-data; name=\"%@\"\n\n%@\n",[NSString MIMEBoundary],key,[dict objectForKey:key]];
-    }
-    [result appendFormat:@"\n--%@--\n",[NSString MIMEBoundary]];
-    return result;
-}
+@interface PreviewController (MarkedShare)
+- (NSString *)keychainStringForAccount:(NSString *)account;
+- (void)setKeychainString:(NSString *)string forAccount:(NSString *)account;
+- (void)deleteMarkedShareCredentials;
+- (BOOL)markedShareIsConnected;
+- (void)connectMarkedShare;
+- (NSString *)markedShareMessageForStatus:(NSInteger)status data:(NSData *)data;
 @end
 
 @implementation PreviewController
@@ -96,7 +86,7 @@
         //        [tabSwitcher setAction:@selector(switchTabs:)];
         //        [tabSwitcher setAutoresizingMask:NSViewMaxXMargin];
         //        [shareButton setTitle:@"Share"];
-        //        [shareButton setToolTip:@"Make this note available to the public on Peg.gd"];
+        //        [shareButton setToolTip:@"Share this note on Marked Share"];
         //        [shareButton setTarget:self];
         //        [shareButton setAction:@selector(shareAsk:)];
         //        [shareButton setAutoresizingMask:NSViewMinXMargin];
@@ -480,42 +470,178 @@
     }
 }
 
+- (NSString *)keychainStringForAccount:(NSString *)account
+{
+    NSDictionary *query = [NSDictionary dictionaryWithObjectsAndKeys:
+                           (id)kSecClassGenericPassword, (id)kSecClass,
+                           NVMarkedShareKeychainService, (id)kSecAttrService,
+                           account, (id)kSecAttrAccount,
+                           (id)kCFBooleanTrue, (id)kSecReturnData,
+                           (id)kSecMatchLimitOne, (id)kSecMatchLimit,
+                           nil];
+    CFTypeRef result = NULL;
+    if (SecItemCopyMatching((CFDictionaryRef)query, &result) != errSecSuccess || !result)
+        return nil;
+    NSData *data = [(NSData *)result autorelease];
+    return [[[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding] autorelease];
+}
+
+- (void)setKeychainString:(NSString *)string forAccount:(NSString *)account
+{
+    NSDictionary *query = [NSDictionary dictionaryWithObjectsAndKeys:
+                           (id)kSecClassGenericPassword, (id)kSecClass,
+                           NVMarkedShareKeychainService, (id)kSecAttrService,
+                           account, (id)kSecAttrAccount,
+                           nil];
+    SecItemDelete((CFDictionaryRef)query);
+    NSMutableDictionary *item = [NSMutableDictionary dictionaryWithDictionary:query];
+    [item setObject:[string dataUsingEncoding:NSUTF8StringEncoding] forKey:(id)kSecValueData];
+    [item setObject:(id)kSecAttrAccessibleAfterFirstUnlock forKey:(id)kSecAttrAccessible];
+    SecItemAdd((CFDictionaryRef)item, NULL);
+}
+
+- (void)deleteMarkedShareCredentials
+{
+    NSDictionary *query = [NSDictionary dictionaryWithObjectsAndKeys:
+                           (id)kSecClassGenericPassword, (id)kSecClass,
+                           NVMarkedShareKeychainService, (id)kSecAttrService,
+                           nil];
+    SecItemDelete((CFDictionaryRef)query);
+}
+
+- (BOOL)markedShareIsConnected
+{
+    return [[self keychainStringForAccount:NVMarkedShareTokenAccount] length] > 0
+        && [[self keychainStringForAccount:NVMarkedShareDeviceAccount] length] > 0;
+}
+
+- (void)connectMarkedShare
+{
+    [[NSWorkspace sharedWorkspace] openURL:[NSURL URLWithString:NVMarkedShareConnectURL]];
+}
+
+- (void)handleShareAuthURL:(NSURL *)url
+{
+    [self window];
+    NSString *token = nil;
+    NSString *deviceKey = nil;
+    NSURLComponents *components = [NSURLComponents componentsWithURL:url resolvingAgainstBaseURL:NO];
+    for (NSURLQueryItem *item in [components queryItems]) {
+        if ([[item name] isEqualToString:@"api_token"])
+            token = [item value];
+        else if ([[item name] isEqualToString:@"device_key"])
+            deviceKey = [item value];
+    }
+    if (![token length] || ![deviceKey length]) {
+        [self showShareURL:@"Marked Share did not return credentials." isError:YES];
+        return;
+    }
+    [self setKeychainString:token forAccount:NVMarkedShareTokenAccount];
+    [self setKeychainString:deviceKey forAccount:NVMarkedShareDeviceAccount];
+    [self showShareURL:@"Marked Share is connected. Share the note again." isError:YES];
+}
+
+- (NSString *)markedShareMessageForStatus:(NSInteger)status data:(NSData *)data
+{
+    if (status == 401)
+        return @"Connect nvALT to Marked Share, then share again.";
+    if (status == 429)
+        return @"Too many shares. Wait a minute and try again.";
+    NSString *message = nil;
+    if ([data length]) {
+        id json = [NSJSONSerialization JSONObjectWithData:data options:0 error:NULL];
+        if ([json isKindOfClass:[NSDictionary class]])
+            message = [json objectForKey:@"error"];
+    }
+    if ([message isKindOfClass:[NSString class]] && [message length])
+        return message;
+    return @"Could not share this note.";
+}
+
 -(IBAction)shareNote:(id)sender
 {
-    AppController *app = [NSApp delegate];
-    NSString *noteTitle = [NSString stringWithFormat:@"%@",titleOfNote([app selectedNoteObject])];
-    NSString *rawString = [app noteContent];
-    SEL mode = [self markupProcessorSelector:[app currentPreviewMode]];
-    NSString *processedString = [NSString performSelector:mode withObject:rawString];
-
-
-    NSMutableURLRequest *request = [[NSMutableURLRequest alloc]
-                                    initWithURL:
-                                    [NSURL URLWithString:@"http://peg.gd/nvapi.php"]];
-    [request setHTTPMethod:@"POST"];
-    [request addValue:@"8bit" forHTTPHeaderField:@"Content-Transfer-Encoding"];
-    [request addValue: [NSString stringWithFormat:@"multipart/form-data; boundary=%@",[NSString MIMEBoundary]] forHTTPHeaderField: @"Content-Type"];
-    NSDictionary* postData = [NSDictionary dictionaryWithObjectsAndKeys:
-                              @"8c4205ec33d8f6caeaaaa0c10a14138c", @"key",
-                              noteTitle, @"title",
-                              processedString, @"body",
-                              nil];
-    [request setHTTPBody: [[NSString multipartMIMEStringWithDictionary: postData] dataUsingEncoding: NSUTF8StringEncoding]];
-    NSHTTPURLResponse * response = nil;
-    NSError * error = nil;
-    NSData * responseData = [NSURLConnection sendSynchronousRequest:request returningResponse:&response error:&error];
-    NSString * responseString = [[[NSString alloc] initWithData:responseData encoding:NSASCIIStringEncoding] autorelease];
-    NSLog(@"RESPONSE STRING: %@", responseString);
-    NSLog(@"%ld",(long)response.statusCode);
-    shareURL = [[NSString stringWithString:responseString] retain];
-    if (response.statusCode == 200) {
-        [self showShareURL:[NSString stringWithFormat:@"View %@",shareURL] isError:NO];
-    } else {
-        [self showShareURL:@"Error connecting" isError:YES];
+    if (![self markedShareIsConnected]) {
+        [self connectMarkedShare];
+        [self showShareURL:@"Connect nvALT in the browser, then share again." isError:YES];
+        return;
     }
 
-    [request release];
+    AppController *app = [NSApp delegate];
+    NoteObject *note = [app selectedNoteObject];
+    NSString *rawString = [app noteContent];
+    if (!note || ![rawString length]) {
+        [self showShareURL:@"There is no note to share." isError:YES];
+        return;
+    }
+    if ([rawString lengthOfBytesUsingEncoding:NSUTF8StringEncoding] > NVMarkedShareMaxBodyBytes) {
+        [self showShareURL:@"This note is too long to share." isError:YES];
+        return;
+    }
 
+    NSString *noteTitle = titleOfNote(note);
+    if (!noteTitle)
+        noteTitle = @"";
+    NSDictionary *payload = [NSDictionary dictionaryWithObject:
+                             [NSDictionary dictionaryWithObjectsAndKeys:
+                              noteTitle, @"title",
+                              rawString, @"body_markdown",
+                              @"unlisted", @"visibility",
+                              [NSNumber numberWithBool:NO], @"allow_remix",
+                              nil]
+                             forKey:@"document"];
+    NSError *jsonError = nil;
+    NSData *body = [NSJSONSerialization dataWithJSONObject:payload options:0 error:&jsonError];
+    if (!body) {
+        [self showShareURL:@"Could not prepare this note for sharing." isError:YES];
+        return;
+    }
+
+    NSString *token = [self keychainStringForAccount:NVMarkedShareTokenAccount];
+    NSString *deviceKey = [self keychainStringForAccount:NVMarkedShareDeviceAccount];
+    NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:[NSURL URLWithString:NVMarkedShareAPIURL]];
+    [request setHTTPMethod:@"POST"];
+    [request setValue:@"application/json" forHTTPHeaderField:@"Content-Type"];
+    [request setValue:[NSString stringWithFormat:@"Bearer %@", token] forHTTPHeaderField:@"Authorization"];
+    [request setValue:deviceKey forHTTPHeaderField:@"X-Device-Key"];
+    [request setHTTPBody:body];
+
+    [self cancelShare:self];
+    [shareButton setEnabled:NO];
+
+    NSURLSessionDataTask *task = [[NSURLSession sharedSession] dataTaskWithRequest:request
+        completionHandler:^(NSData *data, NSURLResponse *response, NSError *error) {
+            NSInteger status = [response isKindOfClass:[NSHTTPURLResponse class]] ? [(NSHTTPURLResponse *)response statusCode] : 0;
+            NSString *publishedURL = nil;
+            if (status == 201 && [data length]) {
+                id json = [NSJSONSerialization JSONObjectWithData:data options:0 error:NULL];
+                if ([json isKindOfClass:[NSDictionary class]]) {
+                    id urlValue = [json objectForKey:@"url"];
+                    if (![urlValue isKindOfClass:[NSString class]]) {
+                        id document = [json objectForKey:@"document"];
+                        if ([document isKindOfClass:[NSDictionary class]])
+                            urlValue = [document objectForKey:@"url"];
+                    }
+                    if ([urlValue isKindOfClass:[NSString class]] && [urlValue length])
+                        publishedURL = urlValue;
+                }
+            }
+            NSString *failure = nil;
+            if (!publishedURL)
+                failure = error ? [error localizedDescription] : [self markedShareMessageForStatus:status data:data];
+            dispatch_async(dispatch_get_main_queue(), ^{
+                [shareButton setEnabled:YES];
+                if (status == 401)
+                    [self deleteMarkedShareCredentials];
+                if (publishedURL) {
+                    [shareURL release];
+                    shareURL = [publishedURL retain];
+                    [self showShareURL:shareURL isError:NO];
+                } else {
+                    [self showShareURL:failure isError:YES];
+                }
+            });
+        }];
+    [task resume];
 }
 
 - (void)connection:(NSURLConnection *)connection didReceiveResponse:(NSURLResponse *)response
@@ -628,6 +754,11 @@
 
 - (IBAction)shareAsk:(id)sender
 {
+    if (![self markedShareIsConnected]) {
+        [self connectMarkedShare];
+        [self showShareURL:@"Connect nvALT in the browser, then share again." isError:YES];
+        return;
+    }
     if (!confirmWindow && !attachedWindow) {
         int side = 3;
         NSPoint buttonPoint = NSMakePoint(NSMidX([shareButton frame]),

@@ -29,6 +29,7 @@
 #include <CoreServices/CoreServices.h>
 #include <Security/Security.h>
 #include <ApplicationServices/ApplicationServices.h>
+#include <string.h>
 
 #define DEFAULT_HASH_ITERATIONS 8000
 #define DEFAULT_KEY_LENGTH 256
@@ -111,6 +112,10 @@ NSMutableDictionary *ServiceAccountDictInit(NotationPrefs *prefs, NSString* serv
 		if (!baseBodyFont || ![baseBodyFont isKindOfClass:[NSFont class]]) {
 			baseBodyFont = [[[GlobalPrefs defaultPrefs] noteBodyFont] retain];
 			NSLog(@"setting base body to current default: %@", baseBodyFont);
+			preferencesChanged = YES;
+		} else if ([GlobalPrefs fontIsLegacyBodyDefault:baseBodyFont]) {
+			[baseBodyFont release];
+			baseBodyFont = [[GlobalPrefs regularSystemFont] retain];
 			preferencesChanged = YES;
 		}
 		//foregroundColor does not receive the same treatment as basebodyfont; in the event of a discrepancy between global and per-db settings,
@@ -456,7 +461,9 @@ NSMutableDictionary *ServiceAccountDictInit(NotationPrefs *prefs, NSString* serv
 	}
 	NSData *data = [NSData dataWithBytes:passwordData length:passwordLength];
 	
-	bzero(passwordData, passwordLength);
+	if (passwordData && passwordLength > 0) {
+		memset_s(passwordData, passwordLength, 0, passwordLength);
+	}
 	
 	SecKeychainItemFreeContent(NULL, passwordData);
 	

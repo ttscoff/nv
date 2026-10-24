@@ -1,0 +1,703 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>APEX(1) — Unified Markdown processor supporting CommonMark,GFM, MultiMarkdown, and Kramdown</title>
+<style>
+body { font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; max-width: 65em; margin: 1em auto; padding: 0 1em; line-height: 1.4; color: #333; }
+body.man-standalone { margin: 0; }
+.man-headline { font-size: 1.75rem; font-weight: bold; margin: 0.5em 0 0.75em; border-bottom: none; color: #a02172; }
+.man-nav { position: fixed; left: 0; top: 0; width: 14em; height: 100vh; overflow-y: auto; padding: 1.25em 1.5em; border-right: 1px solid #e0ddd6; background: #f5f4f0; font-size: 0.9rem; }
+.man-nav ul { list-style: none; padding: 0; margin: 0; }
+.man-nav li { margin: 0.35em 0; }
+.man-nav a { color: #444; text-decoration: none; display: block; padding: 0.2em 0; }
+.man-nav a:hover { color: #2376b1; background: rgba(0,0,0,0.03); }
+.man-main { margin-left: 16em; padding: 1.5em 2em; max-width: 65em; }
+.man-section { font-weight: bold; margin-top: 1em; margin-bottom: 0.25em; }
+.man-section h2, .man-section h3, .man-section h4 { font-size: 1em; margin: 0; color: #3f789b; }
+p { margin: 0.5em 0; }
+strong, .man-option { color: #a02172; font-weight: bold; }
+code, .man-option { font-family: monospace; background: #f5f5f5; padding: 0 0.2em; }
+pre { background: #f5f5f5; padding: 0.75em; overflow-x: auto; }
+ul, ol { margin: 0.5em 0; padding-left: 1.5em; }
+a { color: #2376b1; }
+</style>
+</head>
+<body class="man-standalone">
+<nav class="man-nav"><ul>
+<li><a href="#NAME">NAME</a></li>
+<li><a href="#SYNOPSIS">SYNOPSIS</a></li>
+<li><a href="#DESCRIPTION">DESCRIPTION</a></li>
+<li><a href="#OPTIONS">OPTIONS</a></li>
+<li><a href="#EXAMPLES">EXAMPLES</a></li>
+<li><a href="#PROCESSING-MODES">PROCESSING MODES</a></li>
+<li><a href="#METADATA-CONTROL-OF-OPTIONS">METADATA CONTROL OF OPTIONS</a></li>
+<li><a href="#FEATURES">FEATURES</a></li>
+<li><a href="#SEE-ALSO">SEE ALSO</a></li>
+<li><a href="#AUTHOR">AUTHOR</a></li>
+<li><a href="#COPYRIGHT">COPYRIGHT</a></li>
+<li><a href="#BUGS">BUGS</a></li>
+</ul></nav>
+<main class="man-main">
+<h1 class="man-headline">APEX(1) — Unified Markdown processor supporting CommonMark,GFM, MultiMarkdown, and Kramdown</h1>
+
+<div class="man-section"><h2 id="NAME">NAME</h2></div>
+<p>apex - Unified Markdown processor supporting CommonMark, GFM, MultiMarkdown, and Kramdown</p>
+
+<div class="man-section"><h2 id="SYNOPSIS">SYNOPSIS</h2></div>
+<p><strong>apex</strong> [<em>options</em>] [<em>file</em>]</p>
+<p><strong>apex</strong> –combine [<em>files</em>…]</p>
+<p><strong>apex</strong> –mmd-merge [<em>index files</em>…]</p>
+
+<div class="man-section"><h2 id="DESCRIPTION">DESCRIPTION</h2></div>
+<p>Apex is a unified Markdown processor that combines the best features from CommonMark, GitHub Flavored Markdown (GFM), MultiMarkdown, Kramdown, and Marked. One processor to rule them all.</p>
+<p>If no file is specified, <strong>apex</strong> reads from stdin.</p>
+
+<div class="man-section"><h2 id="OPTIONS">OPTIONS</h2></div>
+
+<div class="man-section"><h3 id="Processing-Modes">Processing Modes</h3></div>
+<dl>
+<dt><strong>-m</strong> <em>MODE</em>, <strong>–mode</strong> <em>MODE</em></dt>
+<dd>Processor mode: <strong>commonmark</strong>, <strong>gfm</strong>, <strong>mmd</strong> (or</dd>
+</dl>
+<p><strong>multimarkdown</strong>), <strong>kramdown</strong>, or <strong>unified</strong> (default). Each mode enables different features and syntax compatibility.</p>
+
+<div class="man-section"><h3 id="InputOutput">Input/Output</h3></div>
+<dl>
+<dt><strong>-o</strong> <em>FILE</em>, <strong>–output</strong> <em>FILE</em></dt>
+<dd>Write output to <em>FILE</em> instead of stdout.</dd>
+</dl>
+<dl>
+<dt><strong>-s</strong>, <strong>–standalone</strong></dt>
+<dd>Generate complete HTML document with <code>&lt;html&gt;</code>, <code>&lt;head&gt;</code>,</dd>
+</dl>
+<p>and <code>&lt;body&gt;</code> tags.</p>
+<dl>
+<dt><strong>–style</strong> <em>FILE</em>, <strong>–css</strong> <em>FILE</em></dt>
+<dd>Link to CSS file(s) in document head (requires</dd>
+</dl>
+<p><strong>–standalone</strong>). Can be used multiple times or accept comma-separated list (e.g., <code>--css style.css --css syntax.css</code> or <code>--css style.css,syntax.css</code>). Overrides CSS metadata if specified.</p>
+<dl>
+<dt><strong>–embed-css</strong></dt>
+<dd>When used with <strong>–css FILE</strong>, read the CSS file(s) and embed</dd>
+</dl>
+<p>their contents into <code>&lt;style&gt;</code> tags in the document head instead of emitting <code>&lt;link rel=&quot;stylesheet&quot;&gt;</code> tags. All specified stylesheets are embedded.</p>
+<dl>
+<dt><strong>–code-highlight</strong> <em>TOOL</em></dt>
+<dd>Use external tool for syntax highlighting of code blocks.</dd>
+</dl>
+<p><em>TOOL</em> must be <strong>pygments</strong> (or <strong>p</strong>, <strong>pyg</strong>) or <strong>skylighting</strong> (or <strong>s</strong>, <strong>sky</strong>). Code blocks are sent to the external tool with their language specifier (if present) or with auto-detection enabled. The highlighted HTML output replaces the original code block in the document.</p>
+<dl>
+<dt><strong>–code-line-numbers</strong></dt>
+<dd>Include line numbers in syntax-highlighted code blocks.</dd>
+</dl>
+<p>Requires <strong>–code-highlight</strong>. When used with Pygments, adds <code>linenos=1</code> option. When used with Skylighting, adds <code>-n</code> flag.</p>
+<dl>
+<dt><strong>–highlight-language-only</strong></dt>
+<dd>Only apply syntax highlighting to code blocks that have a language</dd>
+</dl>
+<p>specified (via <code>```language</code> or IAL). Code blocks without a language will be left unhighlighted. Requires <strong>–code-highlight</strong>.</p>
+<dl>
+<dt><strong>–script</strong> <em>VALUE</em></dt>
+<dd>Inject <code>&lt;script&gt;</code> tags either before <code>&lt;/body&gt;</code> in standalone mode or at the end of the HTML fragment in snippet mode. <em>VALUE</em> can be a path, a URL, or one of the following shorthands: <code>mermaid</code>, <code>mathjax</code>, <code>katex</code>, <code>highlightjs</code>, <code>highlight.js</code>, <code>prism</code>, <code>prismjs</code>, <code>htmx</code>, <code>alpine</code>, <code>alpinejs</code>. Can be used multiple times or with a comma-separated list (e.g., <code>--script mermaid,mathjax</code>).</dd>
+</dl>
+<dl>
+<dt><strong>–title</strong> <em>TITLE</em></dt>
+<dd>Document title (requires <strong>–standalone</strong>, default:</dd>
+</dl>
+<p>“Document”).</p>
+<dl>
+<dt><strong>–pretty</strong></dt>
+<dd>Pretty-print HTML with indentation and whitespace.</dd>
+</dl>
+<dl>
+<dt><strong>–aria</strong></dt>
+<dd>Add ARIA labels and accessibility attributes to HTML</dd>
+</dl>
+<p>output. When enabled, adds:</p>
+<p><code>aria-label=&quot;Table of contents&quot;</code> to TOC navigation elements (<code>&lt;nav class=&quot;toc&quot;&gt;</code>)</p>
+
+<pre><code>- `role=&quot;figure&quot;` to `&lt;figure&gt;` elements
+- `role=&quot;table&quot;` to `&lt;table&gt;` elements
+- `id` attributes to `&lt;figcaption&gt;` elements within
+
+  table figures (if missing)
+
+- `aria-describedby` attributes to tables linking them
+
+  to their captions
+</code></pre>
+<p>This enhances screen reader support and makes the HTML output more accessible. Default: disabled.</p>
+
+<div class="man-section"><h3 id="Feature-Flags">Feature Flags</h3></div>
+<dl>
+<dt><strong>–accept</strong></dt>
+<dd>Accept all Critic Markup changes (apply edits).</dd>
+</dl>
+<dl>
+<dt><strong>–reject</strong></dt>
+<dd>Reject all Critic Markup changes (revert edits).</dd>
+</dl>
+<dl>
+<dt><strong>–code-highlight</strong> <em>TOOL</em></dt>
+<dd>Use external tool for syntax highlighting of code blocks.</dd>
+</dl>
+<p><em>TOOL</em> must be <strong>pygments</strong> (or abbreviations <strong>p</strong>, <strong>pyg</strong>) or <strong>skylighting</strong> (or abbreviations <strong>s</strong>, <strong>sky</strong>). Code blocks are sent to the external tool with their language specifier (if present) or with auto-detection enabled. The highlighted HTML output replaces the original code block in the document.</p>
+<dl>
+<dt><strong>–code-line-numbers</strong></dt>
+<dd>Include line numbers in syntax-highlighted code blocks.</dd>
+</dl>
+<p>Requires <strong>–code-highlight</strong>. When used with Pygments, adds <code>linenos=1</code> option. When used with Skylighting, adds <code>-n</code> flag.</p>
+<dl>
+<dt><strong>–highlight-language-only</strong></dt>
+<dd>Only apply syntax highlighting to code blocks that have a language</dd>
+</dl>
+<p>specified (via <code>```language</code> or IAL). Code blocks without a language will be left unhighlighted. Requires <strong>–code-highlight</strong>.</p>
+<dl>
+<dt><strong>–includes</strong>, <strong>–no-includes</strong></dt>
+<dd>Enable or disable file inclusion. Enabled by default in</dd>
+</dl>
+<p>unified mode.</p>
+<dl>
+<dt><strong>–meta-file</strong> <em>FILE</em></dt>
+<dd>Load metadata from an external file. Auto-detects format: YAML (starts with <code>---</code>), MultiMarkdown (key: value pairs), or Pandoc (starts with <code>%</code>). Metadata from the file is merged with document metadata, with document metadata taking precedence. Metadata can also control command-line options (see METADATA CONTROL OF OPTIONS below). If no <code>--meta-file</code> is provided, Apex will automatically load <code>$XDG_CONFIG_HOME/apex/config.yml</code> (or <code>~/.config/apex/config.yml</code> when <code>XDG_CONFIG_HOME</code> is not set) if it exists, as if it were passed via <code>--meta-file</code>.</dd>
+</dl>
+<dl>
+<dt><strong>–meta</strong> <em>KEY=VALUE</em></dt>
+<dd>Set a metadata key-value pair. Can be used multiple times. Supports comma-separated pairs (e.g., <code>--meta KEY1=value1,KEY2=value2</code>). Values can be quoted to include spaces and special characters. Command-line metadata takes precedence over both file and document metadata. Metadata can also control command-line options (see METADATA CONTROL OF OPTIONS below).</dd>
+</dl>
+<dl>
+<dt><strong>–hardbreaks</strong></dt>
+<dd>Treat newlines as hard breaks.</dd>
+</dl>
+<dl>
+<dt><strong>–widont</strong></dt>
+<dd>Prevent short widows in headings by inserting non-breaking spaces</dd>
+</dl>
+
+<pre><code>(`&amp;nbsp;`) between trailing words when their combined length is 10
+characters or less. Applies to h1-h6 headings.
+</code></pre>
+<dl>
+<dt><strong>–code-is-poetry</strong></dt>
+<dd>Treat code blocks without a language as poetry by adding the <code>poetry</code></dd>
+</dl>
+
+<pre><code>class. Automatically enables **--highlight-language-only**.
+</code></pre>
+<dl>
+<dt><strong>–markdown-in-html</strong>, <strong>–no-markdown-in-html</strong></dt>
+<dd>Enable or disable markdown processing inside HTML blocks with</dd>
+</dl>
+
+<pre><code>`markdown` attributes. Enabled by default in unified mode.
+</code></pre>
+<dl>
+<dt><strong>–random-footnote-ids</strong></dt>
+<dd>Use hash-based footnote IDs (e.g., <code>fn-a7b3c9d2-1</code>) instead of</dd>
+</dl>
+
+<pre><code>sequential IDs to avoid collisions when combining multiple documents.
+</code></pre>
+<dl>
+<dt><strong>–hashtags</strong></dt>
+<dd>Convert <code>#tags</code> into span-wrapped hashtags with the <code>mkhashtag</code> class.</dd>
+</dl>
+<dl>
+<dt><strong>–style-hashtags</strong></dt>
+<dd>Use the <code>mkstyledtag</code> class instead of <code>mkhashtag</code> for hashtags.</dd>
+</dl>
+
+<pre><code>Requires **--hashtags**.
+</code></pre>
+<dl>
+<dt><strong>–proofreader</strong></dt>
+<dd>Treat <code>==highlight==</code> and <code>~~delete~~</code> as CriticMarkup highlight and</dd>
+</dl>
+
+<pre><code>deletion syntax. Automatically enables CriticMarkup processing.
+</code></pre>
+<dl>
+<dt><strong>–hr-page-break</strong></dt>
+<dd>Replace <code>&lt;hr&gt;</code> elements with Marked-style page break divs.</dd>
+</dl>
+<dl>
+<dt><strong>–title-from-h1</strong></dt>
+<dd>Use the first H1 heading as the document title when no title is</dd>
+</dl>
+
+<pre><code>specified via **--title** or metadata. Requires **--standalone**.
+</code></pre>
+<dl>
+<dt><strong>–page-break-before-footnotes</strong></dt>
+<dd>Insert a page break before the footnotes section.</dd>
+</dl>
+<dl>
+<dt><strong>–no-footnotes</strong></dt>
+<dd>Disable footnote support.</dd>
+</dl>
+<dl>
+<dt><strong>–no-math</strong></dt>
+<dd>Disable math support.</dd>
+</dl>
+<dl>
+<dt><strong>–no-smart</strong></dt>
+<dd>Disable smart typography.</dd>
+</dl>
+<dl>
+<dt><strong>–no-tables</strong></dt>
+<dd>Disable table support.</dd>
+</dl>
+<dl>
+<dt><strong>–no-ids</strong></dt>
+<dd>Disable automatic header ID generation.</dd>
+</dl>
+<dl>
+<dt><strong>–header-anchors</strong></dt>
+<dd>Generate <code>&lt;a&gt;</code> anchor tags instead of header IDs.</dd>
+</dl>
+<dl>
+<dt><strong>–wikilinks</strong>, <strong>–no-wikilinks</strong></dt>
+<dd>Enable wiki link syntax <code>[[PageName]]</code>. Default: disabled.</dd>
+</dl>
+
+<div class="man-section"><h3 id="Header-ID-Format">Header ID Format</h3></div>
+<dl>
+<dt><strong>–id-format</strong> <em>FORMAT</em></dt>
+<dd>Header ID format: <strong>gfm</strong> (default), <strong>mmd</strong>, or</dd>
+</dl>
+<p><strong>kramdown</strong>. Modes auto-set format; use this to override in unified mode.</p>
+
+<div class="man-section"><h3 id="List-Options">List Options</h3></div>
+<dl>
+<dt><strong>–alpha-lists</strong>, <strong>–no-alpha-lists</strong></dt>
+<dd>Support alpha list markers (a., b., c. and A., B., C.).</dd>
+</dl>
+<dl>
+<dt><strong>–mixed-lists</strong>, <strong>–no-mixed-lists</strong></dt>
+<dd>Allow mixed list markers at same level (inherit type from</dd>
+</dl>
+<p>first item).</p>
+
+<div class="man-section"><h3 id="Table-Options">Table Options</h3></div>
+<dl>
+<dt><strong>–relaxed-tables</strong>, <strong>–no-relaxed-tables</strong></dt>
+<dd>Enable relaxed table parsing (no separator rows required).</dd>
+</dl>
+<dl>
+<dt><strong>–per-cell-alignment</strong>, <strong>–no-per-cell-alignment</strong></dt>
+<dd>Enable per-cell alignment markers in tables. When enabled, cells</dd>
+</dl>
+<p>starting with a colon (<code>:</code>) are left-aligned, ending with a colon (<code>:</code>) are right-aligned, or both (<code>:tent:</code>) are center-aligned. The colons are stripped from the output and replaced with <code>style=&quot;text-align: ...&quot;</code> attributes. Default: enabled in unified mode, disabled in commonmark, gfm, mmd, and kramdown modes.</p>
+<dl>
+<dt><strong>–captions</strong> <em>POSITION</em></dt>
+<dd>Table caption position: <strong>above</strong> or <strong>below</strong> (default:</dd>
+</dl>
+<p><strong>below</strong>). Controls where table captions appear relative to the table.</p>
+
+<div class="man-section"><h3 id="HTML-and-Links">HTML and Links</h3></div>
+<dl>
+<dt><strong>–unsafe</strong>, <strong>–no-unsafe</strong></dt>
+<dd>Allow raw HTML in output. Default: true for</dd>
+</dl>
+<p>unified/mmd/kramdown modes, false for commonmark/gfm modes.</p>
+<dl>
+<dt><strong>–autolink</strong>, <strong>–no-autolink</strong></dt>
+<dd>Enable autolinking of URLs and email addresses. Default:</dd>
+</dl>
+<p>enabled in GFM, MultiMarkdown, Kramdown, and unified modes; disabled in CommonMark mode.</p>
+<dl>
+<dt><strong>–obfuscate-emails</strong></dt>
+<dd>Obfuscate email links and text using HTML entities</dd>
+</dl>
+<p>(hex-encoded).</p>
+<p><code>dash</code> - Convert spaces to dashes: <code>[[Home Page]]</code> → <code>href=&quot;Home-Page&quot;</code></p>
+<p><code>none</code> - Remove spaces: <code>[[Home Page]]</code> → <code>href=&quot;HomePage&quot;</code></p>
+<p><code>underscore</code> - Convert spaces to underscores: <code>[[Home Page]]</code> → <code>href=&quot;Home_Page&quot;</code></p>
+<p><code>space</code> - Keep spaces (rendered as <code>%%20</code> in HTML): <code>[[Home Page]]</code> → <code>href=&quot;Home%20Page&quot;</code></p>
+
+<pre><code>Default: `dash`.
+</code></pre>
+<dl>
+<dt><strong>–wikilink-sanitize</strong>, <strong>–no-wikilink-sanitize</strong></dt>
+<dd>Sanitize wiki link URLs for cleaner, more compatible links. When enabled:</dd>
+</dl>
+
+<ul>
+<li>Removes apostrophes and quotation marks (i.e. removes <code>&quot;&#39;\</code>´‘’“”`)
+</li>
+<li>Converts select latin-1 characters to ASCII (e.g. e-acute -&gt; e)
+</li>
+<li>Converts uppercase to lowercase
+</li>
+<li>Replaces non-ascii and any non-alphanumeric ascii characters with the space-mode character (except <code>/</code> and <code>.</code>)
+</li>
+<li>Removes duplicate space-mode characters
+</li>
+<li>Removes leading and trailing space-mode characters
+</li>
+</ul>
+<p>For example, with <code>--wikilink-sanitize --wikilink-space dash</code>:</p>
+<p><code>[[O&#39;Brien&#39;s Page]]</code> → <code>href=&quot;obriens-page&quot;</code></p>
+<p><code>[[Hello   World!!!]]</code> → <code>href=&quot;hello-world&quot;</code></p>
+<p><code>[[path/to/FILE.MD]]</code> → <code>href=&quot;path/to/file.md&quot;</code></p>
+<p>Default: disabled.</p>
+
+<div class="man-section"><h3 id="Image-Embedding">Image Embedding</h3></div>
+<dl>
+<dt><strong>–embed-images</strong></dt>
+<dd>Embed local images as base64 data URLs in HTML output. Only local images (file paths) are embedded; remote images (http://, https://) are not processed. Images are read from the filesystem and encoded as base64 data URLs (e.g., <code>data:image/png;base64,...</code>). Relative paths are resolved using the base directory (see <strong>–base-dir</strong>).</dd>
+</dl>
+<dl>
+<dt><strong>–image-captions</strong>, <strong>–no-image-captions</strong></dt>
+<dd>Wrap images with title or alt text in <code>&lt;figure&gt;</code> elements with <code>&lt;figcaption&gt;</code>. Default: enabled in unified and MultiMarkdown modes; disabled in commonmark, gfm, and kramdown modes.</dd>
+</dl>
+<dl>
+<dt><strong>–emoji-autocorrect</strong>, <strong>–no-emoji-autocorrect</strong></dt>
+<dd>Convert emoji names (e.g., <code>:rocket:</code>) to Unicode emoji characters. Default: enabled in unified mode; disabled in other modes.</dd>
+</dl>
+
+<div class="man-section"><h3 id="Path-Resolution">Path Resolution</h3></div>
+<dl>
+<dt><strong>–base-dir</strong> <em>DIR</em></dt>
+<dd>Base directory for resolving relative paths. Used for:</dd>
+</dl>
+
+<pre><code>- Image embedding (with **--embed-images**)
+- File includes/transclusions
+- Relative path resolution when reading from stdin or
+
+  when the working directory differs from the document
+  location
+</code></pre>
+<p>If not specified and reading from a file, the base directory is automatically set to the input file’s directory. When reading from stdin, this flag must be used to resolve relative paths.</p>
+
+<div class="man-section"><h3 id="SuperscriptSubscript">Superscript/Subscript</h3></div>
+<dl>
+<dt><strong>–sup-sub</strong>, <strong>–no-sup-sub</strong></dt>
+<dd>Enable MultiMarkdown-style superscript and subscript syntax. The <code>&lt;sup&gt;</code></sup> character creates superscript for the text immediately following it (stops at space or punctuation). The <code>~</code> character creates subscript when used within a word/identifier (e.g., <code>H~2~O</code> creates H₂O). When tildes are at word boundaries (e.g., <code>~text~</code>), they create underline instead. Default: enabled in unified and MultiMarkdown modes.</dd>
+</dl>
+<dl>
+<dt><strong>–strikethrough</strong>, <strong>–no-strikethrough</strong></dt>
+<dd>Enable or disable GFM-style strikethrough processing (<code>~~text~~</code>). When enabled, <code>~~text~~</code> renders as <code>&lt;del&gt;text&lt;/del&gt;</code>. Default: enabled in GFM and unified modes; disabled in commonmark, mmd, and kramdown modes.</dd>
+</dl>
+<dl>
+<dt><strong>–divs</strong>, <strong>–no-divs</strong></dt>
+<dd>Enable or disable Pandoc fenced divs syntax (<code>::::: {#id .class} ... :::::</code>). Fenced divs allow you to create HTML block elements with attributes using a special fence syntax. By default, fenced divs create <code>&lt;div&gt;</code> elements, but you can specify different block types using the <code>&gt;blocktype</code> syntax (e.g., <code>::: &gt;aside {.sidebar} ... :::</code> creates an <code>&lt;aside&gt;</code> element instead). Opening fences must have at least 3 colons and attributes; closing fences need at least 3 colons. Fenced divs can be nested, including different block types. Default: enabled in unified mode only.</dd>
+</dl>
+<dl>
+<dt><strong>–spans</strong>, <strong>–no-spans</strong></dt>
+<dd>Enable or disable Pandoc-style bracketed spans syntax (<code>[text]{#id .class key=&quot;val&quot;}</code>). Bracketed spans allow you to create HTML <code>&lt;span&gt;</code> elements with attributes. The text inside the brackets is processed as markdown. If the bracketed text matches a reference link definition, it will be treated as a link instead of a span. Default: enabled in unified mode only.</dd>
+</dl>
+
+<div class="man-section"><h3 id="Citations-and-Bibliography">Citations and Bibliography</h3></div>
+<dl>
+<dt><strong>–bibliography</strong> <em>FILE</em></dt>
+<dd>Bibliography file in BibTeX, CSL JSON, or CSL YAML format.</dd>
+</dl>
+<p>Can be specified multiple times to load multiple bibliography files. Citations are automatically enabled when this option is used. Bibliography can also be specified in document metadata.</p>
+<dl>
+<dt><strong>–csl</strong> <em>FILE</em></dt>
+<dd>Citation Style Language (CSL) file for formatting</dd>
+</dl>
+<p>citations and bibliography. Citations are automatically enabled when this option is used. CSL file can also be specified in document metadata.</p>
+<dl>
+<dt><strong>–no-bibliography</strong></dt>
+<dd>Suppress bibliography output even when citations are</dd>
+</dl>
+<p>present.</p>
+<dl>
+<dt><strong>–link-citations</strong></dt>
+<dd>Link citations to their corresponding bibliography</dd>
+</dl>
+<p>entries. Citations will include <code>href</code> attributes pointing to the bibliography entry.</p>
+<dl>
+<dt><strong>–show-tooltips</strong></dt>
+<dd>Show tooltips on citations when hovering (requires CSS</dd>
+</dl>
+<p>support).</p>
+<p>Citation syntax is supported in MultiMarkdown and unified modes:</p>
+
+<ul>
+<li>Pandoc: <code>[@key]</code>, <code>[@key1; @key2]</code>, <code>@key</code>
+</li>
+<li>MultiMarkdown: <code>[#key]</code>
+</li>
+<li>mmark: <code>[@RFC1234]</code>
+</li>
+</ul>
+<p>Bibliography is inserted at the <code>&lt;!-- REFERENCES --&gt;</code> marker or appended to the end of the document if no marker is found.</p>
+
+<div class="man-section"><h3 id="Indices">Indices</h3></div>
+<dl>
+<dt><strong>–indices</strong></dt>
+<dd>Enable index processing. Supports both mmark and TextIndex</dd>
+</dl>
+<p>syntax. Default: enabled in MultiMarkdown and unified modes.</p>
+<dl>
+<dt><strong>–no-indices</strong></dt>
+<dd>Disable index processing.</dd>
+</dl>
+<dl>
+<dt><strong>–no-index</strong></dt>
+<dd>Suppress index generation at the end of the document.</dd>
+</dl>
+<p>Index markers are still created in the document, but the index section is not generated.</p>
+<p>Index syntax is supported in MultiMarkdown and unified modes:</p>
+
+<ul>
+<li><strong>mmark syntax</strong>: <code>(!item)</code>, <code>(!item, subitem)</code>, `(!!item,
+<p>subitem)` for primary entries</p>
+</li>
+<li><strong>TextIndex syntax</strong>: <code>word{^}</code>, <code>[term]{^}</code>, <code>{^params}</code>
+</li>
+</ul>
+<p>The index is automatically generated at the end of the document or at the <code>&lt;!--INDEX--&gt;</code> marker if present. Entries are sorted alphabetically and can be grouped by first letter.</p>
+
+<div class="man-section"><h3 id="AST-Filters">AST Filters</h3></div>
+<dl>
+<dt><strong>–filter</strong> <em>NAME</em></dt>
+<dd>Run a single AST filter from the user filters directory</dd>
+</dl>
+<p>(<code>$XDG_CONFIG_HOME/apex/filters</code> or <code>~/.config/apex/filters</code>). <em>NAME</em> is the basename of an executable that reads Pandoc JSON from stdin and writes Pandoc JSON to stdout.</p>
+<dl>
+<dt><strong>–filters</strong></dt>
+<dd>Run all executable files in the user filters directory, in sorted</dd>
+</dl>
+<p>filename order. Directory filters run first if <strong>–filter</strong> is also used.</p>
+<dl>
+<dt><strong>–lua-filter</strong> <em>FILE</em></dt>
+<dd>Run a Lua script as an AST filter. Apex invokes the system <strong>lua</strong></dd>
+</dl>
+<p>interpreter with <em>FILE</em>. The script reads a Pandoc JSON document from stdin and must write a Pandoc JSON document to stdout. A JSON library (e.g. dkjson) is required; see the Filters documentation for details.</p>
+<dl>
+<dt><strong>–no-strict-filters</strong></dt>
+<dd>Do not abort when a filter fails or returns invalid JSON; log a</dd>
+</dl>
+<p>warning and continue with the previous AST. Default: abort on error.</p>
+<dl>
+<dt><strong>–list-filters</strong></dt>
+<dd>List installed filters and available filters from the central</dd>
+</dl>
+<p>apex-filters directory. Shows filter IDs; available filters show title, author, description, and homepage.</p>
+<dl>
+<dt><strong>–install-filter</strong> <em>ID-or-URL</em></dt>
+<dd>Install an AST filter into the user filters directory. <em>ID-or-URL</em></dd>
+</dl>
+<p>may be a filter ID from the central apex-filters directory (e.g. <strong>unwrap</strong>) or a Git URL / GitHub shorthand. When installing from a URL, Apex may prompt for confirmation.</p>
+<dl>
+<dt><strong>–uninstall-filter</strong> <em>ID</em></dt>
+<dd>Uninstall a filter by ID. Removes the filter (file or directory)</dd>
+</dl>
+<p>from the user filters directory. Apex prompts for confirmation.</p>
+
+<div class="man-section"><h3 id="Plugins">Plugins</h3></div>
+<dl>
+<dt><strong>–plugins</strong>, <strong>–no-plugins</strong></dt>
+<dd>Enable or disable external/plugin processing. Plugins</dd>
+</dl>
+<p>extend Apex with custom processing capabilities.</p>
+<dl>
+<dt><strong>–list-plugins</strong></dt>
+<dd>List installed plugins and available plugins from the</dd>
+</dl>
+<p>remote directory. Shows both locally installed plugins and plugins available for installation from the Apex plugin directory.</p>
+<dl>
+<dt><strong>–install-plugin</strong> <em>ID</em></dt>
+<dd>Install a plugin by ID from the remote directory, or by Git URL/GitHub shorthand (user/repo). Plugins are installed to <code>$XDG_CONFIG_HOME/apex/plugins</code> (or <code>~/.config/apex/plugins</code> when <code>XDG_CONFIG_HOME</code> is not set). When installing from a URL or GitHub shorthand, Apex will prompt for confirmation since plugins execute unverified code.</dd>
+</dl>
+<dl>
+<dt><strong>–uninstall-plugin</strong> <em>ID</em></dt>
+<dd>Uninstall a plugin by ID. Removes the plugin directory</dd>
+</dl>
+<p>from the plugins folder. Apex will prompt for confirmation before removing the plugin.</p>
+
+<div class="man-section"><h3 id="General-Options">General Options</h3></div>
+<dl>
+<dt><strong>-h</strong>, <strong>–help</strong></dt>
+<dd>Show help message and exit.</dd>
+</dl>
+<dl>
+<dt><strong>-v</strong>, <strong>–version</strong></dt>
+<dd>Show version information and exit.</dd>
+</dl>
+<dl>
+<dt><strong>–progress</strong>, <strong>–no-progress</strong></dt>
+<dd>Show progress indicator during processing. Default: enabled when stderr is a TTY.</dd>
+</dl>
+
+<div class="man-section"><h3 id="Multi-file-Utilities">Multi-file Utilities</h3></div>
+<dl>
+<dt><strong>–combine</strong> <em>files…</em></dt>
+<dd>Concatenate one or more Markdown files into a single</dd>
+</dl>
+<p>Markdown stream, expanding all supported include syntaxes. When a <code>SUMMARY.md</code> file is provided, Apex treats it as a GitBook-style index and combines the linked files in order. Output is raw Markdown suitable for piping back into Apex.</p>
+<dl>
+<dt><strong>–mmd-merge</strong> <em>index files…</em></dt>
+<dd>Merge files from one or more MultiMarkdown <code>mmd_merge</code>-style index files into a single Markdown stream. Each non-empty, non-comment line in an index file specifies a document to include. Lines whose first non-whitespace character is <code>#</code> are treated as comments and ignored. Indentation (tabs or groups of four spaces) before the filename increases the header level of the included document (each indent level shifts all Markdown headings in that file down one level). Output is raw Markdown suitable for piping into Apex, for example:</dd>
+</dl>
+<p>apex –mmd-merge index.txt | apex –mode mmd –standalone -o book.html</p>
+
+<div class="man-section"><h2 id="EXAMPLES">EXAMPLES</h2></div>
+<p>Process a markdown file:</p>
+
+<pre><code>apex input.md
+</code></pre>
+<p>Output to a file:</p>
+
+<pre><code>apex input.md -o output.html
+</code></pre>
+<p>Generate standalone HTML document:</p>
+
+<pre><code>apex input.md --standalone --title &quot;My Document&quot;
+</code></pre>
+<p>Pretty-print HTML output:</p>
+
+<pre><code>apex input.md --pretty
+</code></pre>
+<p>Use GFM mode:</p>
+
+<pre><code>apex input.md --mode gfm
+</code></pre>
+<p>Process document with citations and bibliography:</p>
+
+<pre><code>apex document.md --bibliography refs.bib
+</code></pre>
+<p>Use metadata to specify bibliography:</p>
+
+<pre><code>apex document.md
+</code></pre>
+<p>(With bibliography specified in YAML front matter)</p>
+<p>Use Kramdown mode with relaxed tables:</p>
+
+<pre><code>apex input.md --mode kramdown
+</code></pre>
+<p>Process from stdin:</p>
+
+<pre><code>echo &quot;# Hello&quot; | apex
+</code></pre>
+
+<div class="man-section"><h2 id="PROCESSING-MODES">PROCESSING MODES</h2></div>
+<dl>
+<dt><strong>commonmark</strong></dt>
+<dd>Pure CommonMark specification. Minimal features, maximum</dd>
+</dl>
+<p>compatibility.</p>
+<dl>
+<dt><strong>gfm</strong></dt>
+<dd>GitHub Flavored Markdown. Includes tables, strikethrough,</dd>
+</dl>
+<p>task lists, autolinks, and more.</p>
+<dl>
+<dt><strong>mmd</strong>, <strong>multimarkdown</strong></dt>
+<dd>MultiMarkdown compatibility. Includes metadata, definition</dd>
+</dl>
+<p>lists, footnotes, and more.</p>
+<dl>
+<dt><strong>kramdown</strong></dt>
+<dd>Kramdown compatibility. Includes relaxed tables, IAL</dd>
+</dl>
+<p>(Inline Attribute Lists) for adding HTML attributes to elements, and more.</p>
+<dl>
+<dt><strong>unified</strong> (default)</dt>
+<dd>All features enabled. Combines features from all modes.</dd>
+</dl>
+
+<div class="man-section"><h2 id="METADATA-CONTROL-OF-OPTIONS">METADATA CONTROL OF OPTIONS</h2></div>
+<p>Most command-line options can be controlled via document metadata, allowing different files to be processed with different settings when processing batches. This enables per-document configuration without needing separate command-line invocations.</p>
+<p><strong>Boolean options</strong> accept <code>true</code>/<code>false</code>, <code>yes</code>/<code>no</code>, or <code>1</code>/<code>0</code> (case-insensitive). <strong>String options</strong> use the value directly.</p>
+<p><strong>Supported boolean options:</strong> <code>indices</code>, <code>wikilinks</code>, <code>wikilink-sanitize</code>, <code>includes</code>, <code>relaxed-tables</code>, <code>per-cell-alignment</code>, <code>alpha-lists</code>, <code>mixed-lists</code>, <code>sup-sub</code>, <code>strikethrough</code>, <code>autolink</code>, <code>transforms</code>, <code>unsafe</code>, <code>tables</code>, <code>footnotes</code>, <code>smart</code>, <code>math</code>, <code>ids</code>, <code>header-anchors</code>, <code>embed-images</code>, <code>image-captions</code>, <code>link-citations</code>, <code>show-tooltips</code>, <code>suppress-bibliography</code>, <code>suppress-index</code>, <code>group-index-by-letter</code>, <code>obfuscate-emails</code>, <code>pretty</code>, <code>standalone</code>, <code>hardbreaks</code>, <code>plugins</code>, <code>emoji-autocorrect</code>, <code>code-line-numbers</code>, <code>highlight-language-only</code>, <code>markdown-in-html</code></p>
+<p><strong>Supported string options:</strong> <code>bibliography</code>, <code>csl</code>, <code>title</code>, <code>style</code> (or <code>css</code>), <code>id-format</code>, <code>base-dir</code>, <code>mode</code>, <code>wikilink-space</code>, <code>wikilink-extension</code></p>
+
+<pre><code>---
+indices: false
+wikilinks: true
+bibliography: references.bib
+title: My Research Paper
+pretty: true
+standalone: true
+---
+
+</code></pre>
+
+<pre><code>indices: false
+wikilinks: true
+bibliography: references.bib
+title: My Research Paper
+
+</code></pre>
+<p>When processing multiple files with <code>apex *.md</code>, each file can use its own configuration via metadata. You can also use <code>--meta-file</code> to specify a shared configuration file that applies to all processed files.</p>
+<p><strong>Note:</strong> If <code>mode</code> is specified in metadata, it resets all options to that mode’s defaults before applying other metadata options.</p>
+
+<div class="man-section"><h2 id="FEATURES">FEATURES</h2></div>
+<p>Apex supports a wide range of Markdown extensions:</p>
+
+<ul>
+<li><strong>Tables</strong>: GFM-style tables with alignment
+</li>
+<li><strong>Strikethrough</strong>: GFM-style <code>~~text~~</code> (controlled by <strong>–strikethrough</strong>)
+</li>
+<li><strong>Footnotes</strong>: Reference-style footnotes
+</li>
+<li><strong>Math</strong>: Inline (<code>$...$</code>) and display (<code>$$...$$</code>) math
+<p>with LaTeX</p>
+</li>
+<li><strong>Wiki Links</strong>: <code>[[Page]]</code>, <code>[[Page|Display]]</code>,
+<p><code>[[Page#Section]]</code></p>
+</li>
+<li><strong>Critic Markup</strong>: All 5 types (add, del,
+<p>sub, mark, comment)</p>
+</li>
+<li><strong>Smart Typography</strong>: Smart quotes, dashes, ellipsis
+</li>
+<li><strong>Definition Lists</strong>: MultiMarkdown-style definition lists
+</li>
+<li><strong>Task Lists</strong>: GFM-style task lists
+</li>
+<li><strong>Metadata</strong>: YAML front matter, MultiMarkdown metadata,
+<p>Pandoc title blocks</p>
+</li>
+<li><strong>Metadata Transforms</strong>: Transform metadata values with
+<p><code>[%key:transform]</code> syntax (case conversion, string manipulation, regex replacement, date formatting, etc.)</p>
+</li>
+<li><strong>Metadata Control of Options</strong>: Control command-line
+<p>options via metadata for per-document configuration</p>
+</li>
+<li><strong>Header IDs</strong>: Automatic or manual header IDs with
+<p>multiple format options</p>
+</li>
+<li><strong>Relaxed Tables</strong>: Support for tables without separator rows (Kramdown-style). Enabled by default in unified and Kramdown modes.
+</li>
+<li><strong>Per-Cell Alignment</strong>: Support for alignment markers using colons at the start and/or end of table cells. Enabled by default in unified mode only.
+<p>rows (Kramdown-style)</p>
+</li>
+<li><strong>Inline Tables from CSV/TSV</strong>: Convert inline CSV/TSV
+<p>text to tables using ```table fences or <code>&lt;!--TABLE--&gt;</code> markers</p>
+</li>
+</ul>
+<p><strong>Superscript/Subscript</strong>: MultiMarkdown-style superscript (<code>^text</code>) and subscript (<code>~text~</code> within words) syntax. Subscript uses paired tildes within word boundaries (e.g., <code>H~2~O</code>), while tildes at word boundaries create underline</p>
+
+<ul>
+<li><strong>Image Embedding</strong>: Embed local images as base64 data
+<p>URLs with <code>--embed-images</code> flag</p>
+</li>
+</ul>
+<p><strong>Inline Attribute Lists (IAL)</strong>: Kramdown-style syntax for adding HTML attributes (IDs, classes, key-value pairs) to block-level and inline elements. Supports Attribute List Definitions (ALDs) for reusable attribute sets. Available in kramdown and unified modes. See <a href="https://github.com/ttscoff/apex/wiki/Inline-Attribute-Lists">Inline Attribute Lists</a> for complete documentation</p>
+
+<div class="man-section"><h2 id="SEE-ALSO">SEE ALSO</h2></div>
+<p><strong>apex-config</strong>(5), <strong>apex-plugins</strong>(7), <strong>pandoc</strong>(1), <strong>markdown</strong>(7)</p>
+<p>For complete documentation, see the <a href="https://github.com/ttscoff/apex/wiki">Apex Wiki</a>.</p>
+<p>Project homepage: <a href="https://github.com/ApexMarkdown/apex">https://github.com/ApexMarkdown/apex</a></p>
+
+<div class="man-section"><h2 id="AUTHOR">AUTHOR</h2></div>
+<p>Brett Terpstra</p>
+
+<div class="man-section"><h2 id="COPYRIGHT">COPYRIGHT</h2></div>
+<p>Copyright (c) 2025 Brett Terpstra. Licensed under MIT License.</p>
+
+<div class="man-section"><h2 id="BUGS">BUGS</h2></div>
+<p>Report bugs at <a href="https://github.com/ttscoff/apex/issues">https://github.com/ttscoff/apex/issues</a>.</p>
+
+</main>
+</body>
+</html>

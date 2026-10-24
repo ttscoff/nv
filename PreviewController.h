@@ -54,6 +54,7 @@
 -(IBAction)switchTabs:(id)sender;
 -(IBAction)shareNote:(id)sender;
 -(IBAction)shareAsk:(id)sender;
+-(void)handleShareAuthURL:(NSURL *)url;
 -(IBAction)cancelShare:(id)sender;
 
 -(IBAction)makePreviewSticky:(id)sender;

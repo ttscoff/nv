@@ -11,7 +11,7 @@
 
 
 #import "EmptyView.h"
-//#import "AppController.h"
+#import "AppController.h"
 
 @implementation EmptyView
 

@@ -73,7 +73,7 @@ static NSColor *disabledColor, *enabledColor;
 {
 	NSMutableDictionary *attributes = [[[NSMutableDictionary alloc] init] autorelease];
 	[attributes addEntriesFromDictionary:[super _textAttributes]];
-	[attributes setObject:[NSFont systemFontOfSize:11] forKey:NSFontAttributeName];
+	[attributes setObject:[NSFont systemFontOfSize:[NSFont systemFontSize]] forKey:NSFontAttributeName];
 	[attributes setObject:[self interiorColor] forKey:NSForegroundColorAttributeName];
 	
 	return attributes;

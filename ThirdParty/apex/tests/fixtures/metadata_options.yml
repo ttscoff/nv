@@ -1,0 +1,11 @@
+---
+indices: false
+wikilinks: true
+pretty: true
+standalone: true
+title: Test Document from File
+csl: test.csl
+id-format: kramdown
+link-citations: true
+suppress-bibliography: false
+---

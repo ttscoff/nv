@@ -1,0 +1,14 @@
+#ifndef CMARK_GFM_VERSION_H
+#define CMARK_GFM_VERSION_H
+
+/* SPM build: version header for cmark-gfm. Must match vendor/cmark-gfm CMakeLists.txt. */
+
+#define CMARK_GFM_VERSION_MAJOR 0
+#define CMARK_GFM_VERSION_MINOR 29
+#define CMARK_GFM_VERSION_PATCH 0
+#define CMARK_GFM_VERSION_GFM 13
+
+#define CMARK_GFM_VERSION ((CMARK_GFM_VERSION_MAJOR << 24) | (CMARK_GFM_VERSION_MINOR << 16) | (CMARK_GFM_VERSION_PATCH << 8) | CMARK_GFM_VERSION_GFM)
+#define CMARK_GFM_VERSION_STRING "0.29.0.gfm.13"
+
+#endif

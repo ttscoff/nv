@@ -19,6 +19,7 @@
 
 
 #import <Cocoa/Cocoa.h>
+#include <sys/xattr.h>
 
 
 @interface NSFileManager (NV)

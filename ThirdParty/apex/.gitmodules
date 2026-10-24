@@ -1,0 +1,7 @@
+[submodule "vendor/cmark-gfm"]
+	path = vendor/cmark-gfm
+	url = https://github.com/ApexMarkdown/cmark-gfm.git
+	branch = apex
+[submodule "vendor/libyaml"]
+	path = vendor/libyaml
+	url = https://github.com/yaml/libyaml.git

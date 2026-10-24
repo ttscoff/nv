@@ -1,0 +1,20 @@
+{
+  "plugins": [
+    {
+      "id": "kbd",
+      "title": "Keyboard Shortcuts",
+      "description": "Renders {% kbd %} tags as <kbd> elements.",
+      "author": "Brett Terpstra",
+      "homepage": "https://github.com/ApexMarkdown/apex-plugin-kbd",
+      "repo": "https://github.com/ApexMarkdown/apex-plugin-kbd"
+    },
+    {
+      "id": "emoji-span",
+      "title": "Emoji span wrapper",
+      "description": "Wrap :emoji: markers in a span for styling.",
+      "author": "Brett Terpstra",
+      "homepage": "https://github.com/ApexMarkdown/apex-emoji-plugin",
+      "repo": "https://github.com/ApexMarkdown/apex-emoji-plugin.git"
+    }
+  ]
+}

@@ -23,6 +23,7 @@
 #import "NotationDirectoryManager.h"
 #import "NotationFileManager.h"
 #import "NSString_NV.h"
+#import "NSString_CustomTruncation.h"
 #import "NSFileManager_NV.h"
 #import "EncodingsManager.h"
 #import "ExporterManager.h"
@@ -49,17 +50,13 @@
 //#import "ETScrollView.h"
 #import "NSFileManager+DirectoryLocations.h"
 #import "nvaDevConfig.h"
-#import <Sparkle/SUUpdater.h>
+#import <Sparkle/Sparkle.h>
 
 #define NSApplicationPresentationAutoHideMenuBar (1 <<  2)
 #define NSApplicationPresentationHideMenuBar (1 <<  3)
 //#define NSApplicationPresentationAutoHideDock (1 <<  0)
 #define NSApplicationPresentationHideDock (1 <<  1)
 //#define NSApplicationActivationPolicyAccessory
-
-#define kSparkleUpdateFeedForLions @"https://updates.designheresy.com/nvalt/updates.xml"
-#define kSparkleUpdateFeedForSnowLeopard @"http://abyss.designheresy.com/nvalt2/nvalt2snowleopardfeed.xml"
-//http://abyss.designheresy.com/nvalt/betaupdates.xml
 
 #define kSplitViewExpandedDividerThickness 8.0f
 #define kSplitViewCollapsedDividerThickness 5.0f
@@ -348,33 +345,23 @@ void outletObjectAwoke(id sender) {
     [notationController checkIfNotationIsTrashed];
     [[SecureTextEntryManager sharedInstance] checkForIncompatibleApps];
 
-    //connect sparkle programmatically to avoid loading its framework at nib awake;
-    //    if (!NSClassFromString(@"SUUpdater")) {
-    //        NSLog(@"su:%@ SEL:%@",sparkleUpdateItem.target,sparkleUpdateItem.action);
-    //    }else{
-    NSString *frameworkPath = [[[NSBundle bundleForClass:[self class]] privateFrameworksPath] stringByAppendingPathComponent:@"Sparkle.framework"];
-    if ([[NSBundle bundleWithPath:frameworkPath] load]) {
-        SUUpdater *updater =[SUUpdater sharedUpdater];
-        if (IsLionOrLater) {
-            [updater setFeedURL:[NSURL URLWithString:kSparkleUpdateFeedForLions]];
-        }else{
-            [updater setFeedURL:[NSURL URLWithString:kSparkleUpdateFeedForSnowLeopard]];
-        }
-        [sparkleUpdateItem setTarget:updater];
-        [sparkleUpdateItem setAction:@selector(checkForUpdates:)];
-        NSMenuItem *siSparkle = [statBarMenu itemWithTag:902];
-        [siSparkle setTarget:updater];
-        [siSparkle setAction:@selector(checkForUpdates:)];
-        if (![[prefsController notationPrefs] firstTimeUsed]) {
-            //don't do anything automatically on the first launch; afterwards, check every 4 days, as specified in Info.plist
-            //				SEL checksSEL = @selector(setAutomaticallyChecksForUpdates:);
-            [updater setAutomaticallyChecksForUpdates:YES];
-            //				[updater methodForSelector:checksSEL](updater, checksSEL, YES);
-        }
-    } else {
-        NSLog(@"Could not load %@!", frameworkPath);
-    }
-    //    }
+    // Start Sparkle after clearing any feed URL saved by the old setFeedURL: API.
+    // That defaults value overrides SUFeedURL in Info.plist.
+    SPUStandardUpdaterController *controller = [[SPUStandardUpdaterController alloc] initWithStartingUpdater:NO updaterDelegate:nil userDriverDelegate:nil];
+    sparkleController = controller;
+    [controller.updater clearFeedURLFromUserDefaults];
+    if (![[prefsController notationPrefs] firstTimeUsed])
+        [controller.updater setAutomaticallyChecksForUpdates:YES];
+    [sparkleUpdateItem setTarget:controller];
+    [sparkleUpdateItem setAction:@selector(checkForUpdates:)];
+    NSMenuItem *siSparkle = [statBarMenu itemWithTag:902];
+    [siSparkle setTarget:controller];
+    [siSparkle setAction:@selector(checkForUpdates:)];
+    NSError *startError = nil;
+    if (![controller.updater startUpdater:&startError])
+        NSLog(@"Sparkle failed to start: %@", startError);
+    else
+        NSLog(@"Sparkle started");
     // add elasticthreads' menuitems
     if(IsLeopardOrLater){
         [fsMenuItem setEnabled:YES];
@@ -533,6 +520,11 @@ terminateApp:
 - (void)handleGetURLEvent:(NSAppleEventDescriptor *)event withReplyEvent:(NSAppleEventDescriptor *)replyEvent {
 	
 	NSURL *fullURL = [NSURL URLWithString:[[event paramDescriptorForKeyword:keyDirectObject] stringValue]];
+
+	if ([[fullURL host] isEqualToString:@"share-auth"]) {
+		[previewController handleShareAuthURL:fullURL];
+		return;
+	}
 	
 	if (notationController) {
 		if (![self interpretNVURL:fullURL])
@@ -700,13 +692,15 @@ terminateApp:
 		return (currentNote != nil && storageFormatOfNote(currentNote) == PlainTextFormat && ![currentNote contentsWere7Bit]);
     } else if (selector == @selector(editNoteExternally:)) {
         return (numberSelected > 0) && [[menuItem representedObject] canEditAllNotes:[notationController notesAtIndexes:[notesTableView selectedRowIndexes]]];
-	}else if (selector == @selector(previewNoteWithMarked:)){
+	}else if (selector == @selector(previewNoteWithMarked:) || selector == @selector(openMarkedStreamingPreview:)){
         BOOL gotMarked=[[[NSWorkspace sharedWorkspace]URLForApplicationWithBundleIdentifier:@"com.brettterpstra.marky"] isFileURL] || [[[NSWorkspace sharedWorkspace]URLForApplicationWithBundleIdentifier:@"com.brettterpstra.marked2"] isFileURL]
             || [[[NSWorkspace sharedWorkspace]URLForApplicationWithBundleIdentifier:@"com.brettterpstra.marked2.beta"] isFileURL]
             || [[[NSWorkspace sharedWorkspace]URLForApplicationWithBundleIdentifier:@"com.brettterpstra.marked-setapp"] isFileURL];
         if ([menuItem isHidden]==gotMarked) {
             [menuItem setHidden:!gotMarked];
         }
+        if (selector == @selector(openMarkedStreamingPreview:))
+            return gotMarked;
         return gotMarked&&([[notesTableView selectedRowIndexes]count]>0);
     }else if (selector==@selector(togglePreview:)){        
           return (currentNote != nil);
@@ -945,6 +939,20 @@ terminateApp:
         [[notationController notesAtIndexes:indexes] makeObjectsPerformSelector:@selector(editExternallyUsingEditor:) withObject:ed];
     } else {
         NSBeep();
+    }
+}
+
+- (IBAction)openMarkedStreamingPreview:(id)sender {
+    NSString *rawString = [[textView textStorage] string];
+    if ([rawString length]) {
+        NSPasteboard *pb = [NSPasteboard pasteboardWithName:@"mkStreamingPreview"];
+        [pb clearContents];
+        [pb setString:rawString forType:(NSString *)kUTTypeUTF8PlainText];
+    }
+    NSURL *streamURL = [NSURL URLWithString:@"x-marked://stream/"];
+    if (![[NSWorkspace sharedWorkspace] openURL:streamURL]) {
+        NSBeep();
+        NSLog(@"Could not open Marked streaming preview");
     }
 }
 
@@ -2215,6 +2223,7 @@ terminateApp:
     [previewController release];
 	[windowUndoManager release];
 	[dividerShader release];
+	[sparkleController release];
 	[[NSStatusBar systemStatusBar] removeStatusItem:statusItem];
     [statusItem release];
     [statBarMenu release];
@@ -2550,6 +2559,8 @@ terminateApp:
 	[dualFieldView release];
 	dualFieldItem = [[NSToolbarItem alloc] initWithItemIdentifier:@"DualField"];
 	[dualFieldItem setView:dualSV];
+	// The system rounded border is the horizontal line across the search field.
+	[dualFieldItem setBordered:NO];
 	[dualFieldItem setMaxSize:NSMakeSize(FLT_MAX, [dualSV frame].size.height)];
 	[dualFieldItem setMinSize:NSMakeSize(50.0f, [dualSV frame].size.height)];
     [dualFieldItem setLabel:NSLocalizedString(@"Search or Create", @"placeholder text in search/create field")];

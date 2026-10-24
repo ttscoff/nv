@@ -67,7 +67,7 @@
 	NSInteger notesStorageFormatInProgress;
     NotationPrefs *notationPrefs;
 	
-	PassphrasePicker *picker;
+	PassphrasePicker *passphrasePicker;
 	PassphraseChanger *changer;
 
 	BOOL verificationAttempted;

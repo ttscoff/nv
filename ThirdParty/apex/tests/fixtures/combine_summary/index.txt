@@ -1,0 +1,9 @@
+# mmd_merge-style index for combine_summary fixtures
+#
+# Lines starting with # are comments and are ignored.
+
+intro.md
+chapter1.md
+    section1_1.md
+
+

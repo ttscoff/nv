@@ -1,0 +1,1 @@
+{"pandoc-api-version":[1,23,1],"meta":{},"blocks":[{"t":"Header","c":[1,["",[],[]],[{"t":"Str","c":"UNWRAP FILTER"}]},{"t":"RawBlock","c":["html","<figure><p>&lt; <img src=\"image.png\" alt=\"Image\" /></p>\n</figure>\n"]}]}

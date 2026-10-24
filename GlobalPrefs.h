@@ -23,6 +23,7 @@
 
 #import <Cocoa/Cocoa.h>
 #import "SynchronizedNoteProtocol.h"
+#import "BufferUtils.h"
 
 extern NSString *NoteTitleColumnString;
 extern NSString *NoteLabelsColumnString;
@@ -88,6 +89,9 @@ BOOL ColorsEqualWith8BitChannels(NSColor *c1, NSColor *c2);
 - (void)setTableColumnsShowPreview:(BOOL)showPreview sender:(id)sender;
 
 - (void)resolveNoteBodyFontFromNotationPrefsFromSender:(id)sender;
++ (NSFont *)regularSystemFont;
++ (BOOL)fontIsLegacyBodyDefault:(NSFont *)font;
+
 - (void)setNoteBodyFont:(NSFont*)aFont sender:(id)sender;
 - (void)_setNoteBodyFont:(NSFont*)aFont;
 - (NSFont*)noteBodyFont;

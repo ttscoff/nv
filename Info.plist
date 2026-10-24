@@ -144,7 +144,7 @@
 	<key>CFBundlePackageType</key>
 	<string>APPL</string>
 	<key>CFBundleShortVersionString</key>
-	<string>2.2.8</string>
+	<string>3.0.0</string>
 	<key>CFBundleSignature</key>
 	<string>N†l√</string>
 	<key>CFBundleSupportedPlatforms</key>
@@ -156,8 +156,6 @@
 		<dict>
 			<key>CFBundleURLName</key>
 			<string>net.elasticthreads.nv</string>
-		</dict>
-		<dict>
 			<key>CFBundleURLSchemes</key>
 			<array>
 				<string>nvalt</string>
@@ -166,7 +164,7 @@
 		</dict>
 	</array>
 	<key>CFBundleVersion</key>
-	<string>128</string>
+	<string>129</string>
 	<key>LSApplicationCategoryType</key>
 	<string>public.app-category.productivity</string>
 	<key>LSMinimumSystemVersion</key>
@@ -227,8 +225,10 @@
 	<string>Notation.sdef</string>
 	<key>SUCheckAtStartup</key>
 	<false/>
-	<key>SUPublicDSAKeyFile</key>
-	<string>dsa_pub.pem</string>
+	<key>SUFeedURL</key>
+	<string>https://updates.designheresy.com/nvalt/updates.xml</string>
+	<key>SUPublicEDKey</key>
+	<string>3P76phHWelsgccoa1//bNLay8JU4Lg4Nl6cktFrhGMY=</string>
 	<key>SUScheduledCheckInterval</key>
 	<real>345600</real>
 	<key>SmartCrashReports_CompanyName</key>

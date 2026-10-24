@@ -1,0 +1,81 @@
+# Build directories
+commit_message.txt
+tag_message.txt
+build/
+build-coverage/
+build-test/
+xcode_build/
+cmake-build-*/
+*.xcodeproj/xcuserdata/
+*.xcworkspace/xcuserdata/
+
+# Swift Package Manager
+.build/
+.swiftpm/
+*.xcodeproj
+Package.resolved
+
+# Compiled files
+*.o
+*.a
+*.so
+*.dylib
+*.dll
+*.exe
+/apex
+
+# IDE files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# macOS
+.DS_Store
+*.dSYM
+
+# Test outputs
+test_results/
+*.log
+
+# CMake
+CMakeCache.txt
+CMakeFiles/
+cmake_install.cmake
+*.cmake
+!CMakeLists.txt
+
+# CMake-generated Makefiles (in build directories)
+build/**/Makefile
+build/**/*.make
+
+# Package managers
+# Note: vendor/ directory contains git submodules and should be tracked
+.bundle/
+release/
+build-release/
+commit_message.txt
+.github/copilot-instructions.md
+output.html
+/build-debug
+
+# Documentation - app-specific transformations
+documentation/app-transformed/
+documentation/transform_for_app.md
+/documentation/html/apex-app-docs.html
+/documentation/app-settings-table.md
+/build-asan
+/build-test/apex.1
+/build-test/apex_test_runner
+/build-test/apex
+.beads
+
+# Git worktrees
+.worktrees/
+docs
+.cursor
+.github/prompts
+buildnotes.md
+build-*
+coverage

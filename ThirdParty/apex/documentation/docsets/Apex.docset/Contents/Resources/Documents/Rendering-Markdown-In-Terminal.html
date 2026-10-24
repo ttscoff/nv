@@ -1,0 +1,1902 @@
+<!DOCTYPE html>
+<html lang="en">
+
+  <head>
+
+      <meta charset="UTF-8">
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <meta name="generator" content="Apex 1.1.12">
+      <title>Document</title>
+      <style>
+        /* GitHub-style syntax highlighting for Pygments and Skylighting */
+        /* Don't apply background to wrapper when code highlighting is enabled - let default styles handle it */
+        .code-highlighted .highlight, .code-highlighted .sourceCode { background: inherit; border-radius: 6px; padding: 16px; overflow-x: auto; }
+        .highlight pre, .sourceCode pre { margin: 0; padding: 0; background: transparent; }
+        .highlight code, .sourceCode code { font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, monospace; font-size: 12px; line-height: 1.45; }
+        /* Pygments classes */
+        .highlight .k { color: #d73a49; font-weight: 600; } /* Keyword */
+        .highlight .kt { color: #d73a49; } /* Keyword.Type */
+        .highlight .kd { color: #d73a49; font-weight: 600; } /* Keyword.Declaration */
+        .highlight .kn { color: #d73a49; } /* Keyword.Namespace */
+        .highlight .kp { color: #d73a49; } /* Keyword.Pseudo */
+        .highlight .kr { color: #d73a49; font-weight: 600; } /* Keyword.Reserved */
+        .highlight .n { color: #6f42c1; } /* Name */
+        .highlight .na { color: #6f42c1; } /* Name.Attribute */
+        .highlight .nc { color: #6f42c1; font-weight: 600; } /* Name.Class */
+        .highlight .no { color: #005cc5; } /* Name.Constant */
+        .highlight .nd { color: #6f42c1; font-weight: 600; } /* Name.Decorator */
+        .highlight .ni { color: #800080; } /* Name.Entity */
+        .highlight .ne { color: #990000; font-weight: 600; } /* Name.Exception */
+        .highlight .nf { color: #6f42c1; font-weight: 600; } /* Name.Function */
+        .highlight .nl { color: #6f42c1; } /* Name.Label */
+        .highlight .nn { color: #555; } /* Name.Namespace */
+        .highlight .nt { color: #22863a; } /* Name.Tag */
+        .highlight .nv { color: #e36209; } /* Name.Variable */
+        .highlight .s { color: #032f62; } /* String */
+        .highlight .sb { color: #032f62; } /* String.Backtick */
+        .highlight .sc { color: #032f62; } /* String.Char */
+        .highlight .sd { color: #032f62; } /* String.Doc */
+        .highlight .s2 { color: #032f62; } /* String.Double */
+        .highlight .se { color: #032f62; } /* String.Escape */
+        .highlight .sh { color: #032f62; } /* String.Heredoc */
+        .highlight .si { color: #032f62; } /* String.Interpol */
+        .highlight .sx { color: #032f62; } /* String.Other */
+        .highlight .sr { color: #032f62; } /* String.Regex */
+        .highlight .s1 { color: #032f62; } /* String.Single */
+        .highlight .ss { color: #032f62; } /* String.Symbol */
+        .highlight .c { color: #6a737d; font-style: italic; } /* Comment */
+        .highlight .c1 { color: #6a737d; font-style: italic; } /* Comment.Single */
+        .highlight .cm { color: #6a737d; font-style: italic; } /* Comment.Multiline */
+        .highlight .cp { color: #6a737d; font-weight: 600; } /* Comment.Preproc */
+        .highlight .cs { color: #6a737d; font-weight: 600; font-style: italic; } /* Comment.Special */
+        .highlight .m { color: #005cc5; } /* Literal.Number */
+        .highlight .mb { color: #005cc5; } /* Literal.Number.Bin */
+        .highlight .mf { color: #005cc5; } /* Literal.Number.Float */
+        .highlight .mh { color: #005cc5; } /* Literal.Number.Hex */
+        .highlight .mi { color: #005cc5; } /* Literal.Number.Integer */
+        .highlight .il { color: #005cc5; } /* Literal.Number.Integer.Long */
+        .highlight .mo { color: #005cc5; } /* Literal.Number.Oct */
+        .highlight .o { color: #d73a49; } /* Operator */
+        .highlight .ow { color: #d73a49; } /* Operator.Word */
+        .highlight .p { color: #24292e; } /* Punctuation */
+        .highlight .w { color: #e1e4e8; } /* Text.Whitespace */
+        /* Skylighting classes */
+        .sourceCode .kw { color: #d73a49; font-weight: 600; } /* Keyword */
+        .sourceCode .dt { color: #6f42c1; } /* DataType */
+        .sourceCode .dv { color: #005cc5; } /* DecVal */
+        .sourceCode .bn { color: #005cc5; } /* BaseN */
+        .sourceCode .fl { color: #005cc5; } /* Float */
+        .sourceCode .ch { color: #032f62; } /* Char */
+        .sourceCode .st { color: #032f62; } /* String */
+        .sourceCode .co { color: #6a737d; font-style: italic; } /* Comment */
+        .sourceCode .ot { color: #22863a; } /* Other */
+        .sourceCode .al { color: #e36209; font-weight: 600; } /* Alert */
+        .sourceCode .fu { color: #6f42c1; font-weight: 600; } /* Function */
+        .sourceCode .re { color: #032f62; } /* RegionMarker */
+        .sourceCode .er { color: #d73a49; font-weight: 600; } /* Error */
+        .sourceCode .cf { color: #d73a49; font-weight: 600; } /* ControlFlow */
+        .sourceCode .op { color: #d73a49; } /* Operator */
+        .sourceCode .pp { color: #6a737d; } /* Preprocessor */
+        .sourceCode .at { color: #005cc5; } /* Attribute */
+        .sourceCode .do { color: #6a737d; font-style: italic; } /* Documentation */
+        .sourceCode .an { color: #6a737d; font-weight: 600; } /* Annotation */
+        .sourceCode .cv { color: #6a737d; font-weight: 600; font-style: italic; } /* CommentVar */
+        .sourceCode .in { color: #6a737d; } /* Information */
+        .sourceCode .wa { color: #e36209; font-weight: 600; } /* Warning */
+        .sourceCode .im { color: #d73a49; } /* Import */
+        .sourceCode .bu { color: #005cc5; } /* BuiltIn */
+        .sourceCode .ex { color: #6f42c1; } /* Extension */
+        .sourceCode .va { color: #e36209; } /* Variable */
+        .sourceCode .ss { color: #032f62; } /* SpecialString */
+        .sourceCode .sc { color: #032f62; } /* SpecialChar */
+        .sourceCode .vs { color: #032f62; } /* VerbatimString */
+        .sourceCode .il { color: #005cc5; } /* Special */
+        /* Line numbers (Skylighting) */
+        .sourceCode.numberSource .sourceCode { counter-reset: line; }
+        .sourceCode.numberSource .sourceCode > span { position: relative; left: -4em; counter-increment: line; }
+        .sourceCode.numberSource .sourceCode > span > a:first-child::before { content: counter(line); position: relative; left: -1em; text-align: right; vertical-align: baseline; border: none; display: inline-block; min-width: 1em; padding-right: 0.5em; color: #aaa; }
+      </style>
+      <style>
+        body {
+          font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
+          line-height: 1.6;
+          max-width: 800px;
+          margin: 2rem auto;
+          padding: 0 1rem;
+          color: #333;
+        }
+        pre { background: #f5f5f5; padding: 1rem; overflow-x: auto; }
+        code { background: #f0f0f0; padding: 0.2em 0.4em; border-radius: 3px; }
+        blockquote { border-left: 4px solid #ddd; margin: 0; padding-left: 1rem; color: #666; }
+        table { border-collapse: collapse; width: 100%%; }
+        th, td { border: 1px solid #ddd; padding: 0.5rem; }
+        th { background: #f5f5f5; }
+        tfoot td { background: #e8e8e8; }
+        figure.table-figure { width: fit-content; margin: 1em 0; }
+        figure.table-figure table { width: auto; }
+        figcaption { text-align: center; font-weight: bold; font-size: 0.8em; }
+        .page-break { page-break-after: always; }
+        .callout { padding: 1rem; margin: 1rem 0; border-left: 4px solid; }
+        .callout-note { border-color: #3b82f6; background: #eff6ff; }
+        .callout-warning { border-color: #f59e0b; background: #fffbeb; }
+        .callout-tip { border-color: #10b981; background: #f0fdf4; }
+        .callout-danger { border-color: #ef4444; background: #fef2f2; }
+        ins { background: #d4fcbc; text-decoration: none; }
+        del { background: #fbb6c2; text-decoration: line-through; }
+        mark { background: #fff3cd; }
+        .smallcaps { font-variant: small-caps; }
+        .underline { text-decoration: underline; }
+        span.mark { background: #fff3cd; }
+        .hidden { display: none; }
+        .quarto-xref { font-variant: normal; }
+        .critic.comment { background: #e7e7e7; color: #666; font-style: italic; }
+        .mkhashtag { color: #666; }
+        .mkstyledtag {
+          display: inline-block;
+          background: #e0e0e0;
+          padding: 3px 9px;
+          border-radius: 20px;
+          font-size: 0.9em;
+          line-height: 1.4;
+          color: #333;
+          margin: 0 2px;
+        }
+      </style>
+        <meta name="paginate" content="symbols"/>
+      <meta name="highlight-language-only" content="true"/>
+      <meta name="code-line-numbers" content="false"/>
+      <meta name="code-highlight" content="pygments"/>
+      <meta name="sup-sub" content="true"/>
+      <meta name="relaxed-tables" content="true"/>
+      <meta name="includes" content="true"/>
+      <meta name="autolink" content="true"/>
+      <meta name="pretty" content="false"/>
+      <meta name="standalone" content="false"/>
+      <meta name="mode" content="unified"/>
+      <meta name="markdown-in-html" content="true"/>
+      <meta name="image-captions" content="true"/>
+      <meta name="wikilink-extension" content="html"/>
+      <meta name="wikilink-space" content="hyphen"/>
+      <meta name="wikilinks" content="true"/>
+      <meta name="widont" content="true"/>
+      <meta name="plugins" content="true"/>
+      <meta name="id-format" content="gfm"/>
+
+  <style>
+:root {
+  /* border-box width of the fixed sidebar; body offset includes a small gap */
+  --sidebar-width: 250px;
+  --sidebar-offset: 270px;
+}
+
+/* Base styles — override Apex standalone centering (max-width + margin: auto) */
+body {
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  font-size: 17px;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+    "Helvetica Neue", Arial, sans-serif;
+  line-height: 1.65;
+  color: #1e293b;
+  background-color: #fff;
+  max-width: none;
+  width: auto;
+  margin: 2rem 2rem 2rem var(--sidebar-offset);
+  padding: 0 1rem;
+  box-sizing: border-box;
+}
+
+/* Sidebar / Main TOC - wider on larger screens */
+.main-toc,
+.sidebar {
+  position: fixed;
+  left: 0;
+  top: 0;
+  box-sizing: border-box;
+  width: var(--sidebar-width);
+  min-width: var(--sidebar-width);
+  max-width: var(--sidebar-width);
+  height: 100vh;
+  overflow-y: auto;
+  background: #1e293b;
+  color: rgba(255, 255, 255, 0.9);
+  border-right: 2px solid rgba(255, 255, 255, 0.1);
+  padding: 24px 20px 130px;
+  font-size: 14px;
+  z-index: 100;
+  box-shadow: 4px 0 24px rgba(0, 0, 0, 0.08);
+  transition: transform 0.3s ease;
+}
+
+.main-toc ul,
+.sidebar ul {
+  list-style: none;
+  padding-left: 0;
+  margin: 0;
+  padding-bottom: 80px;
+}
+
+.main-toc ul::after,
+.sidebar ul::after {
+  content: "";
+  display: block;
+  height: 80px;
+}
+
+.main-toc li,
+.sidebar li {
+  margin: 0.25em 0;
+}
+
+.main-toc a,
+.sidebar a {
+  color: rgba(255, 255, 255, 0.85);
+  text-decoration: none;
+  display: block;
+  padding: 6px 12px;
+  border-radius: 4px;
+  transition: all 0.15s ease;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.main-toc a:hover,
+.sidebar a:hover {
+  background: #334155;
+  color: #fff;
+}
+
+.sidebar a.active {
+  color: #0ea5e9;
+  font-weight: 500;
+}
+
+/* Hamburger menu button */
+.hamburger-menu {
+  display: none;
+  position: fixed;
+  top: 12px;
+  left: 12px;
+  z-index: 200;
+  background: #1e293b;
+  border: 2px solid rgba(255, 255, 255, 0.1);
+  border-radius: 6px;
+  padding: 10px;
+  cursor: pointer;
+  color: rgba(255, 255, 255, 0.9);
+  font-size: 20px;
+  line-height: 1;
+  box-sizing: border-box;
+  width: 44px;
+  height: 44px;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+  transition: all 0.2s ease;
+  opacity: 0.2;
+}
+
+.hamburger-menu:hover {
+  background: #334155;
+  color: #fff;
+  opacity: 1;
+}
+
+/* Move hamburger to the right of the sidebar when menu is open */
+.hamburger-menu.active {
+  left: calc(var(--sidebar-width) + 12px);
+}
+
+.hamburger-menu.active {
+  background: #0ea5e9;
+}
+
+.hamburger-menu::before {
+  content: "☰";
+}
+
+.hamburger-menu.active::before {
+  content: "✕";
+}
+
+/* Mobile menu overlay */
+.mobile-menu-overlay {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: 150;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.3s ease, visibility 0.3s ease;
+}
+
+.mobile-menu-overlay.active {
+  opacity: 1;
+  visibility: visible;
+}
+
+/* Page TOC */
+.page-toc {
+  background: #f9f9f9;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  padding: 1rem;
+  margin: 1.5rem 0;
+}
+
+.page-toc ul {
+  list-style: none;
+  padding-left: 0;
+  margin: 0;
+}
+
+.page-toc > ul {
+  padding-left: 0;
+}
+
+.page-toc li {
+  margin: 0.25em 0;
+}
+
+.page-toc a {
+  color: #0066cc;
+  text-decoration: none;
+  display: block;
+  padding: 0.25em 0.5em;
+  border-radius: 3px;
+}
+
+.page-toc a:hover {
+  background: #e0e0e0;
+  color: #004499;
+}
+
+.page-toc ul ul {
+  list-style: none;
+  padding-left: 1.5em;
+  margin-top: 0.25em;
+  margin-left: 0;
+}
+
+.page-toc ul ul ul {
+  padding-left: 1.5em;
+}
+
+.page-toc ul ul a {
+  font-size: 0.9em;
+  color: #555;
+}
+
+.page-toc ul ul ul a {
+  font-size: 0.85em;
+  color: #666;
+}
+
+/* Floating TOC */
+.floating-toc {
+  position: fixed;
+  top: 0;
+  left: var(--sidebar-offset);
+  right: 0;
+  z-index: 50;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.2s ease, visibility 0.2s ease;
+  pointer-events: none;
+  display: flex;
+  justify-content: flex-end;
+  padding-right: 2rem;
+}
+
+.floating-toc.visible {
+  opacity: 1;
+  visibility: visible;
+  pointer-events: auto;
+}
+
+.floating-toc-container {
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(10px);
+  border-bottom: 1px solid #ddd;
+  border-radius: 0 0 12px 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  width: fit-content;
+  max-width: 400px;
+  min-width: 200px;
+  overflow: hidden;
+  transition: max-height 0.3s ease;
+}
+
+.floating-toc-header {
+  padding: 8px 16px;
+  cursor: pointer;
+  user-select: none;
+  font-size: 14px;
+  font-weight: 500;
+  color: #1e293b;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.floating-toc-header:hover {
+  background: rgba(0, 0, 0, 0.02);
+}
+
+.floating-toc-content {
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.3s ease;
+}
+
+.floating-toc-container:hover .floating-toc-content {
+  max-height: 70vh;
+  overflow-y: auto;
+}
+
+.floating-toc-content ul {
+  list-style: none;
+  padding: 8px 16px 16px;
+  margin: 0;
+}
+
+.floating-toc-content li {
+  margin: 0.1em 0;
+}
+
+.floating-toc-content a {
+  color: #0066cc;
+  text-decoration: none;
+  display: block;
+  padding: 0.2em 0.5em;
+  border-radius: 4px;
+  font-size: 13px;
+  transition: background 0.15s ease;
+}
+
+.floating-toc-content a:hover {
+  background: #e0e0e0;
+  color: #004499;
+}
+
+.floating-toc-content ul ul {
+  padding-left: 1.2em;
+  margin-top: 0;
+  margin-bottom: 0;
+}
+
+.floating-toc-content ul ul ul {
+  margin-top: 0;
+  margin-bottom: 0;
+}
+
+.floating-toc-content ul ul a {
+  font-size: 12px;
+  color: #555;
+}
+
+.floating-toc-content ul ul ul a {
+  font-size: 11px;
+  color: #666;
+}
+
+/* Smooth scrolling */
+html {
+  scroll-behavior: smooth;
+}
+
+/* Code blocks */
+code {
+  background: #f0f0f0;
+  padding: 0.2em 0.4em;
+  border-radius: 3px;
+  font-family: "Monaco", "Menlo", "Ubuntu Mono", monospace;
+  font-size: 0.9em;
+  margin: 0 0.1em;
+}
+
+pre {
+  background: #f5f5f5;
+  padding: 1rem;
+  overflow-x: auto;
+  border-radius: 4px;
+  margin: 1em 0;
+}
+
+pre code {
+  background: none;
+  padding: 0;
+  margin: 0;
+}
+
+/* Rouge syntax highlighting - GitHub theme, scoped to .highlight containers */
+.highlight {
+  color: #24292e;
+}
+
+.highlight .c {
+  color: #6a737d;
+  font-style: italic;
+} /* Comment */
+.highlight .err {
+  color: #a61717;
+  background-color: #e3d2d2;
+} /* Error */
+.highlight .k {
+  color: #d73a49;
+  font-weight: bold;
+} /* Keyword */
+.highlight .l {
+  color: #032f62;
+} /* Literal */
+.highlight .n {
+  color: #24292e;
+} /* Name */
+.highlight .o {
+  color: #d73a49;
+} /* Operator */
+.highlight .p {
+  color: #24292e;
+} /* Punctuation */
+.highlight .cm {
+  color: #6a737d;
+  font-style: italic;
+} /* Comment.Multiline */
+.highlight .cp {
+  color: #6a737d;
+  font-weight: bold;
+} /* Comment.Preproc */
+.highlight .c1 {
+  color: #6a737d;
+  font-style: italic;
+} /* Comment.Single */
+.highlight .cs {
+  color: #6a737d;
+  font-weight: bold;
+  font-style: italic;
+} /* Comment.Special */
+.highlight .gd {
+  color: #24292e;
+  background-color: #ffeef0;
+} /* Generic.Deleted */
+.highlight .ge {
+  color: #24292e;
+  font-style: italic;
+} /* Generic.Emph */
+.highlight .gr {
+  color: #aa0000;
+} /* Generic.Error */
+.highlight .gh {
+  color: #999999;
+  font-weight: bold;
+} /* Generic.Heading */
+.highlight .gi {
+  color: #24292e;
+  background-color: #f0fff4;
+} /* Generic.Inserted */
+.highlight .go {
+  color: #888888;
+} /* Generic.Output */
+.highlight .gp {
+  color: #555555;
+} /* Generic.Prompt */
+.highlight .gs {
+  font-weight: bold;
+} /* Generic.Strong */
+.highlight .gu {
+  color: #aaaaaa;
+} /* Generic.Subheading */
+.highlight .gt {
+  color: #aa0000;
+} /* Generic.Traceback */
+.highlight .kc {
+  color: #d73a49;
+  font-weight: bold;
+} /* Keyword.Constant */
+.highlight .kd {
+  color: #d73a49;
+  font-weight: bold;
+} /* Keyword.Declaration */
+.highlight .kn {
+  color: #d73a49;
+  font-weight: bold;
+} /* Keyword.Namespace */
+.highlight .kp {
+  color: #d73a49;
+  font-weight: bold;
+} /* Keyword.Pseudo */
+.highlight .kr {
+  color: #d73a49;
+  font-weight: bold;
+} /* Keyword.Reserved */
+.highlight .kt {
+  color: #d73a49;
+  font-weight: bold;
+} /* Keyword.Type */
+.highlight .ld {
+  color: #032f62;
+} /* Literal.Date */
+.highlight .m {
+  color: #005cc5;
+} /* Literal.Number */
+.highlight .s {
+  color: #032f62;
+} /* Literal.String */
+.highlight .na {
+  color: #6f42c1;
+} /* Name.Attribute */
+.highlight .nb {
+  color: #005cc5;
+} /* Name.Builtin */
+.highlight .nc {
+  color: #6f42c1;
+  font-weight: bold;
+} /* Name.Class */
+.highlight .no {
+  color: #005cc5;
+} /* Name.Constant */
+.highlight .nd {
+  color: #6f42c1;
+  font-weight: bold;
+} /* Name.Decorator */
+.highlight .ni {
+  color: #800080;
+} /* Name.Entity */
+.highlight .ne {
+  color: #990000;
+  font-weight: bold;
+} /* Name.Exception */
+.highlight .nf {
+  color: #6f42c1;
+} /* Name.Function */
+.highlight .nl {
+  color: #990000;
+} /* Name.Label */
+.highlight .nn {
+  color: #555555;
+} /* Name.Namespace */
+.highlight .nx {
+  color: #6f42c1;
+} /* Name.Other */
+.highlight .py {
+  color: #990000;
+} /* Name.Property */
+.highlight .nt {
+  color: #22863a;
+} /* Name.Tag */
+.highlight .nv {
+  color: #e36209;
+} /* Name.Variable */
+.highlight .ow {
+  color: #d73a49;
+  font-weight: bold;
+} /* Operator.Word */
+.highlight .w {
+  color: #bbbbbb;
+} /* Text.Whitespace */
+.highlight .mf {
+  color: #005cc5;
+} /* Literal.Number.Float */
+.highlight .mh {
+  color: #005cc5;
+} /* Literal.Number.Hex */
+.highlight .mi {
+  color: #005cc5;
+} /* Literal.Number.Integer */
+.highlight .mo {
+  color: #005cc5;
+} /* Literal.Number.Oct */
+.highlight .sb {
+  color: #032f62;
+} /* Literal.String.Backtick */
+.highlight .sc {
+  color: #032f62;
+} /* Literal.String.Char */
+.highlight .sd {
+  color: #032f62;
+} /* Literal.String.Doc */
+.highlight .s2 {
+  color: #032f62;
+} /* Literal.String.Double */
+.highlight .se {
+  color: #032f62;
+} /* Literal.String.Escape */
+.highlight .sh {
+  color: #032f62;
+} /* Literal.String.Heredoc */
+.highlight .si {
+  color: #032f62;
+} /* Literal.String.Interpol */
+.highlight .sx {
+  color: #032f62;
+} /* Literal.String.Other */
+.highlight .sr {
+  color: #22863a;
+} /* Literal.String.Regex */
+.highlight .s1 {
+  color: #032f62;
+} /* Literal.String.Single */
+.highlight .ss {
+  color: #032f62;
+} /* Literal.String.Symbol */
+.highlight .bp {
+  color: #005cc5;
+} /* Name.Builtin.Pseudo */
+.highlight .vc {
+  color: #e36209;
+} /* Name.Variable.Class */
+.highlight .vg {
+  color: #e36209;
+} /* Name.Variable.Global */
+.highlight .vi {
+  color: #e36209;
+} /* Name.Variable.Instance */
+.highlight .il {
+  color: #005cc5;
+} /* Literal.Number.Integer.Long */
+
+/* Additional Rouge token classes that may be used */
+.highlight .token {
+  color: #5670a0;
+}
+.highlight .token.list {
+  color: #546e9f;
+}
+.highlight .token.punctuation {
+  color: #3e8dad;
+}
+.highlight .token.list.punctuation {
+  color: #e05b78;
+}
+.highlight .token.content {
+  padding: 0;
+}
+
+/* Nested lists in page content */
+ul ul,
+ol ol,
+ul ol,
+ol ul {
+  padding-left: 1.5em;
+  margin-top: 0.25em;
+}
+
+/* Page footer */
+.page-footer {
+  background: #f5f5f5;
+  border-top: 1px solid #ddd;
+  padding: 1.5rem;
+  margin-top: 3rem;
+  color: #666;
+  font-size: 0.9em;
+}
+
+.page-footer p {
+  margin: 0.5em 0;
+}
+
+.page-footer a {
+  color: #0066cc;
+  text-decoration: none;
+}
+
+.page-footer a:hover {
+  text-decoration: underline;
+}
+
+/* Mobile responsive */
+@media (max-width: 768px) {
+  .hamburger-menu {
+    display: flex;
+  }
+
+  .main-toc,
+  .sidebar {
+    transform: translateX(-100%);
+    z-index: 175;
+  }
+
+  .main-toc.mobile-open,
+  .sidebar.mobile-open {
+    transform: translateX(0);
+  }
+
+  body {
+    margin: 2rem 1rem;
+  }
+
+  .floating-toc {
+    left: 0;
+  }
+}
+
+</style></head>
+
+  <body class="code-highlighted">
+<div class="floating-toc" id="floating-toc">
+  <div class="floating-toc-container">
+    <div class="floating-toc-header">
+      <span>Table of Contents 🔻</span>
+    </div>
+    <div class="floating-toc-content" id="floating-toc-content">
+      <!-- Content will be populated by JavaScript -->
+    </div>
+  </div>
+</div>
+
+<button class="hamburger-menu" id="hamburger-menu" aria-label="Toggle navigation"></button>
+<div class="mobile-menu-overlay" id="mobile-menu-overlay"></div>
+
+<nav class="main-toc"><ul><li><a href="Home.html">Home</a></li><li><a href="Getting-Started.html">Getting Started</a></li><li><a href="Installation.html">Installation</a></li><li><a href="Usage.html">Usage</a></li><li><a href="Syntax.html">Syntax</a></li><li><a href="Callouts.html">Callouts</a></li><li><a href="Tables.html">Tables</a></li><li><a href="Inline-Attribute-Lists.html">Inline Attribute Lists</a></li><li><a href="Modes.html">Modes</a></li><li><a href="Quarto-Mode.html">Quarto Mode</a></li><li><a href="Command-Line-Options.html">Command Line Options</a></li><li><a href="Rendering-Markdown-In-Terminal.html">Rendering Markdown in the Terminal</a></li><li><a href="Generating-Man-Pages.html">Generating Man Pages</a></li><li><a href="Multi-File-Documents.html">Multi-file Documents</a></li><li><a href="Citations.html">Citations</a></li><li><a href="Indices.html">Indices</a></li><li><a href="Metadata-Transforms.html">Metadata Transforms</a></li><li><a href="Pandoc-Integration.html">Integrating with Pandoc</a></li><li><a href="Using-Apex-with-Jekyll.html">Using Apex with Jekyll</a></li><li><a href="Header-IDs.html">Header IDs</a></li><li><a href="C-API.html">C API</a></li><li><a href="Writing-Tests.html">Writing Tests</a></li><li><a href="Xcode-Integration.html">Xcode Integration</a></li><li><a href="Examples.html">Examples</a></li><li><a href="Plugins.html">Plugins</a></li><li><a href="Filters.html">Filters</a></li><li><a href="Troubleshooting.html">Troubleshooting</a></li><li><a href="Credits.html">Credits</a></li></ul></nav>
+
+    <h1 id="rendering-markdown-in-the-terminal">
+      Rendering Markdown in the&nbsp;Terminal
+    </h1>
+<nav class="page-toc" id="page-toc-top"><ul><li><a href="#rendering-markdown-in-the-terminal">Rendering Markdown in the&nbsp;Terminal</a><ul><li><a href="#output-formats-t-to">Output formats:&nbsp;-t&nbsp;/&nbsp;--to</a></li><li><a href="#options">Options</a><ul><li><a href="#theme-name">--theme&nbsp;NAME</a></li><li><a href="#width-n">--width&nbsp;N</a></li><li><a href="#code-highlight-theme-theme">--code-highlight-theme&nbsp;THEME</a></li><li><a href="#list-themes">--list-themes</a></li><li><a href="#p-paginate">-p,&nbsp;--paginate</a></li><li><a href="#paginate-symbols">--paginate-symbols</a></li><li><a href="#no-paginate">--no-paginate</a></li></ul></li><li><a href="#inline-images-terminal-graphics">Inline images (terminal&nbsp;graphics)</a><ul><li><a href="#no-terminal-images">--no-terminal-images</a></li><li><a href="#terminal-image-width-n">--terminal-image-width&nbsp;N</a></li></ul></li><li><a href="#configuration-and-metadata">Configuration and&nbsp;metadata</a><ul><li><a href="#metadata-keys">Metadata&nbsp;keys</a></li></ul></li><li><a href="#theme-file-format">Theme file&nbsp;format</a><ul><li><a href="#location-and-naming">Location&nbsp;and&nbsp;naming</a></li><li><a href="#element-keys">Element&nbsp;keys</a></li><li><a href="#example-theme-excerpt">Example theme&nbsp;(excerpt)</a></li></ul></li><li><a href="#debugging-terminal-output">Debugging terminal&nbsp;output</a></li><li><a href="#typical-use-cases">Typical&nbsp;use&nbsp;cases</a></li><li><a href="#replacing-mdless-and-similar-tools">Replacing mdless and similar&nbsp;tools</a></li><li><a href="#see-also">See&nbsp;also</a></li></ul></li></ul></nav>
+
+    <p>
+      Apex can render Markdown to ANSI-colored output suitable for TTYs, terminal emulators, and terminal-based file manager previews (e.g. <strong>lf</strong>, <strong>yazi</strong>). This page describes the output formats, CLI flags, and configuration options.
+    </p>
+
+    <h2 id="output-formats-t-to">
+      Output formats:&nbsp;<code>-t</code>&nbsp;/&nbsp;<code>--to</code>
+    </h2>
+
+    <p>
+      Use <strong><code>-t</code></strong> or <strong><code>--to</code></strong> to choose the output format. For terminal rendering, use one of:
+    </p>
+
+    <table>
+
+      <thead>
+
+        <tr>
+
+          <th>
+            Format
+          </th>
+
+          <th>
+            Aliases
+          </th>
+
+          <th>
+            Description
+          </th>
+
+        </tr>
+
+      </thead>
+
+      <tbody>
+
+        <tr>
+
+          <td>
+            <strong>terminal</strong>
+          </td>
+
+          <td>
+            <strong>cli</strong>
+          </td>
+
+          <td>
+            8/16-color ANSI output (standard and bright colors). Best compatibility with basic terminals.
+          </td>
+
+        </tr>
+        <tr>
+
+          <td>
+            <strong>terminal256</strong>
+          </td>
+
+          <td>
+            —
+          </td>
+
+          <td>
+            256-color ANSI output (xterm-256 palette). Richer colors when your terminal supports it.
+          </td>
+
+        </tr>
+      </tbody>
+
+    </table>
+
+    <p>
+      <strong>Examples:</strong>
+    </p>
+
+    <div class="highlight">
+<pre><span></span><span class="c1"># 16-color terminal output (default theme)</span>
+apex<span class="w"> </span>doc.md<span class="w"> </span>-t<span class="w"> </span>terminal
+
+<span class="c1"># Same as above (cli is an alias for terminal)</span>
+apex<span class="w"> </span>doc.md<span class="w"> </span>-t<span class="w"> </span>cli
+
+<span class="c1"># 256-color terminal output</span>
+apex<span class="w"> </span>doc.md<span class="w"> </span>-t<span class="w"> </span>terminal256
+
+<span class="c1"># Pipe from stdin</span>
+cat<span class="w"> </span>doc.md<span class="w"> </span><span class="p">|</span><span class="w"> </span>apex<span class="w"> </span>-t<span class="w"> </span>terminal
+    </pre>
+  </div>
+
+  <p>
+    Output is written to stdout. Redirect or pipe as needed:
+  </p>
+
+  <div class="highlight">
+<pre><span></span>apex<span class="w"> </span>doc.md<span class="w"> </span>-t<span class="w"> </span>terminal<span class="w"> </span><span class="p">|</span><span class="w"> </span>less<span class="w"> </span>-R
+apex<span class="w"> </span>doc.md<span class="w"> </span>-t<span class="w"> </span>terminal256<span class="w"> </span>-o<span class="w"> </span>-
+  </pre>
+</div>
+
+<h2 id="options">
+  Options
+</h2>
+
+<h3 id="theme-name">
+<code>--theme&nbsp;NAME</code>
+</h3>
+
+<p>
+  Load a terminal theme from:
+</p>
+
+<ul>
+
+  <li>
+    <strong><code>~/.config/apex/terminal/themes/NAME.theme</code></strong> (when <code>NAME</code> is given)
+  </li>
+
+  <li>
+    <strong><code>~/.config/apex/terminal/themes/default.theme</code></strong> (when no theme is specified and a default file exists)
+  </li>
+
+</ul>
+
+<p>
+  Themes are YAML files that map element types to colors and optional bold. See <a href="#theme-file-format">Theme file format</a> below.
+</p>
+
+<p>
+  <strong>Examples:</strong>
+</p>
+
+<div class="highlight">
+<pre><span></span>apex<span class="w"> </span>doc.md<span class="w"> </span>-t<span class="w"> </span>terminal<span class="w"> </span>--theme<span class="w"> </span>brett
+apex<span class="w"> </span>doc.md<span class="w"> </span>-t<span class="w"> </span>terminal256<span class="w"> </span>--theme<span class="w"> </span>dark
+</pre>
+</div>
+
+<h3 Format id="width-n">
+<code>--width&nbsp;N</code>
+</h3>
+
+<p>
+  Hard-wrap terminal (and terminal256) output at <strong>N visible columns</strong>. ANSI escape sequences are not counted toward the width, so colors and formatting are preserved while lines are wrapped. Useful when:
+</p>
+
+<ul>
+
+  <li>
+    Viewing in a narrow terminal or file manager preview pane
+  </li>
+
+  <li>
+    Apex cannot detect the pane width (e.g. in <strong>lf</strong> or <strong>yazi</strong> preview)
+  </li>
+
+</ul>
+
+<p>
+  <strong>N</strong> must be a positive integer. If omitted or set to 0, Apex does not add wrapping; the terminal controls line breaks.
+</p>
+
+<p>
+  <strong>Examples:</strong>
+</p>
+
+<div class="highlight">
+<pre><span></span>apex<span class="w"> </span>doc.md<span class="w"> </span>-t<span class="w"> </span>terminal<span class="w"> </span>--width<span class="w"> </span><span class="m">80</span>
+apex<span class="w"> </span>doc.md<span class="w"> </span>-t<span class="w"> </span>terminal256<span class="w"> </span>--width<span class="w"> </span><span class="m">72</span>
+</pre>
+</div>
+
+<h3 Aliases id="code-highlight-theme-theme">
+<code>--code-highlight-theme&nbsp;THEME</code>
+</h3>
+
+<p>
+  When using an external syntax highlighter (via <code>--code-highlight</code>), you can control the highlighting theme with <code>--code-highlight-theme</code>. The same theme name is applied consistently to HTML and terminal output:
+</p>
+
+<ul>
+
+  <li>
+    <strong>Pygments</strong>: maps to <code>style=THEME</code> for both HTML and terminal/terminal256 ANSI output
+  </li>
+
+  <li>
+    <strong>Skylighting</strong>: maps to <code>--style THEME</code> for both HTML and ANSI output
+  </li>
+
+  <li>
+    <strong>Shiki</strong>: maps to <code>--theme THEME</code> for both HTML and ANSI output
+  </li>
+
+</ul>
+
+<p>
+  For <code>-t terminal</code> / <code>-t terminal256</code>, Apex uses the highlighter’s ANSI output when available, so your code blocks in the terminal use the selected theme’s colors.
+</p>
+
+<div class="highlight">
+<pre><span></span>apex<span class="w"> </span>doc.md<span class="w"> </span>-t<span class="w"> </span>terminal<span class="w"> </span>--code-highlight<span class="w"> </span>pygments<span class="w"> </span>--code-highlight-theme<span class="w"> </span>monokai
+apex<span class="w"> </span>doc.md<span class="w"> </span>-t<span class="w"> </span>terminal256<span class="w"> </span>--code-highlight<span class="w"> </span>shiki<span class="w"> </span>--code-highlight-theme<span class="w"> </span>github-dark
+</pre>
+</div>
+
+<h3 Description id="list-themes">
+<code>--list-themes</code>
+</h3>
+
+<p>
+  List available syntax highlighting themes for Pygments, Skylighting, and Shiki. The output is arranged in multiple columns that adapt to the current terminal width (up to four columns on wide screens).
+</p>
+
+<div class="highlight">
+<pre><span></span>apex<span class="w"> </span>--list-themes
+</pre>
+</div>
+
+<p>
+  Use this together with <code>--code-highlight-theme</code> to discover theme names that look good in your terminal.
+</p>
+
+<h3 id="p-paginate">
+<code>-p,&nbsp;--paginate</code>
+</h3>
+
+<p>
+  When using <code>-t terminal</code>, <code>-t cli</code>, or <code>-t terminal256</code>, <code>-p</code> / <code>--paginate</code> sends the rendered terminal output through a pager instead of writing directly to stdout.
+</p>
+
+<p>
+  <strong>Pager selection order:</strong>
+</p>
+
+<ul>
+
+  <li>
+    If <code>$APEX_PAGER</code> is set and non-empty, Apex uses its value as the pager
+  </li>
+
+  <li>
+    Otherwise, if <code>$PAGER</code> is set and non-empty, Apex uses that
+  </li>
+
+  <li>
+    Otherwise, Apex falls back to <code>less -R</code>
+  </li>
+
+</ul>
+
+<p>
+  Pagination is ignored when the output format is not a terminal format or when <code>-o/--output</code> is used to write to a file.
+</p>
+
+<p>
+  <strong>Pager vs. inline graphics:</strong> <code>less -R</code> and most pagers understand ANSI <strong>color</strong> sequences only—not iTerm inline-image protocols (<code>]1337;…</code>), Kitty graphics, or similar. When <code>paginate: true</code> (or <code>-p</code>) is active and the document contains inline graphics output, Apex <strong>automatically skips the pager</strong> and writes directly to stdout (with a one-line notice on stderr).
+</p>
+
+<p>
+  To paginate documents <strong>with images</strong>, use <strong><code>--paginate-symbols</code></strong> or <strong><code>paginate: symbols</code></strong> instead (see below).
+</p>
+
+<div class="highlight">
+<pre><span></span>apex<span class="w"> </span>doc.md<span class="w"> </span>-t<span class="w"> </span>terminal<span class="w"> </span>--paginate
+<span class="nv">APEX_PAGER</span><span class="o">=</span><span class="s2">&quot;less -RFX&quot;</span><span class="w"> </span>apex<span class="w"> </span>doc.md<span class="w"> </span>-t<span class="w"> </span>terminal256<span class="w"> </span>-p
+</pre>
+</div>
+
+<h3 **terminal** id="paginate-symbols">
+<code>--paginate-symbols</code>
+</h3>
+
+<p>
+  Page terminal output <strong>and</strong> render images as <strong>chafa</strong> ANSI block art (<code>chafa -f symbols</code>). This output is compatible with <strong><code>less -R</code></strong> and typical pagers.
+</p>
+
+<ul>
+
+  <li>
+    Requires <strong>chafa</strong> on <code>PATH</code>
+  </li>
+
+  <li>
+    With <code>-t terminal256</code>, uses <code>chafa -c 256</code>; with <code>-t terminal</code>, uses <code>chafa -c 16</code>
+  </li>
+
+  <li>
+    Equivalent to metadata <code>paginate: symbols</code>
+  </li>
+
+</ul>
+
+<div class="highlight">
+<pre><span></span>apex<span class="w"> </span>doc.md<span class="w"> </span>-t<span class="w"> </span>terminal256<span class="w"> </span>--paginate-symbols
+</pre>
+</div>
+
+<h3 **cli** id="no-paginate">
+<code>--no-paginate</code>
+</h3>
+
+<p>
+  Disable pagination for this run. Overrides <code>-p</code>, <code>--paginate-symbols</code>, and <code>paginate: true</code> / <code>paginate: symbols</code> from config or metadata.
+</p>
+
+<div class="highlight">
+<pre><span></span>apex<span class="w"> </span>doc.md<span class="w"> </span>-t<span class="w"> </span>terminal256<span class="w"> </span>--no-paginate
+</pre>
+</div>
+
+<h2 8/16-color ANSI output (standard and bright colors). Best compatibility with basic terminals. id="inline-images-terminal-graphics">
+  Inline images (terminal&nbsp;graphics)
+</h2>
+
+<p>
+  When <strong><code>stdout</code> is a TTY</strong> and inline images are enabled, Apex can render <code>![alt](url)</code> images as graphics in the terminal instead of link-style text.
+</p>
+
+<p>
+  <strong>Viewer selection</strong> (when <strong>not</strong> using <code>--paginate-symbols</code> / <code>paginate: symbols</code>):
+</p>
+
+<table>
+
+  <thead>
+
+    <tr>
+
+      <th>
+        Priority
+      </th>
+
+      <th>
+        Tool
+      </th>
+
+      <th>
+        When used
+      </th>
+
+    </tr>
+
+  </thead>
+
+  <tbody>
+
+    <tr>
+
+      <td>
+        1
+      </td>
+
+      <td>
+        <strong>imgcat</strong>
+      </td>
+
+      <td>
+        Only when <strong>TERM_PROGRAM</strong> indicates iTerm2 (iTerm inline-image protocol)
+      </td>
+
+    </tr>
+    <tr>
+
+      <td>
+        2
+      </td>
+
+      <td>
+        <strong>chafa</strong>
+      </td>
+
+      <td>
+        Otherwise, if on <code>PATH</code> (<code>-f iterm</code> on iTerm/WezTerm, <code>-f kitty</code> on Kitty, <code>-f symbols</code> on other terminals)
+      </td>
+
+    </tr>
+    <tr>
+
+      <td>
+        3
+      </td>
+
+      <td>
+        <strong>catimg</strong>
+      </td>
+
+      <td>
+        If chafa is not found
+      </td>
+
+    </tr>
+    <tr>
+
+      <td>
+        4
+      </td>
+
+      <td>
+        <strong>viu</strong>
+      </td>
+
+      <td>
+        If neither chafa nor catimg is found
+      </td>
+
+    </tr>
+  </tbody>
+
+</table>
+
+<p>
+  With <strong><code>--paginate-symbols</code></strong> or <strong><code>paginate: symbols</code></strong>, Apex always uses <strong>chafa</strong> with <strong><code>-f symbols</code></strong> so images work inside <strong><code>less -R</code></strong>.
+</p>
+
+<p>
+  <strong>Width:</strong> Use <strong><code>--terminal-image-width N</code></strong> to set the maximum width in character cells (default <strong>50</strong>). This is separate from <strong><code>--width</code></strong>, which wraps prose.
+</p>
+
+<p>
+  <strong>Remote HTTP(S) images:</strong> If <strong><code>curl</code></strong> is on <strong><code>PATH</code></strong>, Apex downloads the image to a temporary file under <strong><code>TMPDIR</code></strong> or <strong><code>/tmp</code></strong>, displays it, then deletes the temp file. Downloads use a <strong>60 second</strong> timeout and reject files larger than <strong>10 MiB</strong>. If <strong><code>curl</code></strong> is missing or the download fails, Apex falls back to link-style output (see below).
+</p>
+
+<p>
+  <strong>When images are not drawn inline:</strong> Apex emits <strong>link-style</strong> output (styled alt text and the URL in parentheses), matching how normal links look in terminal output—not <code>![...](...)</code> markdown. That happens when:
+</p>
+
+<ul>
+
+  <li>
+    Output is <strong>not</strong> a TTY (e.g. piped to a file or another command)
+  </li>
+
+  <li>
+    <strong><code>--no-terminal-images</code></strong> is set
+  </li>
+
+  <li>
+    No supported viewer is installed, or the viewer exits with an error
+  </li>
+
+  <li>
+    A <strong>local</strong> path does not resolve to a readable file
+  </li>
+
+  <li>
+    A <strong>remote</strong> URL cannot be fetched within the limits above
+  </li>
+
+</ul>
+
+<p>
+  <strong>Captions:</strong> After an inline image, a caption line may show the file basename, optional image <code>title</code>, and alt text (subject to <strong><code>title_captions_only</code></strong> / <code>--title-captions-only</code> behavior for links).
+</p>
+
+<h3 id="no-terminal-images">
+<code>--no-terminal-images</code>
+</h3>
+
+<p>
+  Disables inline terminal rendering of images. Images always use the link-style fallback.
+</p>
+
+<div class="highlight">
+<pre><span></span>apex<span class="w"> </span>doc.md<span class="w"> </span>-t<span class="w"> </span>terminal<span class="w"> </span>--no-terminal-images
+</pre>
+</div>
+
+<h3 id="terminal-image-width-n">
+<code>--terminal-image-width&nbsp;N</code>
+</h3>
+
+<p>
+  Sets the maximum width in <strong>character cells</strong> for the terminal image tools (default <strong>50</strong>).
+</p>
+
+<div class="highlight">
+<pre><span></span>apex<span class="w"> </span>doc.md<span class="w"> </span>-t<span class="w"> </span>terminal256<span class="w"> </span>--terminal-image-width<span class="w"> </span><span class="m">72</span>
+</pre>
+</div>
+
+<h2 id="configuration-and-metadata">
+  Configuration and&nbsp;metadata
+</h2>
+
+<p>
+  Terminal behavior can be set via document metadata or a config file (e.g. <code>--meta-file</code>), so you don’t have to pass flags every time.
+</p>
+
+<p>
+  <strong>Precedence:</strong> CLI flags override metadata/config. For width: <strong>CLI <code>--width</code></strong> &gt; <strong>metadata/config <code>terminal.width</code></strong>. For terminal inline images: <strong><code>--no-terminal-images</code></strong> forces images to link-style output; <strong><code>--terminal-image-width</code></strong> overrides <strong><code>terminal.image_width</code></strong> when given.
+</p>
+
+<h3 id="metadata-keys">
+  Metadata&nbsp;keys
+</h3>
+
+<p>
+  Use a <code>terminal:</code> mapping in YAML front matter (or flattened keys in your metadata):
+</p>
+
+<table>
+
+  <thead>
+
+    <tr>
+
+      <th>
+        Key
+      </th>
+
+      <th>
+        Example
+      </th>
+
+      <th>
+        Description
+      </th>
+
+    </tr>
+
+  </thead>
+
+  <tbody>
+
+    <tr>
+
+      <td>
+        <strong>terminal.theme</strong> or <strong>terminal_theme</strong>
+      </td>
+
+      <td>
+<code>brett</code>
+      </td>
+
+      <td>
+        Default terminal theme name for <code>-t terminal</code> / <code>-t terminal256</code>.
+      </td>
+
+    </tr>
+    <tr>
+
+      <td>
+        <strong>terminal.width</strong> or <strong>terminal_width</strong>
+      </td>
+
+      <td>
+<code>80</code>
+      </td>
+
+      <td>
+        Default wrap width (positive integer).
+      </td>
+
+    </tr>
+    <tr>
+
+      <td>
+        <strong>terminal.inline_images</strong> or <strong>terminal_inline_images</strong>
+      </td>
+
+      <td>
+<code>true</code>
+      </td>
+
+      <td>
+        Enable (<code>true</code>) or disable (<code>false</code>) inline terminal image rendering when a viewer is available (default: enabled in the API; use metadata to turn off per document).
+      </td>
+
+    </tr>
+    <tr>
+
+      <td>
+        <strong>terminal.image_width</strong> or <strong>terminal_image_width</strong>
+      </td>
+
+      <td>
+<code>50</code>
+      </td>
+
+      <td>
+        Default max width in character cells for image tools (see <strong>Inline images</strong> above).
+      </td>
+
+    </tr>
+    <tr>
+
+      <td>
+        <strong>paginate</strong> / <strong>terminal.paginate</strong> / <strong>terminal_paginate</strong>
+      </td>
+
+      <td>
+<code>true</code>, <code>false</code>, or <code>symbols</code>
+      </td>
+
+      <td>
+<code>true</code> page via pager (skip pager if inline graphics detected). <code>symbols</code>: page and use chafa ANSI art for images. <code>false</code>: no pagination.
+      </td>
+
+    </tr>
+    <tr>
+
+      <td>
+        <strong>code-highlight</strong> or <strong>code_highlight</strong>
+      </td>
+
+      <td>
+<code>pygments</code>
+      </td>
+
+      <td>
+        Default external syntax highlighter for code blocks (Pygments, Skylighting, Shiki, or abbreviations).
+      </td>
+
+    </tr>
+    <tr>
+
+      <td>
+        <strong>code-highlight-theme</strong> or <strong>code_highlight_theme</strong>
+      </td>
+
+      <td>
+<code>monokai</code>
+      </td>
+
+      <td>
+        Default syntax highlighting theme for both HTML and terminal output.
+      </td>
+
+    </tr>
+  </tbody>
+
+</table>
+
+<p>
+  <strong>Example with pagination and pager-friendly images:</strong>
+</p>
+
+<div class="highlight">
+<pre><span></span><span class="nn">---</span>
+<span class="nt">paginate</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">symbols</span>
+<span class="nt">terminal</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">theme</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">brett</span>
+<span class="w">  </span><span class="nt">width</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">80</span>
+<span class="nn">---</span>
+</pre>
+</div>
+
+<p>
+  <strong>Example in document front matter:</strong>
+</p>
+
+<div class="highlight">
+<pre><span></span><span class="nn">---</span>
+<span class="nt">title</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">My Doc</span>
+<span class="nt">terminal</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">theme</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">brett</span>
+<span class="w">  </span><span class="nt">width</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">80</span>
+<span class="nt">paginate</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">true</span>
+<span class="nt">code-highlight</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">pygments</span>
+<span class="nt">code-highlight-theme</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">monokai</span>
+<span class="nn">---</span>
+</pre>
+</div>
+
+<p>
+  <strong>Example in a shared config file</strong> (e.g. <code>config.yml</code> passed with <code>--meta-file</code>):
+</p>
+
+<div class="highlight">
+<pre><span></span><span class="nt">terminal</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">theme</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">dark</span>
+<span class="w">  </span><span class="nt">width</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">72</span>
+</pre>
+</div>
+
+<p>
+  If you set <strong><code>--theme</code></strong> or <strong><code>--width</code></strong> on the command line, those values override the metadata/config.
+</p>
+
+<h2 id="theme-file-format">
+  Theme file&nbsp;format
+</h2>
+
+<p>
+  Theme files live under <code>~/.config/apex/terminal/themes/</code> and use the <strong><code>.theme</code></strong> extension. They are plain YAML.
+</p>
+
+<h3 **terminal256** id="location-and-naming">
+  Location&nbsp;and&nbsp;naming
+</h3>
+
+<ul>
+
+  <li>
+    Path: <strong><code>~/.config/apex/terminal/themes/&lt;NAME&gt;.theme</code></strong>
+  </li>
+
+  <li>
+    <strong><code>default.theme</code></strong> is used when no theme name is provided (and no <code>--theme</code> is given).
+  </li>
+
+</ul>
+
+<h3 — id="element-keys">
+  Element&nbsp;keys
+</h3>
+
+<p>
+  Common top-level keys:
+</p>
+
+<ul>
+
+  <li>
+    <strong>h1</strong> … <strong>h6</strong> – Heading levels (each can have <code>color</code> and optional <code>bold: true</code>).
+  </li>
+
+  <li>
+    <strong>link</strong> – Link text and optional <code>link.url</code> for the URL style.
+  </li>
+
+  <li>
+    <strong>code_span</strong> – Inline code.
+  </li>
+
+  <li>
+    <strong>code_block</strong> – Fenced code blocks.
+  </li>
+
+  <li>
+    <strong>blockquote</strong> – Blockquote marker and text color (<code>blockquote.character</code>, <code>blockquote.color</code>).
+  </li>
+
+  <li>
+    <strong>table</strong> – Table border/style (<code>table.border</code>, optional <code>table.bold</code>).
+  </li>
+
+  <li>
+    <strong>list_marker</strong> – Style for bullet and numbered list markers (e.g. <code>*</code>, <code>1.</code>, <code>2.</code>). When unset, markers use <strong>bold bright red</strong>.
+  </li>
+
+</ul>
+
+<p>
+  For any element that has a <strong>color</strong> field, you can add <strong><code>bold: true</code></strong> to make that element bold in addition to its color.
+</p>
+
+<h3 256-color ANSI output (xterm-256 palette). Richer colors when your terminal supports it. id="example-theme-excerpt">
+  Example theme&nbsp;(excerpt)
+</h3>
+
+<div class="highlight">
+<pre><span></span><span class="nt">h1</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">color</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;bright_white&quot;</span>
+<span class="w">  </span><span class="nt">bold</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">true</span>
+
+<span class="nt">h2</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">color</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;bright_blue&quot;</span>
+<span class="w">  </span><span class="nt">bold</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">true</span>
+
+<span class="nt">list_marker</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;b</span><span class="nv"> </span><span class="s">intense_red&quot;</span>
+
+<span class="nt">code_span</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">color</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;b</span><span class="nv"> </span><span class="s">white</span><span class="nv"> </span><span class="s">on_intense_black&quot;</span>
+
+<span class="nt">code_block</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">color</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;white</span><span class="nv"> </span><span class="s">on_black&quot;</span>
+<span class="w">  </span><span class="nt">bold</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">true</span>
+</pre>
+</div>
+
+<p>
+  Color values can use names like <strong>red</strong>, <strong>bright_blue</strong>, <strong>intense_red</strong>, and 256-color forms like <strong>38;5;nnn</strong>. The <strong>b</strong> prefix (or <strong>bold: true</strong> in structured keys) enables bold. See existing themes in the repo or in <code>~/.config/apex/terminal/themes/</code> for more examples.
+</p>
+
+<h2 id="debugging-terminal-output">
+  Debugging terminal&nbsp;output
+</h2>
+
+<p>
+  Set <strong><code>APEX_DEBUG_TERMINAL=1</code></strong> to print diagnostics to stderr: selected image viewer, full viewer command lines, <code>TERM_PROGRAM</code>, pagination mode (<code>paginate</code> / <code>paginate_symbols</code>), and syntax highlighter commands.
+</p>
+
+<div class="highlight">
+<pre><span></span><span class="nv">APEX_DEBUG_TERMINAL</span><span class="o">=</span><span class="m">1</span><span class="w"> </span>apex<span class="w"> </span>doc.md<span class="w"> </span>-t<span class="w"> </span>terminal256<span class="w"> </span>--paginate-symbols
+</pre>
+</div>
+
+<h2 id="typical-use-cases">
+  Typical&nbsp;use&nbsp;cases
+</h2>
+
+<ul>
+
+  <li>
+    <strong>Interactive reading (no images):</strong> <code>apex doc.md -t terminal | less -R</code> or <code>apex doc.md -t terminal -p</code>
+  </li>
+
+  <li>
+    <strong>Interactive reading (with images in pager):</strong> <code>apex doc.md -t terminal256 --paginate-symbols</code>
+  </li>
+
+  <li>
+    <strong>Full-quality inline graphics (no pager):</strong> <code>apex doc.md -t terminal256 --no-paginate</code>
+  </li>
+
+  <li>
+    <strong>File manager preview (lf, yazi, etc.):</strong> Use <code>-t terminal</code> or <code>-t terminal256</code> and <code>--width</code> set to your preview pane width (e.g. <code>--width 80</code>), or set <code>terminal.width</code> in metadata/config.
+  </li>
+
+  <li>
+    <strong>Consistent look:</strong> Create a <code>.theme</code> file and reference it with <code>--theme</code> or <code>terminal.theme</code> in metadata so all your terminal renders use the same colors and emphasis.
+  </li>
+
+</ul>
+
+<h2 id="replacing-mdless-and-similar-tools">
+  Replacing mdless and similar&nbsp;tools
+</h2>
+
+<p>
+  If you are used to tools like <code>mdless</code>, you can use Apex as a drop-in replacement and keep all of your preferred colors, width, and pagination settings in one place.
+</p>
+
+<p>
+  One simple approach is a shell alias with pager-friendly images:
+</p>
+
+<div class="highlight">
+<pre><span></span><span class="nb">alias</span><span class="w"> </span><span class="nv">mdless</span><span class="o">=</span><span class="s1">&#39;apex -t terminal256 --paginate-symbols --code-highlight pygments --code-highlight-theme monokai --width 60 --theme mdless&#39;</span>
+</pre>
+</div>
+
+<p>
+  For full-resolution inline graphics (iTerm, Kitty, etc.), omit pagination:
+</p>
+
+<div class="highlight">
+<pre><span></span><span class="nb">alias</span><span class="w"> </span><span class="nv">mdless</span><span class="o">=</span><span class="s1">&#39;apex -t terminal256 --no-paginate --code-highlight pygments --code-highlight-theme monokai --width 60 --theme mdless&#39;</span>
+</pre>
+</div>
+
+<p>
+  You can then run:
+</p>
+
+<div class="highlight">
+<pre><span></span>mdless<span class="w"> </span>README.md
+</pre>
+</div>
+
+<p>
+  Most of these options can also be moved into config or metadata so the alias stays short:
+</p>
+
+<div class="highlight">
+<pre><span></span><span class="nt">terminal</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">theme</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">brett</span>
+<span class="w">  </span><span class="nt">width</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">60</span>
+<span class="nt">paginate</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">symbols</span>
+<span class="nt">code-highlight</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">pygments</span>
+<span class="nt">code-highlight-theme</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">monokai</span>
+</pre>
+</div>
+
+<p>
+  With this configuration, the alias can be as simple as:
+</p>
+
+<div class="highlight">
+<pre><span></span><span class="nb">alias</span><span class="w"> </span><span class="nv">mdless</span><span class="o">=</span><span class="s1">&#39;apex -t terminal256&#39;</span>
+</pre>
+</div>
+
+<p>
+  For pagination without images (or prose-only docs), use <code>paginate: true</code> instead of <code>paginate: symbols</code>. With <code>paginate: true</code>, Apex auto-skips the pager when inline graphics are detected.
+</p>
+
+<h2 id="see-also">
+  See&nbsp;also
+</h2>
+
+<ul>
+
+  <li>
+    <a href="Command-Line-Options.html">Command Line Options</a> – Full list of CLI flags, including <code>-t</code>/<code>--to</code>, <code>--theme</code>, and <code>--width</code>.
+  </li>
+
+  <li>
+    <a href="Configuration.html">Configuration</a> – Config file and metadata behavior.
+  </li>
+
+</ul>
+
+<script>
+// Hamburger menu functionality
+(function() {
+  function initHamburgerMenu() {
+    var hamburger = document.getElementById('hamburger-menu');
+    var sidebar = document.querySelector('.main-toc, .sidebar');
+    var overlay = document.getElementById('mobile-menu-overlay');
+
+    if (!hamburger || !sidebar) return;
+
+    function toggleMenu() {
+      var isOpen = sidebar.classList.contains('mobile-open');
+      if (isOpen) {
+        sidebar.classList.remove('mobile-open');
+        hamburger.classList.remove('active');
+        if (overlay) overlay.classList.remove('active');
+      } else {
+        sidebar.classList.add('mobile-open');
+        hamburger.classList.add('active');
+        if (overlay) overlay.classList.add('active');
+      }
+    }
+
+    hamburger.addEventListener('click', function(e) {
+      e.stopPropagation();
+      toggleMenu();
+    });
+
+    if (overlay) {
+      overlay.addEventListener('click', function() {
+        toggleMenu();
+      });
+    }
+
+    // Close menu when clicking on a sidebar link (mobile only)
+    if (window.innerWidth <= 768) {
+      var sidebarLinks = sidebar.querySelectorAll('a');
+      sidebarLinks.forEach(function(link) {
+        link.addEventListener('click', function() {
+          setTimeout(function() {
+            sidebar.classList.remove('mobile-open');
+            hamburger.classList.remove('active');
+            if (overlay) overlay.classList.remove('active');
+          }, 100);
+        });
+      });
+    }
+
+    // Close menu on window resize if going to desktop
+    window.addEventListener('resize', function() {
+      if (window.innerWidth > 768) {
+        sidebar.classList.remove('mobile-open');
+        hamburger.classList.remove('active');
+        if (overlay) overlay.classList.remove('active');
+      }
+    });
+  }
+
+  // Initialize when DOM is ready
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initHamburgerMenu);
+  } else {
+    initHamburgerMenu();
+  }
+})();
+
+</script>
+<script>
+  (function() {
+    // Clone the page TOC for floating TOC
+    function initFloatingTOC() {
+      var pageTOC = document.getElementById('page-toc-top');
+      var floatingTOCContent = document.getElementById('floating-toc-content');
+      var floatingTOC = document.getElementById('floating-toc');
+
+      if (!pageTOC || !floatingTOCContent || !floatingTOC) return;
+
+      // Clone the TOC structure
+      var tocClone = pageTOC.cloneNode(true);
+      tocClone.id = 'floating-toc-clone';
+      floatingTOCContent.appendChild(tocClone);
+
+      // Update all links to use smooth scrolling
+      var allTOCLinks = document.querySelectorAll('.page-toc a, .floating-toc-content a');
+      allTOCLinks.forEach(function(link) {
+        link.addEventListener('click', function(e) {
+          var href = this.getAttribute('href');
+          if (href && href.startsWith('#')) {
+            e.preventDefault();
+            var targetId = href.substring(1);
+            var targetElement = document.getElementById(targetId);
+            if (targetElement) {
+              var offset = 20; // Offset from top
+
+              // Function to calculate absolute position from document top
+              function getAbsoluteTop(element) {
+                var top = 0;
+                while (element) {
+                  top += element.offsetTop;
+                  element = element.offsetParent;
+                }
+                return top;
+              }
+
+              var absoluteTop = getAbsoluteTop(targetElement);
+              var scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+              var offsetPosition = absoluteTop - offset;
+
+              // Only scroll if we're not already at the target position
+              if (Math.abs(scrollTop - offsetPosition) > 10) {
+                window.scrollTo({
+                  top: Math.max(0, offsetPosition),
+                  behavior: 'smooth'
+                });
+              }
+
+              // Update URL hash without triggering scroll
+              if (history.pushState) {
+                history.pushState(null, null, href);
+              }
+            }
+          }
+        });
+      });
+
+      // Handle scroll to show/hide floating TOC
+      var tocTop = pageTOC.getBoundingClientRect().top + window.pageYOffset;
+      var tocBottom = tocTop + pageTOC.offsetHeight;
+
+      function updateFloatingTOC() {
+        var scrollY = window.pageYOffset || document.documentElement.scrollTop;
+
+        if (scrollY > tocBottom) {
+          floatingTOC.classList.add('visible');
+        } else {
+          floatingTOC.classList.remove('visible');
+        }
+      }
+
+      // Throttle scroll events
+      var ticking = false;
+      window.addEventListener('scroll', function() {
+        if (!ticking) {
+          window.requestAnimationFrame(function() {
+            updateFloatingTOC();
+            ticking = false;
+          });
+          ticking = true;
+        }
+      });
+
+      // Initial check
+      updateFloatingTOC();
+    }
+
+    // Initialize when DOM is ready
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', initFloatingTOC);
+    } else {
+      initFloatingTOC();
+    }
+  })();
+</script>
+<footer class="page-footer"><p>Copyright 2025 Brett Terpstra, All Rights Reserved | MIT License</p></footer></body>
+
+</html>
+

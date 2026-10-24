@@ -9,8 +9,7 @@
 
 #import "RBSplitView.h"
 #import "RBSplitViewPrivateDefines.h"
-
-//#import "AppController.h"
+#import "AppController.h"
 
 // Please don't remove this copyright notice!
 static const unsigned char RBSplitView_Copyright[] __attribute__ ((used)) =

@@ -1,0 +1,9 @@
+---
+id: kbd-inline
+description: Inline {% kbd ... %} keyboard shortcut syntax
+phase: pre_parse
+handler.command: "/usr/bin/env ruby ${APEX_PLUGIN_DIR}/kbd_plugin.rb"
+priority: 100
+timeout_ms: 500
+---
+

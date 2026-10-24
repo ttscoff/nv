@@ -1,0 +1,3188 @@
+<!DOCTYPE html>
+<html lang="en">
+
+  <head>
+
+      <meta charset="UTF-8">
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <meta name="generator" content="Apex 1.1.12">
+      <title>Document</title>
+      <style>
+        /* GitHub-style syntax highlighting for Pygments and Skylighting */
+        /* Don't apply background to wrapper when code highlighting is enabled - let default styles handle it */
+        .code-highlighted .highlight, .code-highlighted .sourceCode { background: inherit; border-radius: 6px; padding: 16px; overflow-x: auto; }
+        .highlight pre, .sourceCode pre { margin: 0; padding: 0; background: transparent; }
+        .highlight code, .sourceCode code { font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, monospace; font-size: 12px; line-height: 1.45; }
+        /* Pygments classes */
+        .highlight .k { color: #d73a49; font-weight: 600; } /* Keyword */
+        .highlight .kt { color: #d73a49; } /* Keyword.Type */
+        .highlight .kd { color: #d73a49; font-weight: 600; } /* Keyword.Declaration */
+        .highlight .kn { color: #d73a49; } /* Keyword.Namespace */
+        .highlight .kp { color: #d73a49; } /* Keyword.Pseudo */
+        .highlight .kr { color: #d73a49; font-weight: 600; } /* Keyword.Reserved */
+        .highlight .n { color: #6f42c1; } /* Name */
+        .highlight .na { color: #6f42c1; } /* Name.Attribute */
+        .highlight .nc { color: #6f42c1; font-weight: 600; } /* Name.Class */
+        .highlight .no { color: #005cc5; } /* Name.Constant */
+        .highlight .nd { color: #6f42c1; font-weight: 600; } /* Name.Decorator */
+        .highlight .ni { color: #800080; } /* Name.Entity */
+        .highlight .ne { color: #990000; font-weight: 600; } /* Name.Exception */
+        .highlight .nf { color: #6f42c1; font-weight: 600; } /* Name.Function */
+        .highlight .nl { color: #6f42c1; } /* Name.Label */
+        .highlight .nn { color: #555; } /* Name.Namespace */
+        .highlight .nt { color: #22863a; } /* Name.Tag */
+        .highlight .nv { color: #e36209; } /* Name.Variable */
+        .highlight .s { color: #032f62; } /* String */
+        .highlight .sb { color: #032f62; } /* String.Backtick */
+        .highlight .sc { color: #032f62; } /* String.Char */
+        .highlight .sd { color: #032f62; } /* String.Doc */
+        .highlight .s2 { color: #032f62; } /* String.Double */
+        .highlight .se { color: #032f62; } /* String.Escape */
+        .highlight .sh { color: #032f62; } /* String.Heredoc */
+        .highlight .si { color: #032f62; } /* String.Interpol */
+        .highlight .sx { color: #032f62; } /* String.Other */
+        .highlight .sr { color: #032f62; } /* String.Regex */
+        .highlight .s1 { color: #032f62; } /* String.Single */
+        .highlight .ss { color: #032f62; } /* String.Symbol */
+        .highlight .c { color: #6a737d; font-style: italic; } /* Comment */
+        .highlight .c1 { color: #6a737d; font-style: italic; } /* Comment.Single */
+        .highlight .cm { color: #6a737d; font-style: italic; } /* Comment.Multiline */
+        .highlight .cp { color: #6a737d; font-weight: 600; } /* Comment.Preproc */
+        .highlight .cs { color: #6a737d; font-weight: 600; font-style: italic; } /* Comment.Special */
+        .highlight .m { color: #005cc5; } /* Literal.Number */
+        .highlight .mb { color: #005cc5; } /* Literal.Number.Bin */
+        .highlight .mf { color: #005cc5; } /* Literal.Number.Float */
+        .highlight .mh { color: #005cc5; } /* Literal.Number.Hex */
+        .highlight .mi { color: #005cc5; } /* Literal.Number.Integer */
+        .highlight .il { color: #005cc5; } /* Literal.Number.Integer.Long */
+        .highlight .mo { color: #005cc5; } /* Literal.Number.Oct */
+        .highlight .o { color: #d73a49; } /* Operator */
+        .highlight .ow { color: #d73a49; } /* Operator.Word */
+        .highlight .p { color: #24292e; } /* Punctuation */
+        .highlight .w { color: #e1e4e8; } /* Text.Whitespace */
+        /* Skylighting classes */
+        .sourceCode .kw { color: #d73a49; font-weight: 600; } /* Keyword */
+        .sourceCode .dt { color: #6f42c1; } /* DataType */
+        .sourceCode .dv { color: #005cc5; } /* DecVal */
+        .sourceCode .bn { color: #005cc5; } /* BaseN */
+        .sourceCode .fl { color: #005cc5; } /* Float */
+        .sourceCode .ch { color: #032f62; } /* Char */
+        .sourceCode .st { color: #032f62; } /* String */
+        .sourceCode .co { color: #6a737d; font-style: italic; } /* Comment */
+        .sourceCode .ot { color: #22863a; } /* Other */
+        .sourceCode .al { color: #e36209; font-weight: 600; } /* Alert */
+        .sourceCode .fu { color: #6f42c1; font-weight: 600; } /* Function */
+        .sourceCode .re { color: #032f62; } /* RegionMarker */
+        .sourceCode .er { color: #d73a49; font-weight: 600; } /* Error */
+        .sourceCode .cf { color: #d73a49; font-weight: 600; } /* ControlFlow */
+        .sourceCode .op { color: #d73a49; } /* Operator */
+        .sourceCode .pp { color: #6a737d; } /* Preprocessor */
+        .sourceCode .at { color: #005cc5; } /* Attribute */
+        .sourceCode .do { color: #6a737d; font-style: italic; } /* Documentation */
+        .sourceCode .an { color: #6a737d; font-weight: 600; } /* Annotation */
+        .sourceCode .cv { color: #6a737d; font-weight: 600; font-style: italic; } /* CommentVar */
+        .sourceCode .in { color: #6a737d; } /* Information */
+        .sourceCode .wa { color: #e36209; font-weight: 600; } /* Warning */
+        .sourceCode .im { color: #d73a49; } /* Import */
+        .sourceCode .bu { color: #005cc5; } /* BuiltIn */
+        .sourceCode .ex { color: #6f42c1; } /* Extension */
+        .sourceCode .va { color: #e36209; } /* Variable */
+        .sourceCode .ss { color: #032f62; } /* SpecialString */
+        .sourceCode .sc { color: #032f62; } /* SpecialChar */
+        .sourceCode .vs { color: #032f62; } /* VerbatimString */
+        .sourceCode .il { color: #005cc5; } /* Special */
+        /* Line numbers (Skylighting) */
+        .sourceCode.numberSource .sourceCode { counter-reset: line; }
+        .sourceCode.numberSource .sourceCode > span { position: relative; left: -4em; counter-increment: line; }
+        .sourceCode.numberSource .sourceCode > span > a:first-child::before { content: counter(line); position: relative; left: -1em; text-align: right; vertical-align: baseline; border: none; display: inline-block; min-width: 1em; padding-right: 0.5em; color: #aaa; }
+      </style>
+      <style>
+        body {
+          font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
+          line-height: 1.6;
+          max-width: 800px;
+          margin: 2rem auto;
+          padding: 0 1rem;
+          color: #333;
+        }
+        pre { background: #f5f5f5; padding: 1rem; overflow-x: auto; }
+        code { background: #f0f0f0; padding: 0.2em 0.4em; border-radius: 3px; }
+        blockquote { border-left: 4px solid #ddd; margin: 0; padding-left: 1rem; color: #666; }
+        table { border-collapse: collapse; width: 100%%; }
+        th, td { border: 1px solid #ddd; padding: 0.5rem; }
+        th { background: #f5f5f5; }
+        tfoot td { background: #e8e8e8; }
+        figure.table-figure { width: fit-content; margin: 1em 0; }
+        figure.table-figure table { width: auto; }
+        figcaption { text-align: center; font-weight: bold; font-size: 0.8em; }
+        .page-break { page-break-after: always; }
+        .callout { padding: 1rem; margin: 1rem 0; border-left: 4px solid; }
+        .callout-note { border-color: #3b82f6; background: #eff6ff; }
+        .callout-warning { border-color: #f59e0b; background: #fffbeb; }
+        .callout-tip { border-color: #10b981; background: #f0fdf4; }
+        .callout-danger { border-color: #ef4444; background: #fef2f2; }
+        ins { background: #d4fcbc; text-decoration: none; }
+        del { background: #fbb6c2; text-decoration: line-through; }
+        mark { background: #fff3cd; }
+        .smallcaps { font-variant: small-caps; }
+        .underline { text-decoration: underline; }
+        span.mark { background: #fff3cd; }
+        .hidden { display: none; }
+        .quarto-xref { font-variant: normal; }
+        .critic.comment { background: #e7e7e7; color: #666; font-style: italic; }
+        .mkhashtag { color: #666; }
+        .mkstyledtag {
+          display: inline-block;
+          background: #e0e0e0;
+          padding: 3px 9px;
+          border-radius: 20px;
+          font-size: 0.9em;
+          line-height: 1.4;
+          color: #333;
+          margin: 0 2px;
+        }
+      </style>
+        <meta name="paginate" content="symbols"/>
+      <meta name="highlight-language-only" content="true"/>
+      <meta name="code-line-numbers" content="false"/>
+      <meta name="code-highlight" content="pygments"/>
+      <meta name="sup-sub" content="true"/>
+      <meta name="relaxed-tables" content="true"/>
+      <meta name="includes" content="true"/>
+      <meta name="autolink" content="true"/>
+      <meta name="pretty" content="false"/>
+      <meta name="standalone" content="false"/>
+      <meta name="mode" content="unified"/>
+      <meta name="markdown-in-html" content="true"/>
+      <meta name="image-captions" content="true"/>
+      <meta name="wikilink-extension" content="html"/>
+      <meta name="wikilink-space" content="hyphen"/>
+      <meta name="wikilinks" content="true"/>
+      <meta name="widont" content="true"/>
+      <meta name="plugins" content="true"/>
+      <meta name="id-format" content="gfm"/>
+
+  <style>
+:root {
+  /* border-box width of the fixed sidebar; body offset includes a small gap */
+  --sidebar-width: 250px;
+  --sidebar-offset: 270px;
+}
+
+/* Base styles — override Apex standalone centering (max-width + margin: auto) */
+body {
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  font-size: 17px;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+    "Helvetica Neue", Arial, sans-serif;
+  line-height: 1.65;
+  color: #1e293b;
+  background-color: #fff;
+  max-width: none;
+  width: auto;
+  margin: 2rem 2rem 2rem var(--sidebar-offset);
+  padding: 0 1rem;
+  box-sizing: border-box;
+}
+
+/* Sidebar / Main TOC - wider on larger screens */
+.main-toc,
+.sidebar {
+  position: fixed;
+  left: 0;
+  top: 0;
+  box-sizing: border-box;
+  width: var(--sidebar-width);
+  min-width: var(--sidebar-width);
+  max-width: var(--sidebar-width);
+  height: 100vh;
+  overflow-y: auto;
+  background: #1e293b;
+  color: rgba(255, 255, 255, 0.9);
+  border-right: 2px solid rgba(255, 255, 255, 0.1);
+  padding: 24px 20px 130px;
+  font-size: 14px;
+  z-index: 100;
+  box-shadow: 4px 0 24px rgba(0, 0, 0, 0.08);
+  transition: transform 0.3s ease;
+}
+
+.main-toc ul,
+.sidebar ul {
+  list-style: none;
+  padding-left: 0;
+  margin: 0;
+  padding-bottom: 80px;
+}
+
+.main-toc ul::after,
+.sidebar ul::after {
+  content: "";
+  display: block;
+  height: 80px;
+}
+
+.main-toc li,
+.sidebar li {
+  margin: 0.25em 0;
+}
+
+.main-toc a,
+.sidebar a {
+  color: rgba(255, 255, 255, 0.85);
+  text-decoration: none;
+  display: block;
+  padding: 6px 12px;
+  border-radius: 4px;
+  transition: all 0.15s ease;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.main-toc a:hover,
+.sidebar a:hover {
+  background: #334155;
+  color: #fff;
+}
+
+.sidebar a.active {
+  color: #0ea5e9;
+  font-weight: 500;
+}
+
+/* Hamburger menu button */
+.hamburger-menu {
+  display: none;
+  position: fixed;
+  top: 12px;
+  left: 12px;
+  z-index: 200;
+  background: #1e293b;
+  border: 2px solid rgba(255, 255, 255, 0.1);
+  border-radius: 6px;
+  padding: 10px;
+  cursor: pointer;
+  color: rgba(255, 255, 255, 0.9);
+  font-size: 20px;
+  line-height: 1;
+  box-sizing: border-box;
+  width: 44px;
+  height: 44px;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+  transition: all 0.2s ease;
+  opacity: 0.2;
+}
+
+.hamburger-menu:hover {
+  background: #334155;
+  color: #fff;
+  opacity: 1;
+}
+
+/* Move hamburger to the right of the sidebar when menu is open */
+.hamburger-menu.active {
+  left: calc(var(--sidebar-width) + 12px);
+}
+
+.hamburger-menu.active {
+  background: #0ea5e9;
+}
+
+.hamburger-menu::before {
+  content: "☰";
+}
+
+.hamburger-menu.active::before {
+  content: "✕";
+}
+
+/* Mobile menu overlay */
+.mobile-menu-overlay {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: 150;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.3s ease, visibility 0.3s ease;
+}
+
+.mobile-menu-overlay.active {
+  opacity: 1;
+  visibility: visible;
+}
+
+/* Page TOC */
+.page-toc {
+  background: #f9f9f9;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  padding: 1rem;
+  margin: 1.5rem 0;
+}
+
+.page-toc ul {
+  list-style: none;
+  padding-left: 0;
+  margin: 0;
+}
+
+.page-toc > ul {
+  padding-left: 0;
+}
+
+.page-toc li {
+  margin: 0.25em 0;
+}
+
+.page-toc a {
+  color: #0066cc;
+  text-decoration: none;
+  display: block;
+  padding: 0.25em 0.5em;
+  border-radius: 3px;
+}
+
+.page-toc a:hover {
+  background: #e0e0e0;
+  color: #004499;
+}
+
+.page-toc ul ul {
+  list-style: none;
+  padding-left: 1.5em;
+  margin-top: 0.25em;
+  margin-left: 0;
+}
+
+.page-toc ul ul ul {
+  padding-left: 1.5em;
+}
+
+.page-toc ul ul a {
+  font-size: 0.9em;
+  color: #555;
+}
+
+.page-toc ul ul ul a {
+  font-size: 0.85em;
+  color: #666;
+}
+
+/* Floating TOC */
+.floating-toc {
+  position: fixed;
+  top: 0;
+  left: var(--sidebar-offset);
+  right: 0;
+  z-index: 50;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.2s ease, visibility 0.2s ease;
+  pointer-events: none;
+  display: flex;
+  justify-content: flex-end;
+  padding-right: 2rem;
+}
+
+.floating-toc.visible {
+  opacity: 1;
+  visibility: visible;
+  pointer-events: auto;
+}
+
+.floating-toc-container {
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(10px);
+  border-bottom: 1px solid #ddd;
+  border-radius: 0 0 12px 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  width: fit-content;
+  max-width: 400px;
+  min-width: 200px;
+  overflow: hidden;
+  transition: max-height 0.3s ease;
+}
+
+.floating-toc-header {
+  padding: 8px 16px;
+  cursor: pointer;
+  user-select: none;
+  font-size: 14px;
+  font-weight: 500;
+  color: #1e293b;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.floating-toc-header:hover {
+  background: rgba(0, 0, 0, 0.02);
+}
+
+.floating-toc-content {
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.3s ease;
+}
+
+.floating-toc-container:hover .floating-toc-content {
+  max-height: 70vh;
+  overflow-y: auto;
+}
+
+.floating-toc-content ul {
+  list-style: none;
+  padding: 8px 16px 16px;
+  margin: 0;
+}
+
+.floating-toc-content li {
+  margin: 0.1em 0;
+}
+
+.floating-toc-content a {
+  color: #0066cc;
+  text-decoration: none;
+  display: block;
+  padding: 0.2em 0.5em;
+  border-radius: 4px;
+  font-size: 13px;
+  transition: background 0.15s ease;
+}
+
+.floating-toc-content a:hover {
+  background: #e0e0e0;
+  color: #004499;
+}
+
+.floating-toc-content ul ul {
+  padding-left: 1.2em;
+  margin-top: 0;
+  margin-bottom: 0;
+}
+
+.floating-toc-content ul ul ul {
+  margin-top: 0;
+  margin-bottom: 0;
+}
+
+.floating-toc-content ul ul a {
+  font-size: 12px;
+  color: #555;
+}
+
+.floating-toc-content ul ul ul a {
+  font-size: 11px;
+  color: #666;
+}
+
+/* Smooth scrolling */
+html {
+  scroll-behavior: smooth;
+}
+
+/* Code blocks */
+code {
+  background: #f0f0f0;
+  padding: 0.2em 0.4em;
+  border-radius: 3px;
+  font-family: "Monaco", "Menlo", "Ubuntu Mono", monospace;
+  font-size: 0.9em;
+  margin: 0 0.1em;
+}
+
+pre {
+  background: #f5f5f5;
+  padding: 1rem;
+  overflow-x: auto;
+  border-radius: 4px;
+  margin: 1em 0;
+}
+
+pre code {
+  background: none;
+  padding: 0;
+  margin: 0;
+}
+
+/* Rouge syntax highlighting - GitHub theme, scoped to .highlight containers */
+.highlight {
+  color: #24292e;
+}
+
+.highlight .c {
+  color: #6a737d;
+  font-style: italic;
+} /* Comment */
+.highlight .err {
+  color: #a61717;
+  background-color: #e3d2d2;
+} /* Error */
+.highlight .k {
+  color: #d73a49;
+  font-weight: bold;
+} /* Keyword */
+.highlight .l {
+  color: #032f62;
+} /* Literal */
+.highlight .n {
+  color: #24292e;
+} /* Name */
+.highlight .o {
+  color: #d73a49;
+} /* Operator */
+.highlight .p {
+  color: #24292e;
+} /* Punctuation */
+.highlight .cm {
+  color: #6a737d;
+  font-style: italic;
+} /* Comment.Multiline */
+.highlight .cp {
+  color: #6a737d;
+  font-weight: bold;
+} /* Comment.Preproc */
+.highlight .c1 {
+  color: #6a737d;
+  font-style: italic;
+} /* Comment.Single */
+.highlight .cs {
+  color: #6a737d;
+  font-weight: bold;
+  font-style: italic;
+} /* Comment.Special */
+.highlight .gd {
+  color: #24292e;
+  background-color: #ffeef0;
+} /* Generic.Deleted */
+.highlight .ge {
+  color: #24292e;
+  font-style: italic;
+} /* Generic.Emph */
+.highlight .gr {
+  color: #aa0000;
+} /* Generic.Error */
+.highlight .gh {
+  color: #999999;
+  font-weight: bold;
+} /* Generic.Heading */
+.highlight .gi {
+  color: #24292e;
+  background-color: #f0fff4;
+} /* Generic.Inserted */
+.highlight .go {
+  color: #888888;
+} /* Generic.Output */
+.highlight .gp {
+  color: #555555;
+} /* Generic.Prompt */
+.highlight .gs {
+  font-weight: bold;
+} /* Generic.Strong */
+.highlight .gu {
+  color: #aaaaaa;
+} /* Generic.Subheading */
+.highlight .gt {
+  color: #aa0000;
+} /* Generic.Traceback */
+.highlight .kc {
+  color: #d73a49;
+  font-weight: bold;
+} /* Keyword.Constant */
+.highlight .kd {
+  color: #d73a49;
+  font-weight: bold;
+} /* Keyword.Declaration */
+.highlight .kn {
+  color: #d73a49;
+  font-weight: bold;
+} /* Keyword.Namespace */
+.highlight .kp {
+  color: #d73a49;
+  font-weight: bold;
+} /* Keyword.Pseudo */
+.highlight .kr {
+  color: #d73a49;
+  font-weight: bold;
+} /* Keyword.Reserved */
+.highlight .kt {
+  color: #d73a49;
+  font-weight: bold;
+} /* Keyword.Type */
+.highlight .ld {
+  color: #032f62;
+} /* Literal.Date */
+.highlight .m {
+  color: #005cc5;
+} /* Literal.Number */
+.highlight .s {
+  color: #032f62;
+} /* Literal.String */
+.highlight .na {
+  color: #6f42c1;
+} /* Name.Attribute */
+.highlight .nb {
+  color: #005cc5;
+} /* Name.Builtin */
+.highlight .nc {
+  color: #6f42c1;
+  font-weight: bold;
+} /* Name.Class */
+.highlight .no {
+  color: #005cc5;
+} /* Name.Constant */
+.highlight .nd {
+  color: #6f42c1;
+  font-weight: bold;
+} /* Name.Decorator */
+.highlight .ni {
+  color: #800080;
+} /* Name.Entity */
+.highlight .ne {
+  color: #990000;
+  font-weight: bold;
+} /* Name.Exception */
+.highlight .nf {
+  color: #6f42c1;
+} /* Name.Function */
+.highlight .nl {
+  color: #990000;
+} /* Name.Label */
+.highlight .nn {
+  color: #555555;
+} /* Name.Namespace */
+.highlight .nx {
+  color: #6f42c1;
+} /* Name.Other */
+.highlight .py {
+  color: #990000;
+} /* Name.Property */
+.highlight .nt {
+  color: #22863a;
+} /* Name.Tag */
+.highlight .nv {
+  color: #e36209;
+} /* Name.Variable */
+.highlight .ow {
+  color: #d73a49;
+  font-weight: bold;
+} /* Operator.Word */
+.highlight .w {
+  color: #bbbbbb;
+} /* Text.Whitespace */
+.highlight .mf {
+  color: #005cc5;
+} /* Literal.Number.Float */
+.highlight .mh {
+  color: #005cc5;
+} /* Literal.Number.Hex */
+.highlight .mi {
+  color: #005cc5;
+} /* Literal.Number.Integer */
+.highlight .mo {
+  color: #005cc5;
+} /* Literal.Number.Oct */
+.highlight .sb {
+  color: #032f62;
+} /* Literal.String.Backtick */
+.highlight .sc {
+  color: #032f62;
+} /* Literal.String.Char */
+.highlight .sd {
+  color: #032f62;
+} /* Literal.String.Doc */
+.highlight .s2 {
+  color: #032f62;
+} /* Literal.String.Double */
+.highlight .se {
+  color: #032f62;
+} /* Literal.String.Escape */
+.highlight .sh {
+  color: #032f62;
+} /* Literal.String.Heredoc */
+.highlight .si {
+  color: #032f62;
+} /* Literal.String.Interpol */
+.highlight .sx {
+  color: #032f62;
+} /* Literal.String.Other */
+.highlight .sr {
+  color: #22863a;
+} /* Literal.String.Regex */
+.highlight .s1 {
+  color: #032f62;
+} /* Literal.String.Single */
+.highlight .ss {
+  color: #032f62;
+} /* Literal.String.Symbol */
+.highlight .bp {
+  color: #005cc5;
+} /* Name.Builtin.Pseudo */
+.highlight .vc {
+  color: #e36209;
+} /* Name.Variable.Class */
+.highlight .vg {
+  color: #e36209;
+} /* Name.Variable.Global */
+.highlight .vi {
+  color: #e36209;
+} /* Name.Variable.Instance */
+.highlight .il {
+  color: #005cc5;
+} /* Literal.Number.Integer.Long */
+
+/* Additional Rouge token classes that may be used */
+.highlight .token {
+  color: #5670a0;
+}
+.highlight .token.list {
+  color: #546e9f;
+}
+.highlight .token.punctuation {
+  color: #3e8dad;
+}
+.highlight .token.list.punctuation {
+  color: #e05b78;
+}
+.highlight .token.content {
+  padding: 0;
+}
+
+/* Nested lists in page content */
+ul ul,
+ol ol,
+ul ol,
+ol ul {
+  padding-left: 1.5em;
+  margin-top: 0.25em;
+}
+
+/* Page footer */
+.page-footer {
+  background: #f5f5f5;
+  border-top: 1px solid #ddd;
+  padding: 1.5rem;
+  margin-top: 3rem;
+  color: #666;
+  font-size: 0.9em;
+}
+
+.page-footer p {
+  margin: 0.5em 0;
+}
+
+.page-footer a {
+  color: #0066cc;
+  text-decoration: none;
+}
+
+.page-footer a:hover {
+  text-decoration: underline;
+}
+
+/* Mobile responsive */
+@media (max-width: 768px) {
+  .hamburger-menu {
+    display: flex;
+  }
+
+  .main-toc,
+  .sidebar {
+    transform: translateX(-100%);
+    z-index: 175;
+  }
+
+  .main-toc.mobile-open,
+  .sidebar.mobile-open {
+    transform: translateX(0);
+  }
+
+  body {
+    margin: 2rem 1rem;
+  }
+
+  .floating-toc {
+    left: 0;
+  }
+}
+
+</style></head>
+
+  <body class="code-highlighted">
+<div class="floating-toc" id="floating-toc">
+  <div class="floating-toc-container">
+    <div class="floating-toc-header">
+      <span>Table of Contents 🔻</span>
+    </div>
+    <div class="floating-toc-content" id="floating-toc-content">
+      <!-- Content will be populated by JavaScript -->
+    </div>
+  </div>
+</div>
+
+<button class="hamburger-menu" id="hamburger-menu" aria-label="Toggle navigation"></button>
+<div class="mobile-menu-overlay" id="mobile-menu-overlay"></div>
+
+<nav class="main-toc"><ul><li><a href="Home.html">Home</a></li><li><a href="Getting-Started.html">Getting Started</a></li><li><a href="Installation.html">Installation</a></li><li><a href="Usage.html">Usage</a></li><li><a href="Syntax.html">Syntax</a></li><li><a href="Callouts.html">Callouts</a></li><li><a href="Tables.html">Tables</a></li><li><a href="Inline-Attribute-Lists.html">Inline Attribute Lists</a></li><li><a href="Modes.html">Modes</a></li><li><a href="Quarto-Mode.html">Quarto Mode</a></li><li><a href="Command-Line-Options.html">Command Line Options</a></li><li><a href="Rendering-Markdown-In-Terminal.html">Rendering Markdown in the Terminal</a></li><li><a href="Generating-Man-Pages.html">Generating Man Pages</a></li><li><a href="Multi-File-Documents.html">Multi-file Documents</a></li><li><a href="Citations.html">Citations</a></li><li><a href="Indices.html">Indices</a></li><li><a href="Metadata-Transforms.html">Metadata Transforms</a></li><li><a href="Pandoc-Integration.html">Integrating with Pandoc</a></li><li><a href="Using-Apex-with-Jekyll.html">Using Apex with Jekyll</a></li><li><a href="Header-IDs.html">Header IDs</a></li><li><a href="C-API.html">C API</a></li><li><a href="Writing-Tests.html">Writing Tests</a></li><li><a href="Xcode-Integration.html">Xcode Integration</a></li><li><a href="Examples.html">Examples</a></li><li><a href="Plugins.html">Plugins</a></li><li><a href="Filters.html">Filters</a></li><li><a href="Troubleshooting.html">Troubleshooting</a></li><li><a href="Credits.html">Credits</a></li></ul></nav>
+
+    <h1 id="plugins">
+      Plugins
+    </h1>
+<nav class="page-toc" id="page-toc-top"><ul><li><a href="#plugins">Plugins</a><ul><li><a href="#enabling-and-disabling-plugins">Enabling and disabling&nbsp;plugins</a></li><li><a href="#where-plugins-live">Where plugins&nbsp;live</a></li><li><a href="#disabling-a-global-plugin-within-a-project-shadowno-op">Disabling a global plugin within a project&nbsp;(shadow/no-op)</a></li><li><a href="#processing-phases">Processing&nbsp;phases</a></li><li><a href="#plugin-manifest-pluginyml">Plugin manifest:&nbsp;plugin.yml</a><ul><li><a href="#metadata-fields-for-directories-and-installers">Metadata fields for directories and&nbsp;installers</a></li><li><a href="#post-install-hooks-postinstall">Post-install hooks&nbsp;(post_install)</a></li></ul></li><li><a href="#plugin-bundles-bundle-key">Plugin bundles (bundle&nbsp;key)</a><ul><li><a href="#bundle-structure">Bundle&nbsp;structure</a></li><li><a href="#inheritance-and-overrides">Inheritance and&nbsp;overrides</a></li><li><a href="#behavior-and-limitations">Behavior and&nbsp;limitations</a></li></ul></li><li><a href="#external-handler-plugins-scriptscommands">External handler plugins&nbsp;(scripts/commands)</a><ul><li><a href="#manifest-fields">Manifest&nbsp;fields</a></li><li><a href="#json-protocol">JSON&nbsp;protocol</a></li></ul></li><li><a href="#declarative-regex-plugins-no-scripting">Declarative regex plugins (no&nbsp;scripting)</a><ul><li><a href="#manifest-fields">Manifest&nbsp;fields</a></li></ul></li><li><a href="#support-directory-and-environment-variables">Support directory and environment&nbsp;variables</a><ul><li><a href="#support-directory-apexsupportdir">Support directory&nbsp;(APEX_SUPPORT_DIR)</a></li><li><a href="#environment-variables-for-external-plugins">Environment variables for external&nbsp;plugins</a></li></ul></li><li><a href="#installing-plugins-from-the-directory">Installing plugins from the&nbsp;directory</a><ul><li><a href="#listing-available-plugins">Listing available&nbsp;plugins</a></li><li><a href="#installing-a-plugin">Installing&nbsp;a&nbsp;plugin</a><ul><li><a href="#security-confirmation-for-direct-installs">Security confirmation for direct&nbsp;installs</a></li><li><a href="#installation-process">Installation&nbsp;process</a></li></ul></li><li><a href="#uninstalling-a-plugin">Uninstalling&nbsp;a&nbsp;plugin</a></li></ul></li><li><a href="#share-your-plugin">Share Your&nbsp;Plugin</a></li><li><a href="#example-kbd-liquid-tag-plugin">Example: kbd liquid tag plugin</a><ul><li><a href="#directory-layout">Directory&nbsp;layout</a></li><li><a href="#pluginyml">plugin.yml</a></li><li><a href="#kbdpluginrb-simplified-shape">kbd_plugin.rb (simplified shape)</a></li></ul></li><li><a href="#example-emoji-span-plugin-declarative">Example: :emoji: span plugin (declarative)</a><ul><li><a href="#directory-layout">Directory&nbsp;layout</a></li><li><a href="#pluginyml">plugin.yml</a></li></ul></li><li><a href="#putting-it-all-together">Putting it all&nbsp;together</a></li></ul></li></ul></nav>
+
+    <p>
+      Apex supports a lightweight plugin system that lets you add new syntax and post‑processing behavior <strong>without patching the core</strong>. Plugins can be small scripts (Ruby, Python, etc.) or simple declarative regex rules defined in YAML.
+    </p>
+
+    <p>
+      This page covers:
+    </p>
+
+    <ul>
+
+      <li>
+        <strong>Where plugins live</strong>
+      </li>
+
+      <li>
+        <strong>How to enable/disable plugins</strong>
+      </li>
+
+      <li>
+        <strong>Processing phases</strong>
+      </li>
+
+      <li>
+        <strong>Plugin manifest format (<code>plugin.yml</code>)</strong>
+      </li>
+
+      <li>
+        <strong>External handler plugins (scripts/commands)</strong>
+      </li>
+
+      <li>
+        <strong>Declarative regex plugins (pure YAML)</strong>
+      </li>
+
+      <li>
+        <strong>Plugin bundles (<code>bundle</code> key)</strong>
+      </li>
+
+      <li>
+        <strong>Support directory and environment variables</strong>
+      </li>
+
+      <li>
+        <strong>Plugin metadata for directories and installers</strong>
+      </li>
+
+      <li>
+        <strong>Installing plugins from the directory or a Git URL</strong>
+      </li>
+
+      <li>
+        <strong>Examples: <code>kbd</code> liquid tag and <code><span class=\"emoji\">:emoji:</span></code> spans</strong>
+      </li>
+
+    </ul>
+
+    <p>
+      If you are using plugins from Swift/Xcode, see <a href="Xcode-Integration#apexoptions-vs-apex_options">Xcode Integration</a> for guidance on when to use high-level <code>ApexOptions</code> vs low-level <code>apex_options</code> and required imports (<code>Apex</code> + <code>ApexC</code>) for direct C struct field access.
+    </p>
+
+<hr />
+    <h2 id="enabling-and-disabling-plugins">
+      Enabling and disabling&nbsp;plugins
+    </h2>
+
+    <p>
+      By design, <strong>plugins are disabled by default</strong> so Apex’s performance and behavior are unchanged unless you explicitly opt in.
+    </p>
+
+    <ul>
+
+      <li>
+
+        <p>
+          <strong>CLI flags</strong>
+        </p>
+
+        <ul>
+
+          <li>
+            <strong>Enable plugins</strong>: <code>apex --plugins input.md</code>
+          </li>
+
+          <li>
+            <strong>Disable plugins</strong>: <code>apex --no-plugins input.md</code>
+          </li>
+
+        </ul>
+
+      </li>
+
+      <li>
+
+        <p>
+          <strong>Metadata keys</strong> (in the document’s front matter)
+        </p>
+
+        <ul>
+
+          <li>
+
+            <p>
+              Any of these keys are recognized (case-insensitive):
+            </p>
+
+            <ul>
+
+              <li>
+<code>plugins</code>
+              </li>
+
+              <li>
+<code>enable-plugins</code>
+              </li>
+
+              <li>
+<code>enable_plugins</code>
+              </li>
+
+            </ul>
+
+          </li>
+
+          <li>
+
+            <p>
+              Example:
+            </p>
+
+            <div class="highlight">
+<pre><span></span><span class="nn">---</span>
+<span class="nt">title</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Plugin demo</span>
+<span class="nt">plugins</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">true</span>
+<span class="nn">---</span>
+            </pre>
+          </div>
+
+        </li>
+
+      </ul>
+
+    </li>
+
+    <li>
+
+      <p>
+        <strong>Precedence</strong>
+      </p>
+
+      <ul>
+
+        <li>
+          If metadata enables or disables plugins, you can still override it from the CLI:
+          <ul>
+
+            <li>
+<code>--plugins</code> forces plugins <strong>on</strong>
+            </li>
+
+            <li>
+<code>--no-plugins</code> forces plugins <strong>off</strong>
+            </li>
+
+          </ul>
+
+        </li>
+
+        <li>
+          CLI flags always win over metadata.
+        </li>
+
+      </ul>
+
+    </li>
+
+  </ul>
+
+  <p>
+    If you never set <code>plugins: true</code> or pass <code>--plugins</code>, Apex will not load or run any plugins.
+  </p>
+
+<hr />
+  <h2 id="where-plugins-live">
+    Where plugins&nbsp;live
+  </h2>
+
+  <p>
+    Plugins are discovered from <strong>project</strong> and <strong>user</strong> locations, in this order:
+  </p>
+
+  <ul>
+
+    <li>
+
+      <p>
+        <strong>Project-local plugins (current directory)</strong>
+      </p>
+
+      <ul>
+
+        <li>
+          Directory: <code>.apex/plugins/</code> under the <strong>current working directory</strong>.
+        </li>
+
+        <li>
+          Structure: <strong>one subdirectory per plugin</strong>, for example:
+          <ul>
+
+            <li>
+<code>.apex/plugins/kbd/plugin.yml</code>
+            </li>
+
+            <li>
+<code>.apex/plugins/kbd/kbd_plugin.rb</code>
+            </li>
+
+            <li>
+<code>.apex/plugins/emoji/plugin.yml</code>
+            </li>
+
+          </ul>
+
+        </li>
+
+      </ul>
+
+    </li>
+
+    <li>
+
+      <p>
+        <strong>Project-local plugins (base directory)</strong>
+      </p>
+
+      <ul>
+
+        <li>
+          If Apex knows a <code>base_directory</code> (from <code>--base-dir</code>, metadata, or the input file’s directory), it also looks in:
+          <ul>
+
+            <li>
+<code>&lt;base_directory&gt;/.apex/plugins/</code>
+            </li>
+
+          </ul>
+
+        </li>
+
+      </ul>
+
+    </li>
+
+    <li>
+
+      <p>
+        <strong>Project-local plugins (Git repository root)</strong>
+      </p>
+
+      <ul>
+
+        <li>
+          If the current directory is inside a Git repository and <code>git rev-parse --show-toplevel</code> succeeds, Apex will also look in:
+          <ul>
+
+            <li>
+<code>&lt;git-top-level&gt;/.apex/plugins/</code>
+            </li>
+
+          </ul>
+
+        </li>
+
+        <li>
+          This is only used when the Git top-level is a parent of (or equal to) the current directory.
+        </li>
+
+      </ul>
+
+    </li>
+
+    <li>
+
+      <p>
+        <strong>Global (user) plugins</strong>
+      </p>
+
+      <ul>
+
+        <li>
+          Directory (XDG-aware):
+          <ul>
+
+            <li>
+              If <code>$XDG_CONFIG_HOME</code> is set:
+              <ul>
+
+                <li>
+<code>$XDG_CONFIG_HOME/apex/plugins/</code>
+                </li>
+
+              </ul>
+
+            </li>
+
+            <li>
+              Otherwise:
+              <ul>
+
+                <li>
+<code>~/.config/apex/plugins/</code>
+                </li>
+
+              </ul>
+
+            </li>
+
+          </ul>
+
+        </li>
+
+        <li>
+          Same structure: one subdirectory per plugin:
+          <ul>
+
+            <li>
+<code>~/.config/apex/plugins/kbd/plugin.yml</code>
+            </li>
+
+            <li>
+<code>~/.config/apex/plugins/emoji/plugin.yml</code>
+            </li>
+
+          </ul>
+
+        </li>
+
+      </ul>
+
+    </li>
+
+  </ul>
+
+  <p>
+    <strong>Plugin IDs must be unique.</strong> If a project plugin and a global plugin share the same <code>id</code>, the <strong>project plugin wins</strong> and the global one is ignored.
+  </p>
+
+<hr />
+  <h2 id="disabling-a-global-plugin-within-a-project-shadowno-op">
+    Disabling a global plugin within a project&nbsp;(shadow/no-op)
+  </h2>
+
+  <p>
+    Sometimes you may want to <strong>disable</strong> a plugin that is installed globally, but only for a specific project. Apex’s lookup order makes this easy: you can <strong>shadow</strong> a global plugin with a <strong>no-op project plugin</strong> that has the same <code>id</code>.
+  </p>
+
+  <p>
+    Key points:
+  </p>
+
+  <ul>
+
+    <li>
+      <strong>Project plugins are loaded before global plugins.</strong>
+    </li>
+
+    <li>
+      If two plugins share the same <code>id</code>, the <strong>first one wins</strong> and the later one is ignored.
+    </li>
+
+    <li>
+      A plugin that has <strong>no handler and no regex</strong> is a <strong>true no-op</strong>: it is loaded, but never changes the text.
+    </li>
+
+  </ul>
+
+  <p>
+    To disable a global plugin called <code>emoji-span</code> just for one project:
+  </p>
+
+  <ol>
+
+    <li>
+
+      <p>
+        Create a project plugins directory:
+      </p>
+
+      <div class="highlight">
+<pre><span></span>.apex/
+  plugins/
+    emoji-span/
+      plugin.yml
+      </pre>
+    </div>
+
+  </li>
+
+  <li>
+
+    <p>
+      Add a minimal <strong>no-op</strong> manifest that declares the same <code>id</code> and a phase, but no handler or pattern:
+    </p>
+
+    <div class="highlight">
+<pre><span></span><span class="nn">---</span>
+<span class="nt">id</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">emoji-span</span>
+<span class="nt">phase</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">post_render</span><span class="w">   </span><span class="c1"># or pre_parse, depending on the original plugin</span>
+<span class="c1"># No handler.command, pattern, or replacement on purpose:</span>
+<span class="c1"># this plugin will be loaded, but it does nothing.</span>
+<span class="nn">---</span>
+    </pre>
+  </div>
+
+</li>
+
+</ol>
+
+<p>
+  When you run Apex with plugins enabled in that project:
+</p>
+
+<ul>
+
+  <li>
+    The project-local <code>emoji-span</code> plugin is discovered first.
+  </li>
+
+  <li>
+    Because a plugin with id <code>emoji-span</code> already exists, the <strong>global</strong> <code>emoji-span</code> plugin is <strong>skipped</strong>.
+  </li>
+
+  <li>
+    Since the project version has no handler or regex, it is effectively a <strong>no-op</strong>, which means the global plugin is <strong>disabled for this project only</strong>.
+  </li>
+
+</ul>
+
+<hr />
+<h2 id="processing-phases">
+  Processing&nbsp;phases
+</h2>
+
+<p>
+  Apex exposes several <strong>phases</strong> in its pipeline. Plugins can hook into one or more phases; for now, two are wired up:
+</p>
+
+<ul>
+
+  <li>
+
+    <p>
+      <strong><code>pre_parse</code></strong>
+    </p>
+
+    <ul>
+
+      <li>
+        Runs on the <strong>raw Markdown text</strong> <em>before</em> it is parsed.
+      </li>
+
+      <li>
+        Good for:
+        <ul>
+
+          <li>
+            Custom syntax (e.g. <code>&lt;span class=&quot;keycombo combined&quot; title=&quot;...&quot;&gt;&lt;kbd class=&quot;key symbol&quot;&gt;...&lt;/kbd&gt;&lt;/span&gt;</code>)
+          </li>
+
+          <li>
+            Textual rewrites
+          </li>
+
+          <li>
+            Adding/removing markup before Apex sees it
+          </li>
+
+        </ul>
+
+      </li>
+
+    </ul>
+
+  </li>
+
+  <li>
+
+    <p>
+      <strong><code>post_render</code></strong>
+    </p>
+
+    <ul>
+
+      <li>
+        Runs on the <strong>final HTML output</strong> after Apex finishes rendering.
+      </li>
+
+      <li>
+        Good for:
+        <ul>
+
+          <li>
+            Wrapping elements in spans/divs
+          </li>
+
+          <li>
+            Adding CSS classes
+          </li>
+
+          <li>
+            Simple HTML post-processing (e.g. turning <code><span class=\"emoji\">:emoji:</span></code> into <code>&lt;span&gt;</code>)
+          </li>
+
+        </ul>
+
+      </li>
+
+    </ul>
+
+  </li>
+
+</ul>
+
+<p>
+  Internally, plugins for each phase are run in a <strong>deterministic order</strong>:
+</p>
+
+<ol>
+
+  <li>
+    Sorted by <strong>priority</strong> (lower numbers first; default is <code>100</code>).
+  </li>
+
+  <li>
+    Ties broken by <strong>plugin <code>id</code></strong> (lexicographically).
+  </li>
+
+</ol>
+
+<hr />
+<h2 id="plugin-manifest-pluginyml">
+  Plugin manifest:&nbsp;<code>plugin.yml</code>
+</h2>
+
+<p>
+  Each plugin is defined by a <strong>manifest</strong> file:
+</p>
+
+<ul>
+
+  <li>
+
+    <p>
+      <strong>File name</strong>: <code>plugin.yml</code>
+    </p>
+
+  </li>
+
+  <li>
+
+    <p>
+      <strong>Location</strong>: inside the plugin’s directory, e.g.:
+    </p>
+
+    <div class="highlight">
+<pre><span></span>.apex/plugins/kbd/plugin.yml
+~/.config/apex/plugins/emoji/plugin.yml
+    </pre>
+  </div>
+
+</li>
+
+</ul>
+
+<p>
+  At minimum, a plugin needs:
+</p>
+
+<div class="highlight">
+<pre><span></span><span class="nn">---</span>
+<span class="nt">id</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">my-plugin</span>
+<span class="c1"># Optional, but strongly recommended metadata:</span>
+<span class="c1"># title: Human-friendly name (if omitted, tools may fall back to id)</span>
+<span class="c1"># author: Name or handle of the plugin author</span>
+<span class="c1"># description: Short, human-readable description of what the plugin does</span>
+<span class="c1"># homepage: URL for the plugin landing page or README</span>
+<span class="c1"># repo: Canonical Git repository URL used for installation/updates</span>
+<span class="nt">phase</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">pre_parse</span><span class="w">           </span><span class="c1"># or post_render</span>
+<span class="nt">priority</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">100</span><span class="w">              </span><span class="c1"># optional, lower runs earlier</span>
+<span class="nt">timeout_ms</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">0</span><span class="w">              </span><span class="c1"># optional, 0 = no extra timeout logic (best-effort)</span>
+<span class="nn">---</span>
+</pre>
+</div>
+
+<p>
+  From there, you choose <strong>one of two plugin types</strong>:
+</p>
+
+<ul>
+
+  <li>
+    <strong>External handler plugin</strong>
+    <ul>
+
+      <li>
+        Runs an external command (Ruby, Python, shell, etc.).
+      </li>
+
+      <li>
+        Declared with a <code>handler.command</code> field.
+      </li>
+
+    </ul>
+
+  </li>
+
+  <li>
+    <strong>Declarative regex plugin</strong>
+    <ul>
+
+      <li>
+        No external code; in-process regex search/replace.
+      </li>
+
+      <li>
+        Declared with <code>pattern</code> and <code>replacement</code> fields.
+      </li>
+
+    </ul>
+
+  </li>
+
+</ul>
+
+<p>
+  You can’t mix both styles in a single plugin; if <code>handler.command</code> is present, the plugin is treated as external.
+</p>
+
+<h3 id="metadata-fields-for-directories-and-installers">
+  Metadata fields for directories and&nbsp;installers
+</h3>
+
+<p>
+  To support plugin directories, automatic installation, and future auto-update tools, Apex understands several <strong>optional metadata fields</strong> in <code>plugin.yml</code>:
+</p>
+
+<ul>
+
+  <li>
+    <strong><code>title</code></strong>: Short, human-friendly name for the plugin (e.g. <code>Keyboard Shortcuts</code>).
+  </li>
+
+  <li>
+    <strong><code>author</code></strong>: Free-form author string (your name, handle, or organization).
+  </li>
+
+  <li>
+    <strong><code>description</code></strong>: One–two sentence description of what the plugin does. This is already used in examples and is what directory listings will usually display.
+  </li>
+
+  <li>
+    <strong><code>homepage</code></strong>: Informational URL where users can learn more about the plugin—often a README, documentation site, or the GitHub project page. This field is <strong>not</strong> used for cloning, but may be shown in <code>--list-plugins</code> output.
+  </li>
+
+  <li>
+    <strong><code>repo</code></strong>: <strong>Canonical Git URL</strong> for the plugin repository, used by Apex when installing plugins from the central directory (for example, <code>https://github.com/ApexMarkdown/apex-kbd-plugin.git</code>). The repository must contain the <code>plugin.yml</code> manifest (and any supporting files) at its root.
+  </li>
+
+  <li>
+    <strong><code>post_install</code></strong>: Optional command that Apex will run after cloning the plugin during <code>--install-plugin</code>. See “Post-install hooks” below.
+  </li>
+
+</ul>
+
+<p>
+  Only <code>id</code>, <code>phase</code>, and either <code>handler.command</code> (for external plugins) or <code>pattern</code>/<code>replacement</code> (for declarative plugins) are required for execution—everything else is optional metadata used by tools.
+</p>
+
+<h3 id="post-install-hooks-postinstall">
+  Post-install hooks&nbsp;(<code>post_install</code>)
+</h3>
+
+<p>
+  External plugins can define an optional <code>post_install</code> command in <code>plugin.yml</code> that Apex will run immediately after cloning the plugin during <code>--install-plugin</code>:
+</p>
+
+<div class="highlight">
+<pre><span></span><span class="nn">---</span>
+<span class="nt">id</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">kbd</span>
+<span class="c1"># ... other fields ...</span>
+<span class="nt">post_install</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">./post_install.sh</span>
+<span class="nn">---</span>
+</pre>
+</div>
+
+<p>
+  When you run:
+</p>
+
+<div class="highlight">
+<pre><span></span>apex<span class="w"> </span>--install-plugin<span class="w"> </span>kbd
+</pre>
+</div>
+
+<p>
+  Apex will:
+</p>
+
+<ol>
+
+  <li>
+    Clone the plugin repository into your user plugin directory (e.g. <code>~/.config/apex/plugins/kbd</code>).
+  </li>
+
+  <li>
+    Look for <code>plugin.yml</code> (or <code>plugin.yaml</code>) in the root of that directory.
+  </li>
+
+  <li>
+    If it finds a <code>post_install</code> key, run the value as a shell command from the plugin directory (equivalent to <code>cd &lt;plugin_dir&gt; &amp;&amp; &lt;post_install&gt;</code>).
+  </li>
+
+</ol>
+
+<p>
+  This hook is useful for:
+</p>
+
+<ul>
+
+  <li>
+    Creating initial configuration files or support data under <code>APEX_SUPPORT_DIR</code>.
+  </li>
+
+  <li>
+    Printing a welcome or usage message via <code>echo</code>.
+  </li>
+
+  <li>
+    Running an interactive setup script that asks the user questions and writes config.
+  </li>
+
+</ul>
+
+<p>
+  If the <code>post_install</code> command exits with a non-zero status, Apex prints a warning but considers the plugin installed successfully (the clone is not rolled back).
+</p>
+
+<hr />
+<h2 id="plugin-bundles-bundle-key">
+  Plugin bundles (<code>bundle</code>&nbsp;key)
+</h2>
+
+<p>
+  Sometimes it is convenient for a single repository to provide <strong>multiple related plugins</strong> as a bundle—for example, a “documentation” bundle that contains:
+</p>
+
+<ul>
+
+  <li>
+<code>kbd</code> – expands <code>&lt;span class=&quot;keycombo combined&quot; title=&quot;Command-3&quot;&gt;&lt;kbd class=&quot;mod symbol&quot;&gt;&amp;#8984;&lt;/kbd&gt;&lt;kbd class=&quot;key symbol&quot;&gt;3&lt;/kbd&gt;&lt;/span&gt;</code> keyboard shortcuts
+  </li>
+
+  <li>
+<code>prefpane</code> – expands <code>{% prefspane Advanced, Processor %}</code>
+  </li>
+
+  <li>
+<code>menubar</code> – expands <code>{% menubar File, Open %}</code>
+  </li>
+
+</ul>
+
+<p>
+  Instead of creating a separate repo (and <code>plugin.yml</code>) for each, Apex supports a <strong>bundle</strong> syntax in <code>plugin.yml</code> when built with full YAML (libyaml) support.
+</p>
+
+<h3 id="bundle-structure">
+  Bundle&nbsp;structure
+</h3>
+
+<p>
+  A <strong>bundle manifest</strong> has:
+</p>
+
+<ul>
+
+  <li>
+    Top-level metadata that applies to the bundle as a whole.
+  </li>
+
+  <li>
+    A <code>bundle:</code> key whose value is a YAML sequence (array) of per-plugin configs.
+  </li>
+
+</ul>
+
+<p>
+  Example:
+</p>
+
+<div class="highlight">
+<pre><span></span><span class="nn">---</span>
+<span class="nt">id</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">documentation</span>
+<span class="nt">title</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Documentation helpers</span>
+<span class="nt">author</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Brett Terpstra</span>
+<span class="nt">description</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">A bundle of documentation-related helpers (kbd, menubar, prefpane).</span>
+<span class="nt">homepage</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">https://github.com/ApexMarkdown/apex-plugin-documentation</span>
+<span class="nt">repo</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">https://github.com/ApexMarkdown/apex-plugin-documentation.git</span>
+
+<span class="c1"># Each entry in bundle defines a child plugin</span>
+<span class="nt">bundle</span><span class="p">:</span>
+<span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">id</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">kbd</span>
+<span class="w">    </span><span class="nt">title</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Keyboard Shortcuts</span>
+<span class="w">    </span><span class="nt">description</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Render &lt;span class=&quot;keycombo combined&quot; title=&quot;...&quot;&gt;&lt;kbd class=&quot;key symbol&quot;&gt;...&lt;/kbd&gt;&lt;/span&gt; key combos to HTML &lt;kbd&gt; elements</span>
+<span class="w">    </span><span class="nt">phase</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">pre_parse</span>
+<span class="w">    </span><span class="nt">priority</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">100</span>
+<span class="w">    </span><span class="nt">handler</span><span class="p">:</span>
+<span class="w">      </span><span class="nt">command</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;ruby</span><span class="nv"> </span><span class="s">kbd_plugin.rb&quot;</span>
+
+<span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">id</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">menubar</span>
+<span class="w">    </span><span class="nt">title</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Menubar Paths</span>
+<span class="w">    </span><span class="nt">description</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Render {% menubar File, Open %} to a styled menu path</span>
+<span class="w">    </span><span class="nt">phase</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">pre_parse</span>
+<span class="w">    </span><span class="nt">handler</span><span class="p">:</span>
+<span class="w">      </span><span class="nt">command</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;ruby</span><span class="nv"> </span><span class="s">menubar_plugin.rb&quot;</span>
+
+<span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">id</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">prefspane</span>
+<span class="w">    </span><span class="nt">title</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Preferences Pane</span>
+<span class="w">    </span><span class="nt">description</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Render {% prefspane Advanced, Processor %} to a styled preference path</span>
+<span class="w">    </span><span class="nt">phase</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">pre_parse</span>
+<span class="w">    </span><span class="nt">handler</span><span class="p">:</span>
+<span class="w">      </span><span class="nt">command</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;ruby</span><span class="nv"> </span><span class="s">prefspane_plugin.rb&quot;</span>
+<span class="nn">---</span>
+</pre>
+</div>
+
+<p>
+  Apex will treat this as <strong>three distinct plugins</strong>:
+</p>
+
+<ul>
+
+  <li>
+<code>kbd</code>
+  </li>
+
+  <li>
+<code>menubar</code>
+  </li>
+
+  <li>
+<code>prefspane</code>
+  </li>
+
+</ul>
+
+<p>
+  all sourced from the same repository and manifest.
+</p>
+
+<h3 id="inheritance-and-overrides">
+  Inheritance and&nbsp;overrides
+</h3>
+
+<p>
+  When loading a bundle, Apex:
+</p>
+
+<ol>
+
+  <li>
+    Parses the top-level mapping (the “bundle header”), and the <code>bundle:</code> sequence, using full YAML.
+  </li>
+
+  <li>
+    For each entry in <code>bundle</code>:
+    <ul>
+
+      <li>
+        Starts with the <strong>top-level metadata</strong>.
+      </li>
+
+      <li>
+        Applies the child entry’s fields as <strong>overrides</strong>.
+      </li>
+
+    </ul>
+
+  </li>
+
+</ol>
+
+<p>
+  Concretely:
+</p>
+
+<ul>
+
+  <li>
+    Top-level <code>author</code>, <code>homepage</code>, and <code>repo</code> are used as defaults for every child plugin.
+  </li>
+
+  <li>
+    Each child <strong>must</strong> define its own:
+    <ul>
+
+      <li>
+<code>id</code>
+      </li>
+
+      <li>
+<code>phase</code>
+      </li>
+
+      <li>
+        and either:
+        <ul>
+
+          <li>
+<code>handler.command</code> (external plugin), or
+          </li>
+
+          <li>
+<code>pattern</code> + <code>replacement</code> (declarative plugin)
+          </li>
+
+        </ul>
+
+      </li>
+
+    </ul>
+
+  </li>
+
+  <li>
+    A child <strong>may</strong> also define its own:
+    <ul>
+
+      <li>
+<code>title</code>
+      </li>
+
+      <li>
+<code>description</code>
+      </li>
+
+      <li>
+<code>priority</code>
+      </li>
+
+      <li>
+<code>timeout_ms</code>
+      </li>
+
+      <li>
+<code>flags</code>
+      </li>
+
+    </ul>
+
+  </li>
+
+  <li>
+    If a child defines <code>author</code>, <code>homepage</code>, or <code>repo</code>, those values <strong>override</strong> the bundle-level defaults for that child only.
+  </li>
+
+</ul>
+
+<p>
+  After merging, each child is turned into a normal internal plugin record, just like if it had its own standalone <code>plugin.yml</code>.
+</p>
+
+<h3 id="behavior-and-limitations">
+  Behavior and&nbsp;limitations
+</h3>
+
+<ul>
+
+  <li>
+    <strong>Discovery</strong>:
+    <ul>
+
+      <li>
+        Bundle manifests live in the same places as normal plugins:
+        <ul>
+
+          <li>
+            Project-local: <code>.apex/plugins/documentation/plugin.yml</code>
+          </li>
+
+          <li>
+            Global: <code>~/.config/apex/plugins/documentation/plugin.yml</code>
+          </li>
+
+        </ul>
+
+      </li>
+
+    </ul>
+
+  </li>
+
+  <li>
+    <strong>Phases and IDs</strong>:
+    <ul>
+
+      <li>
+        Each child plugin’s <code>id</code> and <code>phase</code> are used when registering and running plugins.
+      </li>
+
+      <li>
+        All normal rules apply:
+        <ul>
+
+          <li>
+            IDs must be unique across all loaded plugins.
+          </li>
+
+          <li>
+            Phase must be <code>pre_parse</code> or <code>post_render</code> (for now).
+          </li>
+
+        </ul>
+
+      </li>
+
+    </ul>
+
+  </li>
+
+  <li>
+    <strong>libyaml requirement</strong>:
+    <ul>
+
+      <li>
+        The <code>bundle</code> syntax relies on full YAML parsing via <code>libyaml</code>.
+      </li>
+
+      <li>
+        If Apex is built <strong>without</strong> libyaml support, <code>bundle:</code> is not recognized as a special structure; in that case, you should fall back to separate manifests for each plugin if you need cross-platform behavior on builds that omit libyaml.
+      </li>
+
+    </ul>
+
+  </li>
+
+</ul>
+
+<hr />
+<h2 id="external-handler-plugins-scriptscommands">
+  External handler plugins&nbsp;(scripts/commands)
+</h2>
+
+<p>
+  An external handler plugin defines a <strong>command</strong> to run, which receives JSON on stdin and writes the transformed text to stdout.
+</p>
+
+<h3 id="manifest-fields">
+  Manifest&nbsp;fields
+</h3>
+
+<div class="highlight">
+<pre><span></span><span class="nn">---</span>
+<span class="nt">id</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">kbd</span>
+<span class="nt">title</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Keyboard Shortcuts</span>
+<span class="nt">author</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Brett Terpstra</span>
+<span class="nt">description</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Render &lt;span class=&quot;keycombo combined&quot; title=&quot;...&quot;&gt;&lt;kbd class=&quot;key symbol&quot;&gt;...&lt;/kbd&gt;&lt;/span&gt; key combos to HTML</span>
+<span class="nt">homepage</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">https://github.com/ApexMarkdown/apex-kbd-plugin</span>
+<span class="nt">repo</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">https://github.com/ApexMarkdown/apex-kbd-plugin.git</span>
+<span class="nt">phase</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">pre_parse</span>
+<span class="nt">priority</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">100</span>
+<span class="nt">timeout_ms</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">0</span><span class="w">        </span><span class="c1"># optional</span>
+<span class="nt">handler</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">command</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;ruby</span><span class="nv"> </span><span class="s">kbd_plugin.rb&quot;</span>
+<span class="nn">---</span>
+</pre>
+</div>
+
+<ul>
+
+  <li>
+    <strong><code>id</code></strong>: unique identifier (no spaces recommended).
+  </li>
+
+  <li>
+    <strong><code>title</code>/<code>author</code>/<code>description</code>/<code>homepage</code>/<code>repo</code></strong>: optional metadata used by listing/installation tools and plugin directories.
+  </li>
+
+  <li>
+    <strong><code>phase</code></strong>: <code>pre_parse</code> or <code>post_render</code>.
+  </li>
+
+  <li>
+    <strong><code>priority</code></strong>: integer; lower runs first.
+  </li>
+
+  <li>
+    <strong><code>timeout_ms</code></strong>: optional; host may use this as a soft cap.
+  </li>
+
+  <li>
+    <strong><code>handler.command</code></strong>:
+    <ul>
+
+      <li>
+        Executed via <code>sh -c</code> from the plugin’s directory (<code>APEX_PLUGIN_DIR</code>).
+      </li>
+
+      <li>
+        Must be runnable in your environment (e.g. Ruby installed if you use <code>ruby</code>).
+      </li>
+
+    </ul>
+
+  </li>
+
+</ul>
+
+<h3 id="json-protocol">
+  JSON&nbsp;protocol
+</h3>
+
+<p>
+  For text phases (<code>pre_parse</code>, <code>post_render</code>), Apex sends your command a JSON object on <strong>stdin</strong>:
+</p>
+
+<div class="highlight">
+<pre><span></span><span class="p">{</span>
+<span class="w">  </span><span class="nt">&quot;version&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span>
+<span class="w">  </span><span class="nt">&quot;plugin_id&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;kbd&quot;</span><span class="p">,</span>
+<span class="w">  </span><span class="nt">&quot;phase&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;pre_parse&quot;</span><span class="p">,</span>
+<span class="w">  </span><span class="nt">&quot;text&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;raw or rendered text here&quot;</span>
+<span class="p">}</span>
+</pre>
+</div>
+
+<p>
+  Your plugin should:
+</p>
+
+<ol>
+
+  <li>
+    Read all of stdin.
+  </li>
+
+  <li>
+    Parse the JSON.
+  </li>
+
+  <li>
+    Transform the <code>text</code> field.
+  </li>
+
+  <li>
+    Print the <strong>new text only</strong> to stdout (no extra JSON, headers, or logging).
+  </li>
+
+</ol>
+
+<p>
+  If your plugin fails, times out, or prints nothing, Apex will treat it as a no-op and continue gracefully.
+</p>
+
+<hr />
+<h2 id="declarative-regex-plugins-no-scripting">
+  Declarative regex plugins (no&nbsp;scripting)
+</h2>
+
+<p>
+  For many cases, you don’t need a script at all. A <strong>declarative regex plugin</strong> uses <code>regex.h</code> inside Apex for fast in-process search/replace.
+</p>
+
+<h3 id="manifest-fields">
+  Manifest&nbsp;fields
+</h3>
+
+<div class="highlight">
+<pre><span></span><span class="nn">---</span>
+<span class="nt">id</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">emoji-span</span>
+<span class="nt">title</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Emoji span wrapper</span>
+<span class="nt">author</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Brett Terpstra</span>
+<span class="nt">description: Wrap :emoji</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">markers in a span for styling</span>
+<span class="nt">homepage</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">https://github.com/ApexMarkdown/apex-emoji-plugin</span>
+<span class="nt">repo</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">https://github.com/ApexMarkdown/apex-emoji-plugin.git</span>
+<span class="nt">phase</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">post_render</span>
+<span class="nt">pattern</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;(:[a-zA-Z0-9_+-]+:)&quot;</span>
+<span class="nt">replacement</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;&lt;span</span><span class="nv"> </span><span class="s">class=\&quot;emoji\&quot;&gt;$1&lt;/span&gt;&quot;</span>
+<span class="nt">flags</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;i&quot;</span><span class="w">          </span><span class="c1"># optional: e.g. i, m, s</span>
+<span class="nt">priority</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">200</span>
+<span class="nt">timeout_ms</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">0</span>
+<span class="nn">---</span>
+</pre>
+</div>
+
+<ul>
+
+  <li>
+    <strong><code>pattern</code></strong>: POSIX regular expression (compiled via <code>regcomp</code>).
+  </li>
+
+  <li>
+    <strong><code>replacement</code></strong>:
+    <ul>
+
+      <li>
+        Replacement string with capture groups like <code>$1</code>, <code>$2</code>, etc.
+      </li>
+
+      <li>
+        Runs repeatedly across the text until no more matches.
+      </li>
+
+    </ul>
+
+  </li>
+
+  <li>
+    <strong><code>flags</code></strong> (optional):
+    <ul>
+
+      <li>
+        Currently supports:
+        <ul>
+
+          <li>
+<code>i</code> – case-insensitive
+          </li>
+
+          <li>
+<code>m</code> – multi-line
+          </li>
+
+          <li>
+<code>s</code> – dot matches newline (if supported by underlying regex flavor)
+          </li>
+
+        </ul>
+
+      </li>
+
+    </ul>
+
+  </li>
+
+</ul>
+
+<p>
+  This is ideal when:
+</p>
+
+<ul>
+
+  <li>
+    You only need straightforward pattern substitution.
+  </li>
+
+  <li>
+    Performance matters and you want to avoid <code>fork/exec</code>.
+  </li>
+
+</ul>
+
+<hr />
+<h2 id="support-directory-and-environment-variables">
+  Support directory and environment&nbsp;variables
+</h2>
+
+<p>
+  Plugins sometimes need a place to store <strong>cache/data files</strong> or know which file is being processed. To keep plugin code directories clean and give plugins enough context, Apex exposes a <strong>support directory</strong> and several environment variables.
+</p>
+
+<h3 id="support-directory-apexsupportdir">
+  Support directory&nbsp;(<code>APEX_SUPPORT_DIR</code>)
+</h3>
+
+<p>
+  Base path:
+</p>
+
+<ul>
+
+  <li>
+    If <code>$XDG_CONFIG_HOME</code> is set:
+    <ul>
+
+      <li>
+<code>$XDG_CONFIG_HOME/apex/support/</code>
+      </li>
+
+    </ul>
+
+  </li>
+
+  <li>
+    Otherwise:
+    <ul>
+
+      <li>
+<code>~/.config/apex/support/</code>
+      </li>
+
+    </ul>
+
+  </li>
+
+</ul>
+
+<p>
+  For each plugin, Apex creates:
+</p>
+
+<div class="highlight">
+<pre><span></span>APEX_SUPPORT_DIR/&lt;plugin-id&gt;/
+</pre>
+</div>
+
+<p>
+  You can safely write caches, logs, or temporary files there.
+</p>
+
+<h3 id="environment-variables-for-external-plugins">
+  Environment variables for external&nbsp;plugins
+</h3>
+
+<p>
+  When Apex runs an external handler plugin, it sets:
+</p>
+
+<ul>
+
+  <li>
+
+    <p>
+      <strong><code>APEX_PLUGIN_DIR</code></strong>
+    </p>
+
+    <ul>
+
+      <li>
+        Filesystem path to the plugin’s directory (where <code>plugin.yml</code> lives).
+      </li>
+
+      <li>
+        Useful for loading sidecar files, templates, etc.
+      </li>
+
+    </ul>
+
+  </li>
+
+  <li>
+
+    <p>
+      <strong><code>APEX_SUPPORT_DIR</code></strong>
+    </p>
+
+    <ul>
+
+      <li>
+        Base support directory as described above.
+      </li>
+
+      <li>
+        You’ll usually combine it with your plugin id, e.g. <code>$APEX_SUPPORT_DIR/kbd</code>.
+      </li>
+
+    </ul>
+
+  </li>
+
+  <li>
+
+    <p>
+      <strong><code>APEX_FILE_PATH</code></strong>
+    </p>
+
+    <ul>
+
+      <li>
+        When Apex is invoked on a file (for example <code>apex path/to/file.md</code>), this is the <strong>original path</strong> that was passed on the command line. Plugins can use this to make decisions based on path, directory, or extension.
+      </li>
+
+      <li>
+        When Apex reads from stdin (for example <code>cat file.md | apex</code>), <code>APEX_FILE_PATH</code> is set to:
+        <ul>
+
+          <li>
+            The current <code>base_directory</code> (if one was set via <code>--base-dir</code> or metadata), or
+          </li>
+
+          <li>
+            An empty string (<code>&quot;&quot;</code>) if no base directory is known.
+          </li>
+
+        </ul>
+
+      </li>
+
+      <li>
+        An empty <code>APEX_FILE_PATH</code> is a clear signal that there is no concrete source file path.
+      </li>
+
+    </ul>
+
+  </li>
+
+</ul>
+
+<p>
+  All of these variables apply only during the external command’s execution and are restored afterward.
+</p>
+
+<hr />
+<h2 id="installing-plugins-from-the-directory">
+  Installing plugins from the&nbsp;directory
+</h2>
+
+<p>
+  Apex can install plugins directly from a central directory hosted in the <code>ApexMarkdown/apex-plugins</code> GitHub repository. The directory is published as a JSON file:
+</p>
+
+<ul>
+
+  <li>
+<code>https://github.com/ApexMarkdown/apex-plugins</code> (repository)
+  </li>
+
+  <li>
+<code>https://raw.githubusercontent.com/ApexMarkdown/apex-plugins/refs/heads/main/apex-plugins.json</code> (JSON index)
+  </li>
+
+</ul>
+
+<p>
+  Each entry in <code>apex-plugins.json</code> looks like this:
+</p>
+
+<div class="highlight">
+<pre><span></span><span class="p">{</span>
+<span class="w">  </span><span class="nt">&quot;plugins&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
+<span class="w">    </span><span class="p">{</span>
+<span class="w">      </span><span class="nt">&quot;id&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;kbd&quot;</span><span class="p">,</span>
+<span class="w">      </span><span class="nt">&quot;title&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;Keyboard Shortcuts&quot;</span><span class="p">,</span>
+<span class="w">      </span><span class="nt">&quot;description&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;Renders {% kbd %} tags as &lt;kbd&gt; elements.&quot;</span><span class="p">,</span>
+<span class="w">      </span><span class="nt">&quot;author&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;Brett Terpstra&quot;</span><span class="p">,</span>
+<span class="w">      </span><span class="nt">&quot;homepage&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;https://github.com/ApexMarkdown/apex-plugin-kbd&quot;</span><span class="p">,</span>
+<span class="w">      </span><span class="nt">&quot;repo&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;https://github.com/ApexMarkdown/apex-plugin-kbd&quot;</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="w">  </span><span class="p">]</span>
+<span class="p">}</span>
+</pre>
+</div>
+
+<ul>
+
+  <li>
+    <strong><code>id</code></strong> must match the plugin <code>id</code> declared in that repo’s <code>plugin.yml</code>.
+  </li>
+
+  <li>
+    <strong><code>repo</code></strong> is the canonical Git URL that Apex will pass to <code>git clone</code>.
+  </li>
+
+  <li>
+    <strong><code>title</code></strong>, <strong><code>author</code></strong>, <strong><code>description</code></strong>, and <strong><code>homepage</code></strong> are used for human-readable listings.
+  </li>
+
+</ul>
+
+<h3 id="listing-available-plugins">
+  Listing available&nbsp;plugins
+</h3>
+
+<p>
+  To see what plugins are available in the central directory, use:
+</p>
+
+<div class="highlight">
+<pre><span></span>apex<span class="w"> </span>--list-plugins
+</pre>
+</div>
+
+<p>
+  This command:
+</p>
+
+<ul>
+
+  <li>
+    Fetches <code>apex-plugins.json</code> using <code>curl</code>.
+  </li>
+
+  <li>
+    Parses the <code>plugins</code> array.
+  </li>
+
+  <li>
+    Prints a concise listing to stdout, for example:
+  </li>
+
+</ul>
+
+<div class="highlight">
+<pre><span></span>## Installed Plugins
+
+kbd                  - Keyboard Shortcuts  (author: Brett Terpstra)
+    Renders {% kbd %} tags as &lt;kbd&gt; elements.
+    homepage: https://github.com/ApexMarkdown/apex-kbd-plugin
+
+---
+
+## Available Plugins
+
+emoji-span           - Emoji span wrapper  (author: Brett Terpstra)
+    Wrap <span class=\"emoji\">:emoji:</span> markers in a span for styling.
+    homepage: https://github.com/ApexMarkdown/apex-emoji-plugin
+</pre>
+</div>
+
+<h3 id="installing-a-plugin">
+  Installing&nbsp;a&nbsp;plugin
+</h3>
+
+<p>
+  The <code>--install-plugin</code> command accepts three types of arguments:
+</p>
+
+<ol>
+
+  <li>
+
+    <p>
+      <strong>Plugin ID from the directory</strong> (recommended for curated plugins):
+    </p>
+
+    <div class="highlight">
+<pre><span></span>apex<span class="w"> </span>--install-plugin<span class="w"> </span>kbd
+    </pre>
+  </div>
+
+  <p>
+    This will:
+  </p>
+
+  <ol>
+
+    <li>
+      Fetch <code>apex-plugins.json</code> from the central directory.
+    </li>
+
+    <li>
+      Find the entry whose <code>id</code> matches <code>kbd</code>.
+    </li>
+
+    <li>
+      Read the <code>repo</code> field and clone the repository.
+    </li>
+
+    <li>
+      Install into <code>$XDG_CONFIG_HOME/apex/plugins/kbd</code> or <code>~/.config/apex/plugins/kbd</code>.
+    </li>
+
+  </ol>
+
+</li>
+
+<li>
+
+  <p>
+    <strong>Full Git URL</strong> (for plugins not in the directory):
+  </p>
+
+  <div class="highlight">
+<pre><span></span>apex<span class="w"> </span>--install-plugin<span class="w"> </span>https://github.com/ttscoff/apex-plugin-kbd.git
+  </pre>
+</div>
+
+<p>
+  Also works with SSH URLs:
+</p>
+
+<div class="highlight">
+<pre><span></span>apex<span class="w"> </span>--install-plugin<span class="w"> </span>git@github.com:ttscoff/apex-plugin-kbd.git
+</pre>
+</div>
+
+</li>
+
+<li>
+
+  <p>
+    <strong>GitHub shorthand</strong> (<code>user/repo</code> format):
+  </p>
+
+  <div class="highlight">
+<pre><span></span>apex<span class="w"> </span>--install-plugin<span class="w"> </span>ttscoff/apex-plugin-kbd
+  </pre>
+</div>
+
+<p>
+  This is automatically expanded to <code>https://github.com/ttscoff/apex-plugin-kbd.git</code>.
+</p>
+
+</li>
+
+</ol>
+
+<h4 id="security-confirmation-for-direct-installs">
+  Security confirmation for direct&nbsp;installs
+</h4>
+
+<p>
+  When installing from a <strong>direct Git URL or GitHub shorthand</strong> (i.e., anything outside the curated directory), Apex will prompt:
+</p>
+
+<div class="highlight">
+<pre><span></span>Apex plugins execute unverified code. Only install plugins from trusted sources.
+Continue? (y/n)
+</pre>
+</div>
+
+<ul>
+
+  <li>
+    Answer <code>y</code> or <code>Y</code> to proceed with the installation.
+  </li>
+
+  <li>
+    Any other response (including <code>n</code>, <code>N</code>, or just pressing Enter) aborts the install.
+  </li>
+
+</ul>
+
+<p>
+  <strong>Directory ID installs</strong> (like <code>--install-plugin kbd</code> from the curated list) do <strong>not</strong> show this prompt, as those plugins have been reviewed and included in the central directory.
+</p>
+
+<h4 id="installation-process">
+  Installation&nbsp;process
+</h4>
+
+<p>
+  For all installation methods, Apex will:
+</p>
+
+<ol>
+
+  <li>
+
+    <p>
+      Create (if necessary) the user plugin directory:
+    </p>
+
+    <ul>
+
+      <li>
+<code>$XDG_CONFIG_HOME/apex/plugins</code> if <code>$XDG_CONFIG_HOME</code> is set, or
+      </li>
+
+      <li>
+<code>~/.config/apex/plugins</code> otherwise.
+      </li>
+
+    </ul>
+
+  </li>
+
+  <li>
+
+    <p>
+      For <strong>direct URL/shorthand installs</strong>:
+    </p>
+
+    <ul>
+
+      <li>
+        Clone the repository into a temporary directory.
+      </li>
+
+      <li>
+        Read <code>plugin.yml</code> (or <code>plugin.yaml</code>) from the cloned repo to determine the plugin <code>id</code>.
+      </li>
+
+      <li>
+        Move the cloned directory to the final location: <code>~/.config/apex/plugins/&lt;id&gt;/</code>.
+      </li>
+
+    </ul>
+
+  </li>
+
+  <li>
+
+    <p>
+      For <strong>directory ID installs</strong>:
+    </p>
+
+    <ul>
+
+      <li>
+        Clone directly into the final location: <code>~/.config/apex/plugins/&lt;id&gt;/</code>.
+      </li>
+
+    </ul>
+
+  </li>
+
+  <li>
+
+    <p>
+      If the target directory already exists, Apex will refuse to overwrite it and print an error. You can remove or rename the existing directory and rerun <code>--install-plugin</code> to reinstall.
+    </p>
+
+  </li>
+
+  <li>
+
+    <p>
+      After successful cloning, look for a <code>post_install</code> hook in <code>plugin.yml</code> and run it if present.
+    </p>
+
+  </li>
+
+</ol>
+
+<blockquote>
+
+  <p>
+    <strong>Security note:</strong> Apex plugins execute unverified code. Only install plugins from trusted sources. When installing from a direct Git URL or GitHub repo name, you will be prompted to confirm before the plugin is cloned.
+  </p>
+
+</blockquote>
+
+<p>
+  Once installed, the plugin is just like any other user-global plugin:
+</p>
+
+<ul>
+
+  <li>
+    It will be discovered from <code>$XDG_CONFIG_HOME/apex/plugins</code> or <code>~/.config/apex/plugins</code>.
+  </li>
+
+  <li>
+    You still need to enable plugins via <code>--plugins</code> or metadata (<code>plugins: true</code>).
+  </li>
+
+</ul>
+
+<p>
+  If you are authoring a plugin for inclusion in the directory:
+</p>
+
+<ul>
+
+  <li>
+    Make sure your <code>plugin.yml</code> has at least <code>id</code>, <code>phase</code>, and either <code>handler.command</code> or <code>pattern</code>/<code>replacement</code>.
+  </li>
+
+  <li>
+    Add <code>title</code>, <code>author</code>, <code>description</code>, <code>homepage</code>, and <code>repo</code> to <code>plugin.yml</code> so directory tools and installers have complete metadata.
+  </li>
+
+  <li>
+    Ensure the <code>plugin.yml</code> and any scripts live at the <strong>root</strong> of the Git repository referenced by <code>repo</code>.
+  </li>
+
+</ul>
+
+<h3 id="uninstalling-a-plugin">
+  Uninstalling&nbsp;a&nbsp;plugin
+</h3>
+
+<p>
+  To remove a locally installed plugin, use:
+</p>
+
+<div class="highlight">
+<pre><span></span>apex<span class="w"> </span>--uninstall-plugin<span class="w"> </span>kbd
+</pre>
+</div>
+
+<p>
+  The <code>--uninstall-plugin</code> command:
+</p>
+
+<ul>
+
+  <li>
+    Verifies that the plugin directory exists under the user plugin path (<code>$XDG_CONFIG_HOME/apex/plugins</code> or <code>~/.config/apex/plugins</code>).
+  </li>
+
+  <li>
+    Prompts for confirmation before deleting the plugin directory.
+  </li>
+
+  <li>
+    Removes only the plugin’s directory; support data under <code>.../apex/support/&lt;plugin-id&gt;/</code> is left intact.
+  </li>
+
+</ul>
+
+<p>
+  This command only works for plugins installed in the user plugin directory. Project-local plugins (in <code>.apex/plugins/</code>) must be removed manually by deleting the plugin directory.
+</p>
+
+<h2 id="share-your-plugin">
+  Share Your&nbsp;Plugin
+</h2>
+
+<p>
+  To request that your plugin be added to the central directory:
+</p>
+
+<ol>
+
+  <li>
+    <strong>Fork</strong> the <code>ApexMarkdown/apex-plugins</code> repository on GitHub to your own account or organization.
+  </li>
+
+  <li>
+    <strong>Clone</strong> your fork locally and create a new branch for your plugin entry (for example, <code>add-kbd-plugin</code>).
+  </li>
+
+  <li>
+    Open the <code>apex-plugins.json</code> file in the root of your fork and add a new object to the <code>plugins</code> array with the fields:
+    <ul>
+
+      <li>
+<code>id</code> (matching the <code>id</code> in your plugin’s <code>plugin.yml</code>),
+      </li>
+
+      <li>
+<code>title</code>,
+      </li>
+
+      <li>
+<code>description</code>,
+      </li>
+
+      <li>
+<code>author</code>,
+      </li>
+
+      <li>
+<code>homepage</code>,
+      </li>
+
+      <li>
+<code>repo</code> (canonical Git URL for the plugin repo).
+      </li>
+
+    </ul>
+
+  </li>
+
+  <li>
+    Commit your changes and <strong>push</strong> the branch to your fork on GitHub.
+  </li>
+
+  <li>
+    From your fork, open a <strong>pull request</strong> against the <code>main</code> branch of <code>ApexMarkdown/apex-plugins</code>, briefly describing your plugin and confirming that the <code>id</code> and <code>repo</code> match your published plugin repository.
+  </li>
+
+  <li>
+    Once the pull request is reviewed and merged, your plugin will show up in <code>apex --list-plugins</code> and be installable via <code>apex --install-plugin &lt;id&gt;</code>.
+  </li>
+
+</ol>
+
+<hr />
+<h2 id="example-kbd-liquid-tag-plugin">
+  Example: <code>kbd</code> liquid tag plugin
+</h2>
+
+<p>
+  This example shows how to support a liquid-style <code>&lt;span class=&quot;keycombo combined&quot; title=&quot;...&quot;&gt;&lt;kbd class=&quot;key symbol&quot;&gt;...&lt;/kbd&gt;&lt;/span&gt;</code> syntax, turning key combos into <code>&lt;kbd&gt;</code> markup.
+</p>
+
+<h3 id="directory-layout">
+  Directory&nbsp;layout
+</h3>
+
+<p>
+  Project-local example:
+</p>
+
+<div class="highlight">
+<pre><span></span>.apex/
+  plugins/
+    kbd/
+      plugin.yml
+      kbd_plugin.rb
+</pre>
+</div>
+
+<p>
+  Global example:
+</p>
+
+<div class="highlight">
+<pre><span></span>~/.config/apex/plugins/
+  kbd/
+    plugin.yml
+    kbd_plugin.rb
+</pre>
+</div>
+
+<h3 id="pluginyml">
+<code>plugin.yml</code>
+</h3>
+
+<div class="highlight">
+<pre><span></span><span class="nn">---</span>
+<span class="nt">id</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">kbd</span>
+<span class="nt">title</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Keyboard Shortcuts</span>
+<span class="nt">author</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Brett Terpstra</span>
+<span class="nt">description</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Render &lt;span class=&quot;keycombo combined&quot; title=&quot;...&quot;&gt;&lt;kbd class=&quot;key symbol&quot;&gt;...&lt;/kbd&gt;&lt;/span&gt; key combos to HTML &lt;kbd&gt; elements</span>
+<span class="nt">homepage</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">https://github.com/ApexMarkdown/apex-kbd-plugin</span>
+<span class="nt">repo</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">https://github.com/ApexMarkdown/apex-kbd-plugin.git</span>
+<span class="nt">phase</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">pre_parse</span>
+<span class="nt">priority</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">100</span>
+<span class="nt">timeout_ms</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">0</span>
+<span class="nt">handler</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">command</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;ruby</span><span class="nv"> </span><span class="s">kbd_plugin.rb&quot;</span>
+<span class="nn">---</span>
+</pre>
+</div>
+
+<h3 id="kbdpluginrb-simplified-shape">
+<code>kbd_plugin.rb</code> (simplified shape)
+</h3>
+
+<p>
+  The full script lives in the <code>examples</code> directory of the Apex repo as a reference. Conceptually, it:
+</p>
+
+<ul>
+
+  <li>
+    Reads JSON from stdin.
+  </li>
+
+  <li>
+    Extracts <code>text</code>.
+  </li>
+
+  <li>
+    Replaces each <code>&lt;span class=&quot;keycombo combined&quot; title=&quot;...&quot;&gt;&lt;kbd class=&quot;key symbol&quot;&gt;...&lt;/kbd&gt;&lt;/span&gt;</code> occurrence with properly formatted <code>&lt;kbd&gt;</code> HTML.
+  </li>
+
+  <li>
+    Prints the full transformed text to stdout.
+  </li>
+
+</ul>
+
+<p>
+  A very abridged sketch:
+</p>
+
+<div class="highlight">
+<pre><span></span><span class="ch">#!/usr/bin/env ruby</span>
+<span class="nb">require</span><span class="w"> </span><span class="s2">&quot;json&quot;</span>
+
+<span class="n">payload</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="no">JSON</span><span class="o">.</span><span class="n">parse</span><span class="p">(</span><span class="vg">$stdin</span><span class="o">.</span><span class="n">read</span><span class="p">)</span>
+<span class="n">text</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">payload</span><span class="o">[</span><span class="s2">&quot;text&quot;</span><span class="o">]</span><span class="w"> </span><span class="o">||</span><span class="w"> </span><span class="s2">&quot;&quot;</span>
+
+<span class="c1"># ... helper methods for normalizing modifier names, etc. ...</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">render_kbd</span><span class="p">(</span><span class="n">markup</span><span class="p">)</span>
+<span class="w">  </span><span class="c1"># convert markup like &quot;^~@r&quot; to HTML</span>
+<span class="w">  </span><span class="c1"># returning something like:</span>
+<span class="w">  </span><span class="c1">#   &lt;kbd&gt;⌃&lt;/kbd&gt;+&lt;kbd&gt;⌥&lt;/kbd&gt;+&lt;kbd&gt;⌘&lt;/kbd&gt;+&lt;kbd&gt;R&lt;/kbd&gt;</span>
+<span class="k">end</span>
+
+<span class="n">result</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">text</span><span class="o">.</span><span class="n">gsub</span><span class="p">(</span><span class="sr">/\{%\s*kbd\s+([^%]+)%\}/</span><span class="p">)</span><span class="w"> </span><span class="k">do</span>
+<span class="w">  </span><span class="n">render_kbd</span><span class="p">(</span><span class="no">Regexp</span><span class="o">.</span><span class="n">last_match</span><span class="p">(</span><span class="mi">1</span><span class="p">))</span>
+<span class="k">end</span>
+
+<span class="nb">print</span><span class="w"> </span><span class="n">result</span>
+</pre>
+</div>
+
+<p>
+  You can customize this script as you like; the only requirement is that it obey the stdin JSON / stdout contract.
+</p>
+
+<hr />
+<h2 id="example-emoji-span-plugin-declarative">
+  Example: <code><span class=\"emoji\">:emoji:</span></code> span plugin (declarative)
+</h2>
+
+<p>
+  This plugin turns <code><span class=\"emoji\">:emoji:</span></code> tokens in the final HTML into <code>&lt;span class=&quot;emoji&quot;&gt;<span class=\"emoji\">:emoji:</span>&lt;/span&gt;</code>.
+</p>
+
+<h3 id="directory-layout">
+  Directory&nbsp;layout
+</h3>
+
+<div class="highlight">
+<pre><span></span>~/.config/apex/plugins/
+  emoji/
+    plugin.yml
+</pre>
+</div>
+
+<h3 id="pluginyml">
+<code>plugin.yml</code>
+</h3>
+
+<div class="highlight">
+<pre><span></span><span class="nn">---</span>
+<span class="nt">id</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">emoji-span</span>
+<span class="nt">title</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Emoji span wrapper</span>
+<span class="nt">author</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Brett Terpstra</span>
+<span class="nt">description: Wrap :emoji</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">markers in a span for styling</span>
+<span class="nt">homepage</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">https://github.com/ApexMarkdown/apex-emoji-plugin</span>
+<span class="nt">repo</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">https://github.com/ApexMarkdown/apex-emoji-plugin.git</span>
+<span class="nt">phase</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">post_render</span>
+<span class="nt">pattern</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;(:[a-zA-Z0-9_+-]+:)&quot;</span>
+<span class="nt">replacement</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;&lt;span</span><span class="nv"> </span><span class="s">class=\&quot;emoji\&quot;&gt;$1&lt;/span&gt;&quot;</span>
+<span class="nt">flags</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;i&quot;</span>
+<span class="nt">priority</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">200</span>
+<span class="nt">timeout_ms</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">0</span>
+<span class="nn">---</span>
+</pre>
+</div>
+
+<p>
+  Because this is a declarative plugin, <strong>no external command is run</strong>. Apex compiles the regex and runs the replacements internally.
+</p>
+
+<hr />
+<h2 id="putting-it-all-together">
+  Putting it all&nbsp;together
+</h2>
+
+<p>
+  A typical workflow:
+</p>
+
+<ol>
+
+  <li>
+
+    <p>
+      <strong>Create a plugin directory</strong>
+    </p>
+
+    <ul>
+
+      <li>
+        Project-local: <code>.apex/plugins/my-plugin/</code>
+      </li>
+
+      <li>
+        Or global: <code>~/.config/apex/plugins/my-plugin/</code>
+      </li>
+
+    </ul>
+
+  </li>
+
+  <li>
+
+    <p>
+      <strong>Add <code>plugin.yml</code></strong>
+    </p>
+
+    <ul>
+
+      <li>
+        Choose <code>phase</code> (<code>pre_parse</code> or <code>post_render</code>).
+      </li>
+
+      <li>
+        Choose plugin type:
+        <ul>
+
+          <li>
+            External: add <code>handler.command</code>.
+          </li>
+
+          <li>
+            Declarative: add <code>pattern</code>, <code>replacement</code>, and optional <code>flags</code>.
+          </li>
+
+        </ul>
+
+      </li>
+
+      <li>
+        Optionally, add metadata fields (<code>title</code>, <code>author</code>, <code>description</code>, <code>homepage</code>, <code>repo</code>) so your plugin shows up nicely in directories and can be auto-installed.
+      </li>
+
+      <li>
+        For bundles, use <code>bundle:</code> to define multiple related child plugins in one manifest.
+      </li>
+
+    </ul>
+
+  </li>
+
+  <li>
+
+    <p>
+      <strong>Add code (if external)</strong>
+    </p>
+
+    <ul>
+
+      <li>
+        Put your script alongside <code>plugin.yml</code>.
+      </li>
+
+      <li>
+        Implement the JSON stdin → text stdout contract.
+      </li>
+
+    </ul>
+
+  </li>
+
+  <li>
+
+    <p>
+      <strong>Enable plugins</strong>
+    </p>
+
+    <ul>
+
+      <li>
+        Either:
+        <ul>
+
+          <li>
+            Add <code>plugins: true</code> (or <code>enable-plugins: true</code>) to your document metadata, <strong>or</strong>
+          </li>
+
+          <li>
+            Run with <code>--plugins</code> on the command line.
+          </li>
+
+        </ul>
+
+      </li>
+
+    </ul>
+
+  </li>
+
+  <li>
+
+    <p>
+      <strong>Test</strong>
+    </p>
+
+    <ul>
+
+      <li>
+        Run Apex on a sample document that exercises your plugin syntax.
+      </li>
+
+      <li>
+        If something goes wrong, log to a file under <code>$APEX_SUPPORT_DIR/&lt;id&gt;/</code> rather than printing debugging output to stdout.
+      </li>
+
+    </ul>
+
+  </li>
+
+</ol>
+
+<p>
+  Once you’re comfortable, you can share the <code>plugin.yml</code> plus any scripts with others; they just need to drop the directory into their <code>.apex/plugins/</code> or <code>~/.config/apex/plugins/</code> and enable plugins as needed.
+</p>
+
+<script>
+// Hamburger menu functionality
+(function() {
+  function initHamburgerMenu() {
+    var hamburger = document.getElementById('hamburger-menu');
+    var sidebar = document.querySelector('.main-toc, .sidebar');
+    var overlay = document.getElementById('mobile-menu-overlay');
+
+    if (!hamburger || !sidebar) return;
+
+    function toggleMenu() {
+      var isOpen = sidebar.classList.contains('mobile-open');
+      if (isOpen) {
+        sidebar.classList.remove('mobile-open');
+        hamburger.classList.remove('active');
+        if (overlay) overlay.classList.remove('active');
+      } else {
+        sidebar.classList.add('mobile-open');
+        hamburger.classList.add('active');
+        if (overlay) overlay.classList.add('active');
+      }
+    }
+
+    hamburger.addEventListener('click', function(e) {
+      e.stopPropagation();
+      toggleMenu();
+    });
+
+    if (overlay) {
+      overlay.addEventListener('click', function() {
+        toggleMenu();
+      });
+    }
+
+    // Close menu when clicking on a sidebar link (mobile only)
+    if (window.innerWidth <= 768) {
+      var sidebarLinks = sidebar.querySelectorAll('a');
+      sidebarLinks.forEach(function(link) {
+        link.addEventListener('click', function() {
+          setTimeout(function() {
+            sidebar.classList.remove('mobile-open');
+            hamburger.classList.remove('active');
+            if (overlay) overlay.classList.remove('active');
+          }, 100);
+        });
+      });
+    }
+
+    // Close menu on window resize if going to desktop
+    window.addEventListener('resize', function() {
+      if (window.innerWidth > 768) {
+        sidebar.classList.remove('mobile-open');
+        hamburger.classList.remove('active');
+        if (overlay) overlay.classList.remove('active');
+      }
+    });
+  }
+
+  // Initialize when DOM is ready
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initHamburgerMenu);
+  } else {
+    initHamburgerMenu();
+  }
+})();
+
+</script>
+<script>
+  (function() {
+    // Clone the page TOC for floating TOC
+    function initFloatingTOC() {
+      var pageTOC = document.getElementById('page-toc-top');
+      var floatingTOCContent = document.getElementById('floating-toc-content');
+      var floatingTOC = document.getElementById('floating-toc');
+
+      if (!pageTOC || !floatingTOCContent || !floatingTOC) return;
+
+      // Clone the TOC structure
+      var tocClone = pageTOC.cloneNode(true);
+      tocClone.id = 'floating-toc-clone';
+      floatingTOCContent.appendChild(tocClone);
+
+      // Update all links to use smooth scrolling
+      var allTOCLinks = document.querySelectorAll('.page-toc a, .floating-toc-content a');
+      allTOCLinks.forEach(function(link) {
+        link.addEventListener('click', function(e) {
+          var href = this.getAttribute('href');
+          if (href && href.startsWith('#')) {
+            e.preventDefault();
+            var targetId = href.substring(1);
+            var targetElement = document.getElementById(targetId);
+            if (targetElement) {
+              var offset = 20; // Offset from top
+
+              // Function to calculate absolute position from document top
+              function getAbsoluteTop(element) {
+                var top = 0;
+                while (element) {
+                  top += element.offsetTop;
+                  element = element.offsetParent;
+                }
+                return top;
+              }
+
+              var absoluteTop = getAbsoluteTop(targetElement);
+              var scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+              var offsetPosition = absoluteTop - offset;
+
+              // Only scroll if we're not already at the target position
+              if (Math.abs(scrollTop - offsetPosition) > 10) {
+                window.scrollTo({
+                  top: Math.max(0, offsetPosition),
+                  behavior: 'smooth'
+                });
+              }
+
+              // Update URL hash without triggering scroll
+              if (history.pushState) {
+                history.pushState(null, null, href);
+              }
+            }
+          }
+        });
+      });
+
+      // Handle scroll to show/hide floating TOC
+      var tocTop = pageTOC.getBoundingClientRect().top + window.pageYOffset;
+      var tocBottom = tocTop + pageTOC.offsetHeight;
+
+      function updateFloatingTOC() {
+        var scrollY = window.pageYOffset || document.documentElement.scrollTop;
+
+        if (scrollY > tocBottom) {
+          floatingTOC.classList.add('visible');
+        } else {
+          floatingTOC.classList.remove('visible');
+        }
+      }
+
+      // Throttle scroll events
+      var ticking = false;
+      window.addEventListener('scroll', function() {
+        if (!ticking) {
+          window.requestAnimationFrame(function() {
+            updateFloatingTOC();
+            ticking = false;
+          });
+          ticking = true;
+        }
+      });
+
+      // Initial check
+      updateFloatingTOC();
+    }
+
+    // Initialize when DOM is ready
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', initFloatingTOC);
+    } else {
+      initFloatingTOC();
+    }
+  })();
+</script>
+<footer class="page-footer"><p>Copyright 2025 Brett Terpstra, All Rights Reserved | MIT License</p></footer></body>
+
+</html>
+

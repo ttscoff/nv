@@ -21,8 +21,8 @@
 #import "NSBezierPath_NV.h"
 #import "NotationPrefs.h"
 #import "GlobalPrefs.h"
+#import "BufferUtils.h"
 
-#define SYSTEM_LIST_FONT_SIZE 12.0f
 
 @implementation PrefsWindowController
 
@@ -226,7 +226,7 @@
 				newFontSize = [NSFont smallSystemFontSize];
 				break;
 			case 2:
-				newFontSize = /*[NSFont systemFontSize]*/ SYSTEM_LIST_FONT_SIZE;
+				newFontSize = [NSFont systemFontSize];
 				break;
 			case 3:
 				newFontSize = [tableTextSizeField floatValue];
@@ -411,7 +411,7 @@
     float fontSize = [prefsController tableFontSize];
     int fontButtonIndex = 3;
     if (fontSize == [NSFont smallSystemFontSize]) fontButtonIndex = 0;
-    else if (fontSize == /*[NSFont systemFontSize]*/ SYSTEM_LIST_FONT_SIZE) fontButtonIndex = 1;
+    else if (fabsf(fontSize - (float)[NSFont systemFontSize]) < 0.01f) fontButtonIndex = 1;
     [tableTextMenuButton selectItemAtIndex:fontButtonIndex];
     [tableTextSizeField setFloatValue:fontSize];
     [tableTextSizeField setHidden:(fontButtonIndex != 3)];

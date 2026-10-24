@@ -71,7 +71,7 @@ enum {VERIFY_NOT_ATTEMPTED, VERIFY_FAILED, VERIFY_IN_PROGRESS, VERIFY_SUCCESS};
 	return nil;
 }
 - (void)dealloc {
-	[picker release];
+	[passphrasePicker release];
 	[changer release];
 	[notationPrefs release];
 	[postStorageFormatInvocation release];
@@ -126,7 +126,7 @@ enum {VERIFY_NOT_ATTEMPTED, VERIFY_FAILED, VERIFY_IN_PROGRESS, VERIFY_SUCCESS};
 		
 		//force these objects to re-init with the new notationprefs
 		[changer release]; changer = nil;
-		[picker release]; picker = nil;
+		[passphrasePicker release]; passphrasePicker = nil;
 		
 		[notationPrefs release];
 		notationPrefs = [[[GlobalPrefs defaultPrefs] notationPrefs] retain];
@@ -526,7 +526,7 @@ enum {VERIFY_NOT_ATTEMPTED, VERIFY_FAILED, VERIFY_IN_PROGRESS, VERIFY_SUCCESS};
 	[allowedTypesTable reloadData];
 }
 
-- (void)passphrasePicker:(PassphrasePicker*)picker choseAPassphrase:(BOOL)success {
+- (void)passphrasePicker:(PassphrasePicker*)aPicker choseAPassphrase:(BOOL)success {
 	
 	[self setEncryptionControlsState:success];
 	[notationPrefs setDoesEncryption:success];
@@ -548,18 +548,18 @@ enum {VERIFY_NOT_ATTEMPTED, VERIFY_FAILED, VERIFY_IN_PROGRESS, VERIFY_SUCCESS};
 		
 		//so queue it up:
 		InvocationRecorder *invRecorder = [InvocationRecorder invocationRecorder];
-		[[invRecorder prepareWithInvocationTarget:picker] showAroundWindow:[view window] resultDelegate:self];
+		[[invRecorder prepareWithInvocationTarget:passphrasePicker] showAroundWindow:[view window] resultDelegate:self];
 		postStorageFormatInvocation = [[invRecorder invocation] retain];
 	}
 }
 
 - (void)enableEncryption {
-	if (!picker) picker = [[PassphrasePicker alloc] initWithNotationPrefs:notationPrefs];
+	if (!passphrasePicker) passphrasePicker = [[PassphrasePicker alloc] initWithNotationPrefs:notationPrefs];
 	
 	NSInteger format = [notationPrefs notesStorageFormat];
 	if (format == SingleDatabaseFormat) {
 		
-		[picker showAroundWindow:[view window] resultDelegate:self];
+		[passphrasePicker showAroundWindow:[view window] resultDelegate:self];
 	} else {
 		NSString *formatStrings[] = { NSLocalizedString(@"(WHAT??)",@"user shouldn't see this"), 
 			NSLocalizedString(@"plain text",nil), NSLocalizedString(@"rich text",nil), NSLocalizedString(@"HTML",nil) };
@@ -583,7 +583,7 @@ enum {VERIFY_NOT_ATTEMPTED, VERIFY_FAILED, VERIFY_IN_PROGRESS, VERIFY_SUCCESS};
 	[notationPrefs setDoesEncryption:NO];
 	[self updateRemoveKeychainItemStatus];
 	
-	[picker release]; picker = nil;		
+	[passphrasePicker release]; passphrasePicker = nil;
 }
 
 - (void)disableEncryptionWithWarning:(BOOL)warning {

@@ -1,0 +1,547 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>AMApplicationBuild</key>
+	<string>534</string>
+	<key>AMApplicationVersion</key>
+	<string>2.10</string>
+	<key>AMDocumentVersion</key>
+	<string>2</string>
+	<key>actions</key>
+	<array>
+		<dict>
+			<key>action</key>
+			<dict>
+				<key>AMActionVersion</key>
+				<string>1.2.1</string>
+				<key>AMApplication</key>
+				<array>
+					<string>TextEdit</string>
+				</array>
+				<key>AMParameterProperties</key>
+				<dict>
+					<key>enteredRTFDData</key>
+					<dict/>
+					<key>enteredText</key>
+					<dict/>
+				</dict>
+				<key>AMProvides</key>
+				<dict>
+					<key>Container</key>
+					<string>Single</string>
+					<key>Types</key>
+					<array>
+						<string>com.apple.cocoa.attributed-string</string>
+					</array>
+				</dict>
+				<key>AMRequiredResources</key>
+				<array/>
+				<key>ActionBundlePath</key>
+				<string>/System/Library/Automator/Get Specified Text.action</string>
+				<key>ActionName</key>
+				<string>Get Specified Text</string>
+				<key>ActionParameters</key>
+				<dict>
+					<key>enteredRTFDData</key>
+					<data>
+					cnRmZAAAAAADAAAAAgAAAAcAAABUWFQucnRm
+					AQAAAC7tCQAAKwAAAAEAAADlCQAAe1xydGYx
+					XGFuc2lcYW5zaWNwZzEyNTJcY29jb2FydGYy
+					ODcwClxjb2NvYXRleHRzY2FsaW5nMFxjb2Nv
+					YXBsYXRmb3JtMHtcZm9udHRibFxmMFxmc3dp
+					c3NcZmNoYXJzZXQwIEhlbHZldGljYTt9Cntc
+					Y29sb3J0Ymw7XHJlZDI1NVxncmVlbjI1NVxi
+					bHVlMjU1O1xyZWQwXGdyZWVuMFxibHVlMDt9
+					CntcKlxleHBhbmRlZGNvbG9ydGJsOztcY3Nz
+					cmdiXGMwXGMwXGMwO30KXGRlZnRhYjcyMApc
+					cGFyZFxwYXJkZWZ0YWI3MjBcc2ExMjBccGFy
+					dGlnaHRlbmZhY3RvcjAKClxmMFxmczM2IFxj
+					ZjAgXGV4cG5kMFxleHBuZHR3MFxrZXJuaW5n
+					MAojIEhlYWRlciAxXApcCkxvcmVtIGlwc3Vt
+					IGRvbG9yIHNpdCBhbWV0LCAqKmNvbnNlY3Rl
+					dHVyIGFkaXBpc2ljaW5nKiogZWxpdCwgc2Vk
+					IGRvICplaXVzbW9kIHRlbXBvciogaW5jaWRp
+					ZHVudCB1dCBsYWJvcmUgZXQgZG9sb3JlIG1h
+					Z25hIGFsaXF1YS4gVXQgZW5pbSBhZCBtaW5p
+					bSB2ZW5pYW0sIHF1aXMgbm9zdHJ1ZCBleGVy
+					Y2l0YXRpb24gdWxsYW1jbyBsYWJvcmlzIG5p
+					c2kgdXQgYWxpcXVpcCBleCBlYSBjb21tb2Rv
+					IGNvbnNlcXVhdC4gRHVpcyBhdXRlIGlydXJl
+					IGRvbG9yIGluIHJlcHJlaGVuZGVyaXQgaW4g
+					dm9sdXB0YXRlIHZlbGl0IGVzc2UgY2lsbHVt
+					IGRvbG9yZSBldSBmdWdpYXQgbnVsbGEgcGFy
+					aWF0dXIuIEV4Y2VwdGV1ciBzaW50IG9jY2Fl
+					Y2F0IGN1cGlkYXRhdCBub24gcHJvaWRlbnQs
+					IHN1bnQgaW4gY3VscGEgcXVpIG9mZmljaWEg
+					ZGVzZXJ1bnQgbW9sbGl0IGFuaW0gaWQgZXN0
+					IGxhYm9ydW0uXApcCiMjIEhlYWRlciAyXApc
+					ClNlZCB1dCBbcGVyc3BpY2lhdGlzIHVuZGVd
+					KGh0dHBzOi8vYnJldHR0ZXJwc3RyYS5jb20p
+					IG9tbmlzIGlzdGUgbmF0dXMgZXJyb3Igc2l0
+					IHZvbHVwdGF0ZW0gYWNjdXNhbnRpdW0gZG9s
+					b3JlbXF1ZSBsYXVkYW50aXVtLCB0b3RhbSBy
+					ZW0gYXBlcmlhbSwgZWFxdWUgaXBzYSBxdWFl
+					IGFiIGlsbG8gaW52ZW50b3JlIHZlcml0YXRp
+					cyBldCBxdWFzaSBhcmNoaXRlY3RvIGJlYXRh
+					ZSB2aXRhZSBkaWN0YSBzdW50IGV4cGxpY2Fi
+					by4gTmVtbyBlbmltIGlwc2FtIHZvbHVwdGF0
+					ZW0gcXVpYSB2b2x1cHRhcyBzaXQgYXNwZXJu
+					YXR1ciBhdXQgb2RpdCBhdXQgZnVnaXQsIHNl
+					ZCBxdWlhIGNvbnNlcXV1bnR1ciBtYWduaSBk
+					b2xvcmVzIGVvcyBxdWkgcmF0aW9uZSB2b2x1
+					cHRhdGVtIHNlcXVpIG5lc2NpdW50LiBOZXF1
+					ZSBwb3JybyBxdWlzcXVhbSBlc3QsIHF1aSBk
+					b2xvcmVtIGlwc3VtIHF1aWEgZG9sb3Igc2l0
+					IGFtZXQsIGNvbnNlY3RldHVyLCBhZGlwaXNj
+					aSB2ZWxpdCwgc2VkIHF1aWEgbm9uIG51bXF1
+					YW0gZWl1cyBtb2RpIHRlbXBvcmEgaW5jaWR1
+					bnQgdXQgbGFib3JlIGV0IGRvbG9yZSBtYWdu
+					YW0gYWxpcXVhbSBxdWFlcmF0IHZvbHVwdGF0
+					ZW0uIFV0IGVuaW0gYWQgbWluaW1hIHZlbmlh
+					bSwgcXVpcyBub3N0cnVtIGV4ZXJjaXRhdGlv
+					bmVtIHVsbGFtIGNvcnBvcmlzIHN1c2NpcGl0
+					IGxhYm9yaW9zYW0sIG5pc2kgdXQgYWxpcXVp
+					ZCBleCBlYSBjb21tb2RpIGNvbnNlcXVhdHVy
+					PyBRdWlzIGF1dGVtIHZlbCBldW0gaXVyZSBy
+					ZXByZWhlbmRlcml0IHF1aSBpbiBlYSB2b2x1
+					cHRhdGUgdmVsaXQgZXNzZSBxdWFtIG5paGls
+					IG1vbGVzdGlhZSBjb25zZXF1YXR1ciwgdmVs
+					IGlsbHVtIHF1aSBkb2xvcmVtIGV1bSBmdWdp
+					YXQgcXVvIHZvbHVwdGFzIG51bGxhIHBhcmlh
+					dHVyP1wKXApBdCB2ZXJvIGVvcyBldCBhY2N1
+					c2FtdXMgZXQgaXVzdG8gb2RpbyBkaWduaXNz
+					aW1vcyBkdWNpbXVzIHF1aSBibGFuZGl0aWlz
+					IHByYWVzZW50aXVtIHZvbHVwdGF0dW0gZGVs
+					ZW5pdGkgYXRxdWUgY29ycnVwdGkgcXVvcyBk
+					b2xvcmVzIGV0IHF1YXMgbW9sZXN0aWFzIGV4
+					Y2VwdHVyaSBzaW50IG9jY2FlY2F0aSBjdXBp
+					ZGl0YXRlIG5vbiBwcm92aWRlbnQsIHNpbWls
+					aXF1ZSBzdW50IGluIGN1bHBhIHF1aSBvZmZp
+					Y2lhIGRlc2VydW50IG1vbGxpdGlhIGFuaW1p
+					LCBpZCBlc3QgbGFib3J1bSBldCBkb2xvcnVt
+					IGZ1Z2EuIEV0IGhhcnVtIHF1aWRlbSByZXJ1
+					bSBmYWNpbGlzIGVzdCBldCBleHBlZGl0YSBk
+					aXN0aW5jdGlvLiBOYW0gbGliZXJvIHRlbXBv
+					cmUsIGN1bSBzb2x1dGEgbm9iaXMgZXN0IGVs
+					aWdlbmRpIG9wdGlvIGN1bXF1ZSBuaWhpbCBp
+					bXBlZGl0IHF1byBtaW51cyBpZCBxdW9kIG1h
+					eGltZSBwbGFjZWF0IGZhY2VyZSBwb3NzaW11
+					cywgb21uaXMgdm9sdXB0YXMgYXNzdW1lbmRh
+					IGVzdCwgb21uaXMgZG9sb3IgcmVwZWxsZW5k
+					dXMuIFRlbXBvcmlidXMgYXV0ZW0gcXVpYnVz
+					ZGFtIGV0IGF1dCBvZmZpY2lpcyBkZWJpdGlz
+					IGF1dCByZXJ1bSBuZWNlc3NpdGF0aWJ1cyBz
+					YWVwZSBldmVuaWV0IHV0IGV0IHZvbHVwdGF0
+					ZXMgcmVwdWRpYW5kYWUgc2ludCBldCBtb2xl
+					c3RpYWUgbm9uIHJlY3VzYW5kYWUuIEl0YXF1
+					ZSBlYXJ1bSByZXJ1bSBoaWMgdGVuZXR1ciBh
+					IHNhcGllbnRlIGRlbGVjdHVzLCB1dCBhdXQg
+					cmVpY2llbmRpcyB2b2x1cHRhdGlidXMgbWFp
+					b3JlcyBhbGlhcyBjb25zZXF1YXR1ciBhdXQg
+					cGVyZmVyZW5kaXMgZG9sb3JpYnVzIGFzcGVy
+					aW9yZXMgcmVwZWxsYXQufQEAAAAjAAAAAQAA
+					AAcAAABUWFQucnRmEAAAAJ2ScGq2AQAAAAAA
+					AAAAAAA=
+					</data>
+					<key>enteredText</key>
+					<string># Header 1
+
+Lorem ipsum dolor sit amet, **consectetur adipisicing** elit, sed do *eiusmod tempor* incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+
+## Header 2
+
+Sed ut [perspiciatis unde](https://brettterpstra.com) omnis iste natus error sit voluptatem accusantium doloremque laudantium, totam rem aperiam, eaque ipsa quae ab illo inventore veritatis et quasi architecto beatae vitae dicta sunt explicabo. Nemo enim ipsam voluptatem quia voluptas sit aspernatur aut odit aut fugit, sed quia consequuntur magni dolores eos qui ratione voluptatem sequi nesciunt. Neque porro quisquam est, qui dolorem ipsum quia dolor sit amet, consectetur, adipisci velit, sed quia non numquam eius modi tempora incidunt ut labore et dolore magnam aliquam quaerat voluptatem. Ut enim ad minima veniam, quis nostrum exercitationem ullam corporis suscipit laboriosam, nisi ut aliquid ex ea commodi consequatur? Quis autem vel eum iure reprehenderit qui in ea voluptate velit esse quam nihil molestiae consequatur, vel illum qui dolorem eum fugiat quo voluptas nulla pariatur?
+
+At vero eos et accusamus et iusto odio dignissimos ducimus qui blanditiis praesentium voluptatum deleniti atque corrupti quos dolores et quas molestias excepturi sint occaecati cupiditate non provident, similique sunt in culpa qui officia deserunt mollitia animi, id est laborum et dolorum fuga. Et harum quidem rerum facilis est et expedita distinctio. Nam libero tempore, cum soluta nobis est eligendi optio cumque nihil impedit quo minus id quod maxime placeat facere possimus, omnis voluptas assumenda est, omnis dolor repellendus. Temporibus autem quibusdam et aut officiis debitis aut rerum necessitatibus saepe eveniet ut et voluptates repudiandae sint et molestiae non recusandae. Itaque earum rerum hic tenetur a sapiente delectus, ut aut reiciendis voluptatibus maiores alias consequatur aut perferendis doloribus asperiores repellat.</string>
+				</dict>
+				<key>BundleIdentifier</key>
+				<string>com.apple.GetSpecifiedText</string>
+				<key>CFBundleVersion</key>
+				<string>1.2.1</string>
+				<key>CanShowSelectedItemsWhenRun</key>
+				<false/>
+				<key>CanShowWhenRun</key>
+				<true/>
+				<key>Category</key>
+				<array>
+					<string>AMCategoryText</string>
+				</array>
+				<key>Class Name</key>
+				<string>AMGetSpecifiedTextAction</string>
+				<key>Keywords</key>
+				<array>
+					<string>Get</string>
+					<string>Text</string>
+				</array>
+				<key>OutputUUID</key>
+				<string>88712BBA-B69E-4F10-A478-5D44CBF145AE</string>
+				<key>UUID</key>
+				<string>09750B0B-A45A-4374-B1CB-1617EED97A1A</string>
+				<key>UnlocalizedApplications</key>
+				<array>
+					<string>TextEdit</string>
+				</array>
+				<key>arguments</key>
+				<dict>
+					<key>0</key>
+					<dict>
+						<key>default value</key>
+						<string></string>
+						<key>name</key>
+						<string>enteredRTFDData</string>
+						<key>required</key>
+						<string>0</string>
+						<key>type</key>
+						<string>0</string>
+						<key>uuid</key>
+						<string>0</string>
+					</dict>
+					<key>1</key>
+					<dict>
+						<key>default value</key>
+						<string></string>
+						<key>name</key>
+						<string>enteredText</string>
+						<key>required</key>
+						<string>0</string>
+						<key>type</key>
+						<string>0</string>
+						<key>uuid</key>
+						<string>1</string>
+					</dict>
+				</dict>
+				<key>conversionLabel</key>
+				<integer>0</integer>
+				<key>isViewVisible</key>
+				<integer>1</integer>
+				<key>location</key>
+				<string>309.000000:168.000000</string>
+				<key>nibPath</key>
+				<string>/System/Library/Automator/Get Specified Text.action/Contents/Resources/Base.lproj/main.nib</string>
+			</dict>
+			<key>isViewVisible</key>
+			<integer>1</integer>
+		</dict>
+		<dict>
+			<key>action</key>
+			<dict>
+				<key>AMAccepts</key>
+				<dict>
+					<key>Container</key>
+					<string>List</string>
+					<key>Optional</key>
+					<true/>
+					<key>Types</key>
+					<array>
+						<string>com.apple.cocoa.string</string>
+					</array>
+				</dict>
+				<key>AMActionVersion</key>
+				<string>2.0.3</string>
+				<key>AMApplication</key>
+				<array>
+					<string>Automator</string>
+				</array>
+				<key>AMParameterProperties</key>
+				<dict>
+					<key>COMMAND_STRING</key>
+					<dict/>
+					<key>CheckedForUserDefaultShell</key>
+					<dict/>
+					<key>inputMethod</key>
+					<dict/>
+					<key>shell</key>
+					<dict/>
+					<key>source</key>
+					<dict/>
+				</dict>
+				<key>AMProvides</key>
+				<dict>
+					<key>Container</key>
+					<string>List</string>
+					<key>Types</key>
+					<array>
+						<string>com.apple.cocoa.string</string>
+					</array>
+				</dict>
+				<key>ActionBundlePath</key>
+				<string>/System/Library/Automator/Run Shell Script.action</string>
+				<key>ActionName</key>
+				<string>Run Shell Script</string>
+				<key>ActionParameters</key>
+				<dict>
+					<key>COMMAND_STRING</key>
+					<string>set -euo pipefail
+
+APEX_BIN=""
+for candidate in /opt/homebrew/bin/apex /usr/local/bin/apex; do
+  if [ -x "$candidate" ]; then
+    APEX_BIN="$candidate"
+    break
+  fi
+done
+if [ -z "$APEX_BIN" ] &amp;&amp; command -v apex &gt;/dev/null 2&gt;&amp;1; then
+  APEX_BIN="$(command -v apex)"
+fi
+
+if [ -z "${APEX_BIN}" ]; then
+  osascript -e 'display notification "Install Apex: brew tap ttscoff/thelab &amp;&amp; brew install apex" with title "Markdown to RTF"' &gt;/dev/null 2&gt;&amp;1 || true
+  exit 1
+fi
+
+tmp="$(mktemp -t apex-md2rtf).rtf"
+trap 'rm -f "$tmp"' EXIT
+
+# Selected text arrives on stdin from Automator
+"$APEX_BIN" -t rtf &gt; "$tmp"
+
+# pbcopy auto-detects an RTF header and places rich text on the pasteboard
+pbcopy &lt; "$tmp"
+</string>
+					<key>CheckedForUserDefaultShell</key>
+					<true/>
+					<key>inputMethod</key>
+					<integer>0</integer>
+					<key>shell</key>
+					<string>/bin/bash</string>
+					<key>source</key>
+					<string></string>
+				</dict>
+				<key>BundleIdentifier</key>
+				<string>com.apple.RunShellScript</string>
+				<key>CFBundleVersion</key>
+				<string>2.0.3</string>
+				<key>CanShowSelectedItemsWhenRun</key>
+				<false/>
+				<key>CanShowWhenRun</key>
+				<true/>
+				<key>Category</key>
+				<array>
+					<string>AMCategoryUtilities</string>
+				</array>
+				<key>Class Name</key>
+				<string>RunShellScriptAction</string>
+				<key>InputUUID</key>
+				<string>EB42042E-50A9-4A48-8A72-FA600B1829A7</string>
+				<key>Keywords</key>
+				<array>
+					<string>Shell</string>
+					<string>Script</string>
+					<string>Command</string>
+					<string>Run</string>
+					<string>Unix</string>
+				</array>
+				<key>OutputUUID</key>
+				<string>7934C4C1-D4C0-4990-B38C-51267AB3EF90</string>
+				<key>UUID</key>
+				<string>85233135-6973-47CA-B8CE-5C920D68703E</string>
+				<key>UnlocalizedApplications</key>
+				<array>
+					<string>Automator</string>
+				</array>
+				<key>arguments</key>
+				<dict>
+					<key>0</key>
+					<dict>
+						<key>default value</key>
+						<integer>0</integer>
+						<key>name</key>
+						<string>inputMethod</string>
+						<key>required</key>
+						<string>0</string>
+						<key>type</key>
+						<string>0</string>
+						<key>uuid</key>
+						<string>0</string>
+					</dict>
+					<key>1</key>
+					<dict>
+						<key>default value</key>
+						<false/>
+						<key>name</key>
+						<string>CheckedForUserDefaultShell</string>
+						<key>required</key>
+						<string>0</string>
+						<key>type</key>
+						<string>0</string>
+						<key>uuid</key>
+						<string>1</string>
+					</dict>
+					<key>2</key>
+					<dict>
+						<key>default value</key>
+						<string></string>
+						<key>name</key>
+						<string>source</string>
+						<key>required</key>
+						<string>0</string>
+						<key>type</key>
+						<string>0</string>
+						<key>uuid</key>
+						<string>2</string>
+					</dict>
+					<key>3</key>
+					<dict>
+						<key>default value</key>
+						<string></string>
+						<key>name</key>
+						<string>COMMAND_STRING</string>
+						<key>required</key>
+						<string>0</string>
+						<key>type</key>
+						<string>0</string>
+						<key>uuid</key>
+						<string>3</string>
+					</dict>
+					<key>4</key>
+					<dict>
+						<key>default value</key>
+						<string>/bin/sh</string>
+						<key>name</key>
+						<string>shell</string>
+						<key>required</key>
+						<string>0</string>
+						<key>type</key>
+						<string>0</string>
+						<key>uuid</key>
+						<string>4</string>
+					</dict>
+				</dict>
+				<key>isViewVisible</key>
+				<integer>1</integer>
+				<key>location</key>
+				<string>309.000000:350.000000</string>
+				<key>nibPath</key>
+				<string>/System/Library/Automator/Run Shell Script.action/Contents/Resources/Base.lproj/main.nib</string>
+			</dict>
+			<key>isViewVisible</key>
+			<integer>1</integer>
+		</dict>
+		<dict>
+			<key>action</key>
+			<dict>
+				<key>AMAccepts</key>
+				<dict>
+					<key>Container</key>
+					<string>List</string>
+					<key>Optional</key>
+					<true/>
+					<key>Types</key>
+					<array>
+						<string>com.apple.applescript.object</string>
+					</array>
+				</dict>
+				<key>AMActionVersion</key>
+				<string>1.0.2</string>
+				<key>AMApplication</key>
+				<array>
+					<string>Automator</string>
+				</array>
+				<key>AMParameterProperties</key>
+				<dict>
+					<key>source</key>
+					<dict/>
+				</dict>
+				<key>AMProvides</key>
+				<dict>
+					<key>Container</key>
+					<string>List</string>
+					<key>Types</key>
+					<array>
+						<string>com.apple.applescript.object</string>
+					</array>
+				</dict>
+				<key>ActionBundlePath</key>
+				<string>/System/Library/Automator/Run AppleScript.action</string>
+				<key>ActionName</key>
+				<string>Run AppleScript</string>
+				<key>ActionParameters</key>
+				<dict>
+					<key>source</key>
+					<string>on run {input, parameters}	-- Replace the Markdown selection with rich paste (RTF already on clipboard)	delay 0.05	tell application "System Events" to keystroke "v" using command down	return inputend run</string>
+				</dict>
+				<key>BundleIdentifier</key>
+				<string>com.apple.Automator.RunScript</string>
+				<key>CFBundleVersion</key>
+				<string>1.0.2</string>
+				<key>CanShowSelectedItemsWhenRun</key>
+				<false/>
+				<key>CanShowWhenRun</key>
+				<true/>
+				<key>Category</key>
+				<array>
+					<string>AMCategoryUtilities</string>
+				</array>
+				<key>Class Name</key>
+				<string>RunScriptAction</string>
+				<key>InputUUID</key>
+				<string>7934C4C1-D4C0-4990-B38C-51267AB3EF90</string>
+				<key>Keywords</key>
+				<array>
+					<string>Run</string>
+				</array>
+				<key>OutputUUID</key>
+				<string>C7CF8D85-50A9-4382-A138-921DD5A4DCF2</string>
+				<key>UUID</key>
+				<string>BA86E618-2200-4325-A6B1-DE8C4D4FACE3</string>
+				<key>UnlocalizedApplications</key>
+				<array>
+					<string>Automator</string>
+				</array>
+				<key>arguments</key>
+				<dict>
+					<key>0</key>
+					<dict>
+						<key>default value</key>
+						<string>on run {input, parameters}
+	
+	(* Your script goes here *)
+	
+	return input
+end run</string>
+						<key>name</key>
+						<string>source</string>
+						<key>required</key>
+						<string>0</string>
+						<key>type</key>
+						<string>0</string>
+						<key>uuid</key>
+						<string>0</string>
+					</dict>
+				</dict>
+				<key>isViewVisible</key>
+				<true/>
+				<key>location</key>
+				<string>309.000000:775.000000</string>
+				<key>nibPath</key>
+				<string>/System/Library/Automator/Run AppleScript.action/Contents/Resources/Base.lproj/main.nib</string>
+			</dict>
+			<key>isViewVisible</key>
+			<true/>
+		</dict>
+	</array>
+	<key>connectors</key>
+	<dict>
+		<key>A144E864-76A7-4C22-B1D6-1578F56E27AE</key>
+		<dict>
+			<key>from</key>
+			<string>09750B0B-A45A-4374-B1CB-1617EED97A1A - 09750B0B-A45A-4374-B1CB-1617EED97A1A</string>
+			<key>to</key>
+			<string>85233135-6973-47CA-B8CE-5C920D68703E - 85233135-6973-47CA-B8CE-5C920D68703E</string>
+		</dict>
+		<key>D17C4E92-CF89-4D8E-9CD8-BBBA58619C82</key>
+		<dict>
+			<key>from</key>
+			<string>85233135-6973-47CA-B8CE-5C920D68703E - 85233135-6973-47CA-B8CE-5C920D68703E</string>
+			<key>to</key>
+			<string>BA86E618-2200-4325-A6B1-DE8C4D4FACE3 - BA86E618-2200-4325-A6B1-DE8C4D4FACE3</string>
+		</dict>
+	</dict>
+	<key>workflowMetaData</key>
+	<dict>
+		<key>workflowTypeIdentifier</key>
+		<string>com.apple.Automator.workflow</string>
+	</dict>
+</dict>
+</plist>

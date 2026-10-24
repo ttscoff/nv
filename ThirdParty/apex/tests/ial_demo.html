@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IAL Demo - Attribute Inspector</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            line-height: 1.6;
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+
+        .content {
+            background: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        /* Style for elements with attributes - add visual indicator */
+        [class]:hover,
+        [id]:hover {
+            outline: 2px solid #4CAF50;
+            outline-offset: 2px;
+            background-color: rgba(76, 175, 80, 0.1);
+            transition: background-color 0.2s;
+        }
+    </style>
+    <script>
+        // Add tooltips showing all attributes on hover
+        document.addEventListener('DOMContentLoaded', function() {
+            // Create tooltip element
+            const tooltip = document.createElement('div');
+            tooltip.id = 'attribute-tooltip';
+            tooltip.style.cssText = 'position: absolute; background: #333; color: white; padding: 8px 12px; border-radius: 4px; font-size: 12px; font-family: "Courier New", monospace; z-index: 10000; pointer-events: none; opacity: 0; transition: opacity 0.2s; box-shadow: 0 2px 8px rgba(0,0,0,0.3); max-width: 400px; word-wrap: break-word; white-space: normal; line-height: 1.4;';
+            document.body.appendChild(tooltip);
+
+            // Function to get all attributes as a formatted string
+            function getAttributesString(el) {
+                const attrs = [];
+                if (el.id) attrs.push('id="' + el.id + '"');
+                if (el.className) attrs.push('class="' + el.className + '"');
+                for (let i = 0; i < el.attributes.length; i++) {
+                    const attr = el.attributes[i];
+                    if (attr.name !== 'id' && attr.name !== 'class' && !attr.name.startsWith('data-apex-')) {
+                        attrs.push(attr.name + '="' + attr.value + '"');
+                    }
+                }
+                return attrs.length > 0 ? attrs.join(' ') : 'No attributes';
+            }
+
+            // Add hover handlers to all elements with attributes
+            const elementsWithAttrs = document.querySelectorAll('[class], [id]');
+            elementsWithAttrs.forEach(el => {
+                // Skip the tooltip itself and elements inside code blocks
+                if (el.id === 'attribute-tooltip' || el.closest('code') || el.closest('pre')) {
+                    return;
+                }
+
+                el.addEventListener('mouseenter', function(e) {
+                    const attrs = getAttributesString(this);
+                    const tagName = this.tagName.toLowerCase();
+                    tooltip.innerHTML = '<strong>&lt;' + tagName + '</strong> ' +
+                                      (attrs !== 'No attributes' ? attrs : '<em>' + attrs + '</em>') +
+                                      '<strong>&gt;</strong>';
+                    tooltip.style.opacity = '1';
+
+                    const rect = this.getBoundingClientRect();
+                    let left = rect.left + window.scrollX;
+                    let top = rect.top + window.scrollY - tooltip.offsetHeight - 8;
+
+                    // Position tooltip
+                    tooltip.style.left = left + 'px';
+                    tooltip.style.top = top + 'px';
+
+                    // Adjust if tooltip goes off screen
+                    setTimeout(() => {
+                        const tooltipRect = tooltip.getBoundingClientRect();
+                        if (tooltipRect.left < 0) {
+                            tooltip.style.left = '10px';
+                        }
+                        if (tooltipRect.top < 0) {
+                            tooltip.style.top = (rect.bottom + window.scrollY + 8) + 'px';
+                        }
+                        if (tooltipRect.right > window.innerWidth) {
+                            tooltip.style.left = (window.innerWidth - tooltipRect.width - 10) + 'px';
+                        }
+                    }, 0);
+                });
+
+                el.addEventListener('mouseleave', function() {
+                    tooltip.style.opacity = '0';
+                });
+            });
+
+            console.log('Attribute inspector loaded. Hover over elements with attributes to see them.');
+        });
+    </script>
+</head>
+<body>
+    <div class="content">
+<h1 id="ial-inline-attribute-lists-demo">IAL (Inline Attribute Lists) Demo</h1>
+<p>This document demonstrates all supported IAL features in Apex.</p>
+<h2 id="block-level-ials-next-line">Block-Level IALs (Next-Line)</h2>
+<p>Block-level IALs appear on a separate line after the element they apply to.</p>
+<h3 id="headings-with-ials">Headings with IALs</h3>
+<h1 id="custom-heading-id">Heading with ID</h1>
+<h2 class="highlight" id="custom-heading-id">Heading with Class</h2>
+<h3 id="heading-id" class="class1 class2">Heading with Both</h3>
+<h4 class="primary large bold" id="heading-with-class">Multiple Classes</h4>
+<h3 id="heading-id">Paragraphs with IALs</h3>
+<p class="tip">This paragraph has a class applied to it.</p>
+<p id="paragraph-id" class="important note">This paragraph has an ID and multiple classes.</p>
+<h3 id="multiple-classes">Lists with IALs</h3>
+<ul class="unordered-list">
+<li>First item</li>
+<li>Second item</li>
+<li>Third item</li>
+<li>Numbered item one</li>
+<li>Numbered item two</li>
+<li>Numbered item three</li>
+</ul>
+<h3 id="paragraphs-with-ials">Blockquotes with IALs</h3>
+<blockquote class="quote inspirational">
+<p>This is a blockquote with attributes.</p>
+</blockquote>
+<h2 id="lists-with-ials">Inline Span-Level IALs</h2>
+<p>Inline IALs appear immediately after inline elements within paragraphs.</p>
+<h3 id="blockquotes-with-ials">Links with Inline IALs</h3>
+<p>This is a <a href="https://example.com">regular link</a> without an IAL.</p>
+<p>Here’s a paragraph with a <a href="https://example.com" class="button">styled link</a> that has a button class.</p>
+<p>You can have <a href="https://example.com" class="link-primary">multiple links</a> with <a href="https://example.com" class="link-secondary">different classes</a> in the same paragraph.</p>
+<p>Links with the <a href="https://example.com">same URL</a> should still work correctly when <a href="https://example.com" class="special-link">one has an IAL</a>.</p>
+<h3 id="inline-span-level-ials">Images with Inline IALs</h3>
+<p><img src="image.png" alt="Regular image" /></p>
+<p><img src="logo.png" alt="Styled image" class="logo centered" /></p>
+<p><img src="icon.png" alt="Image with ID" id="site-icon" class="icon" /></p>
+<h3 id="links-with-inline-ials">Emphasis with Inline IALs</h3>
+<p>This paragraph has <strong class="bold-style">bold text</strong> with a custom class and <em class="italic-style">italic text</em> with another class.</p>
+<p>You can combine <strong class="bold">bold</strong> and <em class="italic">italic</em> in the same paragraph with different styles.</p>
+<p>Nested <strong class="bold-wrapper">bold with <em class="nested-italic">italic</em> inside</strong> works too.</p>
+<h3 id="images-with-inline-ials">Code with Inline IALs</h3>
+<p>Use <code class="code-inline">inline code</code> for code snippets with styling.</p>
+<p>You can have multiple <code class="code-1">code spans</code> and <code class="code-2">more code</code> with different classes.</p>
+<h3 id="emphasis-with-inline-ials">Mixed Inline Elements</h3>
+<p>This paragraph combines a <a href="https://example.com" class="link-class">link</a>, <strong class="bold-class">bold text</strong>, <em class="italic-class">italic text</em>, and <code class="code-class">code</code> all with different IALs.</p>
+<h2 id="code-with-inline-ials">Complex Examples</h2>
+<h3 id="mixed-inline-elements">Multiple IALs in Sequence</h3>
+<p><a href="url1" class="first">First link</a> and <a href="url2" class="second">second link</a> and <a href="url3" class="third">third link</a> all in one paragraph.</p>
+<p><strong class="b1">First bold</strong>, <strong class="b2">second bold</strong>, and <strong class="b3">third bold</strong> text elements.</p>
+<h3 id="complex-examples">IALs with Text After</h3>
+<p><a href="https://example.com" class="button">Click here</a> to visit our website and learn more.</p>
+<p><strong>Important</strong>: This text has an IAL{:.highlight} that isn’t associated with a span or block level element (bold, italics, link, etc.) and is therefore ignored (left in the text).</p>
+<h3 id="multiple-ials-in-sequence">IALs with Duplicate URLs</h3>
+<p>Here’s a <a href="https://example.com">regular link</a> to demonstrate link styling.</p>
+<p><a href="https://example.com" class="button">Click This Button</a></p>
+<p>Both links point to the same URL, but only the second one has the button class.</p>
+<h3 id="ials-with-text-after">IALs with Multiple Attributes</h3>
+<p><a href="url" class="primary large button">Link with multiple classes</a></p>
+<p><strong id="bold-id" class="highlight important">Bold with ID and classes</strong></p>
+<h2 id="ials-with-duplicate-urls">Edge Cases</h2>
+<h3 id="ials-with-multiple-attributes">IAL at End of Paragraph</h3>
+<p>This paragraph ends with a <a href="https://example.com" class="end-link">link</a>.</p>
+<h3 id="edge-cases">IAL with Whitespace</h3>
+<p><a href="url" class="spaced-class">Link</a> works with spaces.</p>
+<h3 id="ial-at-end-of-paragraph">IALs in Lists</h3>
+<ul>
+<li>List item with <a href="url" class="list-link">link</a></li>
+<li>Another item with <strong class="list-bold">bold</strong> text</li>
+<li>Final item with <code class="list-code">code</code></li>
+</ul>
+<h2 id="ial-with-whitespace">Summary</h2>
+<p>IALs provide a powerful way to add HTML attributes to markdown elements:</p>
+<ul>
+<li>Block-level IALs use next-line syntax: <code>{: .class #id}</code></li>
+<li>Inline IALs appear immediately after elements: <code>[link](url){:.class}</code></li>
+<li>Support for IDs, classes, and custom attributes</li>
+<li>Works with headings, paragraphs, lists, blockquotes, links, images, emphasis, and code</li>
+</ul>
+    </div>
+</body>
+</html>

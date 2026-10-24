@@ -20,7 +20,6 @@
 #import "NSCollection_utils.h"
 #import "GlobalPrefs.h"
 #import "NSString_NV.h"
-#import <AutoHyperlinks/AutoHyperlinks.h>
 
 
 NSString *NVHiddenDoneTagAttributeName = @"NVDoneTag";
@@ -202,33 +201,31 @@ static BOOL _StringWithRangeIsProbablyObjC(NSString *string, NSRange blockRange)
 }
 
 - (void)addLinkAttributesForRange:(NSRange)changedRange {
-//    return;
+	NSString *string = [self string];
+	NSUInteger stringLength = [string length];
+	if (changedRange.location > stringLength)
+		return;
+	changedRange.length = MIN(changedRange.length, stringLength - changedRange.location);
+
 	if (!changedRange.length)
 		return;
-	
-	//lazily loads Adium's BSD-licensed Auto-Hyperlinks:
-	//http://trac.adium.im/wiki/AutoHyperlinksFramework
-	
-	static Class AHHyperlinkScanner = Nil;
-	static Class AHMarkedHyperlink = Nil;
-	if (!AHHyperlinkScanner || !AHMarkedHyperlink) {
-		if (![[NSBundle bundleWithPath:[[[NSBundle mainBundle] privateFrameworksPath] stringByAppendingPathComponent:@"AutoHyperlinks.framework"]] load]) {
-			NSLog(@"Could not load AutoHyperlinks framework");
-			return;
-		}
-		AHHyperlinkScanner = NSClassFromString(@"AHHyperlinkScanner");
-		AHMarkedHyperlink = NSClassFromString(@"AHMarkedHyperlink");
-	}
-	
-	id scanner = [AHHyperlinkScanner hyperlinkScannerWithString:[[self string] substringWithRange:changedRange]];
-	id markedLink = nil;
-	while ((markedLink = [scanner nextURI])) {
-		NSURL *markedLinkURL = nil;
-		if ((markedLinkURL = [markedLink URL]) && !([markedLinkURL isFileURL] && [[markedLinkURL absoluteString] 
-																				  rangeOfString:@"/.file/" options:NSLiteralSearch].location != NSNotFound)) {
-			[self addAttribute:NSLinkAttributeName value:markedLinkURL 
-						 range:NSMakeRange([markedLink range].location + changedRange.location, [markedLink range].length)];
-		}
+
+	static NSDataDetector *detector = nil;
+	static dispatch_once_t onceToken;
+	dispatch_once(&onceToken, ^{
+		NSError *error = nil;
+		detector = [[NSDataDetector alloc] initWithTypes:NSTextCheckingTypeLink error:&error];
+		if (!detector)
+			NSLog(@"Could not create link detector: %@", error);
+	});
+	if (!detector)
+		return;
+
+	NSArray *matches = [detector matchesInString:string options:0 range:changedRange];
+	for (NSTextCheckingResult *result in matches) {
+		NSURL *URL = [result URL];
+		if (URL && !([URL isFileURL] && [[URL absoluteString] rangeOfString:@"/.file/" options:NSLiteralSearch].location != NSNotFound))
+			[self addAttribute:NSLinkAttributeName value:URL range:[result range]];
 	}
 
 	//also detect double-bracketed URLs here

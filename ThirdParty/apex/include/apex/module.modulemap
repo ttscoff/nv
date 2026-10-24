@@ -1,0 +1,29 @@
+module ApexHeaders {
+    umbrella header "apex.h"
+    header "plugins.h"
+    explicit module parser {
+        header "parser.h"
+        export *
+    }
+    explicit module renderer {
+        header "renderer.h"
+        export *
+    }
+    explicit module buffer {
+        header "buffer.h"
+        export *
+    }
+    explicit module ast_markdown {
+        header "ast_markdown.h"
+        export *
+    }
+    explicit module ast_man {
+        header "ast_man.h"
+        export *
+    }
+    explicit module ast_rtf {
+        header "ast_rtf.h"
+        export *
+    }
+    export *
+}

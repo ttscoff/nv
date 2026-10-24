@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+  <key>CFBundleIdentifier</key>
+  <string>apex</string>
+  <key>CFBundleName</key>
+  <string>Apex</string>
+  <key>DocSetPlatformFamily</key>
+  <string>apex</string>
+  <key>isDashDocset</key>
+  <true/>
+  <key>dashIndexFilePath</key>
+  <string>Home.html</string>
+  <key>DashDocSetFamily</key>
+  <string>dashtoc</string>
+  <key>DashDocSetPluginKeyword</key>
+  <string>apex</string>
+  <key>DashDocSetFallbackURL</key>
+  <string>Home.html</string>
+  <key>DashDocSetDeclaredInStyle</key>
+  <string>originalName</string>
+</dict>
+</plist>

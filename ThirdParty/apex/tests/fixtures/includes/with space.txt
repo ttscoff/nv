@@ -1,0 +1,1 @@
+Percent-decoded include works.

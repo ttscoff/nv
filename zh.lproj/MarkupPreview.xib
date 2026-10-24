@@ -60,7 +60,7 @@ Gw
                 <textField verticalHuggingPriority="750" id="200">
                     <rect key="frame" x="-3" y="43" width="244" height="14"/>
                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                    <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="center" title="Share note online via Peggd?" id="201">
+                    <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="center" title="Share this note on Marked Share?" id="201">
                         <font key="font" metaFont="smallSystem"/>
                         <color key="textColor" red="0.99990308279999995" green="1" blue="0.99983000759999996" alpha="1" colorSpace="calibratedRGB"/>
                         <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
@@ -166,7 +166,7 @@ Gw
                             <action selector="saveHTML:" target="-2" id="274"/>
                         </connections>
                     </button>
-                    <button toolTip="Share on Peggd" wantsLayer="YES" verticalHuggingPriority="750" alphaValue="0.80000000000000004" id="265">
+                    <button toolTip="Share on Marked Share" wantsLayer="YES" verticalHuggingPriority="750" alphaValue="0.80000000000000004" id="265">
                         <rect key="frame" x="370" y="7" width="28" height="19"/>
                         <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxY="YES"/>
                         <buttonCell key="cell" type="recessed" bezelStyle="recessed" image="HUDIconShare" imagePosition="only" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="266">
