@@ -40,7 +40,7 @@ body {
 }
 
 h1 {
-  margin: 0 0 18px;
+  margin: 28px 0 18px;
   padding-bottom: 10px;
   border-bottom: 2px solid var(--accent);
   font-size: 22px;
@@ -49,8 +49,13 @@ h1 {
   line-height: 1.2;
 }
 
+h1:first-of-type {
+  margin-top: 0;
+}
+
 h2,
-h3 {
+h3,
+h4 {
   margin: 20px 0 6px;
   color: var(--accent);
   font-size: 12px;
