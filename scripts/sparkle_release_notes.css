@@ -1,0 +1,97 @@
+/* Sparkle update window and hosted release notes.
+   Sized for the narrow Sparkle web view. Teal follows the nvALT icon. */
+
+:root {
+  color-scheme: light dark;
+  --bg: #f4f6f6;
+  --fg: #1c2430;
+  --muted: #5c6770;
+  --accent: #0e8f88;
+  --rule: rgba(14, 143, 136, 0.45);
+  --chip: rgba(14, 143, 136, 0.12);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #161b1f;
+    --fg: #eef2f3;
+    --muted: #a7b1b6;
+    --accent: #5ed9d0;
+    --rule: rgba(94, 217, 208, 0.5);
+    --chip: rgba(94, 217, 208, 0.14);
+  }
+}
+
+html {
+  background: var(--bg);
+}
+
+body {
+  margin: 0;
+  padding: 22px 26px 36px;
+  max-width: 40rem;
+  box-sizing: border-box;
+  background: var(--bg);
+  color: var(--fg);
+  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Helvetica Neue", sans-serif;
+  font-size: 14px;
+  line-height: 1.45;
+  -webkit-font-smoothing: antialiased;
+}
+
+h1 {
+  margin: 0 0 18px;
+  padding-bottom: 10px;
+  border-bottom: 2px solid var(--accent);
+  font-size: 22px;
+  font-weight: 650;
+  letter-spacing: -0.03em;
+  line-height: 1.2;
+}
+
+h2,
+h3 {
+  margin: 20px 0 6px;
+  color: var(--accent);
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+p {
+  margin: 0 0 10px;
+}
+
+ul,
+ol {
+  margin: 0 0 8px;
+  padding-left: 1.2em;
+}
+
+li {
+  margin: 0.35em 0;
+}
+
+li strong {
+  font-weight: 650;
+}
+
+a {
+  color: var(--accent);
+}
+
+code {
+  padding: 0.1em 0.35em;
+  border-radius: 4px;
+  background: var(--chip);
+  font-family: ui-monospace, "SF Mono", Menlo, monospace;
+  font-size: 0.92em;
+}
+
+blockquote {
+  margin: 0 0 14px;
+  padding-left: 12px;
+  border-left: 3px solid var(--rule);
+  color: var(--muted);
+}
