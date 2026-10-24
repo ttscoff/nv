@@ -154,6 +154,7 @@
 		}
 		
 		[self upgradeDatabaseIfNecessary];
+		[self migrateOpenMetaTagsToFinderTags];
 		
 		[self updateTitlePrefixConnections];
     }
@@ -173,20 +174,72 @@
 
 - (void)mirrorAllOMToFinderTags
 {
-    if(IsMavericksOrLater&&([self currentNoteStorageFormat]!=SingleDatabaseFormat)&&(allNotes!=nil)&&(allNotes.count>0)){
-        NSUInteger mirroredCount=0;
-        for (NoteObject *note in allNotes) {
-            if(![note mirrorTags]){
-                break;
-            }
-            mirroredCount++;
-        }
-        if (mirroredCount!=allNotes.count) {
-            NSLog(@"didn't mirror every note");
-        }else{
-            [self performSelector:@selector(sortAndRedisplayNotes) withObject:nil afterDelay:2.5f];
-        }
-    }
+	[self migrateOpenMetaTagsToFinderTags];
+}
+
+- (void)migrateOpenMetaTagsToFinderTags
+{
+	if ([self currentNoteStorageFormat] == SingleDatabaseFormat || [allNotes count] == 0)
+		return;
+
+	NSFileManager *fileManager = [NSFileManager defaultManager];
+	NSUInteger converted = 0;
+	BOOL labelsChanged = NO;
+	for (NoteObject *note in allNotes) {
+		NSString *path = [note noteFilePath];
+		if (![path length])
+			continue;
+		const char *fsPath = [path fileSystemRepresentation];
+		NSArray *openMetaTags = [fileManager getOpenMetaTagsAtFSPath:fsPath];
+		if ([openMetaTags count] == 0)
+			continue;
+
+		NSMutableArray *merged = [NSMutableArray arrayWithArray:[note orderedLabelTitles]];
+		NSArray *sources[2] = { openMetaTags, [fileManager getFinderTagsAtFSPath:fsPath] };
+		NSUInteger sourceIndex;
+		for (sourceIndex = 0; sourceIndex < 2; sourceIndex++) {
+			NSString *tag;
+			for (tag in sources[sourceIndex]) {
+				if (![tag isKindOfClass:[NSString class]] || [tag length] == 0)
+					continue;
+				NSRange newline = [tag rangeOfString:@"\n"];
+				if (newline.location != NSNotFound)
+					tag = [tag substringToIndex:newline.location];
+				tag = [tag stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
+				if ([tag length] == 0 || [merged containsObject:tag])
+					continue;
+				[merged addObject:tag];
+			}
+		}
+
+		if (![fileManager setFinderTags:merged atFSPath:fsPath])
+			continue;
+		[fileManager removeOpenMetaTagsAtFSPath:fsPath];
+		converted++;
+
+		NSArray *current = [note orderedLabelTitles];
+		if ([merged count] == [current count]) {
+			NSUInteger i;
+			BOOL same = YES;
+			for (i = 0; i < [merged count]; i++) {
+				if (![[merged objectAtIndex:i] isEqualToString:[current objectAtIndex:i]]) {
+					same = NO;
+					break;
+				}
+			}
+			if (same)
+				continue;
+		}
+		[note setLabelString:[merged componentsJoinedByString:@" "]];
+		labelsChanged = YES;
+	}
+
+	if (![[NSUserDefaults standardUserDefaults] boolForKey:@"UseFinderTags"])
+		[[NSUserDefaults standardUserDefaults] setBool:YES forKey:@"UseFinderTags"];
+	if (converted)
+		NSLog(@"Converted OpenMeta tags to Finder tags on %lu notes", (unsigned long)converted);
+	if (labelsChanged)
+		[self performSelector:@selector(sortAndRedisplayNotes) withObject:nil afterDelay:0.1];
 }
 
 - (void)upgradeDatabaseIfNecessary {

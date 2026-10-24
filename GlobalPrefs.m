@@ -127,7 +127,7 @@ static void sendCallbacksForGlobalPrefs(GlobalPrefs* self, SEL selector, id orig
 		tableColumns = nil;
 
 		[defaults registerDefaults:[NSDictionary dictionaryWithObjectsAndKeys:
-			[NSNumber numberWithBool:NO], UseFinderTagsKey,
+			[NSNumber numberWithBool:YES], UseFinderTagsKey,
 			[NSNumber numberWithBool:YES], AutoSuggestLinksKey,
 			[NSNumber numberWithBool:YES], AutoFormatsDoneTagKey, 
 			[NSNumber numberWithBool:YES], AutoIndentsNewLinesKey, 

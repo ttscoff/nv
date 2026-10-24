@@ -27,6 +27,10 @@
 
 - (id)getTagsAtFSPath:(const char*)path;
 - (BOOL)setTags:(id)plistObject atFSPath:(const char*)path;
+- (id)getFinderTagsAtFSPath:(const char*)path;
+- (BOOL)setFinderTags:(id)plistObject atFSPath:(const char*)path;
+- (id)getOpenMetaTagsAtFSPath:(const char*)path;
+- (BOOL)removeOpenMetaTagsAtFSPath:(const char*)path;
 
 - (NSString*)pathCopiedFromAliasData:(NSData*)aliasData;
 - (BOOL)setTextEncodingAttribute:(NSStringEncoding)encoding atFSPath:(const char*)path;

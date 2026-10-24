@@ -59,14 +59,7 @@
 
 - (id)getTagsAtFSPath:(const char*)path
 {
-	if ([[NSUserDefaults standardUserDefaults] boolForKey:@"UseFinderTags"])
-	{
-		return [self getFinderTagsAtFSPath:path];
-	}
-	else
-	{
-		return [self getOpenMetaTagsAtFSPath:path];
-	}
+	return [self getFinderTagsAtFSPath:path];
 }
 
 - (id)getFinderTagsAtFSPath:(const char*)path
@@ -84,10 +77,9 @@
         NSLog(@"trouble getting finder tags:%@",error);
 		return nil;
 	}
-	else
-	{
-		return existingTags;
-	}
+	if ([existingTags count] == 0)
+		return nil;
+	return existingTags;
 
 }
 
@@ -129,14 +121,15 @@
 
 
 - (BOOL)setTags:(id)plistObject atFSPath:(const char*)path {
-	if ([[NSUserDefaults standardUserDefaults] boolForKey:@"UseFinderTags"])
-	{
-		return [self setFinderTags:plistObject atFSPath:path];
-	}
-	else
-	{
-		return [self setOpenMetaTags:plistObject atFSPath:path];
-	}
+	return [self setFinderTags:plistObject atFSPath:path];
+}
+
+- (BOOL)removeOpenMetaTagsAtFSPath:(const char*)path {
+	if (!path)
+		return NO;
+	if (removexattr(path, "com.apple.metadata:kMDItemOMUserTags", 0) < 0)
+		return errno == ENOATTR;
+	return YES;
 }
 
 - (BOOL)setFinderTags:(id)plistObject atFSPath:(const char*)path
