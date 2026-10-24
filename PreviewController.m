@@ -12,8 +12,7 @@
 #import "NSString_Markdown.h"
 #import "NSString_Textile.h"
 #import "NoteObject.h"
-#import "ETTransparentButtonCell.h"
-#import "ETTransparentButton.h"
+#import "NotationPrefs.h"
 #import "BTTransparentScroller.h"
 #import "NSFileManager_NV.h"
 #import "NSFileManager+DirectoryLocations.h"
@@ -66,11 +65,6 @@ static const NSUInteger NVMarkedShareMaxBodyBytes = 500000;
             [[self window] orderFront:self];
         }
 
-        NSRect shCon = [[[self window] contentView]visibleRect];
-        shCon.origin.x +=20;
-        shCon.origin.y -= 2;
-        shCon.size.width = 99;
-        shCon.size.height = 28;
         //        tabSwitcher = [[[ETTransparentButton alloc]initWithFrame:shCon] retain];
         //        shCon.origin.x = [[[self window] contentView]visibleRect].origin.x + [[[self window] contentView]visibleRect].size.width - 80;
         //        shCon.size.width = 56;
@@ -110,34 +104,6 @@ static const NSUInteger NVMarkedShareMaxBodyBytes = 500000;
         //        [[[self window] contentView] addSubview:saveButton];
         //        [[[self window] contentView] addSubview:stickyPreviewButton];
         //        [[[self window] contentView] addSubview:printPreviewButton];
-        [tabView selectTabViewItem:[tabView tabViewItemAtIndex:0]];
-
-        shCon = [shareConfirmation visibleRect];
-        shCon.origin.x = shCon.size.width - 106;
-        shCon.origin.y = 1;
-        shCon.size.width = 81;
-        shCon.size.height = 28;
-        shareConfirm = [[[ETTransparentButton alloc]initWithFrame:shCon] retain];
-        shCon.origin.x = [shareConfirmation visibleRect].origin.x + 25;
-        shareCancel = [[[ETTransparentButton alloc]initWithFrame:shCon] retain];
-        [shareConfirm setTitle:@"Yes"];
-        [shareConfirm setTarget:self];
-        [shareConfirm setAction:@selector(shareNote:)];
-        [shareCancel setTitle:@"No, thanks"];
-        [shareCancel setTarget:self];
-        [shareCancel setAction:@selector(cancelShare:)];
-        [shareConfirmation addSubview:shareCancel];
-        [shareConfirmation addSubview:shareConfirm];
-
-        shCon = [shareNotification visibleRect];
-        shCon.size.width = 116;
-        shCon.size.height = 28;
-        shCon.origin.x = 70;
-        viewOnWebButton = [[[ETTransparentButton alloc]initWithFrame:shCon] retain];
-        [viewOnWebButton setTitle:@"View in Browser"];
-        [viewOnWebButton setTarget:self];
-        [viewOnWebButton setAction:@selector(openShareURL:)];
-        [shareNotification addSubview:viewOnWebButton];
         // [[[self window] contentView] setNeedsDisplay:YES];
 
         //		[preview setPolicyDelegate:self];
@@ -146,8 +112,86 @@ static const NSUInteger NVMarkedShareMaxBodyBytes = 500000;
     return self;
 }
 
+- (NSButton *)popupButtonWithTitle:(NSString *)title action:(SEL)action frame:(NSRect)frame
+{
+    NSButton *button = [[NSButton alloc] initWithFrame:frame];
+    [button setTitle:title];
+    [button setBezelStyle:NSBezelStyleRounded];
+    [button setButtonType:NSButtonTypeMomentaryPushIn];
+    [button setControlSize:NSControlSizeSmall];
+    [button setFont:[NSFont systemFontOfSize:[NSFont smallSystemFontSize]]];
+    [[button cell] setControlSize:NSControlSizeSmall];
+    [button setTarget:self];
+    [button setAction:action];
+    return button;
+}
+
+- (NSColor *)color:(NSColor *)color forAppearance:(NSAppearance *)appearance
+{
+    __block NSColor *resolved = color;
+    [appearance performAsCurrentDrawingAppearance:^{
+        NSColor *components = [color colorUsingType:NSColorTypeComponentBased];
+        if (components)
+            resolved = components;
+    }];
+    return resolved;
+}
+
+- (void)styleShareTextField:(NSTextField *)field
+{
+    [field setTextColor:[NSColor labelColor]];
+    [field setDrawsBackground:NO];
+    [field setBezeled:NO];
+    [field setBordered:NO];
+}
+
+- (void)applySystemAppearanceToPopup:(MAAttachedWindow *)popup
+{
+    NSAppearance *appearance = [NSApp effectiveAppearance];
+    [popup setAppearance:appearance];
+    [popup setBackgroundColor:[self color:[NSColor windowBackgroundColor] forAppearance:appearance]];
+    [popup setBorderColor:[self color:[NSColor separatorColor] forAppearance:appearance]];
+    [popup setViewMargin:8.0f];
+    [popup setBorderWidth:1.0f];
+    [popup setCornerRadius:12.0f];
+    [popup setHasArrow:YES];
+    [popup setDrawsRoundCornerBesideArrow:YES];
+    [popup setArrowBaseWidth:16.0f];
+    [popup setArrowHeight:8.0f];
+}
+
 -(void)awakeFromNib
 {
+    NSRect confirmBounds = [shareConfirmation bounds];
+    shareCancel = [self popupButtonWithTitle:@"No, thanks" action:@selector(cancelShare:) frame:NSMakeRect(12, 8, 108, 24)];
+    shareConfirm = [self popupButtonWithTitle:@"Yes" action:@selector(shareNote:) frame:NSMakeRect(NSMaxX(confirmBounds) - 12 - 72, 8, 72, 24)];
+    [shareConfirm setKeyEquivalent:@"\r"];
+    [shareConfirmation addSubview:shareCancel];
+    [shareConfirmation addSubview:shareConfirm];
+    for (NSView *subview in [shareConfirmation subviews]) {
+        if ([subview isKindOfClass:[NSTextField class]])
+            [self styleShareTextField:(NSTextField *)subview];
+    }
+
+    NSRect noticeBounds = [shareNotification bounds];
+    viewOnWebButton = [self popupButtonWithTitle:@"View in Browser" action:@selector(openShareURL:) frame:NSMakeRect(NSMidX(noticeBounds) - 64, 8, 128, 24)];
+    [shareNotification addSubview:viewOnWebButton];
+    [self styleShareTextField:urlTextField];
+    [tabView selectTabViewItem:[tabView tabViewItemAtIndex:0]];
+    for (NSView *subview in [shareNotification subviews]) {
+        if (![subview isKindOfClass:[NSButton class]] || [(NSButton *)subview action] != @selector(hideShareURL:))
+            continue;
+        NSButton *closeButton = (NSButton *)subview;
+        NSImage *image = [NSImage imageWithSystemSymbolName:@"xmark" accessibilityDescription:@"Close"];
+        [image setTemplate:YES];
+        [closeButton setImage:image];
+        [closeButton setAlternateImage:nil];
+        [closeButton setBordered:NO];
+        [closeButton setImagePosition:NSImageOnly];
+        [closeButton setContentTintColor:[NSColor secondaryLabelColor]];
+        [closeButton setFrame:NSMakeRect(6, NSMaxY(noticeBounds) - 22, 16, 16)];
+    }
+
     cssString = [[[self class] css] retain];
     htmlString = [[[self class] html] retain];
     lastNote = [[NSApp delegate] selectedNoteObject];
@@ -328,6 +372,7 @@ static const NSUInteger NVMarkedShareMaxBodyBytes = 500000;
 -(void)preview:(id)object
 {
     if (self.isPreviewSticky) {
+        [self updateOpenInMarkedButton];
         return;
     }
     NSString *lastScrollPosition = [preview stringByEvaluatingJavaScriptFromString:@"document.getElementsByTagName('body')[0].scrollTop"];
@@ -364,6 +409,7 @@ static const NSUInteger NVMarkedShareMaxBodyBytes = 500000;
 
     [sourceView replaceCharactersInRange:NSMakeRange(0, [[sourceView string] length]) withString:processedString];
     self.isPreviewOutdated = NO;
+    [self updateOpenInMarkedButton];
 }
 
 -(SEL)markupProcessorSelector:(NSInteger)previewMode
@@ -430,7 +476,7 @@ static const NSUInteger NVMarkedShareMaxBodyBytes = 500000;
     [stickyPreviewButton setToolTip:@"Return the preview to normal functionality."];
     [stickyPreviewButton setAction:@selector(makePreviewNotSticky:)];
     [shareButton setEnabled:NO];
-    [saveButton setEnabled:NO];
+    [self updateOpenInMarkedButton];
     [[self window] setHidesOnDeactivate:NO];
 }
 
@@ -442,7 +488,6 @@ static const NSUInteger NVMarkedShareMaxBodyBytes = 500000;
     [stickyPreviewButton setToolTip:@"Maintain current note in Preview, even if you switch to other notes."];
     [stickyPreviewButton setAction:@selector(makePreviewSticky:)];
     [shareButton setEnabled:YES];
-    [saveButton setEnabled:YES];
     self.isPreviewOutdated = YES;
     [self performSelector:@selector(preview:) withObject:[[NSApplication sharedApplication] delegate] afterDelay:0.0];
     [[self window] setHidesOnDeactivate:YES];
@@ -684,6 +729,46 @@ static const NSUInteger NVMarkedShareMaxBodyBytes = 500000;
     }
 }
 
+- (NoteObject *)noteShownInPreview
+{
+    if (self.isPreviewSticky && lastNote)
+        return lastNote;
+    return [(AppController *)[NSApp delegate] selectedNoteObject];
+}
+
+- (void)updateOpenInMarkedButton
+{
+    NoteObject *note = [self noteShownInPreview];
+    BOOL show = NO;
+    if (note && storageFormatOfNote(note) == PlainTextFormat)
+        show = [[note noteFilePath] length] > 0;
+    [saveButton setHidden:!show];
+}
+
+-(IBAction)openInMarked:(id)sender
+{
+    NoteObject *note = [self noteShownInPreview];
+    if (!note || storageFormatOfNote(note) != PlainTextFormat) {
+        NSBeep();
+        return;
+    }
+    id notesController = [note delegate];
+    if ([notesController respondsToSelector:@selector(synchronizeNoteChanges:)])
+        [notesController synchronizeNoteChanges:nil];
+
+    NSString *path = [note noteFilePath];
+    if (![path length]) {
+        NSBeep();
+        return;
+    }
+    NSString *encodedPath = [path stringByAddingPercentEncodingWithAllowedCharacters:[NSCharacterSet URLQueryAllowedCharacterSet]];
+    NSURL *url = encodedPath ? [NSURL URLWithString:[NSString stringWithFormat:@"x-marked-3://open?file=%@", encodedPath]] : nil;
+    if (!url || ![[NSWorkspace sharedWorkspace] openURL:url]) {
+        NSBeep();
+        NSLog(@"Could not open note in Marked");
+    }
+}
+
 -(IBAction)saveHTML:(id)sender
 {
     if (!accessoryView) {
@@ -768,15 +853,7 @@ static const NSUInteger NVMarkedShareMaxBodyBytes = 500000;
                                                       inWindow:[shareButton window]
                                                         onSide:side
                                                     atDistance:15.0f];
-        [confirmWindow setBorderColor:[NSColor colorWithCalibratedHue:0.278 saturation:0.000 brightness:0.871 alpha:0.950]];
-        [confirmWindow setBackgroundColor:[NSColor colorWithCalibratedRed:0.134 green:0.134 blue:0.134 alpha:0.950]];
-        [confirmWindow setViewMargin:3.0f];
-        [confirmWindow setBorderWidth:1.0f];
-        [confirmWindow setCornerRadius:10.0f];
-        [confirmWindow setHasArrow:YES];
-        [confirmWindow setDrawsRoundCornerBesideArrow:YES];
-        [confirmWindow setArrowBaseWidth:10.0f];
-        [confirmWindow setArrowHeight:6.0f];
+        [self applySystemAppearanceToPopup:confirmWindow];
 
         [[shareButton window] addChildWindow:confirmWindow ordered:NSWindowAbove];
 
@@ -806,15 +883,7 @@ static const NSUInteger NVMarkedShareMaxBodyBytes = 500000;
                                                        inWindow:[shareButton window]
                                                          onSide:side
                                                      atDistance:15.0f];
-        [attachedWindow setBorderColor:[NSColor colorWithCalibratedHue:0.278 saturation:0.000 brightness:0.871 alpha:0.950]];
-        [attachedWindow setBackgroundColor:[NSColor colorWithCalibratedRed:0.134 green:0.134 blue:0.134 alpha:0.950]];
-        [attachedWindow setViewMargin:3.0f];
-        [attachedWindow setBorderWidth:1.0f];
-        [attachedWindow setCornerRadius:10.0f];
-        [attachedWindow setHasArrow:YES];
-        [attachedWindow setDrawsRoundCornerBesideArrow:YES];
-        [attachedWindow setArrowBaseWidth:10.0f];
-        [attachedWindow setArrowHeight:6.0f];
+        [self applySystemAppearanceToPopup:attachedWindow];
 
         [[shareButton window] addChildWindow:attachedWindow ordered:NSWindowAbove];
         

@@ -97,6 +97,9 @@ CGFloat _perceptualDarkness(NSColor*a);
 	
 	didRenderFully = NO;
 	[[self layoutManager] setDelegate:self];
+	[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(noteTextStorageDidProcessEditing:) name:NSTextStorageDidProcessEditingNotification object:[self textStorage]];
+	[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(markdownCompletionPreferenceChanged:) name:NSUserDefaultsDidChangeNotification object:nil];
+	[self scheduleMarkdownHighlight];
 
 
     [self bind:@"automaticQuoteSubstitutionEnabled" toObject:[NSUserDefaultsController sharedUserDefaultsController] withKeyPath:@"values.NSAutomaticQuoteSubstitutionEnabled" options:@{@"NSContinuouslyUpdatesValue":@YES}];
@@ -228,6 +231,7 @@ if ([selectorString isEqualToString:SEL_STR(setNoteBodyFont:sender:)]) {
     [[self enclosingScrollView]setNeedsDisplay:YES];
 //    [[[self enclosingScrollView]contentView]setNeedsDisplay:YES];
     [self setNeedsDisplay:YES];
+	[self scheduleMarkdownHighlight];
 }
 
 #define _CM(__ch) ((__ch) * 255.0)
@@ -766,7 +770,185 @@ copyRTFType:
 	[self setSelectedRange:newRange];
 }
 
-    
+static NSRegularExpression *NVMarkdownRegex(NSString *pattern) {
+	NSError *error = nil;
+	NSRegularExpression *regex = [NSRegularExpression regularExpressionWithPattern:pattern options:NSRegularExpressionAnchorsMatchLines error:&error];
+	if (!regex)
+		NSLog(@"nvALT markdown highlight: %@", error);
+	return regex;
+}
+
+static NSColor *NVBlendColors(NSColor *first, NSColor *second, CGFloat fraction, NSColor *fallback) {
+	NSColor *a = [first colorUsingColorSpace:[NSColorSpace sRGBColorSpace]];
+	NSColor *b = [second colorUsingColorSpace:[NSColorSpace sRGBColorSpace]];
+	NSColor *blend = (a && b) ? [a blendedColorWithFraction:fraction ofColor:b] : nil;
+	return blend ?: fallback;
+}
+
+- (BOOL)markdownCompletionsEnabled {
+	return [[NSUserDefaults standardUserDefaults] boolForKey:@"UsesMarkdownCompletions"];
+}
+
+- (void)scheduleMarkdownHighlight {
+	[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(highlightMarkdownSyntax) object:nil];
+	[self performSelector:@selector(highlightMarkdownSyntax) withObject:nil afterDelay:0.03];
+}
+
+- (void)noteTextStorageDidProcessEditing:(NSNotification *)note {
+	if (![NSThread isMainThread]) {
+		[self performSelectorOnMainThread:@selector(scheduleMarkdownHighlight) withObject:nil waitUntilDone:NO];
+		return;
+	}
+	[self scheduleMarkdownHighlight];
+}
+
+- (void)markdownCompletionPreferenceChanged:(NSNotification *)note {
+	static BOOL haveCached = NO;
+	static BOOL cached = NO;
+	BOOL enabled = [self markdownCompletionsEnabled];
+	if (haveCached && cached == enabled)
+		return;
+	haveCached = YES;
+	cached = enabled;
+	[self scheduleMarkdownHighlight];
+}
+
+- (void)paintMarkdownRange:(NSRange)range color:(NSColor *)color strikethrough:(BOOL)strikethrough {
+	NSString *string = [self string];
+	if (!color || range.length == 0 || range.location == NSNotFound || NSMaxRange(range) > [string length])
+		return;
+	NSTextStorage *storage = [self textStorage];
+	NSLayoutManager *layout = [self layoutManager];
+	NSUInteger index = range.location;
+	NSUInteger end = NSMaxRange(range);
+	NSDictionary *attrs = strikethrough ? @{ NSForegroundColorAttributeName: color, NSStrikethroughStyleAttributeName: @(NSUnderlineStyleSingle) } : @{ NSForegroundColorAttributeName: color };
+	while (index < end) {
+		NSRange effective = NSMakeRange(0, 0);
+		id link = [storage attribute:NSLinkAttributeName atIndex:index longestEffectiveRange:&effective inRange:NSMakeRange(0, [string length])];
+		NSRange slice = NSIntersectionRange(range, effective);
+		if (slice.length && !link)
+			[layout addTemporaryAttributes:attrs forCharacterRange:slice];
+		if (NSMaxRange(effective) <= index)
+			break;
+		index = NSMaxRange(effective);
+	}
+}
+
+- (void)paintMarkdownMatches:(NSRegularExpression *)regex string:(NSString *)string content:(NSColor *)content marker:(NSColor *)marker contentGroup:(NSInteger)contentGroup delimiterGroup:(NSInteger)delimiterGroup hasCloser:(BOOL)hasCloser strikethrough:(BOOL)strikethrough {
+	if (!regex)
+		return;
+	[regex enumerateMatchesInString:string options:0 range:NSMakeRange(0, [string length]) usingBlock:^(NSTextCheckingResult *result, NSMatchingFlags flags, BOOL *stop) {
+		NSRange whole = [result range];
+		[self paintMarkdownRange:whole color:marker strikethrough:NO];
+		if (contentGroup > 0 && (NSInteger)[result numberOfRanges] > contentGroup) {
+			NSRange inside = [result rangeAtIndex:(NSUInteger)contentGroup];
+			if (inside.location != NSNotFound && inside.length)
+				[self paintMarkdownRange:inside color:content strikethrough:strikethrough];
+		}
+		if (delimiterGroup > 0 && (NSInteger)[result numberOfRanges] > delimiterGroup) {
+			NSRange opener = [result rangeAtIndex:(NSUInteger)delimiterGroup];
+			if (opener.location != NSNotFound && opener.length) {
+				[self paintMarkdownRange:opener color:marker strikethrough:NO];
+				if (hasCloser && whole.length >= opener.length * 2) {
+					NSRange closer = NSMakeRange(NSMaxRange(whole) - opener.length, opener.length);
+					if (closer.location >= NSMaxRange(opener))
+						[self paintMarkdownRange:closer color:marker strikethrough:NO];
+				}
+			}
+		}
+	}];
+}
+
+- (void)highlightFencedCodeInString:(NSString *)string code:(NSColor *)code marker:(NSColor *)marker {
+	NSUInteger length = [string length];
+	NSUInteger index = 0;
+	while (index < length) {
+		NSRange lineRange = [string lineRangeForRange:NSMakeRange(index, 0)];
+		NSString *trimmed = [[string substringWithRange:lineRange] stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
+		BOOL backtick = [trimmed hasPrefix:@"```"];
+		BOOL tilde = [trimmed hasPrefix:@"~~~"];
+		if (!backtick && !tilde) {
+			index = NSMaxRange(lineRange);
+			continue;
+		}
+		NSString *fence = backtick ? @"```" : @"~~~";
+		NSRange openLine = lineRange;
+		NSUInteger scan = NSMaxRange(lineRange);
+		BOOL closed = NO;
+		while (scan < length) {
+			NSRange nextLine = [string lineRangeForRange:NSMakeRange(scan, 0)];
+			NSString *nextTrimmed = [[string substringWithRange:nextLine] stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
+			scan = NSMaxRange(nextLine);
+			if ([nextTrimmed hasPrefix:fence]) {
+				[self paintMarkdownRange:NSMakeRange(openLine.location, scan - openLine.location) color:code strikethrough:NO];
+				[self paintMarkdownRange:openLine color:marker strikethrough:NO];
+				[self paintMarkdownRange:nextLine color:marker strikethrough:NO];
+				closed = YES;
+				break;
+			}
+		}
+		if (!closed) {
+			[self paintMarkdownRange:NSMakeRange(openLine.location, length - openLine.location) color:code strikethrough:NO];
+			[self paintMarkdownRange:openLine color:marker strikethrough:NO];
+			return;
+		}
+		index = scan;
+	}
+}
+
+- (void)highlightMarkdownSyntax {
+	NSLayoutManager *layout = [self layoutManager];
+	NSString *string = [self string];
+	NSRange fullRange = NSMakeRange(0, [string length]);
+	if (layout && fullRange.length) {
+		[layout removeTemporaryAttribute:NSForegroundColorAttributeName forCharacterRange:fullRange];
+		[layout removeTemporaryAttribute:NSStrikethroughStyleAttributeName forCharacterRange:fullRange];
+	}
+	if (![self markdownCompletionsEnabled] || !layout || !fullRange.length || !prefsController)
+		return;
+
+	NSColor *foreground = [prefsController foregroundTextColor] ?: [NSColor textColor];
+	NSColor *background = [self backgroundColor] ?: [NSColor textBackgroundColor];
+	NSColor *marker = NVBlendColors(foreground, background, 0.55, [NSColor secondaryLabelColor]);
+	NSColor *heading = NVBlendColors([NSColor systemBlueColor], foreground, 0.2, [NSColor systemBlueColor]);
+	NSColor *code = NVBlendColors([NSColor systemRedColor], foreground, 0.35, [NSColor systemRedColor]);
+	NSColor *quote = NVBlendColors(foreground, background, 0.28, foreground);
+	NSColor *link = [[self preferredLinkAttributes] objectForKey:NSForegroundColorAttributeName] ?: heading;
+
+	static NSRegularExpression *headingRegex;
+	static NSRegularExpression *quoteRegex;
+	static NSRegularExpression *listRegex;
+	static NSRegularExpression *emphasisRegex;
+	static NSRegularExpression *strikeRegex;
+	static NSRegularExpression *linkRegex;
+	static NSRegularExpression *wikiRegex;
+	static NSRegularExpression *codeRegex;
+	static NSRegularExpression *ruleRegex;
+	static dispatch_once_t once;
+	dispatch_once(&once, ^{
+		headingRegex = [NVMarkdownRegex(@"^(#{1,6})[ \\t]+(.+)$") retain];
+		quoteRegex = [NVMarkdownRegex(@"^([ \\t]{0,3}>)(.*)$") retain];
+		listRegex = [NVMarkdownRegex(@"^[ \\t]{0,3}(?:[-+*]|\\d+[.)])(?=[ \\t])") retain];
+		emphasisRegex = [NVMarkdownRegex(@"(?<![A-Za-z0-9])(\\*\\*|__|\\*|_)(?!\\s)([^\\n]+?)(?<!\\s)\\1(?![A-Za-z0-9])") retain];
+		strikeRegex = [NVMarkdownRegex(@"~~(?!\\s)([^\\n]+?)(?<!\\s)~~") retain];
+		linkRegex = [NVMarkdownRegex(@"!?\\[([^\\]\\n]*)\\]\\([^\\)\\n]*\\)") retain];
+		wikiRegex = [NVMarkdownRegex(@"\\[\\[([^\\]\\n]+)\\]\\]") retain];
+		codeRegex = [NVMarkdownRegex(@"(`+)([^`\\n]+?)\\1") retain];
+		ruleRegex = [NVMarkdownRegex(@"^[ \\t]{0,3}(?:(?:\\*[ \\t]*){3,}|(?:-[ \\t]*){3,}|(?:_[ \\t]*){3,})$") retain];
+	});
+
+	[self paintMarkdownMatches:quoteRegex string:string content:quote marker:marker contentGroup:2 delimiterGroup:1 hasCloser:NO strikethrough:NO];
+	[self paintMarkdownMatches:headingRegex string:string content:heading marker:marker contentGroup:2 delimiterGroup:1 hasCloser:NO strikethrough:NO];
+	[self paintMarkdownMatches:emphasisRegex string:string content:foreground marker:marker contentGroup:2 delimiterGroup:1 hasCloser:YES strikethrough:NO];
+	[self paintMarkdownMatches:strikeRegex string:string content:foreground marker:marker contentGroup:1 delimiterGroup:0 hasCloser:NO strikethrough:YES];
+	[self paintMarkdownMatches:linkRegex string:string content:link marker:marker contentGroup:1 delimiterGroup:0 hasCloser:NO strikethrough:NO];
+	[self paintMarkdownMatches:wikiRegex string:string content:link marker:marker contentGroup:1 delimiterGroup:0 hasCloser:NO strikethrough:NO];
+	[self paintMarkdownMatches:listRegex string:string content:marker marker:marker contentGroup:0 delimiterGroup:0 hasCloser:NO strikethrough:NO];
+	[self paintMarkdownMatches:ruleRegex string:string content:marker marker:marker contentGroup:0 delimiterGroup:0 hasCloser:NO strikethrough:NO];
+	[self paintMarkdownMatches:codeRegex string:string content:code marker:marker contentGroup:2 delimiterGroup:1 hasCloser:YES strikethrough:NO];
+	[self highlightFencedCodeInString:string code:code marker:marker];
+}
+
 - (BOOL)performKeyEquivalent:(NSEvent *)anEvent {
 //    [[NSApp delegate] resetModTimers];
     //    [[NSNotificationCenter defaultCenter] postNotificationName:@"ModTimersShouldReset" object:nil];
@@ -777,6 +959,17 @@ copyRTFType:
 	if (((modFlags & NSCommandKeyMask)>0)&&([[self window]firstResponder]==self)) {
 		
 		unichar keyChar = [anEvent firstCharacterIgnoringModifiers];
+		NSUInteger deviceIndependent = modFlags & NSDeviceIndependentModifierFlagsMask;
+		BOOL commandOnly = (deviceIndependent & NSCommandKeyMask) &&
+			!(deviceIndependent & (NSShiftKeyMask | NSAlternateKeyMask | NSControlKeyMask));
+		if (commandOnly && (keyChar == 'b' || keyChar == 'B')) {
+			[self bold:nil];
+			return YES;
+		}
+		if (commandOnly && (keyChar == 'i' || keyChar == 'I')) {
+			[self italic:nil];
+			return YES;
+		}
 		if (keyChar == NSCarriageReturnCharacter || keyChar == NSNewlineCharacter || keyChar == NSEnterCharacter) {
 		//	NSLog(@"insertion");
 			NSUInteger charIndex = [self selectedRange].location;
@@ -1515,9 +1708,65 @@ static long (*GetGetScriptManagerVariablePointer())(short) {
 	return NO;	
 }
 
+- (BOOL)replaceEmptyListMarkerWithLineBreak {
+	if (![prefsController autoFormatsListBullets])
+		return NO;
+	NSRange selected = [self selectedRange];
+	if (selected.length != 0 || selected.location == NSNotFound)
+		return NO;
+	NSString *string = [self string];
+	if (selected.location > [string length])
+		return NO;
+
+	NSRange lineRange = [string lineRangeForRange:NSMakeRange(selected.location, 0)];
+	if (lineRange.length == 0)
+		return NO;
+	NSString *line = [string substringWithRange:lineRange];
+	NSUInteger contentLength = [line length];
+	while (contentLength && [[NSCharacterSet newlineCharacterSet] characterIsMember:[line characterAtIndex:contentLength - 1]])
+		contentLength--;
+	if (contentLength == 0)
+		return NO;
+
+	NSCharacterSet *whitespace = [NSCharacterSet whitespaceCharacterSet];
+	NSUInteger index = 0;
+	while (index < contentLength && [whitespace characterIsMember:[line characterAtIndex:index]])
+		index++;
+	if (index >= contentLength)
+		return NO;
+
+	unichar marker = [line characterAtIndex:index];
+	NSUInteger markerEnd = NSNotFound;
+	if ([[NSCharacterSet listBulletsCharacterSet] characterIsMember:marker]) {
+		markerEnd = index + 1;
+	} else if ([[NSCharacterSet decimalDigitCharacterSet] characterIsMember:marker]) {
+		NSUInteger digit = index;
+		while (digit < contentLength && [[NSCharacterSet decimalDigitCharacterSet] characterIsMember:[line characterAtIndex:digit]])
+			digit++;
+		if (digit < contentLength && ([line characterAtIndex:digit] == '.' || [line characterAtIndex:digit] == ')'))
+			markerEnd = digit + 1;
+	}
+	// A continued item always has whitespace after the marker. A bare "1." or "---" is left alone.
+	if (markerEnd == NSNotFound || markerEnd >= contentLength)
+		return NO;
+	if ([line rangeOfCharacterFromSet:[whitespace invertedSet] options:0 range:NSMakeRange(markerEnd, contentLength - markerEnd)].location != NSNotFound)
+		return NO;
+
+	if (![self shouldChangeTextInRange:lineRange replacementString:@"\n"])
+		return NO;
+	[self replaceCharactersInRange:lineRange withString:@"\n"];
+	[self didChangeText];
+	[self setSelectedRange:NSMakeRange(lineRange.location, 0)];
+	[self scrollRangeToVisible:[self selectedRange]];
+	return YES;
+}
+
 - (void)insertNewline:(id)sender {
 	//reset custom styles after each line
 	[self setTypingAttributes:[prefsController noteBodyAttributes]];
+
+	if ([self replaceEmptyListMarkerWithLineBreak])
+		return;
 	
 	[super insertNewline:sender];
 	
@@ -1746,6 +1995,7 @@ static long (*GetGetScriptManagerVariablePointer())(short) {
 }
 
 - (void)dealloc {
+    [NSObject cancelPreviousPerformRequestsWithTarget:self];
     NSLog(@"dealloc linkinged");
     [self unbind:@"automaticQuoteSubstitutionEnabled"];
     [self unbind:@"automaticDashSubstitutionEnabled"];

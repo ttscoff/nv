@@ -400,10 +400,6 @@
 
 /* No comment provided by engineer. */
 "Upload Notes" = "上传笔记";
-
-/* human-readable name for the Simplenote service */
-"Simplenote" = "Simplenote";
-
 /* human-readable name for the SimpleText service */
 "SimpleText" = "SimpleText";
 
@@ -472,13 +468,6 @@
 
 /* no comment */
 "Session could not be created" = "会话无法被创建";
-
-/* Simplenote-specific error */
-"No authorization token" = "无验证";
-
-/* Simplenote-specific error */
-"The index of notes could not be parsed." = "无法解析笔记索引。";
-
 /* string to prefix a sync service error */
 "Error: " = "错误: ";
 

@@ -5,6 +5,6 @@ import Apex
 public final class NVApexMarkdown: NSObject {
     @objc(htmlFromMarkdown:)
     public static func html(from markdown: String) -> String {
-        markdown.apexHTML(mode: .multimarkdown)
+        markdown.apexHTML(mode: .unified)
     }
 }

@@ -57,3 +57,5 @@ nvalt.taskpaper
 *.pbxproj
 .cursor
 .github/prompts/
+commit_message.txt
+buildnotes.md

@@ -163,7 +163,7 @@ static void sendCallbacksForGlobalPrefs(GlobalPrefs* self, SEL selector, id orig
             [NSNumber numberWithBool:NO], AlternatingRowsKey,
             [NSNumber numberWithBool:NO], UseAutoPairing,
             [NSNumber numberWithBool:NO], UseETScrollbarsOnLion,
-            [NSNumber numberWithBool:NO], UsesMarkdownCompletions,
+            [NSNumber numberWithBool:YES], UsesMarkdownCompletions,
 
 			[NSArchiver archivedDataWithRootObject:
 			 [GlobalPrefs regularSystemFont]], NoteBodyFontKey,

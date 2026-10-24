@@ -11,7 +11,6 @@
 
 @class AppController;
 @class NoteObject;
-@class ETTransparentButton;
 
 @interface PreviewController : NSWindowController 
 {
@@ -23,7 +22,7 @@
   IBOutlet NSButton *saveButton;
   IBOutlet NSButton *stickyPreviewButton;
   IBOutlet NSButton *printPreviewButton;
-	ETTransparentButton *viewOnWebButton;
+	NSButton *viewOnWebButton;
   BOOL isPreviewOutdated;
   BOOL isPreviewSticky;
 	NSMutableData *receivedData;
@@ -33,8 +32,8 @@
 	IBOutlet NSTextField *urlTextField;
 	IBOutlet NSView *shareNotification;
 	IBOutlet NSView *shareConfirmation;
-	ETTransparentButton *shareCancel;
-  ETTransparentButton *shareConfirm;
+	NSButton *shareCancel;
+	NSButton *shareConfirm;
 	NSString *shareURL;
 	NSString *cssString;
 	NSString *htmlString;
@@ -51,6 +50,7 @@
 @property (assign) BOOL isPreviewSticky;
 
 -(IBAction)saveHTML:(id)sender;
+-(IBAction)openInMarked:(id)sender;
 -(IBAction)switchTabs:(id)sender;
 -(IBAction)shareNote:(id)sender;
 -(IBAction)shareAsk:(id)sender;

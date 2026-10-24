@@ -821,7 +821,6 @@ bail:
 	//clear aNoteObject's syncServicesMD to facilitate sync recreation upon undoing of deletion
 	//new notes should not have any sync MD; if they do, they should be added using -addNotesFromSync:
 	//problem is that note could very likely still be in the process of syncing, in which case these dicts will be accessed
-	//for simplenote is is necessary only once the iPhone app has fully deleted the note off the server; otherwise a regular update will recreate it
 	//[note removeAllSyncServiceMD];
     
 	[note makeNoteDirtyUpdateTime:YES updateFile:YES];

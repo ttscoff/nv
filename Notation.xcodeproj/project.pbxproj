@@ -76,7 +76,6 @@
 		21A38EE412EA864400CEB5F0 /* MakeDefault_Pressed.tiff in Resources */ = {isa = PBXBuildFile; fileRef = 21A38EE212EA864400CEB5F0 /* MakeDefault_Pressed.tiff */; };
 		21A6E6FD0974204F008436A9 /* LabelsListController.m in Sources */ = {isa = PBXBuildFile; fileRef = 21A6E6FC0974204F008436A9 /* LabelsListController.m */; };
 		21A73DC8099712A8009F8A6C /* WALController.m in Sources */ = {isa = PBXBuildFile; fileRef = 21A73DC7099712A8009F8A6C /* WALController.m */; };
-		21AD2550110A8BA600B7A985 /* SimplenoteEntryCollector.m in Sources */ = {isa = PBXBuildFile; fileRef = 21AD254F110A8BA600B7A985 /* SimplenoteEntryCollector.m */; };
 		21AD2850110BE99B00B7A985 /* SyncSessionController.m in Sources */ = {isa = PBXBuildFile; fileRef = 21AD284F110BE99B00B7A985 /* SyncSessionController.m */; };
 		21AD292D110C188800B7A985 /* TinyAlert.tif in Resources */ = {isa = PBXBuildFile; fileRef = 21AD292C110C188800B7A985 /* TinyAlert.tif */; };
 		21B1BC361104D20E0004A7D0 /* InvocationRecorder.m in Sources */ = {isa = PBXBuildFile; fileRef = 21B1BC351104D20E0004A7D0 /* InvocationRecorder.m */; };
@@ -100,7 +99,6 @@
 		21E6B09B0B6E6D0C001ABEDC /* URLGetter.nib in Resources */ = {isa = PBXBuildFile; fileRef = 21E6B0950B6E6D0B001ABEDC /* URLGetter.nib */; };
 		21E6B09F0B6E6D18001ABEDC /* URLGetter.m in Sources */ = {isa = PBXBuildFile; fileRef = 21E6B09D0B6E6D18001ABEDC /* URLGetter.m */; };
 		21F078FC10EC280E004FE56F /* NotationSyncServiceManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 21F078FB10EC280E004FE56F /* NotationSyncServiceManager.m */; };
-		21F0794310EC5EA2004FE56F /* SimplenoteSession.m in Sources */ = {isa = PBXBuildFile; fileRef = 21F0794210EC5EA2004FE56F /* SimplenoteSession.m */; };
 		21F0797E10EC93B0004FE56F /* SyncResponseFetcher.m in Sources */ = {isa = PBXBuildFile; fileRef = 21F0797D10EC93B0004FE56F /* SyncResponseFetcher.m */; };
 		21F07C7B10EDED93004FE56F /* BSJSONEncoder.m in Sources */ = {isa = PBXBuildFile; fileRef = 21F07C7210EDED93004FE56F /* BSJSONEncoder.m */; };
 		21F07C7C10EDED93004FE56F /* NSArray+BSJSONAdditions.m in Sources */ = {isa = PBXBuildFile; fileRef = 21F07C7410EDED93004FE56F /* NSArray+BSJSONAdditions.m */; };
@@ -233,7 +231,7 @@
 		934C3FB514FDA06A000D14BA /* templateclean.html in Resources */ = {isa = PBXBuildFile; fileRef = 934C3FB114FDA069000D14BA /* templateclean.html */; };
 		934C3FB914FDA74F000D14BA /* NSFileManager+DirectoryLocations.m in Sources */ = {isa = PBXBuildFile; fileRef = 934C3FB814FDA74F000D14BA /* NSFileManager+DirectoryLocations.m */; };
 		93A158BC133C304D00E1E7DA /* Markdownify.nvhelp in Resources */ = {isa = PBXBuildFile; fileRef = 93A158BB133C304D00E1E7DA /* Markdownify.nvhelp */; };
-		93A158BE133C497400E1E7DA /* Notality.icns in Resources */ = {isa = PBXBuildFile; fileRef = 93A158BD133C497400E1E7DA /* Notality.icns */; };
+		93A158BE133C497400E1E7DA /* nvALT.icon in Resources */ = {isa = PBXBuildFile; fileRef = 93A158BD133C497400E1E7DA /* nvALT.icon */; };
 		93B348281371547800658F98 /* HUDIconLock.png in Resources */ = {isa = PBXBuildFile; fileRef = 93B348241371547800658F98 /* HUDIconLock.png */; };
 		93B348291371547800658F98 /* HUDIconPrint.png in Resources */ = {isa = PBXBuildFile; fileRef = 93B348251371547800658F98 /* HUDIconPrint.png */; };
 		93B3482A1371547800658F98 /* HUDIconSave.png in Resources */ = {isa = PBXBuildFile; fileRef = 93B348261371547800658F98 /* HUDIconSave.png */; };
@@ -441,8 +439,6 @@
 		21A6E6FC0974204F008436A9 /* LabelsListController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = LabelsListController.m; sourceTree = "<group>"; };
 		21A73DC6099712A8009F8A6C /* WALController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WALController.h; sourceTree = "<group>"; };
 		21A73DC7099712A8009F8A6C /* WALController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = WALController.m; sourceTree = "<group>"; };
-		21AD254E110A8BA600B7A985 /* SimplenoteEntryCollector.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SimplenoteEntryCollector.h; sourceTree = "<group>"; };
-		21AD254F110A8BA600B7A985 /* SimplenoteEntryCollector.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SimplenoteEntryCollector.m; sourceTree = "<group>"; };
 		21AD284E110BE99B00B7A985 /* SyncSessionController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SyncSessionController.h; sourceTree = "<group>"; };
 		21AD284F110BE99B00B7A985 /* SyncSessionController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SyncSessionController.m; sourceTree = "<group>"; };
 		21AD292C110C188800B7A985 /* TinyAlert.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = TinyAlert.tif; path = Images/TinyAlert.tif; sourceTree = "<group>"; };
@@ -488,8 +484,6 @@
 		21E6B09E0B6E6D18001ABEDC /* URLGetter.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = URLGetter.h; sourceTree = "<group>"; };
 		21F078FA10EC280E004FE56F /* NotationSyncServiceManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = NotationSyncServiceManager.h; sourceTree = "<group>"; };
 		21F078FB10EC280E004FE56F /* NotationSyncServiceManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = NotationSyncServiceManager.m; sourceTree = "<group>"; };
-		21F0794110EC5EA2004FE56F /* SimplenoteSession.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SimplenoteSession.h; sourceTree = "<group>"; };
-		21F0794210EC5EA2004FE56F /* SimplenoteSession.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SimplenoteSession.m; sourceTree = "<group>"; };
 		21F0797C10EC93B0004FE56F /* SyncResponseFetcher.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SyncResponseFetcher.h; sourceTree = "<group>"; };
 		21F0797D10EC93B0004FE56F /* SyncResponseFetcher.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SyncResponseFetcher.m; sourceTree = "<group>"; };
 		21F07C7110EDED93004FE56F /* BSJSONEncoder.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = BSJSONEncoder.h; path = JSON/BSJSONEncoder.h; sourceTree = "<group>"; };
@@ -729,7 +723,6 @@
 		5CC2DF0A13083BCF006772D9 /* StatusItemView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = StatusItemView.m; sourceTree = "<group>"; };
 		5CCEEF1B130B599B00E15B77 /* DFView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DFView.h; sourceTree = "<group>"; };
 		5CCEEF1C130B599B00E15B77 /* DFView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DFView.m; sourceTree = "<group>"; };
-		5CD58D771D9DA3C70004E1B8 /* SimperiumConfig.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = SimperiumConfig.h; sourceTree = "<group>"; };
 		5CDBA8E413A5449900E7494E /* it */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = it; path = it.lproj/MarkupPreview.xib; sourceTree = "<group>"; };
 		5CDBA8E713A5449900E7494E /* de */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = de; path = de.lproj/MarkupPreview.xib; sourceTree = "<group>"; };
 		5CDBA8EA13A5450200E7494E /* zh */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = zh; path = zh.lproj/MainMenu.xib; sourceTree = "<group>"; };
@@ -779,7 +772,7 @@
 		934C3FB714FDA74F000D14BA /* NSFileManager+DirectoryLocations.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSFileManager+DirectoryLocations.h"; sourceTree = "<group>"; };
 		934C3FB814FDA74F000D14BA /* NSFileManager+DirectoryLocations.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSFileManager+DirectoryLocations.m"; sourceTree = "<group>"; };
 		93A158BB133C304D00E1E7DA /* Markdownify.nvhelp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = Markdownify.nvhelp; sourceTree = "<group>"; };
-		93A158BD133C497400E1E7DA /* Notality.icns */ = {isa = PBXFileReference; lastKnownFileType = image.icns; path = Notality.icns; sourceTree = "<group>"; };
+		93A158BD133C497400E1E7DA /* nvALT.icon */ = {isa = PBXFileReference; lastKnownFileType = folder.iconcomposer.icon; path = nvALT.icon; sourceTree = "<group>"; };
 		93B348241371547800658F98 /* HUDIconLock.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = HUDIconLock.png; path = Images/HUDIconLock.png; sourceTree = "<group>"; };
 		93B348251371547800658F98 /* HUDIconPrint.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = HUDIconPrint.png; path = Images/HUDIconPrint.png; sourceTree = "<group>"; };
 		93B348261371547800658F98 /* HUDIconSave.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = HUDIconSave.png; path = Images/HUDIconSave.png; sourceTree = "<group>"; };
@@ -1110,7 +1103,7 @@
 				93B348261371547800658F98 /* HUDIconSave.png */,
 				93B348271371547800658F98 /* HUDIconShare.png */,
 				5C2CC189134989D7006FFE56 /* nvMenuDark.png */,
-				93A158BD133C497400E1E7DA /* Notality.icns */,
+				93A158BD133C497400E1E7DA /* nvALT.icon */,
 				5C94376C132A0C9D00B08B80 /* greyscrollervertbottom3.tif */,
 				5C94376D132A0C9D00B08B80 /* greyscrollervertfill3.tif */,
 				5C94376E132A0C9D00B08B80 /* greyscrollerverttop3.tif */,
@@ -1186,15 +1179,10 @@
 				21CB29AD10EEE39400360118 /* SyncServiceSessionProtocol.h */,
 				21F078FA10EC280E004FE56F /* NotationSyncServiceManager.h */,
 				21F078FB10EC280E004FE56F /* NotationSyncServiceManager.m */,
-				21AD254E110A8BA600B7A985 /* SimplenoteEntryCollector.h */,
-				21AD254F110A8BA600B7A985 /* SimplenoteEntryCollector.m */,
-				21F0794110EC5EA2004FE56F /* SimplenoteSession.h */,
-				21F0794210EC5EA2004FE56F /* SimplenoteSession.m */,
 				21F0797C10EC93B0004FE56F /* SyncResponseFetcher.h */,
 				21F0797D10EC93B0004FE56F /* SyncResponseFetcher.m */,
 				21AD284E110BE99B00B7A985 /* SyncSessionController.h */,
 				21AD284F110BE99B00B7A985 /* SyncSessionController.m */,
-				5CD58D771D9DA3C70004E1B8 /* SimperiumConfig.h */,
 			);
 			name = "Sync Services";
 			sourceTree = "<group>";
@@ -1587,7 +1575,7 @@
 				5CF96E0B132EA29D0079B3FD /* Preferences.xib in Resources */,
 				5CF96E0C132EA29D0079B3FD /* NotationPrefsView.nib in Resources */,
 				93A158BC133C304D00E1E7DA /* Markdownify.nvhelp in Resources */,
-				93A158BE133C497400E1E7DA /* Notality.icns in Resources */,
+				93A158BE133C497400E1E7DA /* nvALT.icon in Resources */,
 				5C2CC18A134989D7006FFE56 /* nvMenuDark.png in Resources */,
 				93B348281371547800658F98 /* HUDIconLock.png in Resources */,
 				93B348291371547800658F98 /* HUDIconPrint.png in Resources */,
@@ -1694,7 +1682,6 @@
 				D3EECA00106F66C70023D7F8 /* NVPasswordGenerator.m in Sources */,
 				21BD2ED110DAF31500BA3DF6 /* LinearDividerShader.m in Sources */,
 				21F078FC10EC280E004FE56F /* NotationSyncServiceManager.m in Sources */,
-				21F0794310EC5EA2004FE56F /* SimplenoteSession.m in Sources */,
 				21F0797E10EC93B0004FE56F /* SyncResponseFetcher.m in Sources */,
 				21F07C7B10EDED93004FE56F /* BSJSONEncoder.m in Sources */,
 				21F07C7C10EDED93004FE56F /* NSArray+BSJSONAdditions.m in Sources */,
@@ -1702,7 +1689,6 @@
 				21F07C7E10EDED93004FE56F /* NSScanner+BSJSONAdditions.m in Sources */,
 				21F07C7F10EDED93004FE56F /* NSString+BSJSONAdditions.m in Sources */,
 				21B1BC361104D20E0004A7D0 /* InvocationRecorder.m in Sources */,
-				21AD2550110A8BA600B7A985 /* SimplenoteEntryCollector.m in Sources */,
 				21AD2850110BE99B00B7A985 /* SyncSessionController.m in Sources */,
 				212C6952110E1940004DD82C /* TitlebarButton.m in Sources */,
 				21B548FA112F307E00E163A1 /* NotationDirectoryManager.m in Sources */,
@@ -2120,6 +2106,8 @@
 		212B842409780B5000F3597F /* Development */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = nvALT;
+				ASSETCATALOG_COMPILER_STANDALONE_ICON_BEHAVIOR = all;
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_IDENTITY = "Mac Developer";
 				COMBINE_HIDPI_IMAGES = YES;
@@ -2319,11 +2307,14 @@
 		5C9CB58C134A7F0400073277 /* ForBuilding */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = nvALT;
+				ASSETCATALOG_COMPILER_STANDALONE_ICON_BEHAVIOR = all;
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_IDENTITY = "Mac Developer";
 				COMBINE_HIDPI_IMAGES = YES;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				DEVELOPMENT_TEAM = 47TRS7H4BH;
+				ENABLE_HARDENED_RUNTIME = YES;
 				ENABLE_STRICT_OBJC_MSGSEND = NO;
 				LD_RUNPATH_SEARCH_PATHS = "@executable_path/../Frameworks";
 				LIBRARY_SEARCH_PATHS = "$(PROJECT_DIR)";

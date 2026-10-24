@@ -134,7 +134,9 @@
 	<key>CFBundleGetInfoString</key>
 	<string>nvALT by David Halter and Brett Terpstra, based on NV 2.0 β5 Copyright © 2010 Zachary Schneirov, All Rights Reserved.</string>
 	<key>CFBundleIconFile</key>
-	<string>Notality.icns</string>
+	<string>nvALT</string>
+	<key>CFBundleIconName</key>
+	<string>nvALT</string>
 	<key>CFBundleIdentifier</key>
 	<string>$(PRODUCT_BUNDLE_IDENTIFIER)</string>
 	<key>CFBundleInfoDictionaryVersion</key>

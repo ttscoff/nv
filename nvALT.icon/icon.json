@@ -1,0 +1,79 @@
+{
+  "fill" : {
+    "linear-gradient" : [
+      "display-p3:0.00000,0.21616,0.33018,1.00000",
+      "display-p3:0.21790,0.36996,0.43064,1.00000"
+    ]
+  },
+  "groups" : [
+    {
+      "layers" : [
+        {
+          "fill" : {
+            "linear-gradient" : [
+              "display-p3:0.74962,0.85772,1.00000,0.25239",
+              "display-p3:0.91396,0.89637,0.96783,1.00000"
+            ]
+          },
+          "image-name" : "Image 4.png",
+          "name" : "Image 4",
+          "position" : {
+            "scale" : 1.65,
+            "translation-in-points" : [
+              202,
+              241.4375
+            ]
+          }
+        },
+        {
+          "fill" : {
+            "linear-gradient" : [
+              "display-p3:0.17092,0.22389,0.25297,1.00000",
+              "display-p3:0.10177,0.16467,0.20918,1.00000"
+            ]
+          },
+          "image-name" : "Image 3.png",
+          "name" : "Image 3",
+          "position" : {
+            "scale" : 1.65,
+            "translation-in-points" : [
+              202,
+              16.787500000000136
+            ]
+          }
+        },
+        {
+          "fill" : {
+            "linear-gradient" : [
+              "display-p3:0.81822,0.97662,1.00000,1.00000",
+              "display-p3:0.85851,0.75297,0.96783,1.00000"
+            ]
+          },
+          "image-name" : "Image 2.png",
+          "name" : "Image 2",
+          "position" : {
+            "scale" : 1.5,
+            "translation-in-points" : [
+              -24,
+              32
+            ]
+          }
+        }
+      ],
+      "shadow" : {
+        "kind" : "neutral",
+        "opacity" : 0.5
+      },
+      "translucency" : {
+        "enabled" : true,
+        "value" : 0.3
+      }
+    }
+  ],
+  "supported-platforms" : {
+    "circles" : [
+      "watchOS"
+    ],
+    "squares" : "shared"
+  }
+}

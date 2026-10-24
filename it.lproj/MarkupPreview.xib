@@ -141,7 +141,7 @@ Gw
                         </tabViewItems>
                     </tabView>
                     <button toolTip="Lock note to preview" wantsLayer="YES" verticalHuggingPriority="750" alphaValue="0.80000000000000004" id="261">
-                        <rect key="frame" x="300" y="7" width="28" height="19"/>
+                        <rect key="frame" x="336" y="7" width="28" height="19"/>
                         <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxY="YES"/>
                         <buttonCell key="cell" type="recessed" bezelStyle="recessed" image="HUDIconLock" imagePosition="overlaps" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="262">
                             <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES" changeBackground="YES" changeGray="YES"/>
@@ -153,21 +153,19 @@ Gw
                             <action selector="makePreviewSticky:" target="-2" id="269"/>
                         </connections>
                     </button>
-                    <button toolTip="Save Preview" wantsLayer="YES" verticalHuggingPriority="750" alphaValue="0.80000000000000004" id="263">
-                        <rect key="frame" x="404" y="7" width="28" height="19"/>
+                    <button toolTip="Open in Marked" hidden="YES" wantsLayer="YES" verticalHuggingPriority="750" id="263">
+                        <rect key="frame" x="208" y="7" width="120" height="19"/>
                         <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxY="YES"/>
-                        <buttonCell key="cell" type="recessed" bezelStyle="recessed" image="HUDIconSave" imagePosition="only" alignment="center" borderStyle="border" imageScaling="axesIndependently" inset="2" id="264">
+                        <buttonCell key="cell" type="roundRect" title="Open in Marked" bezelStyle="roundedRect" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="264">
                             <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
-                            <font key="font" metaFont="systemBold" size="12"/>
-                            <string key="keyEquivalent">S</string>
-                            <modifierMask key="keyEquivalentModifierMask" command="YES"/>
+                            <font key="font" metaFont="titleBar" size="12"/>
                         </buttonCell>
                         <connections>
-                            <action selector="saveHTML:" target="-2" id="274"/>
+                            <action selector="openInMarked:" target="-2" id="274"/>
                         </connections>
                     </button>
                     <button toolTip="Share on Marked Share" wantsLayer="YES" verticalHuggingPriority="750" alphaValue="0.80000000000000004" id="265">
-                        <rect key="frame" x="370" y="7" width="28" height="19"/>
+                        <rect key="frame" x="404" y="7" width="28" height="19"/>
                         <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxY="YES"/>
                         <buttonCell key="cell" type="recessed" bezelStyle="recessed" image="HUDIconShare" imagePosition="only" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="266">
                             <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
@@ -178,7 +176,7 @@ Gw
                         </connections>
                     </button>
                     <button toolTip="Print/PDF" wantsLayer="YES" verticalHuggingPriority="750" alphaValue="0.80000000000000004" id="267">
-                        <rect key="frame" x="334" y="7" width="28" height="19"/>
+                        <rect key="frame" x="370" y="7" width="28" height="19"/>
                         <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxY="YES"/>
                         <buttonCell key="cell" type="recessed" bezelStyle="recessed" image="HUDIconPrint" imagePosition="only" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="268">
                             <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
@@ -211,7 +209,6 @@ Gw
     <resources>
         <image name="HUDIconLock" width="512" height="512"/>
         <image name="HUDIconPrint" width="512" height="512"/>
-        <image name="HUDIconSave" width="512" height="512"/>
         <image name="HUDIconShare" width="512" height="512"/>
         <image name="TabClose_Front_Pressed" width="12" height="13"/>
         <image name="TabClose_Front_Rollover" width="12" height="13"/>

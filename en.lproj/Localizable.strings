@@ -401,9 +401,6 @@
 /* No comment provided by engineer. */
 "Upload Notes" = "Upload Notes";
 
-/* human-readable name for the Simplenote service */
-"Simplenote" = "Simplenote";
-
 /* human-readable name for the SimpleText service */
 "SimpleText" = "SimpleText";
 
@@ -472,13 +469,6 @@
 
 /* no comment */
 "Session could not be created" = "Session could not be created";
-
-/* Simplenote-specific error */
-"No authorization token" = "No authorization token";
-
-/* Simplenote-specific error */
-"The index of notes could not be parsed." = "The index of notes could not be parsed.";
-
 /* string to prefix a sync service error */
 "Error: " = "Error: ";
 
