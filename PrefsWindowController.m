@@ -586,16 +586,9 @@ NSRect ScaleRectWithFactor(NSRect rect, float factor) {
 }
 
 - (IBAction)toggleStatusItem:(id)sender{
-//    NSUserDefaults *stdDefaults=[NSUserDefaults standardUserDefaults];
-//    BOOL showIt=[stdDefaults boolForKey:@"StatusBarItem"];
-//    if (showIt) {
-//        [stdDefaults setBool:NO forKey:@"StatusBarItem"];
-//        //        [togDockLabel setStringValue:@"This will immediately restart NV"];
-//    }else{
-//        [stdDefaults setBool:YES forKey:@"StatusBarItem"];
-//    }
-//    [stdDefaults synchronize];
-	[[NSNotificationCenter defaultCenter]postNotificationName:@"AppShouldToggleStatusItem" object:nil];
+    BOOL show = ([sender state] == NSOnState);
+    [[NSUserDefaults standardUserDefaults] setBool:show forKey:@"StatusBarItem"];
+	[[NSNotificationCenter defaultCenter] postNotificationName:@"AppShouldToggleStatusItem" object:[NSNumber numberWithBool:show]];
 }
 
 

@@ -239,6 +239,7 @@ void outletObjectAwoke(id sender);
 - (void)reActivate:(id)sender;
 - (void)toggleStatusItem:(NSNotification *)notification;
 - (void)setUpStatusBarItem;
+- (void)setMenuBarIconVisible:(BOOL)visible;
 - (NSArray *)referenceLinksInString:(NSString *)contentString;
 - (void)offerMarkdownConversionIfNeeded;
 - (IBAction)convertNotesToMarkdown:(id)sender;

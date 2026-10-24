@@ -510,6 +510,7 @@ void outletObjectAwoke(id sender) {
 	
 	[self performSelector:@selector(runDelayedUIActionsAfterLaunch) withObject:nil afterDelay:0.0];
 	[self performSelector:@selector(offerMarkdownConversionIfNeeded) withObject:nil afterDelay:0.6];
+	[self setMenuBarIconVisible:[[NSUserDefaults standardUserDefaults] boolForKey:@"StatusBarItem"]];
     
 	
     
@@ -3358,36 +3359,58 @@ terminateApp:
 }
 
 
-- (void)setUpStatusBarItem{
-
-    NSImage *statusIcon=[NSImage imageNamed:@"nvMenuDark"];
-    [statusIcon setSize:NSMakeSize(16.0, 16.0)];
-    [statusIcon setTemplate:YES];
-    statusItem =[[NSStatusBar systemStatusBar] statusItemWithLength:24.f];
-    if (IsYosemiteOrLater) {
-        statusItem.button.image=statusIcon;
-        statusItem.button.target=self;
-        statusItem.button.action=@selector(statusItemAction:);
-        [statusItem.button sendActionOn:NSEventMaskLeftMouseUp|NSEventMaskRightMouseUp];
-    }else{
-        statusItem.image=statusIcon;
-        statusItem.target=self;
-        statusItem.action=@selector(statusItemAction:);
-         [statusItem sendActionOn:NSEventMaskLeftMouseUp|NSEventMaskRightMouseUp];
-        statusItem.highlightMode=YES;
+- (NSImage *)menuBarIconImage {
+    NSString *path = [[NSBundle mainBundle] pathForResource:@"nvMenuDark" ofType:@"png"];
+    NSImage *source = path ? [[NSImage alloc] initWithContentsOfFile:path] : nil;
+    if (!source)
+        source = [[NSImage imageNamed:@"nvMenuDark"] retain];
+    if (!source)
+        source = [[NSImage imageWithSystemSymbolName:@"note.text" accessibilityDescription:@"nvALT"] retain];
+    NSImage *icon = [[NSImage alloc] initWithSize:NSMakeSize(18, 18)];
+    if (source) {
+        [icon lockFocus];
+        [source drawInRect:NSMakeRect(1, 1, 16, 16) fromRect:NSZeroRect operation:NSCompositingOperationSourceOver fraction:1.0];
+        [icon unlockFocus];
+        [source release];
     }
-    [statusItem retain];
-
+    [icon setTemplate:YES];
+    return [icon autorelease];
 }
 
-    - (void)toggleStatusItem:(NSNotification *)notification{
-        if (!statusItem) {
-            [self setUpStatusBarItem];
-        }else{
-            [[NSStatusBar systemStatusBar]removeStatusItem:statusItem];
-            statusItem=nil;
+- (void)setMenuBarIconVisible:(BOOL)visible {
+    if (!visible) {
+        if (statusItem) {
+            [[NSStatusBar systemStatusBar] removeStatusItem:statusItem];
+            [statusItem release];
+            statusItem = nil;
         }
+        return;
     }
+
+    if (!statusItem) {
+        statusItem = [[[NSStatusBar systemStatusBar] statusItemWithLength:NSSquareStatusItemLength] retain];
+        statusItem.autosaveName = @"nvALTStatusItem";
+        statusItem.button.target = self;
+        statusItem.button.action = @selector(statusItemAction:);
+        [statusItem.button sendActionOn:NSEventMaskLeftMouseUp | NSEventMaskRightMouseUp];
+        statusItem.button.imagePosition = NSImageOnly;
+        statusItem.button.imageScaling = NSImageScaleProportionallyDown;
+        statusItem.button.toolTip = @"nvALT";
+    }
+    statusItem.button.image = [self menuBarIconImage];
+    statusItem.visible = YES;
+}
+
+- (void)setUpStatusBarItem {
+    [self setMenuBarIconVisible:YES];
+}
+
+- (void)toggleStatusItem:(NSNotification *)notification {
+    BOOL show = [[NSUserDefaults standardUserDefaults] boolForKey:@"StatusBarItem"];
+    if ([[notification object] isKindOfClass:[NSNumber class]])
+        show = [[notification object] boolValue];
+    [self setMenuBarIconVisible:show];
+}
     
     
 #pragma mark NSPREDICATE TO FIND MARKDOWN REFERENCE LINKS
