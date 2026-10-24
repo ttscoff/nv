@@ -1760,7 +1760,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "set -e\nFW=\"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/Sparkle.framework\"\nSIGN_ID=\"${EXPANDED_CODE_SIGN_IDENTITY}\"\nif [ -z \"$SIGN_ID\" ]; then\n  SIGN_ID=\"-\"\nfi\nsign()\n{\n  codesign --force --sign \"$SIGN_ID\" --preserve-metadata=identifier,entitlements --timestamp=none \"$1\"\n}\nsign \"$FW/Versions/B/XPCServices/Downloader.xpc\"\nsign \"$FW/Versions/B/XPCServices/Installer.xpc\"\nsign \"$FW/Versions/B/Autoupdate\"\nsign \"$FW/Versions/B/Updater.app\"\nsign \"$FW\"\n";
+			shellScript = "set -e\nFW=\"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/Sparkle.framework\"\nSIGN_ID=\"${EXPANDED_CODE_SIGN_IDENTITY}\"\nif [ -z \"$SIGN_ID\" ]; then\n  SIGN_ID=\"-\"\nfi\nsign()\n{\n  codesign --force --sign \"$SIGN_ID\" --options runtime --preserve-metadata=identifier,entitlements --timestamp=none \"$1\"\n}\nsign \"$FW/Versions/B/XPCServices/Downloader.xpc\"\nsign \"$FW/Versions/B/XPCServices/Installer.xpc\"\nsign \"$FW/Versions/B/Autoupdate\"\nsign \"$FW/Versions/B/Updater.app\"\nsign \"$FW\"\n";
 		};
 /* End PBXShellScriptBuildPhase section */
 
