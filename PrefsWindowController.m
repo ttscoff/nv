@@ -23,6 +23,13 @@
 #import "GlobalPrefs.h"
 #import "BufferUtils.h"
 
+@interface PrefsWindowController () <NSTableViewDataSource, NSTableViewDelegate>
+{
+	NSTableView *sidebarTable;
+	NSView *detailView;
+	NSArray *settingsPanes;
+}
+@end
 
 @implementation PrefsWindowController
 
@@ -460,24 +467,9 @@
     [showGridButton setState:[prefsController showGrid]];
     [autoPairButton setState:[prefsController useAutoPairing]];
     items = [[NSMutableDictionary alloc] init];
-    
-    [self addToolbarItemWithName:@"General"];
-    [self addToolbarItemWithName:@"Notes"];	
-    [self addToolbarItemWithName:@"Editing"];
-	[self addToolbarItemWithName:@"Fonts & Colors"];
-		
-    toolbar = [[NSToolbar alloc] initWithIdentifier:@"preferencePanes"];
-    [toolbar setDelegate:self];
-    [toolbar setAllowsUserCustomization:NO];
-    [toolbar setAutosavesConfiguration:NO]; 
-    [window setToolbar:toolbar];
-    [toolbar release];  //setToolbar retains the toolbar we pass, so release the one we used.
-	
-	[window setShowsToolbarButton:NO];
     [useETScrollbarsOnLionButton setState:[prefsController useETScrollbarsOnLion]];
     [useETScrollbarsOnLionButton setHidden:!IsLionOrLater];
-    [self switchViews:nil];  //select last selected pane by default
-    
+    [self installSettingsSplitView];
 }
 
 
@@ -498,73 +490,183 @@
     return [items allKeys];
 }
 
-- (void)switchViews:(NSToolbarItem *)item {
-    NSString *sender = nil;
-	
-    if (item == nil) {
-        sender = [prefsController lastSelectedPreferencesPane];
-        [toolbar setSelectedItemIdentifier:sender];
-    } else {
-        sender = [item itemIdentifier];
-		[prefsController setLastSelectedPreferencesPane:sender sender:self];
-    }
-	
-    NSView *prefsView = nil;
-	
-    [window setTitle:[[NSBundle mainBundle] localizedStringForKey:sender value:@"" table:nil]];
-	
-    if ([sender isEqualToString:@"General"]){
-         prefsView = generalView;
-    } else if([sender isEqualToString:@"Notes"]) {
-        prefsView = [self databaseView];
-    } else if([sender isEqualToString:@"Editing"]) {
-        prefsView = editingView;
-    } else if([sender isEqualToString:@"Fonts & Colors"]) {
-        prefsView = fontsColorsView;
-	} else {
-		NSLog(@"unknown sender: %@", sender);
-	}
-    
-    if (prefsView == databaseView)
-		[folderLocationsMenuButton setMenu:[self directorySelectionMenu]];
-	
-	NSAssert(prefsView != nil, @"switching to a nil prefs view!");
-    
-	[[NSFontPanel sharedFontPanel] close];
-	
-	//fix this math to convert between window and view coordinates for resolution independence
-	
-	float userSpaceScaleFactor = [window userSpaceScaleFactor];
-	
-    //to stop flicker, we make a temp blank view.
-	
-	NSRect windowContentFrame = ScaleRectWithFactor([[window contentView] frame], userSpaceScaleFactor);
-    NSView *tempView = [[NSView alloc] initWithFrame:[[window contentView] frame]];
-    [window setContentView:tempView];
-    [tempView release];
-    
-    NSRect newFrame = [window frame];
-	NSRect viewFrameForWindow = ScaleRectWithFactor([prefsView frame], userSpaceScaleFactor);
-    newFrame.size.height = viewFrameForWindow.size.height + ([window frame].size.height - windowContentFrame.size.height);
-    newFrame.size.width = viewFrameForWindow.size.width;
-    newFrame.origin.y += (windowContentFrame.size.height - viewFrameForWindow.size.height);
-    	
-    [window setShowsResizeIndicator:YES];
-    [window setFrame:newFrame display:YES animate:YES];
-
-    [window setContentView:prefsView];
+- (NSArray *)settingsPaneNames {
+	return [NSArray arrayWithObjects:@"General", @"Notes", @"Editing", @"Fonts & Colors", nil];
 }
 
-NSRect ScaleRectWithFactor(NSRect rect, float factor) {
-	NSRect newRect = rect;
-	newRect.size.width *= factor;
-	newRect.size.height *= factor;
-	newRect.origin.x *= factor;
-	newRect.origin.y *= factor;
-	
-	//these may still need to be rounded up
-	
-	return newRect;
+- (NSArray *)settingsPaneSymbols {
+	return [NSArray arrayWithObjects:@"gearshape", @"note.text", @"square.and.pencil", @"textformat", nil];
+}
+
+- (NSString *)localizedSettingsTitleForPane:(NSString *)name {
+	return [[NSBundle mainBundle] localizedStringForKey:name value:name table:nil];
+}
+
+- (NSView *)settingsViewForPane:(NSString *)name {
+	if ([name isEqualToString:@"General"])
+		return generalView;
+	if ([name isEqualToString:@"Notes"])
+		return [self databaseView];
+	if ([name isEqualToString:@"Editing"])
+		return editingView;
+	if ([name isEqualToString:@"Fonts & Colors"])
+		return fontsColorsView;
+	return nil;
+}
+
+- (void)installSettingsSplitView {
+	CGFloat sidebarWidth = 196;
+	CGFloat paneWidth = 0;
+	CGFloat paneHeight = 0;
+	NSView *notesPane = [self databaseView];
+	NSArray *panes = [NSArray arrayWithObjects:generalView, notesPane, editingView, fontsColorsView, nil];
+	for (NSView *pane in panes) {
+		paneWidth = MAX(paneWidth, NSWidth([pane frame]));
+		paneHeight = MAX(paneHeight, NSHeight([pane frame]));
+	}
+	settingsPanes = [panes retain];
+	CGFloat inset = 16;
+	NSSize contentSize = NSMakeSize(sidebarWidth + paneWidth + inset * 2, paneHeight + inset * 2);
+
+	detailView = [[NSView alloc] initWithFrame:NSMakeRect(0, 0, paneWidth + inset * 2, contentSize.height)];
+
+	NSVisualEffectView *sidebarBackground = [[NSVisualEffectView alloc] initWithFrame:NSMakeRect(0, 0, sidebarWidth, contentSize.height)];
+	[sidebarBackground setMaterial:NSVisualEffectMaterialSidebar];
+	[sidebarBackground setBlendingMode:NSVisualEffectBlendingModeBehindWindow];
+	[sidebarBackground setAutoresizingMask:NSViewWidthSizable | NSViewHeightSizable];
+
+	NSScrollView *sidebarScroll = [[NSScrollView alloc] initWithFrame:[sidebarBackground bounds]];
+	[sidebarScroll setDrawsBackground:NO];
+	[sidebarScroll setBorderType:NSNoBorder];
+	[sidebarScroll setHasVerticalScroller:NO];
+	[sidebarScroll setAutohidesScrollers:YES];
+	[sidebarScroll setAutoresizingMask:NSViewWidthSizable | NSViewHeightSizable];
+
+	sidebarTable = [[NSTableView alloc] initWithFrame:[sidebarScroll bounds]];
+	NSTableColumn *column = [[NSTableColumn alloc] initWithIdentifier:@"pane"];
+	[column setWidth:sidebarWidth - 8];
+	[column setResizingMask:NSTableColumnAutoresizingMask];
+	[sidebarTable addTableColumn:column];
+	[column release];
+	[sidebarTable setHeaderView:nil];
+	[sidebarTable setRowHeight:32];
+	[sidebarTable setIntercellSpacing:NSMakeSize(0, 4)];
+	[sidebarTable setStyle:NSTableViewStyleSourceList];
+	[sidebarTable setSelectionHighlightStyle:NSTableViewSelectionHighlightStyleSourceList];
+	[sidebarTable setBackgroundColor:[NSColor clearColor]];
+	[sidebarTable setAllowsEmptySelection:NO];
+	[sidebarTable setFocusRingType:NSFocusRingTypeNone];
+	[sidebarTable setDataSource:self];
+	[sidebarTable setDelegate:self];
+	[sidebarScroll setDocumentView:sidebarTable];
+	[sidebarBackground addSubview:sidebarScroll];
+	[sidebarScroll release];
+
+	NSViewController *sidebarController = [[NSViewController alloc] init];
+	[sidebarController setView:sidebarBackground];
+	[sidebarBackground release];
+	NSViewController *detailController = [[NSViewController alloc] init];
+	[detailController setView:detailView];
+
+	NSSplitViewController *split = [[NSSplitViewController alloc] init];
+	NSSplitViewItem *sidebarItem = [NSSplitViewItem sidebarWithViewController:sidebarController];
+	[sidebarItem setMinimumThickness:sidebarWidth];
+	[sidebarItem setMaximumThickness:sidebarWidth];
+	[sidebarItem setCanCollapse:NO];
+	NSSplitViewItem *detailItem = [NSSplitViewItem splitViewItemWithViewController:detailController];
+	[split addSplitViewItem:sidebarItem];
+	[split addSplitViewItem:detailItem];
+	[sidebarController release];
+	[detailController release];
+
+	[window setTitle:NSLocalizedString(@"Settings", @"settings window title")];
+	[window setContentMinSize:contentSize];
+	[window setContentMaxSize:contentSize];
+	[window setContentViewController:split];
+	[window setContentSize:contentSize];
+	[split release];
+
+	NSString *selected = [prefsController lastSelectedPreferencesPane];
+	NSUInteger index = [[self settingsPaneNames] indexOfObject:selected];
+	if (index == NSNotFound)
+		index = 0;
+	[sidebarTable selectRowIndexes:[NSIndexSet indexSetWithIndex:index] byExtendingSelection:NO];
+}
+
+- (void)showSettingsPaneNamed:(NSString *)name {
+	NSView *prefsView = [self settingsViewForPane:name];
+	if (!prefsView)
+		return;
+	if (prefsView == databaseView)
+		[folderLocationsMenuButton setMenu:[self directorySelectionMenu]];
+
+	[[NSFontPanel sharedFontPanel] close];
+
+	NSArray *existing = [[detailView subviews] copy];
+	for (NSView *subview in existing)
+		[subview removeFromSuperview];
+	[existing release];
+
+	CGFloat inset = 16;
+	NSRect paneFrame = [prefsView frame];
+	CGFloat hostHeight = NSHeight([detailView bounds]);
+	paneFrame.origin.x = inset;
+	paneFrame.origin.y = hostHeight - NSHeight(paneFrame) - inset;
+	[prefsView setFrame:paneFrame];
+	[prefsView setAutoresizingMask:NSViewMinYMargin | NSViewMaxXMargin];
+	[detailView addSubview:prefsView];
+}
+
+- (NSInteger)numberOfRowsInTableView:(NSTableView *)tableView {
+	return (NSInteger)[[self settingsPaneNames] count];
+}
+
+- (NSView *)tableView:(NSTableView *)tableView viewForTableColumn:(NSTableColumn *)tableColumn row:(NSInteger)row {
+	NSTableCellView *cell = [tableView makeViewWithIdentifier:@"SettingsPane" owner:self];
+	if (!cell) {
+		cell = [[[NSTableCellView alloc] initWithFrame:NSMakeRect(0, 0, 180, 32)] autorelease];
+		[cell setIdentifier:@"SettingsPane"];
+		NSImageView *imageView = [[NSImageView alloc] initWithFrame:NSMakeRect(10, 6, 20, 20)];
+		[imageView setImageScaling:NSImageScaleProportionallyUpOrDown];
+		NSTextField *label = [[NSTextField alloc] initWithFrame:NSMakeRect(36, 6, 140, 18)];
+		[label setBezeled:NO];
+		[label setDrawsBackground:NO];
+		[label setEditable:NO];
+		[label setSelectable:NO];
+		[label setFont:[NSFont systemFontOfSize:13]];
+		[label setTextColor:[NSColor labelColor]];
+		[label setAutoresizingMask:NSViewWidthSizable];
+		[cell setImageView:imageView];
+		[cell setTextField:label];
+		[cell addSubview:imageView];
+		[cell addSubview:label];
+		[imageView release];
+		[label release];
+	}
+	NSString *name = [[self settingsPaneNames] objectAtIndex:(NSUInteger)row];
+	NSString *title = [self localizedSettingsTitleForPane:name];
+	[[cell textField] setStringValue:title];
+	NSImage *symbol = [NSImage imageWithSystemSymbolName:[[self settingsPaneSymbols] objectAtIndex:(NSUInteger)row] accessibilityDescription:title];
+	[symbol setTemplate:YES];
+	[[cell imageView] setImage:symbol];
+	return cell;
+}
+
+- (void)tableViewSelectionDidChange:(NSNotification *)notification {
+	NSInteger row = [sidebarTable selectedRow];
+	if (row < 0)
+		return;
+	NSString *name = [[self settingsPaneNames] objectAtIndex:(NSUInteger)row];
+	[prefsController setLastSelectedPreferencesPane:name sender:self];
+	[self showSettingsPaneNamed:name];
+}
+
+- (void)switchViews:(NSToolbarItem *)item {
+	NSString *sender = item ? [item itemIdentifier] : [prefsController lastSelectedPreferencesPane];
+	NSUInteger index = [[self settingsPaneNames] indexOfObject:sender];
+	if (index == NSNotFound)
+		index = 0;
+	[sidebarTable selectRowIndexes:[NSIndexSet indexSetWithIndex:index] byExtendingSelection:NO];
 }
 
 //elasticwork

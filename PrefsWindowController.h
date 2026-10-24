@@ -100,7 +100,6 @@
 - (NSView*)databaseView;
 - (void)addToolbarItemWithName:(NSString*)name;
 - (void)switchViews:(NSToolbarItem *)item;
-	NSRect ScaleRectWithFactor(NSRect rect, float factor);
 - (IBAction)toggleHideDockIcon:(id)sender;
 - (IBAction)toggleKeepsTextWidthInWindow:(id)sender;
 - (IBAction)setMaxWidth:(id)sender;

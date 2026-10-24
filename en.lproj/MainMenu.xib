@@ -44,7 +44,7 @@
                             <menuItem isSeparatorItem="YES" id="196">
                                 <modifierMask key="keyEquivalentModifierMask" command="YES"/>
                             </menuItem>
-                            <menuItem title="Preferences…" keyEquivalent="," id="129">
+                            <menuItem title="Settings…" keyEquivalent="," id="129">
                                 <connections>
                                     <action selector="showPreferencesWindow:" target="213" id="381"/>
                                 </connections>
@@ -1037,7 +1037,7 @@ CA
                         <action selector="orderFrontStandardAboutPanel:" target="-2" id="1546"/>
                     </connections>
                 </menuItem>
-                <menuItem title="Preferences…" keyEquivalent="," id="1180">
+                <menuItem title="Settings…" keyEquivalent="," id="1180">
                     <connections>
                         <action selector="showPreferencesWindow:" target="213" id="1181"/>
                     </connections>
