@@ -330,7 +330,7 @@
 "Cut" = "Taglia";
 
 /* informational delete-this-note? text */
-"Press Command-Z to undo this action later." = "Premi ⌘-Z per annullare questa operazione.";
+"Press Command-Z to undo this action later." = "Premi ⌘Z per annullare questa operazione.";
 
 /* undo action name for deleting notes */
 "Delete %d Notes" = "Cancella %d note";
@@ -610,7 +610,7 @@
 "Type any text to search; press Return to create a note" = "Digita il testo da cercare; premi Invio per creare una nota";
 
 /* tooltip string for search/title field */
-"Now editing this note; rename it with %@-R" = "Modifica della nota; rinominala con %@-R";
+"Now editing this note; rename it with %@R" = "Modifica della nota; rinominala con %@-R";
 
 
 /* default files name */

@@ -11,10 +11,10 @@ When you select one of the found notes (e.g., using the up/down keys) NV display
 \
 If you had typed the beginning of a note's title, NV would have selected that note automatically.\
 \
-To create another note, just start typing in the search area again (press 
-\f1 \uc0\u8984 
-\f0 -L to get there from the Keyboard). Don't worry, you won't rename your note--for that you'll either need to double-click its title in the list of notes or press 
-\f1 \uc0\u8984 
+To create another note, just start typing in the search area again (press
+\f1 \uc0\u8984
+\f0 L to get there from the Keyboard). Don't worry, you won't rename your note--for that you'll either need to double-click its title in the list of notes or press
+\f1 \uc0\u8984
 \f0 -R.\
 \
 \pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\ql\qnatural\pardirnatural

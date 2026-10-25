@@ -19,6 +19,8 @@
 #import "NotationPrefs.h"
 #import "GlobalPrefs.h"
 #import "NSString_NV.h"
+#import "SimplenoteSession.h"
+#import "NSCollection_utils.h"
 #import "NotationPrefsViewController.h"
 #import "NSData_transformations.h"
 #import "NotationFileManager.h"
@@ -876,6 +878,29 @@ NSMutableDictionary *ServiceAccountDictInit(NotationPrefs *prefs, NSString* serv
 	preferencesChanged = YES;
 	
 	return [seenDiskUUIDEntries count] - 1;
+}
+
+- (void)checkForKnownRedundantSyncConduitsAtPath:(NSString*)dbPath {
+	NSArray *enabledValues = [[syncServiceAccounts allValues] objectsFromDictionariesForKey:@"enabled"];
+	if ([enabledValues containsObject:[NSNumber numberWithBool:YES]] && SingleDatabaseFormat != notesStorageFormat) {
+		NSString *syncServiceTitle = [SimplenoteSession localizedServiceTitle];
+
+		NSDictionary *stDict = [[NSUserDefaults standardUserDefaults] persistentDomainForName:@"com.hogbaysoftware.SimpleText"];
+		NSString *simpleTextFolder = [stDict objectForKey:@"SyncedDocumentsPathKey"];
+		if (!simpleTextFolder) simpleTextFolder = [NSHomeDirectory() stringByAppendingPathComponent:@"SimpleText"];
+		NSString *dropboxFolder = [NSHomeDirectory() stringByAppendingPathComponent:@"Dropbox"];
+
+		NSString *offendingFileConduitName = nil;
+		if ([[dbPath lowercaseString] hasPrefix:[simpleTextFolder lowercaseString]]) {
+			offendingFileConduitName = NSLocalizedString(@"SimpleText", nil);
+		} else if ([[dbPath lowercaseString] hasPrefix:[dropboxFolder lowercaseString]]) {
+			offendingFileConduitName = NSLocalizedString(@"Dropbox", nil);
+		}
+		if (offendingFileConduitName) {
+			NSRunAlertPanel([NSString stringWithFormat:NSLocalizedString(@"<Feedback loop warning title>", nil), offendingFileConduitName, syncServiceTitle],
+							[NSString stringWithFormat:NSLocalizedString(@"<Feedback loop warning message>", nil), syncServiceTitle], NSLocalizedString(@"OK", nil), nil, nil);
+		}
+	}
 }
 
 - (void)setKeyLengthInBits:(unsigned int)newLength {

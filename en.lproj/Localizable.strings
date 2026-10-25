@@ -330,7 +330,7 @@
 "Cut" = "Cut";
 
 /* informational delete-this-note? text */
-"Press Command-Z to undo this action later." = "Press ⌘-Z to undo this action later.";
+"Press Command-Z to undo this action later." = "Press ⌘Z to undo this action later.";
 
 /* undo action name for deleting notes */
 "Delete %d Notes" = "Delete %d Notes";

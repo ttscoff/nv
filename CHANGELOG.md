@@ -1,3 +1,15 @@
+nvALT 3.0.3
+-------------------------
+
+#### CHANGED
+
+- List **Settings** panes in a sidebar and show the selected pane beside them.
+- Rename the **Preferences** menu item to Settings.
+
+#### IMPROVED
+
+- Size the **Settings** window so each pane's options fit without collapsing into a chevron.
+
 nvALT 3.0.2
 -------------------------
 

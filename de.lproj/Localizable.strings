@@ -330,7 +330,7 @@
 "Cut" = "Auschschneiden";
 
 /* informational delete-this-note? text */
-"Press Command-Z to undo this action later." = "⌘-Z drücken um diesen Vorgang später zu widerrufen.";
+"Press Command-Z to undo this action later." = "⌘Z drücken um diesen Vorgang später zu widerrufen.";
 
 /* undo action name for deleting notes */
 "Delete %d Notes" = "%d Notizen löschen";

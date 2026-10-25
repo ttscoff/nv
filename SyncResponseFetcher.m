@@ -94,11 +94,11 @@
 	}
 	
 	[request setHTTPShouldHandleCookies:NO];
-	[request addValue:@"Sinus cardinalis nvALT 2.2B" forHTTPHeaderField:@"User-agent"];
+	[request setValue:@"Sinus cardinalis nvALT 2.2B" forHTTPHeaderField:@"User-Agent"];
 	
 	if (requestHeaders) {
 		for (NSString *field in [requestHeaders allKeys]) {
-			[request addValue:[requestHeaders objectForKey:field] forHTTPHeaderField:field];
+			[request setValue:[requestHeaders objectForKey:field] forHTTPHeaderField:field];
 		}
 	}
 	//if POSTData is nil, do a plain GET request

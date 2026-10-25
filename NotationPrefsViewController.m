@@ -22,6 +22,9 @@
 #import "NotationPrefs.h"
 #import "NSString_NV.h"
 #import "NSCollection_utils.h"
+#import "SyncResponseFetcher.h"
+#import "SimplenoteSession.h"
+#import "NSDictionary+BSJSONAdditions.h"
 #import "PassphrasePicker.h"
 #import "PassphraseChanger.h"
 #import "NSFileManager_NV.h"
@@ -37,6 +40,8 @@
     return YES;
 }
 @end
+
+enum {VERIFY_NOT_ATTEMPTED, VERIFY_FAILED, VERIFY_IN_PROGRESS, VERIFY_SUCCESS};
 
 @implementation NotationPrefsViewController
 
@@ -85,10 +90,161 @@
     [allowedTypesTable setDelegate:self];
 	
 	
-	[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(initializeControls) name:NotationPrefsDidChangeNotification object:nil];
+	//this additional management for sync prefs, plus the need for per-service settings and externally triggering updates really demands its own class
+	NSNotificationCenter *center = [NSNotificationCenter defaultCenter];
+	if (syncAccountField) [center addObserver:self selector:@selector(syncCredentialsDidChange:) name:NSControlTextDidChangeNotification object:syncAccountField];
+	if (syncPasswordField) {
+		[center addObserver:self selector:@selector(syncCredentialsDidChange:) name:NSControlTextDidChangeNotification object:syncPasswordField];
+		[center addObserver:self selector:@selector(syncEditingDidEnd:) name:NSControlTextDidEndEditingNotification object:syncPasswordField];
+	}
+	[center addObserver:self selector:@selector(initializeControls) name:NotationPrefsDidChangeNotification object:nil];
 
+    [self configureSimplenoteLoginControls];
     [self initializeControls];
 	[self addMarkdownConversionButton];
+}
+
+- (void)configureSimplenoteLoginControls {
+	if (!syncAccountField || !syncPasswordField)
+		return;
+	[self usePlainSimplenoteCodeField];
+	NSView *syncView = [syncAccountField superview];
+	for (NSView *subview in [syncView subviews]) {
+		if (![subview isKindOfClass:[NSTextField class]] || [subview isKindOfClass:[NSSecureTextField class]])
+			continue;
+		NSTextField *label = (NSTextField *)subview;
+		if ([[label cell] isEditable] || [[label cell] isSelectable])
+			continue;
+		if (fabs(NSMaxY([label frame]) - NSMaxY([syncPasswordField frame])) > 12)
+			continue;
+		if (NSMaxX([label frame]) > NSMinX([syncPasswordField frame]) + 4)
+			continue;
+		[label setStringValue:NSLocalizedString(@"Code:", @"Simplenote login code label")];
+		break;
+	}
+	if ([[syncPasswordField cell] respondsToSelector:@selector(setEchosBullets:)])
+		[(NSSecureTextFieldCell *)[syncPasswordField cell] setEchosBullets:NO];
+	[[syncPasswordField cell] setPlaceholderString:NSLocalizedString(@"Code from email", @"Simplenote login code placeholder")];
+	[[syncAccountField cell] setLineBreakMode:NSLineBreakByTruncatingTail];
+
+	if ([syncView viewWithTag:7302])
+		return;
+	NSButton *button = [[NSButton alloc] initWithFrame:NSZeroRect];
+	[button setBezelStyle:NSBezelStyleRounded];
+	[button setButtonType:NSButtonTypeMomentaryPushIn];
+	[button setTitle:NSLocalizedString(@"Email Code", @"Simplenote login button")];
+	[button setTag:7302];
+	[button setTarget:self];
+	[button setAction:@selector(emailSimplenoteLoginCode:)];
+	[button sizeToFit];
+	NSRect codeFrame = [syncPasswordField frame];
+	NSRect buttonFrame = [button frame];
+	CGFloat buttonWidth = buttonFrame.size.width + 14;
+	CGFloat gap = 8;
+	if (codeFrame.size.width > buttonWidth + gap + 70) {
+		codeFrame.size.width -= buttonWidth + gap;
+		[syncPasswordField setFrame:codeFrame];
+	}
+	buttonFrame.size.width = buttonWidth;
+	buttonFrame.size.height = MAX(buttonFrame.size.height, codeFrame.size.height);
+	buttonFrame.origin.x = NSMaxX([syncPasswordField frame]) + gap;
+	buttonFrame.origin.y = NSMidY(codeFrame) - (buttonFrame.size.height / 2.0);
+	[button setFrame:NSIntegralRect(buttonFrame)];
+	[button setAutoresizingMask:NSViewMinXMargin | NSViewMinYMargin];
+	[syncView addSubview:button];
+	[button release];
+}
+
+- (void)usePlainSimplenoteCodeField {
+	if (![syncPasswordField isKindOfClass:[NSSecureTextField class]])
+		return;
+	NSTextField *codeField = [[NSTextField alloc] initWithFrame:[syncPasswordField frame]];
+	[codeField setAutoresizingMask:[syncPasswordField autoresizingMask]];
+	[codeField setEditable:YES];
+	[codeField setSelectable:YES];
+	[codeField setBezeled:YES];
+	[codeField setDrawsBackground:YES];
+	[codeField setFont:[syncPasswordField font]];
+	[[codeField cell] setScrollable:YES];
+	[[codeField cell] setSendsActionOnEndEditing:YES];
+	NSNotificationCenter *center = [NSNotificationCenter defaultCenter];
+	[center removeObserver:self name:NSControlTextDidChangeNotification object:syncPasswordField];
+	[center removeObserver:self name:NSControlTextDidEndEditingNotification object:syncPasswordField];
+	[[syncPasswordField superview] replaceSubview:syncPasswordField with:codeField];
+	syncPasswordField = codeField;
+	[center addObserver:self selector:@selector(syncCredentialsDidChange:) name:NSControlTextDidChangeNotification object:syncPasswordField];
+	[center addObserver:self selector:@selector(syncEditingDidEnd:) name:NSControlTextDidEndEditingNotification object:syncPasswordField];
+	[codeField release];
+}
+
+- (NSData *)simplenoteJSONData:(NSDictionary *)body {
+	if (![NSJSONSerialization isValidJSONObject:body])
+		return nil;
+	return [NSJSONSerialization dataWithJSONObject:body options:0 error:nil];
+}
+
+- (NSString *)simplenoteLoginCodeFromEntry:(NSString *)entry {
+	NSString *trimmed = [entry stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
+	NSString *code = trimmed;
+	if ([trimmed rangeOfString:@"auth_code="].location != NSNotFound)
+		code = [self simplenoteQueryValueNamed:@"auth_code" inEntry:trimmed];
+	NSCharacterSet *letters = [NSCharacterSet alphanumericCharacterSet];
+	NSMutableString *onlyLetters = [NSMutableString string];
+	NSUInteger i;
+	for (i = 0; i < [code length]; i++) {
+		unichar character = [code characterAtIndex:i];
+		if ([letters characterIsMember:character])
+			[onlyLetters appendFormat:@"%C", character];
+	}
+	if ([onlyLetters length] < 4 || [onlyLetters length] > 8)
+		return nil;
+	return [onlyLetters uppercaseString];
+}
+
+- (NSDictionary *)simplenoteAccountHeaders {
+	return [NSDictionary dictionaryWithObjectsAndKeys:
+			@"Simplenote/2.22 (Macintosh)", @"User-Agent",
+			@"application/json", @"Accept", nil];
+}
+
+- (NSString *)simplenoteQueryValueNamed:(NSString *)name inEntry:(NSString *)entry {
+	NSRange found = [entry rangeOfString:[name stringByAppendingString:@"="]];
+	if (found.location == NSNotFound)
+		return nil;
+	NSString *rest = [entry substringFromIndex:NSMaxRange(found)];
+	NSRange end = [rest rangeOfCharacterFromSet:[NSCharacterSet characterSetWithCharactersInString:@"&# \t\r\n\"'"]];
+	if (end.location != NSNotFound)
+		rest = [rest substringToIndex:end.location];
+	NSString *decoded = [rest stringByRemovingPercentEncoding];
+	return [decoded length] ? decoded : rest;
+}
+
+- (void)acceptSimplenoteSyncToken:(NSString *)token {
+	NSString *stored = [SimplenoteSession storedSecretForSyncToken:token];
+	if (![stored length]) {
+		[self setVerificationStatus:VERIFY_FAILED withString:NSLocalizedString(@"Simplenote did not return a login token.", @"Simplenote login status")];
+		return;
+	}
+	[syncPasswordField setStringValue:@""];
+	[notationPrefs setSyncPassword:stored forService:SimplenoteServiceName];
+	[self setVerificationStatus:VERIFY_SUCCESS withString:NSLocalizedString(@"Signed in", @"Simplenote login status")];
+}
+
+- (IBAction)emailSimplenoteLoginCode:(id)sender {
+	NSString *email = [[syncAccountField stringValue] stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
+	if (![email length]) {
+		[self setVerificationStatus:VERIFY_FAILED withString:NSLocalizedString(@"Enter the email address for your Simplenote account.", @"Simplenote login status")];
+		return;
+	}
+	[self cancelLoginVerifier];
+	NSDictionary *body = [NSDictionary dictionaryWithObjectsAndKeys:[email lowercaseString], @"username", @"macOS", @"request_source", nil];
+	NSData *postData = [self simplenoteJSONData:body];
+	if (!postData)
+		return;
+	loginVerifier = [[SyncResponseFetcher alloc] initWithURL:[SimplenoteSession simplenoteLoginRequestURL] POSTData:postData headers:[self simplenoteAccountHeaders] contentType:@"application/json" delegate:self];
+	[loginVerifier setRepresentedObject:@"request-login"];
+	[loginVerifier start];
+	[self setVerificationStatus:VERIFY_IN_PROGRESS withString:NSLocalizedString(@"Requesting a login code…", @"Simplenote login status")];
 }
 
 - (void)addMarkdownConversionButton {
@@ -162,6 +318,14 @@
 		[self updateRemoveKeychainItemStatus];
 		[confirmFileDeletionButton setState:[notationPrefs confirmFileDeletion]];
 		
+		[enabledSyncButton setState:[notationPrefs syncServiceIsEnabled:SimplenoteServiceName]];
+		NSString *username = [[notationPrefs syncAccountForServiceName:SimplenoteServiceName] objectForKey:@"username"];
+		[syncAccountField setStringValue:username ? username : @""];
+		
+		[syncingFrequency selectItemWithTag:[notationPrefs syncFrequencyInMinutesForServiceName:SimplenoteServiceName]];
+		
+		[self setSyncControlsState:[notationPrefs syncServiceIsEnabled:SimplenoteServiceName]];
+		
 		[secureTextEntryButton setState:[notationPrefs secureTextEntry]];
 		
 		[allowedTypesTable reloadData];
@@ -170,6 +334,28 @@
             [useFinderTaggingButton setHidden:YES];
         }
     }
+}
+
+- (void)setSyncControlsState:(BOOL)syncState {
+	
+	if (!syncState) {
+		[self cancelLoginVerifier];
+	}
+	[self setVerificationStatus:VERIFY_NOT_ATTEMPTED withString:@""];
+	[syncingFrequency setEnabled:syncState];
+	[syncAccountField setEnabled:syncState];
+	[syncPasswordField setEnabled:syncState];
+	[(NSButton *)[[syncAccountField superview] viewWithTag:7302] setEnabled:syncState];
+	[syncEncAlertView setHidden:!syncState || ![notationPrefs doesEncryption]];
+	[syncEncAlertField setHidden:!syncState || ![notationPrefs doesEncryption]];
+	if (syncState) {
+		NSString *stored = [notationPrefs syncPasswordForServiceName:SimplenoteServiceName];
+		if ([SimplenoteSession isStoredSyncToken:stored]) {
+			[self setVerificationStatus:VERIFY_SUCCESS withString:NSLocalizedString(@"Signed in", @"Simplenote login status")];
+		} else {
+			[self setVerificationStatus:VERIFY_NOT_ATTEMPTED withString:NSLocalizedString(@"Email yourself a login code, then paste it here.", @"Simplenote login status")];
+		}
+	}
 }
 
 - (void)setEncryptionControlsState:(BOOL)encryptionState {
@@ -182,6 +368,10 @@
 	
     [keyLengthField setEnabled:encryptionState];
     [keyLengthStepper setEnabled:encryptionState];
+	
+	BOOL syncState = [notationPrefs syncServiceIsEnabled:SimplenoteServiceName];
+	[syncEncAlertView setHidden:!syncState || !encryptionState];
+	[syncEncAlertField setHidden:!syncState || !encryptionState];
 }
 
 - (void)setSeparateFileControlsState:(BOOL)separateFileControlsState {
@@ -368,6 +558,145 @@
 	
 }
 
+- (IBAction)toggledSyncing:(id)sender {
+	[notationPrefs setSyncEnabled:[enabledSyncButton state] forService:SimplenoteServiceName];
+	[self setSyncControlsState:[enabledSyncButton state]];
+}
+
+- (IBAction)syncFrequencyChange:(id)sender {
+	if (sender) {
+		[self performSelector:_cmd withObject:nil afterDelay:0.0];
+	} else {
+		[notationPrefs setSyncFrequency:[syncingFrequency selectedTag] forService:SimplenoteServiceName];
+	}
+}
+
+- (void)syncEditingDidEnd:(NSNotification *)aNotification {
+	if (!verificationAttempted) {
+		[self cancelLoginVerifier];
+		[self startLoginVerifier];
+	}
+}
+
+- (void)syncCredentialsDidChange:(NSNotification *)aNotification {
+	
+	if ([aNotification object] == syncAccountField) {
+		[notationPrefs removeSyncPasswordForService:SimplenoteServiceName];
+		[notationPrefs setSyncUsername:[syncAccountField stringValue] forService:SimplenoteServiceName];
+		
+		[self startVerifyingAfterDelay];
+	} else if ([aNotification object] == syncPasswordField) {
+		[self startVerifyingAfterDelay];
+	}
+}
+
+
+- (void)setVerificationStatus:(int)status withString:(NSString*)aString {
+	
+	switch (status) {
+		case VERIFY_NOT_ATTEMPTED:
+			verificationAttempted = NO;
+			[verifyStatusImageView setImage:nil];
+			break;
+		case VERIFY_FAILED:
+			verificationAttempted = YES;
+			[verifyStatusImageView setImage:[NSImage imageNamed:@"statusError"]];
+			break;
+		case VERIFY_IN_PROGRESS:
+			[verifyStatusImageView setImage:[NSImage imageNamed:@"statusInProgress"]];
+			break;
+		case VERIFY_SUCCESS:
+			verificationAttempted = YES;
+			[verifyStatusImageView setImage:[NSImage imageNamed:@"statusValidated"]];
+			break;
+	}
+	[verifyStatusImageView setHidden: VERIFY_NOT_ATTEMPTED == status];
+	[verifyStatusField setStringValue: aString ? aString : @""];
+}
+
+- (void)startVerifyingAfterDelay {
+	[self cancelLoginVerifier];
+	
+	[self performSelector:@selector(startLoginVerifier) withObject:nil afterDelay:1.5];
+}
+
+- (void)cancelLoginVerifier {
+	[loginVerifier cancel];
+	[loginVerifier autorelease];
+	loginVerifier = nil;
+	[self setVerificationStatus:VERIFY_NOT_ATTEMPTED withString:@""];
+	
+	[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(startLoginVerifier) object:nil];
+}
+
+- (void)startLoginVerifier {
+	if (loginVerifier)
+		return;
+	NSString *email = [[syncAccountField stringValue] stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
+	NSString *entry = [[syncPasswordField stringValue] stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
+	if (![email length] || ![entry length])
+		return;
+
+	if ([entry rangeOfString:@"://"].location != NSNotFound) {
+		NSString *directToken = [self simplenoteQueryValueNamed:@"token" inEntry:entry];
+		if ([directToken length] && [[self simplenoteQueryValueNamed:@"auth_code" inEntry:entry] length] == 0) {
+			[self acceptSimplenoteSyncToken:directToken];
+			return;
+		}
+	}
+	NSString *code = [self simplenoteLoginCodeFromEntry:entry];
+	if (![code length])
+		return;
+	NSDictionary *body = [NSDictionary dictionaryWithObjectsAndKeys:[email lowercaseString], @"username", code, @"auth_code", nil];
+	NSData *postData = [self simplenoteJSONData:body];
+	if (!postData)
+		return;
+	loginVerifier = [[SyncResponseFetcher alloc] initWithURL:[SimplenoteSession simplenoteLoginCompletionURL] POSTData:postData headers:[self simplenoteAccountHeaders] contentType:@"application/json" delegate:self];
+	[loginVerifier setRepresentedObject:@"complete-login"];
+	[loginVerifier start];
+	[self setVerificationStatus:VERIFY_IN_PROGRESS withString:@""];
+}
+
+- (void)syncResponseFetcher:(SyncResponseFetcher*)fetcher receivedData:(NSData*)data returningError:(NSString*)errString {
+	BOOL httpFailed = errString || [fetcher statusCode] >= 400;
+	BOOL requestedCode = [[fetcher representedObject] isEqualToString:@"request-login"];
+	if (requestedCode) {
+		if ([fetcher statusCode] == 429) {
+			[self setVerificationStatus:VERIFY_FAILED withString:NSLocalizedString(@"Simplenote asked me to wait before sending another code.", @"Simplenote login status")];
+		} else if (httpFailed) {
+			[self setVerificationStatus:VERIFY_FAILED withString:NSLocalizedString(@"Simplenote did not send a login code.", @"Simplenote login status")];
+		} else {
+			[self setVerificationStatus:VERIFY_NOT_ATTEMPTED withString:NSLocalizedString(@"Check your email and paste the login code.", @"Simplenote login status")];
+		}
+		return;
+	}
+
+	if ([fetcher statusCode] == 429) {
+		[self setVerificationStatus:VERIFY_FAILED withString:NSLocalizedString(@"Simplenote asked me to wait before trying that code again.", @"Simplenote login status")];
+		return;
+	}
+	if (httpFailed) {
+		[self setVerificationStatus:VERIFY_FAILED withString:NSLocalizedString(@"That login code was not accepted.", @"Simplenote login status")];
+		return;
+	}
+
+	NSString *bodyString = [[[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding] autorelease];
+	NSDictionary *response = nil;
+	@try {
+		response = [NSDictionary dictionaryWithJSONString:bodyString];
+	} @catch (NSException *exception) {
+		response = nil;
+	}
+	NSString *token = [response objectForKey:@"sync_token"];
+	if (![token isKindOfClass:[NSString class]] || ![token length])
+		token = [response objectForKey:@"access_token"];
+	if (![token isKindOfClass:[NSString class]] || ![token length]) {
+		[self setVerificationStatus:VERIFY_FAILED withString:NSLocalizedString(@"Simplenote did not return a login token.", @"Simplenote login status")];
+		return;
+	}
+	[self acceptSimplenoteSyncToken:token];
+}
+
 - (IBAction)changedSecureTextEntry:(id)sender {
 	[notationPrefs setSecureTextEntry:[secureTextEntryButton state]];
 }
@@ -378,6 +707,10 @@
 	
 	if (!changer) changer = [[PassphraseChanger alloc] initWithNotationPrefs:notationPrefs];
 	[changer showAroundWindow:[view window]];
+}
+
+- (IBAction)visitSimplenoteSite:(id)sender {
+    [[NSWorkspace sharedWorkspace] openURL:[NSURL URLWithString:@"http://simplenote.com/"]];
 }
 
 - (IBAction)makeDefaultExtension:(id)sender {

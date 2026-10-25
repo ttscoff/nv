@@ -330,7 +330,7 @@
 "Cut" = "剪切";
 
 /* informational delete-this-note? text */
-"Press Command-Z to undo this action later." = "按 ⌘-Z 撤销这个动作。";
+"Press Command-Z to undo this action later." = "按 ⌘Z 撤销这个动作。";
 
 /* undo action name for deleting notes */
 "Delete %d Notes" = "删除 %d 条笔记";

@@ -20,6 +20,7 @@
 #import "InvocationRecorder.h"
 #import "SyncServiceSessionProtocol.h"
 #import "NotationDirectoryManager.h"
+#import "SimplenoteSession.h"
 #import <IOKit/pwr_mgt/IOPMLib.h>
 
 //#import <IOKit/IOMessage.h>
@@ -49,11 +50,16 @@ static void SleepCallBack(void *refcon, io_service_t y, natural_t messageType, v
 //these two methods must return parallel arrays:
 
 + (NSArray*)allServiceNames {
-	return [NSArray array];
+	static NSArray *allNames = nil;
+	if (!allNames) allNames = [[NSArray alloc] initWithObjects:SimplenoteServiceName, nil];
+	return allNames;
 }
 
 + (NSArray*)allServiceClasses {
-	return [NSArray array];
+	static NSArray *allClasses = nil;
+	if (!allClasses) allClasses = [[NSArray alloc] initWithObjects:NSClassFromString(@"SimplenoteSession"), nil];
+
+	return allClasses;
 }
 
 - (void)setSyncDelegate:(id)aDelegate {
@@ -129,7 +135,20 @@ static void SleepCallBack(void *refcon, io_service_t y, natural_t messageType, v
 	id<SyncServiceSession> session = [syncServiceSessions objectForKey:serviceName];
 	
 	if (!session) {
-		NSLog(@"%@: unknown service named '%@'", NSStringFromSelector(_cmd), serviceName);
+		if ([serviceName isEqualToString:SimplenoteServiceName]) {
+
+			if (![notationPrefs syncServiceIsEnabled:SimplenoteServiceName]) return nil;
+
+			SimplenoteSession *snSession = [[SimplenoteSession alloc] initWithNotationPrefs:notationPrefs];
+			if (snSession) {
+				[syncServiceSessions setObject:snSession forKey:serviceName];
+				[snSession setDelegate:syncDelegate];
+				[snSession release];
+			}
+			return snSession;
+		} else {
+			NSLog(@"%@: unknown service named '%@'", NSStringFromSelector(_cmd), serviceName);
+		}
 	}
 	return session;
 }
