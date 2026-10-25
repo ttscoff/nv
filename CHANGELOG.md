@@ -1,3 +1,15 @@
+nvALT 3.0.4
+-------------------------
+
+#### CHANGED
+
+- Sign in to **Simplenote** with a code emailed to you instead of a password.
+
+#### FIXED
+
+- Put **Simplenote** sync back, including the Synchronization tab in Notes settings.
+- Warn again when **Simplenote** sync is on and notes are stored in Dropbox or SimpleText.
+
 nvALT 3.0.3
 -------------------------
 
