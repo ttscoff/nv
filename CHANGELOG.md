@@ -1,3 +1,26 @@
+nvALT 3.0.5
+-------------------------
+
+#### CHANGED
+
+- Sign in to **Simplenote** with a code emailed to you instead of a password.
+- The default **note font** is SF Pro at 16 pt. A font you already chose stays as it is.
+
+#### NEW
+
+- Set the **note list** font from Fonts & Colors. It starts as SF Pro at 14 pt.
+
+#### IMPROVED
+
+- Leave more room above the first line of a **note**.
+
+#### FIXED
+
+- Put **Simplenote** sync back, including the Synchronization tab in Notes settings.
+- Warn again when **Simplenote** sync is on and notes are stored in Dropbox or SimpleText.
+- Open the **notes folder** picker when the saved folder is gone.
+- Keep **alternating rows** lined up with the grid.
+
 nvALT 3.0.4
 -------------------------
 
