@@ -47,6 +47,7 @@ static NSString *TableSortColumnKey = @"TableSortColumn";
 static NSString *TableIsReverseSortedKey = @"TableIsReverseSorted";
 static NSString *TableColumnsHaveBodyPreviewKey = @"TableColumnsHaveBodyPreview";
 static NSString *NoteBodyFontKey = @"NoteBodyFont";
+static NSString *NoteListFontKey = @"NoteListFont";
 static NSString *ConfirmNoteDeletionKey = @"ConfirmNoteDeletion";
 static NSString *CheckSpellingInNoteBodyKey = @"CheckSpellingInNoteBody";
 static NSString *TextReplacementInNoteBodyKey = @"TextReplacementInNoteBody";
@@ -166,7 +167,7 @@ static void sendCallbacksForGlobalPrefs(GlobalPrefs* self, SEL selector, id orig
             [NSNumber numberWithBool:YES], UsesMarkdownCompletions,
 
 			[NSArchiver archivedDataWithRootObject:
-			 [GlobalPrefs regularSystemFont]], NoteBodyFontKey,
+			 [GlobalPrefs defaultNoteBodyFont]], NoteBodyFontKey,
 			
 			[NSArchiver archivedDataWithRootObject:[NSColor blackColor]], ForegroundTextColorKey,
 			[NSArchiver archivedDataWithRootObject:[NSColor whiteColor]], BackgroundTextColorKey,
@@ -189,12 +190,42 @@ static void sendCallbacksForGlobalPrefs(GlobalPrefs* self, SEL selector, id orig
 	return [NSFont systemFontOfSize:[NSFont systemFontSize]];
 }
 
++ (NSFont *)nv_fontWithNames:(NSArray *)names size:(CGFloat)size {
+	for (NSString *name in names) {
+		NSFont *font = [NSFont fontWithName:name size:size];
+		if (font)
+			return font;
+	}
+	return [NSFont systemFontOfSize:size];
+}
+
++ (NSFont *)defaultNoteBodyFont {
+	return [self nv_fontWithNames:[NSArray arrayWithObjects:@"SFPro-Regular", @"SFProText-Regular", nil] size:16.0];
+}
+
++ (NSFont *)defaultNoteListFont {
+	return [self nv_fontWithNames:[NSArray arrayWithObjects:@"SFPro-Regular", @"SFProText-Regular", nil] size:14.0];
+}
+
++ (BOOL)fontIsUnreleasedAvenirListDefault:(NSFont *)font {
+	if (!font || ![font isKindOfClass:[NSFont class]])
+		return NO;
+	NSString *name = [font fontName];
+	return [name isEqualToString:@"Avenir-Book"] || [name isEqualToString:@"Avenir-Roman"] || [name isEqualToString:@"AvenirNext-Regular"];
+}
+
 + (BOOL)fontIsLegacyBodyDefault:(NSFont *)font {
 	if (!font || ![font isKindOfClass:[NSFont class]])
 		return NO;
 	NSString *name = [font fontName];
 	BOOL helvetica = [name isEqualToString:@"Helvetica"] || [name isEqualToString:@"Helvetica-Regular"];
-	return helvetica && fabs([font pointSize] - 12.0) < 0.01;
+	if (helvetica && fabs([font pointSize] - 12.0) < 0.01)
+		return YES;
+	NSFont *system = [NSFont systemFontOfSize:[font pointSize]];
+	BOOL systemFace = system && [name isEqualToString:[system fontName]];
+	CGFloat size = [font pointSize];
+	BOOL stockSize = fabs(size - [NSFont systemFontSize]) < 0.01 || fabs(size - [NSFont smallSystemFontSize]) < 0.01 || fabs(size - 12.0) < 0.01 || fabs(size - 13.0) < 0.01;
+	return systemFace && stockSize;
 }
 
 - (void)_upgradeLegacyFontSizesIfNeeded {
@@ -611,18 +642,19 @@ BOOL ColorsEqualWith8BitChannels(NSColor *c1, NSColor *c2) {
 - (void)resolveNoteBodyFontFromNotationPrefsFromSender:(id)sender {
 	
 	NSFont *prefsFont = [notationPrefs baseBodyFont];
-	if ([defaults integerForKey:NVFontSizeEpochKey] < 1) {
-		NSFont *regular = [GlobalPrefs regularSystemFont];
+	if ([defaults integerForKey:NVFontSizeEpochKey] < 2) {
+		[self noteBodyFont];
+		NSFont *current = [self noteBodyFont];
 		BOOL legacyDatabaseFont = [GlobalPrefs fontIsLegacyBodyDefault:prefsFont];
 		if (legacyDatabaseFont) {
-			[notationPrefs setBaseBodyFont:regular];
-			prefsFont = regular;
+			NSFont *replacement = upgradedLegacyBodyFont ? [GlobalPrefs defaultNoteBodyFont] : current;
+			[notationPrefs setBaseBodyFont:replacement];
+			prefsFont = replacement;
 		}
-		[self noteBodyFont];
-		if (legacyDatabaseFont || upgradedLegacyBodyFont)
-			[self setNoteBodyFont:regular sender:sender];
+		if (upgradedLegacyBodyFont)
+			[self setNoteBodyFont:[GlobalPrefs defaultNoteBodyFont] sender:sender];
 		upgradedLegacyBodyFont = NO;
-		[defaults setInteger:1 forKey:NVFontSizeEpochKey];
+		[defaults setInteger:2 forKey:NVFontSizeEpochKey];
 	}
 	if (prefsFont) {
 		NSFont *noteFont = [self noteBodyFont];
@@ -687,9 +719,9 @@ BOOL ColorsEqualWith8BitChannels(NSColor *c1, NSColor *c2) {
 			[defaults removeObjectForKey:NoteBodyFontKey];
 			goto retry;
 		}
-		if ([defaults integerForKey:NVFontSizeEpochKey] < 1 && [GlobalPrefs fontIsLegacyBodyDefault:noteBodyFont]) {
+		if ([defaults integerForKey:NVFontSizeEpochKey] < 2 && [GlobalPrefs fontIsLegacyBodyDefault:noteBodyFont]) {
 			[noteBodyFont release];
-			noteBodyFont = [[GlobalPrefs regularSystemFont] retain];
+			noteBodyFont = [[GlobalPrefs defaultNoteBodyFont] retain];
 			[defaults setObject:[NSArchiver archivedDataWithRootObject:noteBodyFont] forKey:NoteBodyFontKey];
 			upgradedLegacyBodyFont = YES;
 		}
@@ -819,13 +851,60 @@ BOOL ColorsEqualWith8BitChannels(NSColor *c1, NSColor *c2) {
 	SEND_CALLBACKS();
 }
 
+- (void)_storeTableFont:(NSFont *)aFont {
+	[noteListFont release];
+	noteListFont = [aFont retain];
+	[defaults setObject:[NSArchiver archivedDataWithRootObject:noteListFont] forKey:NoteListFontKey];
+	[defaults setFloat:[noteListFont pointSize] forKey:TableFontSizeKey];
+}
+
+- (NSFont *)tableFont {
+	if (noteListFont)
+		return noteListFont;
+	NSData *stored = [defaults dataForKey:NoteListFontKey];
+	if (stored) {
+		@try {
+			noteListFont = [[NSUnarchiver unarchiveObjectWithData:stored] retain];
+		} @catch (NSException *exception) {
+			NSLog(@"Error trying to unarchive note list font (%@, %@)", [exception name], [exception reason]);
+		}
+	}
+	BOOL replaceAvenirDefault = [GlobalPrefs fontIsUnreleasedAvenirListDefault:noteListFont];
+	if (![noteListFont isKindOfClass:[NSFont class]] || replaceAvenirDefault) {
+		CGFloat keptSize = replaceAvenirDefault ? [noteListFont pointSize] : 0.0;
+		[noteListFont release];
+		noteListFont = nil;
+		CGFloat size = keptSize > 0.0 ? keptSize : [defaults floatForKey:TableFontSizeKey];
+		BOOL stockSize = size < 1.0 || fabs(size - [NSFont systemFontSize]) < 0.01 || fabs(size - [NSFont smallSystemFontSize]) < 0.01 || fabs(size - 12.0) < 0.01 || fabs(size - 13.0) < 0.01 || fabs(size - 14.0) < 0.01;
+		if (stockSize) {
+			noteListFont = [[GlobalPrefs defaultNoteListFont] retain];
+		} else {
+			NSFont *family = [GlobalPrefs defaultNoteListFont];
+			noteListFont = [[[NSFontManager sharedFontManager] convertFont:family toSize:size] retain];
+			if (!noteListFont)
+				noteListFont = [[NSFont systemFontOfSize:size] retain];
+		}
+		[defaults setObject:[NSArchiver archivedDataWithRootObject:noteListFont] forKey:NoteListFontKey];
+	}
+	return noteListFont;
+}
+
 - (float)tableFontSize {
-	return [defaults floatForKey:TableFontSizeKey];
+	return [[self tableFont] pointSize];
+}
+
+- (void)setTableFont:(NSFont *)aFont sender:(id)sender {
+	if (!aFont)
+		return;
+	[self _storeTableFont:aFont];
+	SEND_CALLBACKS();
 }
 
 - (void)setTableFontSize:(float)fontSize sender:(id)sender {
-	[defaults setFloat:fontSize forKey:TableFontSizeKey];
-	
+	NSFont *resized = [[NSFontManager sharedFontManager] convertFont:[self tableFont] toSize:fontSize];
+	if (!resized)
+		resized = [NSFont systemFontOfSize:fontSize];
+	[self _storeTableFont:resized];
 	SEND_CALLBACKS();
 }
 

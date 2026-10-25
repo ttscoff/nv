@@ -113,9 +113,14 @@ NSMutableDictionary *ServiceAccountDictInit(NotationPrefs *prefs, NSString* serv
 			baseBodyFont = [[[GlobalPrefs defaultPrefs] noteBodyFont] retain];
 			NSLog(@"setting base body to current default: %@", baseBodyFont);
 			preferencesChanged = YES;
-		} else if ([GlobalPrefs fontIsLegacyBodyDefault:baseBodyFont]) {
+		} else if ([[NSUserDefaults standardUserDefaults] integerForKey:@"NVFontSizeEpoch"] < 2 &&
+				   [GlobalPrefs fontIsLegacyBodyDefault:baseBodyFont]) {
+			NSFont *current = [[GlobalPrefs defaultPrefs] noteBodyFont];
 			[baseBodyFont release];
-			baseBodyFont = [[GlobalPrefs regularSystemFont] retain];
+			if (current && ![GlobalPrefs fontIsLegacyBodyDefault:current])
+				baseBodyFont = [current retain];
+			else
+				baseBodyFont = [[GlobalPrefs defaultNoteBodyFont] retain];
 			preferencesChanged = YES;
 		}
 		//foregroundColor does not receive the same treatment as basebodyfont; in the event of a discrepancy between global and per-db settings,

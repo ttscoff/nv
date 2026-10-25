@@ -60,6 +60,7 @@ BOOL ColorsEqualWith8BitChannels(NSColor *c1, NSColor *c2);
 	NSDictionary *noteBodyAttributes, *searchTermHighlightAttributes;
 	NSMutableParagraphStyle *noteBodyParagraphStyle;
 	NSFont *noteBodyFont;
+	NSFont *noteListFont;
 	BOOL autoCompleteSearches;
 	
 	NSMutableArray *tableColumns;
@@ -90,6 +91,8 @@ BOOL ColorsEqualWith8BitChannels(NSColor *c1, NSColor *c2);
 
 - (void)resolveNoteBodyFontFromNotationPrefsFromSender:(id)sender;
 + (NSFont *)regularSystemFont;
++ (NSFont *)defaultNoteBodyFont;
++ (NSFont *)defaultNoteListFont;
 + (BOOL)fontIsLegacyBodyDefault:(NSFont *)font;
 
 - (void)setNoteBodyFont:(NSFont*)aFont sender:(id)sender;
@@ -159,6 +162,8 @@ BOOL ColorsEqualWith8BitChannels(NSColor *c1, NSColor *c2);
 
 - (float)tableFontSize;
 - (void)setTableFontSize:(float)fontSize sender:(id)sender;
+- (NSFont *)tableFont;
+- (void)setTableFont:(NSFont *)aFont sender:(id)sender;
 
 - (void)setHorizontalLayout:(BOOL)value sender:(id)sender;
 - (BOOL)horizontalLayout;

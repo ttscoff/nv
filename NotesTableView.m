@@ -166,6 +166,7 @@ static void _CopyItemWithSelectorFromMenu(NSMenu *destMenu, NSMenu *sourceMenu, 
 - (void)awakeFromNib {
 	[globalPrefs registerWithTarget:self forChangesInSettings:
 	 @selector(setTableFontSize:sender:),
+	 @selector(setTableFont:sender:),
 	 @selector(setHorizontalLayout:sender:),@selector(setShowGrid:sender:),@selector(setAlternatingRows:sender:), nil];
 	
 	[self registerForDraggedTypes:[NSArray arrayWithObjects:NSFilenamesPboardType, NSRTFPboardType, NSRTFDPboardType, NSStringPboardType, nil]];
@@ -280,7 +281,7 @@ static void _CopyItemWithSelectorFromMenu(NSMenu *destMenu, NSMenu *sourceMenu, 
 	if (!cachedCell) cachedCell = [[col dataCell] retain];
 	[col setDataCell: horiz ? [[[UnifiedCell alloc] init] autorelease] : cachedCell];
 	
-	NSFont *font = [NSFont systemFontOfSize:[globalPrefs tableFontSize]];
+	NSFont *font = [globalPrefs tableFont];
 	NSUInteger i;
 	for (i=0; i<[allColumns count]; i++) {
 		[[[allColumns objectAtIndex:i] dataCell] setFont:font];
@@ -303,7 +304,7 @@ static void _CopyItemWithSelectorFromMenu(NSMenu *destMenu, NSMenu *sourceMenu, 
 
 - (void)settingChangedForSelectorString:(NSString*)selectorString {
 	
-	if ([selectorString isEqualToString:SEL_STR(setTableFontSize:sender:)]) {
+	if ([selectorString isEqualToString:SEL_STR(setTableFontSize:sender:)] || [selectorString isEqualToString:SEL_STR(setTableFont:sender:)]) {
 		
 		[self _configureAttributesForCurrentLayout];
 		
@@ -1354,11 +1355,14 @@ enum { kNext_Tag = 'j', kPrev_Tag = 'k' };
 	if (![self dataSource]) {
 		return;
 	}
-    
-    CGFloat newHt=[self rowsInRect:clipRect].length * ([self rowHeight] + [self intercellSpacing].height);
-    if (newHt<clipRect.size.height) {
-        clipRect.size.height=newHt;
-    }
+	NSInteger nRows = [self numberOfRows];
+	if (nRows <= 0)
+		return;
+	CGFloat maxY = NSMaxY([self rectOfRow:nRows - 1]);
+	if (NSMinY(clipRect) >= maxY)
+		return;
+	if (NSMaxY(clipRect) > maxY)
+		clipRect.size.height = maxY - NSMinY(clipRect);
     [super drawGridInClipRect:clipRect];
 }
 
@@ -1401,31 +1405,50 @@ enum { kNext_Tag = 'j', kPrev_Tag = 'k' };
 			altColor = [backColor blendedColorWithFraction:0.05f ofColor:[NSColor blackColor]];
         }
         
-        CGFloat rectHeight = [self rowHeight] + [self intercellSpacing].height;
-        NSInteger loc;
-        if (clipRect.origin.y<0.0f) {
-            CGFloat minY=fabs(NSMinY(clipRect));
-            loc=(NSInteger)(minY/rectHeight);
-            if (((NSInteger)minY % (NSInteger)rectHeight)!=0) {
-                loc++;
-            }
-            loc=0-loc;
-        }else{
-            loc=(NSInteger)[self rowsInRect:clipRect].location;
+        /* Bands used to be painted at rowHeight + intercellSpacing from y=0.
+           The real rows sit lower than that, so the bands crossed the grid lines. */
+        NSInteger nRows = [self numberOfRows];
+        CGFloat pitch = [self rowHeight] + [self intercellSpacing].height;
+        CGFloat origin0 = 0.0;
+        if (nRows > 0) {
+            NSRect firstRow = [self rectOfRow:0];
+            origin0 = NSMinY(firstRow);
+            if (nRows > 1)
+                pitch = NSMinY([self rectOfRow:1]) - origin0;
+            else if (NSHeight(firstRow) > 0.0)
+                pitch = NSHeight(firstRow);
         }
-        NSRect rowRect=NSMakeRect(0.0f, (rectHeight * (CGFloat)loc),NSMaxX(clipRect), rectHeight);
-        CGFloat maxY=NSMaxY(clipRect);
-        NSInteger row;
+        if (pitch < 1.0)
+            pitch = 1.0;
+
+        NSRect fillRect = clipRect;
+        fillRect.origin.x = 0.0;
+        fillRect.size.width = NSWidth([self bounds]);
+        [backColor setFill];
+        NSRectFill(fillRect);
+
+        CGFloat maxY = NSMaxY(clipRect);
+        NSInteger row = 0;
+        if (NSMinY(clipRect) > origin0)
+            row = (NSInteger)floor((NSMinY(clipRect) - origin0) / pitch);
+        if (row < 0)
+            row = 0;
         [NSGraphicsContext saveGraphicsState];
-        //        [[NSGraphicsContext currentContext] setShouldAntialias:NO];
-        for (row=loc; rowRect.origin.y < maxY; row++) {
-            if(( row % 2)!=0){
-                [altColor setFill];
-            }else{
-                [backColor setFill];
+        for (; origin0 + (pitch * row) < maxY; row++) {
+            if ((row % 2) == 0)
+                continue;
+            NSRect rowRect = NSMakeRect(0.0, origin0 + (pitch * row), NSWidth(fillRect), pitch);
+            if (row < nRows) {
+                rowRect = [self rectOfRow:row];
+                rowRect.origin.x = 0.0;
+                rowRect.size.width = NSWidth(fillRect);
+                if (row + 1 < nRows)
+                    rowRect.size.height = NSMinY([self rectOfRow:row + 1]) - NSMinY(rowRect);
+                else
+                    rowRect.size.height = pitch;
             }
-            NSRectFill(rowRect);
-            rowRect.origin.y+=rectHeight;
+            [altColor setFill];
+            NSRectFill(NSIntersectionRect(rowRect, fillRect));
         }
         [NSGraphicsContext restoreGraphicsState];
     }

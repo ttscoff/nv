@@ -53,6 +53,8 @@
 	NSMutableDictionary *items;
 	NSToolbar *toolbar;
 	BOOL fontPanelWasOpen;
+	NSTextField *listTextFontField;
+	NSInteger fontPanelTarget;
 	
 	IBOutlet NSWindow *window;
 	IBOutlet NSView *editingView, *generalView, *fontsColorsView, *databaseView, *notationPrefsView;
@@ -75,6 +77,7 @@
 - (IBAction)changeBodyFont:(id)sender;
 - (IBAction)changedRTL:(id)sender;
 - (void)previewNoteBodyFont;
+- (IBAction)changeListFont:(id)sender;
 - (IBAction)changedNoteDeletion:(id)sender;
 - (IBAction)changedNotesFolderLocation:(id)sender;
 - (IBAction)changedQuitBehavior:(id)sender;

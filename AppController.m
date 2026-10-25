@@ -501,6 +501,7 @@ void outletObjectAwoke(id sender) {
 	 @selector(setForegroundTextColor:sender:),  //ditto
 	 @selector(setBackgroundTextColor:sender:),  //ditto
 	 @selector(setTableFontSize:sender:),  //when to tell notationcontroller to regenerate the (now potentially too-short) note-body previews
+	 @selector(setTableFont:sender:),
 	 @selector(addTableColumn:sender:),  //ditto
 	 @selector(removeTableColumn:sender:),  //ditto
 	 @selector(setTableColumnsShowPreview:sender:),  //when to tell notationcontroller to generate or disable note-body previews
@@ -1085,7 +1086,7 @@ terminateApp:
 			[self updateColorScheme];
 		}
 		
-	} else if ([selectorString isEqualToString:SEL_STR(setTableFontSize:sender:)] || [selectorString isEqualToString:SEL_STR(setTableColumnsShowPreview:sender:)]) {
+	} else if ([selectorString isEqualToString:SEL_STR(setTableFontSize:sender:)] || [selectorString isEqualToString:SEL_STR(setTableFont:sender:)] || [selectorString isEqualToString:SEL_STR(setTableColumnsShowPreview:sender:)]) {
 		
 		ResetFontRelatedTableAttributes();
 		[notesTableView updateTitleDereferencorState];

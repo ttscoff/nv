@@ -37,7 +37,7 @@ static long (*GetGetScriptManagerVariablePointer())(short);
 #endif
 
 #define kDefaultTextInsetWidth 8.0
-#define kDefaultTextInsetHeight 8.0
+#define kDefaultTextInsetHeight 16.0
 
 @interface NSCursor (WhiteIBeamCursor)
 + (NSCursor*)whiteIBeamCursor;
@@ -2366,7 +2366,8 @@ static long (*GetGetScriptManagerVariablePointer())(short) {
 #pragma mark managing text width
 
 - (void)resetInset{
-    if ([self textContainerInset].width!=kDefaultTextInsetWidth) {
+    NSSize inset = [self textContainerInset];
+    if (inset.width != kDefaultTextInsetWidth || inset.height != kDefaultTextInsetHeight) {
         [self setTextContainerInset:NSMakeSize(kDefaultTextInsetWidth, kDefaultTextInsetHeight)];
     }//||didRenderFully
     //    else if (didRenderFully) {
@@ -2402,7 +2403,8 @@ static long (*GetGetScriptManagerVariablePointer())(short) {
             }
         }
     }
-    if (always||([self textContainerInset].width!=insX)) {
+    NSSize currentInset = [self textContainerInset];
+    if (always || currentInset.width != insX || currentInset.height != kDefaultTextInsetHeight) {
         [self setTextContainerInset:NSMakeSize(insX, kDefaultTextInsetHeight)];
         return YES;
     }

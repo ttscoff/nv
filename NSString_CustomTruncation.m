@@ -118,9 +118,12 @@ NSDictionary *LineTruncAttributesForTitle() {
 		float fontSize = [prefs tableFontSize];
 		BOOL usesBold = ColumnIsSet(NoteLabelsColumn, bitmap) || ColumnIsSet(NoteDateCreatedColumn, bitmap) ||
 		ColumnIsSet(NoteDateModifiedColumn, bitmap) || [prefs tableColumnsShowPreview];
+		NSFont *titleFont = [prefs tableFont];
+		if (usesBold)
+			titleFont = [[NSFontManager sharedFontManager] convertFont:titleFont toHaveTrait:NSBoldFontMask];
 		
 		titleTruncAttrs = [[NSMutableDictionary dictionaryWithObjectsAndKeys:[[LineBreakingStyle() mutableCopy] autorelease], NSParagraphStyleAttributeName,
-							(usesBold ? [NSFont boldSystemFontOfSize:fontSize] : [NSFont systemFontOfSize:fontSize]), NSFontAttributeName, nil] retain];
+							titleFont, NSFontAttributeName, nil] retain];
 		
 		if (ColumnIsSet(NoteDateCreatedColumn, bitmap) || ColumnIsSet(NoteDateModifiedColumn, bitmap)) {
 			//account for right-"aligned" date string, which will be relatively constant, so this can be cached

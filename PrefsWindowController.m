@@ -103,13 +103,25 @@
 }
 
 - (IBAction)changeBodyFont:(id)sender {
+	fontPanelTarget = 0;
 	[[NSFontManager sharedFontManager] setSelectedFont:[prefsController noteBodyFont] isMultiple:NO];
     [[NSFontManager sharedFontManager] orderFrontFontPanel:self];
+}
+
+- (IBAction)changeListFont:(id)sender {
+	fontPanelTarget = 1;
+	[[NSFontManager sharedFontManager] setSelectedFont:[prefsController tableFont] isMultiple:NO];
+	[[NSFontManager sharedFontManager] orderFrontFontPanel:self];
 }
 
 - (void)changeFont:(id)sender {
 	NSFontManager *fontMan = [NSFontManager sharedFontManager];
 	NSFont *panelFont = [fontMan convertFont:[fontMan selectedFont]];
+	if (fontPanelTarget == 1) {
+		[prefsController setTableFont:panelFont sender:self];
+		[self previewNoteBodyFont];
+		return;
+	}
 	
 	if (/*![fontMan fontNamed:[panelFont fontName] hasTraits:NSUnboldFontMask | NSUnitalicFontMask]*/
 	([fontMan traitsOfFont:panelFont] & NSItalicFontMask) == NSItalicFontMask ||
@@ -147,14 +159,115 @@
 	NSDictionary *attributes = [NSDictionary dictionaryWithObjectsAndKeys:font ? font : [NSFont systemFontOfSize:12.0],
 		NSFontAttributeName, [NSColor blackColor], NSForegroundColorAttributeName, centerStyle, NSParagraphStyleAttributeName, nil];
 
-	NSString *fontNameAndSize = font ? [NSString stringWithFormat:@"%@ %g", [font fontName], [font pointSize]] : @"Unknown";
+	NSString *fontNameAndSize = font ? [NSString stringWithFormat:@"%@ %g", [font displayName], [font pointSize]] : @"Unknown";
 	NSAttributedString *attributedString = [[NSAttributedString alloc] initWithString:fontNameAndSize attributes:attributes];
 	
 	[[bodyTextFontField cell] setAttributedStringValue:attributedString];
     [bodyTextFontField updateCell:[bodyTextFontField cell]];
 	
 	[attributedString autorelease];
-	
+
+	if (tableTextMenuButton) {
+		float listSize = [prefsController tableFontSize];
+		int fontButtonIndex = 3;
+		if (listSize == [NSFont smallSystemFontSize]) fontButtonIndex = 0;
+		else if (fabsf(listSize - (float)[NSFont systemFontSize]) < 0.01f) fontButtonIndex = 1;
+		[tableTextMenuButton selectItemAtIndex:fontButtonIndex];
+		[tableTextSizeField setFloatValue:listSize];
+		[tableTextSizeField setHidden:(fontButtonIndex != 3)];
+	}
+
+	NSFont *listFont = [prefsController tableFont];
+	if (listTextFontField && listFont) {
+		NSDictionary *listAttributes = [NSDictionary dictionaryWithObjectsAndKeys:listFont, NSFontAttributeName, [NSColor blackColor], NSForegroundColorAttributeName, centerStyle, NSParagraphStyleAttributeName, nil];
+		NSString *listName = [NSString stringWithFormat:@"%@ %g", [listFont displayName], [listFont pointSize]];
+		NSAttributedString *listSample = [[NSAttributedString alloc] initWithString:listName attributes:listAttributes];
+		[[listTextFontField cell] setAttributedStringValue:listSample];
+		[listSample release];
+	}
+}
+
+- (void)addListFontControls {
+	if (!fontsColorsView || !bodyTextFontField || [fontsColorsView viewWithTag:7303])
+		return;
+	CGFloat shift = 34.0;
+	NSButton *bodyButton = nil;
+	NSTextField *bodyLabel = nil;
+	NSRect bodyFrame = [bodyTextFontField frame];
+	NSArray *subviews = [[fontsColorsView subviews] copy];
+	NSMutableArray *savedMasks = [[NSMutableArray alloc] initWithCapacity:[subviews count]];
+	for (NSView *subview in subviews) {
+		[savedMasks addObject:[NSNumber numberWithUnsignedInteger:[subview autoresizingMask]]];
+		[subview setAutoresizingMask:NSViewNotSizable];
+		if (subview == bodyTextFontField)
+			continue;
+		if ([subview isKindOfClass:[NSButton class]] && [(NSButton *)subview action] == @selector(changeBodyFont:))
+			bodyButton = (NSButton *)subview;
+		else if ([subview isKindOfClass:[NSTextField class]] && ![[(NSTextField *)subview cell] isEditable] &&
+				 NSMaxX([subview frame]) <= NSMinX(bodyFrame) + 8 &&
+				 fabs(NSMidY([subview frame]) - NSMidY(bodyFrame)) < 14)
+			bodyLabel = (NSTextField *)subview;
+	}
+	for (NSView *subview in subviews) {
+		NSRect frame = [subview frame];
+		if (NSMaxY(frame) <= NSMinY(bodyFrame) + 1.0)
+			frame.origin.y -= shift;
+		frame.origin.y += shift;
+		[subview setFrame:frame];
+	}
+	NSRect viewFrame = [fontsColorsView frame];
+	viewFrame.size.height += shift;
+	[fontsColorsView setFrame:viewFrame];
+	NSUInteger maskIndex = 0;
+	for (NSView *subview in subviews)
+		[subview setAutoresizingMask:[[savedMasks objectAtIndex:maskIndex++] unsignedIntegerValue]];
+	[savedMasks release];
+	[subviews release];
+
+	bodyFrame = [bodyTextFontField frame];
+	NSRect previewFrame = bodyFrame;
+	previewFrame.origin.y -= shift;
+	NSTextField *preview = [[NSTextField alloc] initWithFrame:previewFrame];
+	[preview setEditable:NO];
+	[preview setSelectable:NO];
+	[preview setBezeled:YES];
+	[preview setDrawsBackground:YES];
+	[preview setAlignment:NSTextAlignmentCenter];
+	[preview setTag:7303];
+	[preview setAutoresizingMask:[bodyTextFontField autoresizingMask]];
+	[fontsColorsView addSubview:preview];
+	listTextFontField = preview;
+	[preview release];
+
+	if (bodyLabel) {
+		NSRect labelFrame = [bodyLabel frame];
+		labelFrame.origin.y -= shift;
+		NSTextField *label = [[NSTextField alloc] initWithFrame:labelFrame];
+		[label setEditable:NO];
+		[label setSelectable:NO];
+		[label setBezeled:NO];
+		[label setDrawsBackground:NO];
+		[label setAlignment:NSTextAlignmentRight];
+		[label setFont:[bodyLabel font]];
+		[label setStringValue:NSLocalizedString(@"List Font:", @"Fonts settings label")];
+		[label setAutoresizingMask:[bodyLabel autoresizingMask]];
+		[fontsColorsView addSubview:label];
+		[label release];
+	}
+	if (bodyButton) {
+		NSRect buttonFrame = [bodyButton frame];
+		buttonFrame.origin.y -= shift;
+		NSButton *button = [[NSButton alloc] initWithFrame:buttonFrame];
+		[button setButtonType:NSButtonTypeMomentaryPushIn];
+		[button setBezelStyle:[bodyButton bezelStyle]];
+		[button setTitle:[bodyButton title]];
+		[button setFont:[bodyButton font]];
+		[button setTarget:self];
+		[button setAction:@selector(changeListFont:)];
+		[button setAutoresizingMask:[bodyButton autoresizingMask]];
+		[fontsColorsView addSubview:button];
+		[button release];
+	}
 }
 
 - (IBAction)changedUseETScrollbarsOnLion:(id)sender{
@@ -243,7 +356,8 @@
 			[tableTextSizeField selectText:sender];
 		
 		[prefsController setTableFontSize:newFontSize sender:self];
-	}	
+		[self previewNoteBodyFont];
+	}
 }
 
 - (IBAction)changedTitleCompletion:(id)sender {
@@ -352,7 +466,15 @@
     [openPanel setTitle:NSLocalizedString(@"Select a folder",@"title of open panel for selecting a notes folder")];
     [openPanel setPrompt:NSLocalizedString(@"Select", @"title of open panel button to select a folder")];
     [openPanel setMessage:NSLocalizedString(@"Select the folder that Notational Velocity should use for reading and storing notes.",nil)];
-    [openPanel setDirectoryURL:[NSURL fileURLWithPath:startingDirectory]];
+    /* A missing notes folder (a Dropbox path that was moved, for example) leaves startingDirectory nil.
+       fileURLWithPath: throws on nil and the panel never appears. */
+    if ([startingDirectory length]) {
+		@try {
+			[openPanel setDirectoryURL:[NSURL fileURLWithPath:startingDirectory isDirectory:YES]];
+		} @catch (NSException *exception) {
+			NSLog(@"Opening the notes folder picker without a starting directory (%@)", [exception reason]);
+		}
+    }
     [openPanel setAllowedFileTypes:nil];
     if ([openPanel runModal]==NSFileHandlingPanelOKButton) {
         
@@ -435,6 +557,7 @@
 	[softTabsButton setState:[prefsController softTabs]];
 	[makeURLsClickable setState:[prefsController URLsAreClickable]];
     [rtlButton setState:[prefsController rtl]];
+    [self addListFontControls];
     [self previewNoteBodyFont];
 	[appShortcutField setStringValue:[[prefsController appActivationKeyCombo] description]];
 	[searchHighlightColorWell setColor:[prefsController searchTermHighlightColorRaw:YES]];
