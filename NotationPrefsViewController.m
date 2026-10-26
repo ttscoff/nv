@@ -207,6 +207,16 @@ enum {VERIFY_NOT_ATTEMPTED, VERIFY_FAILED, VERIFY_IN_PROGRESS, VERIFY_SUCCESS};
 			@"application/json", @"Accept", nil];
 }
 
+- (NSString *)simplenoteErrorCodeInData:(NSData *)data {
+	if (![data length])
+		return nil;
+	id object = [NSJSONSerialization JSONObjectWithData:data options:0 error:nil];
+	if (![object isKindOfClass:[NSDictionary class]])
+		return nil;
+	id error = [(NSDictionary *)object objectForKey:@"error"];
+	return [error isKindOfClass:[NSString class]] ? error : nil;
+}
+
 - (NSString *)simplenoteQueryValueNamed:(NSString *)name inEntry:(NSString *)entry {
 	NSRange found = [entry rangeOfString:[name stringByAppendingString:@"="]];
 	if (found.location == NSNotFound)
@@ -572,10 +582,11 @@ enum {VERIFY_NOT_ATTEMPTED, VERIFY_FAILED, VERIFY_IN_PROGRESS, VERIFY_SUCCESS};
 }
 
 - (void)syncEditingDidEnd:(NSNotification *)aNotification {
-	if (!verificationAttempted) {
-		[self cancelLoginVerifier];
-		[self startLoginVerifier];
-	}
+	// A login code works once. Submit it when editing ends, and leave an
+	// in-flight request alone so Return cannot send the same code again.
+	if ([aNotification object] != syncPasswordField || loginVerifier)
+		return;
+	[self startLoginVerifier];
 }
 
 - (void)syncCredentialsDidChange:(NSNotification *)aNotification {
@@ -583,10 +594,8 @@ enum {VERIFY_NOT_ATTEMPTED, VERIFY_FAILED, VERIFY_IN_PROGRESS, VERIFY_SUCCESS};
 	if ([aNotification object] == syncAccountField) {
 		[notationPrefs removeSyncPasswordForService:SimplenoteServiceName];
 		[notationPrefs setSyncUsername:[syncAccountField stringValue] forService:SimplenoteServiceName];
-		
-		[self startVerifyingAfterDelay];
-	} else if ([aNotification object] == syncPasswordField) {
-		[self startVerifyingAfterDelay];
+	} else if ([aNotification object] == syncPasswordField && !loginVerifier && verificationAttempted) {
+		[self setVerificationStatus:VERIFY_NOT_ATTEMPTED withString:@""];
 	}
 }
 
@@ -612,12 +621,6 @@ enum {VERIFY_NOT_ATTEMPTED, VERIFY_FAILED, VERIFY_IN_PROGRESS, VERIFY_SUCCESS};
 	}
 	[verifyStatusImageView setHidden: VERIFY_NOT_ATTEMPTED == status];
 	[verifyStatusField setStringValue: aString ? aString : @""];
-}
-
-- (void)startVerifyingAfterDelay {
-	[self cancelLoginVerifier];
-	
-	[self performSelector:@selector(startLoginVerifier) withObject:nil afterDelay:1.5];
 }
 
 - (void)cancelLoginVerifier {
@@ -658,6 +661,10 @@ enum {VERIFY_NOT_ATTEMPTED, VERIFY_FAILED, VERIFY_IN_PROGRESS, VERIFY_SUCCESS};
 }
 
 - (void)syncResponseFetcher:(SyncResponseFetcher*)fetcher receivedData:(NSData*)data returningError:(NSString*)errString {
+	if (fetcher == loginVerifier) {
+		[loginVerifier autorelease];
+		loginVerifier = nil;
+	}
 	BOOL httpFailed = errString || [fetcher statusCode] >= 400;
 	BOOL requestedCode = [[fetcher representedObject] isEqualToString:@"request-login"];
 	if (requestedCode) {
@@ -666,7 +673,7 @@ enum {VERIFY_NOT_ATTEMPTED, VERIFY_FAILED, VERIFY_IN_PROGRESS, VERIFY_SUCCESS};
 		} else if (httpFailed) {
 			[self setVerificationStatus:VERIFY_FAILED withString:NSLocalizedString(@"Simplenote did not send a login code.", @"Simplenote login status")];
 		} else {
-			[self setVerificationStatus:VERIFY_NOT_ATTEMPTED withString:NSLocalizedString(@"Check your email and paste the login code.", @"Simplenote login status")];
+			[self setVerificationStatus:VERIFY_NOT_ATTEMPTED withString:NSLocalizedString(@"Check your email, paste the code, and press Return.", @"Simplenote login status")];
 		}
 		return;
 	}
@@ -676,7 +683,12 @@ enum {VERIFY_NOT_ATTEMPTED, VERIFY_FAILED, VERIFY_IN_PROGRESS, VERIFY_SUCCESS};
 		return;
 	}
 	if (httpFailed) {
-		[self setVerificationStatus:VERIFY_FAILED withString:NSLocalizedString(@"That login code was not accepted.", @"Simplenote login status")];
+		NSString *errorCode = [self simplenoteErrorCodeInData:data];
+		NSLog(@"Simplenote rejected the login code (HTTP %ld%@).", (long)[fetcher statusCode], errorCode ? [@", " stringByAppendingString:errorCode] : @"");
+		NSString *message = NSLocalizedString(@"That login code was not accepted.", @"Simplenote login status");
+		if ([errorCode isEqualToString:@"request-not-found"])
+			message = NSLocalizedString(@"That login code has expired. Email yourself a new one.", @"Simplenote login status");
+		[self setVerificationStatus:VERIFY_FAILED withString:message];
 		return;
 	}
 

@@ -107,7 +107,6 @@
 - (IBAction)toggledSyncing:(id)sender;
 - (IBAction)syncFrequencyChange:(id)sender;
 
-- (void)startVerifyingAfterDelay;
 - (void)startLoginVerifier;
 - (void)cancelLoginVerifier;
 - (void)setVerificationStatus:(int)status withString:(NSString*)aString;
