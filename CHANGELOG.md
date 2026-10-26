@@ -1,3 +1,32 @@
+nvALT 3.0.7
+-------------------------
+
+#### CHANGED
+
+- Open **Keyboard Shortcuts** in its own window.
+
+#### NEW
+
+- Insert a **Markdown link** with Option-Command-K.
+- Paste a **URL** as a Markdown link when text is selected, or as an autolink when it is not.
+- Cycle the **list marker** with Option-Command-L when automatic list formatting is on. Lock Note to Preview no longer uses that shortcut.
+- Indent or outdent a **list item** or blockquote with Tab and Shift-Tab, and indent lines with Control-Command-Left and Control-Command-Right.
+- Continue a **blockquote** or code fence when you press Return, and leave the quote when the line is empty.
+- Renumber a **numbered list** as you edit it, when automatic list formatting is on.
+- Move a **paragraph** or list item with Control-Command-Up and Control-Command-Down.
+- Expand or shrink the **selection** by Markdown structure with Option-Command-Up and Option-Command-Down.
+- Insert or jump to a **reference link** with F6, and a footnote with F7.
+- Highlight **invisible characters** and unusual spaces in a note.
+
+#### IMPROVED
+
+- Color **nested list** markers while Markdown highlighting is on.
+- Indent using the **tab width** from settings.
+
+#### FIXED
+
+- Scroll to show the **cursor** when F6 or F7 jumps to a reference or footnote.
+
 nvALT 3.0.6
 -------------------------
 
