@@ -68,6 +68,18 @@ p {
   margin: 0 0 10px;
 }
 
+p.upgrade-notice {
+  margin: 0 0 22px;
+  padding: 12px 14px;
+  border: 1px solid var(--rule);
+  border-radius: 8px;
+  background: var(--chip);
+}
+
+p.upgrade-notice strong {
+  font-weight: 650;
+}
+
 ul,
 ol {
   margin: 0 0 8px;

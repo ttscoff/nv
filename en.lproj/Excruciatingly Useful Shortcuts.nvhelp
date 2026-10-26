@@ -85,6 +85,16 @@ Text formatting shortcuts:\
 \f1 \uc0\u8984 
 \f0  ]		(right square bracket) Indent one or more lines\
 
+\f1 \uc0\u8963 
+\f1 \uc0\u8984 
+\f1 \uc0\u8592 
+\f0 		Outdent one or more lines\
+
+\f1 \uc0\u8963 
+\f1 \uc0\u8984 
+\f1 \uc0\u8594 
+\f0 		Indent one or more lines\
+
 \f1 \uc0\u8997 
 \f0  Tab	Indent\
 
@@ -99,4 +109,149 @@ Text formatting shortcuts:\
 
 \f1 \uc0\u8984 
 \f0  Y		Strikethrough\
+
+\f1 \uc0\u8997 
+\f1 \uc0\u8984 
+\f0  K		Insert a Markdown link\
+
+\f1 \uc0\u8679 
+\f1 \uc0\u8984 
+\f0  L		Insert a wiki link\
+
+\f1 \uc0\u8997 
+\f1 \uc0\u8984 
+\f0  L		Cycle the list marker while editing\
+Tab		Indent a list item or blockquote\
+Shift-Tab	Outdent a list item or blockquote\
+Return		Continue a list, blockquote, or code fence\
+
+\f1 \uc0\u8984 
+\f0  
+\f1 \uc0\u8679 
+\f0  .	Quote this line\
+
+\f1 \uc0\u8984 
+\f0  
+\f1 \uc0\u8679 
+\f0  ,	Remove a quote marker\
+
+\f1 \uc0\u8984 
+\f0  
+\f1 \uc0\u8679 
+\f0  =	Raise the heading level\
+
+\f1 \uc0\u8984 
+\f0  
+\f1 \uc0\u8679 
+\f0  -	Lower the heading level\
+
+\f1 \uc0\u8963 
+\f1 \uc0\u8984 
+\f1 \uc0\u8593 
+\f0 		Move this paragraph or list item up\
+
+\f1 \uc0\u8963 
+\f1 \uc0\u8984 
+\f1 \uc0\u8595 
+\f0 		Move this paragraph or list item down\
+
+\f1 \uc0\u8997 
+\f1 \uc0\u8984 
+\f1 \uc0\u8593 
+\f0 		Expand the selection\
+
+\f1 \uc0\u8997 
+\f1 \uc0\u8984 
+\f1 \uc0\u8595 
+\f0 		Shrink the selection\
+F6		Turn the selection into a reference link, or jump to its definition\
+F7		Insert a footnote, or jump between the marker and its note\
+\
+Finding and notes:\
+\
+
+\f1 \uc0\u8984 
+\f0  F		Find\
+
+\f1 \uc0\u8997 
+\f1 \uc0\u8984 
+\f0  F		Find and replace\
+
+\f1 \uc0\u8997 
+\f1 \uc0\u8984 
+\f0  E		Use the selection for Find\
+
+\f1 \uc0\u8997 
+\f1 \uc0\u8984 
+\f0  J		Jump to the selection\
+
+\f1 \uc0\u8984 
+\f0  
+\f1 \uc0\u8679 
+\f0  R	Show the selected note in the Finder\
+
+\f1 \uc0\u8997 
+\f1 \uc0\u8984 
+\f0  C		Copy the note's URL\
+
+\f1 \uc0\u8997 
+\f1 \uc0\u8984 
+\f0  V		Paste a Markdown link\
+\
+View and preview:\
+\
+
+\f1 \uc0\u8984 
+\f0  ,		Settings\
+
+\f1 \uc0\u8984 
+\f0  
+\f1 \uc0\u8679 
+\f0  K	Show or hide the word count\
+
+\f1 \uc0\u8984 
+\f0  
+\f1 \uc0\u8679 
+\f0  C	Collapse or expand the notes list\
+
+\f1 \uc0\u8997 
+\f1 \uc0\u8984 
+\f0  L		Switch between vertical and horizontal layout\
+
+\f1 \uc0\u8997 
+\f1 \uc0\u8984 
+\f0  1		Black and white\
+
+\f1 \uc0\u8997 
+\f1 \uc0\u8984 
+\f0  2		Low contrast\
+
+\f1 \uc0\u8997 
+\f1 \uc0\u8984 
+\f0  3		Your color scheme\
+
+\f1 \uc0\u8997 
+\f1 \uc0\u8984 
+\f0  P		Show or hide note previews in the list\
+
+\f1 \uc0\u8963 
+\f1 \uc0\u8984 
+\f0  P		Show or hide the preview\
+
+\f1 \uc0\u8963 
+\f1 \uc0\u8984 
+\f0  M		Preview in Marked\
+
+\f1 \uc0\u8984 
+\f0  U		Show or hide the preview source\
+
+\f1 \uc0\u8984 
+\f0  
+\f1 \uc0\u8679 
+\f0  S	Save the preview as HTML\
+
+\f1 \uc0\u8984 
+\f0  
+\f1 \uc0\u8679 
+\f0  M	Turn Markdown completion on or off\
 }

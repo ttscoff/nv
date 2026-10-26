@@ -595,8 +595,8 @@ CA
                                     <action selector="toggleSourceView:" target="213" id="1278"/>
                                 </connections>
                             </menuItem>
-                            <menuItem title="Notiz in Vorschau fixieren" keyEquivalent="L" id="1299">
-                                <modifierMask key="keyEquivalentModifierMask" option="YES" command="YES"/>
+                            <menuItem title="Notiz in Vorschau fixieren" id="1299">
+                                <modifierMask key="keyEquivalentModifierMask"/>
                                 <connections>
                                     <action selector="lockPreview:" target="213" id="1301"/>
                                 </connections>

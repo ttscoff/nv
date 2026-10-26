@@ -32,6 +32,10 @@
 	BOOL didRenderFully;
 	
 	BOOL didChangeIntoAutomaticRange;
+	BOOL renumberingNumberedLists;
+	BOOL markdownAdjustingSelection;
+	NSInteger markdownSelectionLevel;
+	NSUInteger markdownSelectionAnchor;
 	NSRange lastAutomaticallySelectedRange;
 	NSRange changedRange;
 	BOOL isAutocompleting, wasDeleting;

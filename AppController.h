@@ -115,6 +115,7 @@
 	NSArray *savedSelectedNotes;
 	BOOL hasLaunched;
     PreviewController *previewController;
+    NSWindow *shortcutsHelpWindow;
     // IBOutlet NSMenuItem *markdownPreview;
     IBOutlet NSMenuItem *multiMarkdownPreview;
     IBOutlet NSMenuItem *textilePreview;

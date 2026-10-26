@@ -602,8 +602,8 @@ CA
                                     <action selector="toggleSourceView:" target="213" id="1246"/>
                                 </connections>
                             </menuItem>
-                            <menuItem title="Lock Note to Preview" keyEquivalent="L" id="1293">
-                                <modifierMask key="keyEquivalentModifierMask" option="YES" command="YES"/>
+                            <menuItem title="Lock Note to Preview" id="1293">
+                                <modifierMask key="keyEquivalentModifierMask"/>
                                 <connections>
                                     <action selector="lockPreview:" target="213" id="1296"/>
                                 </connections>

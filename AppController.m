@@ -1127,12 +1127,70 @@ terminateApp:
 	return ![[tableColumn identifier] isEqualToString:NoteTitleColumnString];
 }
 
+- (void)showKeyboardShortcuts {
+	NSString *path = [[NSBundle mainBundle] pathForResource:@"Excruciatingly Useful Shortcuts" ofType:@"nvhelp"];
+	NSData *data = [NSData dataWithContentsOfFile:path];
+	NSMutableAttributedString *text = data ? [[[NSMutableAttributedString alloc] initWithRTF:data documentAttributes:NULL] autorelease] : nil;
+	if (![text length]) {
+		NSBeep();
+		return;
+	}
+	NSRange fullRange = NSMakeRange(0, [text length]);
+	[text removeAttribute:NSBackgroundColorAttributeName range:fullRange];
+	[text addAttribute:NSForegroundColorAttributeName value:[NSColor labelColor] range:fullRange];
+	[text addAttribute:NSFontAttributeName value:[NSFont systemFontOfSize:13.0] range:fullRange];
+
+	if (!shortcutsHelpWindow) {
+		shortcutsHelpWindow = [[NSWindow alloc] initWithContentRect:NSMakeRect(0, 0, 560, 640)
+														   styleMask:(NSWindowStyleMaskTitled | NSWindowStyleMaskClosable | NSWindowStyleMaskMiniaturizable | NSWindowStyleMaskResizable)
+															 backing:NSBackingStoreBuffered
+															   defer:NO];
+		[shortcutsHelpWindow setTitle:NSLocalizedString(@"Keyboard Shortcuts", nil)];
+		[shortcutsHelpWindow setDelegate:self];
+		[shortcutsHelpWindow setReleasedWhenClosed:NO];
+		[shortcutsHelpWindow setMinSize:NSMakeSize(420, 320)];
+		[shortcutsHelpWindow setContentMinSize:NSMakeSize(420, 320)];
+		[shortcutsHelpWindow center];
+
+		NSScrollView *scrollView = [[[NSScrollView alloc] initWithFrame:[[shortcutsHelpWindow contentView] bounds]] autorelease];
+		[scrollView setAutoresizingMask:NSViewWidthSizable | NSViewHeightSizable];
+		[scrollView setHasVerticalScroller:YES];
+		[scrollView setHasHorizontalScroller:NO];
+		[scrollView setBorderType:NSNoBorder];
+		[scrollView setDrawsBackground:NO];
+
+		NSTextView *helpView = [[[NSTextView alloc] initWithFrame:[scrollView bounds]] autorelease];
+		[helpView setEditable:NO];
+		[helpView setSelectable:YES];
+		[helpView setRichText:YES];
+		[helpView setImportsGraphics:NO];
+		[helpView setDrawsBackground:YES];
+		[helpView setBackgroundColor:[NSColor textBackgroundColor]];
+		[helpView setTextContainerInset:NSMakeSize(18, 16)];
+		[helpView setAutoresizingMask:NSViewWidthSizable];
+		[helpView setHorizontallyResizable:NO];
+		[helpView setVerticallyResizable:YES];
+		[helpView setUsesFindPanel:YES];
+		[[helpView textContainer] setWidthTracksTextView:YES];
+		[[helpView textContainer] setContainerSize:NSMakeSize(0, FLT_MAX)];
+		[scrollView setDocumentView:helpView];
+		[shortcutsHelpWindow setContentView:scrollView];
+	}
+
+	NSTextView *helpView = (NSTextView *)[(NSScrollView *)[shortcutsHelpWindow contentView] documentView];
+	[[helpView textStorage] setAttributedString:text];
+	[helpView setBackgroundColor:[NSColor textBackgroundColor]];
+	[helpView scrollRangeToVisible:NSMakeRange(0, 0)];
+	[shortcutsHelpWindow makeKeyAndOrderFront:self];
+}
+
 - (IBAction)showHelpDocument:(id)sender {
 	NSString *path = nil;
 	
 	switch ([sender tag]) {
 		case 1:		//shortcuts
-			path = [[NSBundle mainBundle] pathForResource:NSLocalizedString(@"Excruciatingly Useful Shortcuts", nil) ofType:@"nvhelp" inDirectory:nil];
+			[self showKeyboardShortcuts];
+			return;
 		case 2:		//acknowledgments
 			if (!path) path = [[NSBundle mainBundle] pathForResource:@"Acknowledgments" ofType:@"txt" inDirectory:nil];
 			[[NSWorkspace sharedWorkspace] openURLs:[NSArray arrayWithObject:[NSURL fileURLWithPath:path]] withAppBundleIdentifier:@"com.apple.TextEdit"
@@ -2140,6 +2198,11 @@ terminateApp:
 }
 
 - (void)windowWillClose:(NSNotification *)aNotification {
+    if ([aNotification object] == shortcutsHelpWindow) {
+        [shortcutsHelpWindow autorelease];
+        shortcutsHelpWindow = nil;
+        return;
+    }
     
     //	[self resetModTimers];
     [[NSNotificationCenter defaultCenter] postNotificationName:@"ModTimersShouldReset" object:nil];
