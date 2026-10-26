@@ -4228,6 +4228,35 @@ static NSString *NVRegexLiteral(NSString *text) {
 	return highest;
 }
 
+- (void)revealSelectedRange {
+	NSString *text = [self string];
+	NSRange selection = [self selectedRange];
+	if (![text length] || selection.location > [text length]) {
+		[self scrollRangeToVisible:selection];
+		return;
+	}
+	NSUInteger index = selection.location == [text length] ? [text length] - 1 : selection.location;
+	NSRange line = [text lineRangeForRange:NSMakeRange(index, 0)];
+	NSLayoutManager *layout = [self layoutManager];
+	NSTextContainer *container = [self textContainer];
+	if (!layout || !container || !line.length) {
+		[self scrollRangeToVisible:line.length ? line : selection];
+		return;
+	}
+	[layout ensureLayoutForCharacterRange:line];
+	NSRange glyphRange = [layout glyphRangeForCharacterRange:line actualCharacterRange:NULL];
+	if (!glyphRange.length) {
+		[self scrollRangeToVisible:line];
+		return;
+	}
+	NSRect rect = [layout boundingRectForGlyphRange:glyphRange inTextContainer:container];
+	NSPoint origin = [self textContainerOrigin];
+	rect.origin.x += origin.x;
+	rect.origin.y += origin.y;
+	rect = NSInsetRect(rect, 0.0, -40.0);
+	[self scrollRectToVisible:rect];
+}
+
 - (void)appendMagicDefinition:(NSString *)definition {
 	NSString *text = [self string];
 	NSString *gap = @"";
@@ -4239,7 +4268,7 @@ static NSString *NVRegexLiteral(NSString *text) {
 		[self replaceCharactersInRange:NSMakeRange(location, 0) withString:insertion];
 		[self didChangeText];
 		[self setSelectedRange:NSMakeRange(location + [insertion length], 0)];
-		[self scrollRangeToVisible:[self selectedRange]];
+		[self revealSelectedRange];
 	}
 }
 
@@ -4266,8 +4295,10 @@ static NSString *NVRegexLiteral(NSString *text) {
 			found = result.range;
 			*stop = YES;
 		}];
-		if (found.location != NSNotFound)
+		if (found.location != NSNotFound) {
 			[self setSelectedRange:NSMakeRange(NSMaxRange(found), 0)];
+			[self revealSelectedRange];
+		}
 		return YES;
 	}
 	for (NSTextCheckingResult *match in [use matchesInString:line options:0 range:NSMakeRange(0, [line length])]) {
@@ -4283,7 +4314,7 @@ static NSString *NVRegexLiteral(NSString *text) {
 			[self setSelectedRange:NSMakeRange(NSMaxRange(found.range), 0)];
 		else
 			[self appendMagicDefinition:[NSString stringWithFormat:@"[%@]: ", rawIdentifier]];
-		[self scrollRangeToVisible:[self selectedRange]];
+		[self revealSelectedRange];
 		return YES;
 	}
 	if (!selection.length)
@@ -4322,9 +4353,10 @@ static NSString *NVRegexLiteral(NSString *text) {
 			found = result.range;
 			*stop = YES;
 		}];
-		if (found.location != NSNotFound)
+		if (found.location != NSNotFound) {
 			[self setSelectedRange:NSMakeRange(NSMaxRange(found), 0)];
-		[self scrollRangeToVisible:[self selectedRange]];
+			[self revealSelectedRange];
+		}
 		return YES;
 	}
 	NSRegularExpression *inlineNote = [NSRegularExpression regularExpressionWithPattern:@"\\[\\^(\\d+)\\]" options:0 error:nil];
@@ -4339,7 +4371,7 @@ static NSString *NVRegexLiteral(NSString *text) {
 			[self setSelectedRange:NSMakeRange(NSMaxRange(found.range), 0)];
 		else
 			[self appendMagicDefinition:[NSString stringWithFormat:@"[^%@]: ", number]];
-		[self scrollRangeToVisible:[self selectedRange]];
+		[self revealSelectedRange];
 		return YES;
 	}
 	NSUInteger number = [self highestMagicNumberForFootnote:YES] + 1;
