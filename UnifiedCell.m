@@ -180,9 +180,16 @@ NSAttributedString *AttributedStringForSelection(NSAttributedString *str, BOOL w
 	//draw note date and tags
 
 	NSMutableDictionary *baseAttrs = [self baseTextAttributes];
-	BOOL isActive = (IsLeopardOrLater && [tv selectionHighlightStyle] == NSTableViewSelectionHighlightStyleSourceList) ? YES : [tv isActiveStyle];
+	BOOL isActive = [tv isActiveStyle];
+	BOOL lightRow = [tv usesLightRowBackground];
 	
-	NSColor *textColor = ([self isHighlighted] && isActive) ? [NSColor whiteColor] : (![self isHighlighted] ? [[self class] dateColorForTint]/*[NSColor grayColor]*/ : nil);
+	NSColor *textColor = nil;
+	if ([self isHighlighted] && (isActive || !lightRow))
+		textColor = [NSColor whiteColor];
+	else if ([self isHighlighted])
+		textColor = [NSColor colorWithCalibratedWhite:0.35 alpha:1.0];
+	else
+		textColor = [[self class] dateColorForTint];
 	if (textColor)
 		[baseAttrs setObject:textColor forKey:NSForegroundColorAttributeName];
 	if (IsSnowLeopardOrLater && [self isHighlighted] && ([tv selectionHighlightStyle] == NSTableViewSelectionHighlightStyleSourceList)) {
@@ -219,7 +226,7 @@ NSAttributedString *AttributedStringForSelection(NSAttributedString *str, BOOL w
 		//clip the tags image within the bounds of the cell so that narrow columns look nicer
 		[NSGraphicsContext saveGraphicsState];
 		NSRectClip(cellFrame);
-		[noteObject drawLabelBlocksInRect:rect rightAlign:!previewIsHidden highlighted:([self isHighlighted] && isActive)];
+		[noteObject drawLabelBlocksInRect:rect rightAlign:!previewIsHidden highlighted:([self isHighlighted] && (isActive || !lightRow))];
 		[NSGraphicsContext restoreGraphicsState];
 	}
 	

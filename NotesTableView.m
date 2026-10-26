@@ -222,6 +222,13 @@ static void _CopyItemWithSelectorFromMenu(NSMenu *destMenu, NSMenu *sourceMenu, 
 	return isActiveStyle;
 }
 
+- (BOOL)usesLightRowBackground {
+	NSColor *color = [[self backgroundColor] colorUsingColorSpaceName:NSCalibratedWhiteColorSpace];
+	if (!color)
+		return YES;
+	return [color whiteComponent] >= 0.5;
+}
+
 - (void)_setActiveStyleState:(BOOL)activeStyle {
 	NoteAttributeColumn *col = [self noteAttributeColumnForIdentifier:NoteTitleColumnString];
 #if SET_DUAL_HIGHLIGHTS
@@ -1458,7 +1465,25 @@ enum { kNext_Tag = 'j', kPrev_Tag = 'k' };
     if (![self dataSource]) {
 		return;
 	}
-        [super highlightSelectionInClipRect:clipRect];
+	BOOL focused = [[self window] firstResponder] == self || [self currentEditor] != nil;
+	/* Dark Mode's inactive selection is a dark bar. On a light list that leaves dark text on it. */
+	if (focused || ![self usesLightRowBackground]) {
+		[super highlightSelectionInClipRect:clipRect];
+		return;
+	}
+	NSColor *fill = [[self backgroundColor] blendedColorWithFraction:0.16f ofColor:[NSColor blackColor]];
+	[fill setFill];
+	NSIndexSet *rows = [self selectedRowIndexes];
+	NSUInteger row = [rows firstIndex];
+	while (row != NSNotFound) {
+		NSRect rowRect = [self rectOfRow:(NSInteger)row];
+		rowRect.origin.x = 0.0;
+		rowRect.size.width = NSWidth([self bounds]);
+		NSRect drawRect = NSIntersectionRect(rowRect, clipRect);
+		if (!NSIsEmptyRect(drawRect))
+			NSRectFill(drawRect);
+		row = [rows indexGreaterThanIndex:row];
+	}
 }
 
 @end

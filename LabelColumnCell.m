@@ -64,7 +64,7 @@
 		NSRect blocksRect = cellFrame;
 		blocksRect.origin = NSMakePoint(NSMinX(cellFrame), NSMaxY(cellFrame) - ceilf(((cellFrame.size.height + 1.0) - 
 																					  ([[GlobalPrefs defaultPrefs] tableFontSize] * 1.3 + 1.5))/2.0));
-		[noteObject drawLabelBlocksInRect:blocksRect rightAlign:NO highlighted:([self isHighlighted] && [tv isActiveStyle])];
+		[noteObject drawLabelBlocksInRect:blocksRect rightAlign:NO highlighted:([self isHighlighted] && ([tv isActiveStyle] || ![tv usesLightRowBackground]))];
 		
 		[[NSGraphicsContext currentContext] restoreGraphicsState];
 	}

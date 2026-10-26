@@ -2419,7 +2419,10 @@ terminateApp:
             if (([window firstResponder]==notesTableView)||(isEditing&&([notesTableView editedRow]==rowIndex))) {//([notesTableView rowHeight]>30.0)||
                 [aCell setTextColor:[NSColor whiteColor]];
                 return;
-            }else if ([[foregrndColor colorUsingColorSpaceName:NSCalibratedWhiteColorSpace] whiteComponent]>0.5) {                    
+            } else if (![notesTableView usesLightRowBackground]) {
+                [aCell setTextColor:[NSColor whiteColor]];
+                return;
+            } else if ([[foregrndColor colorUsingColorSpaceName:NSCalibratedWhiteColorSpace] whiteComponent]>0.5) {
                 [aCell setTextColor:[NSColor colorWithCalibratedWhite:0.2 alpha:1.0]];
                 return;
             }
@@ -2908,6 +2911,7 @@ terminateApp:
     
     [notesTableView setGridColor:foregrndColor];
     [notesTableView setBackgroundColor:backgrndColor];
+    [notesTableView setNeedsDisplay:YES];
     [notationController setForegroundTextColor:foregrndColor];
     
     [textView setBackgroundColor:backgrndColor];

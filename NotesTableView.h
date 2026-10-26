@@ -73,6 +73,7 @@ typedef struct _ViewLocationContext {
 - (float)tableFontHeight;
 
 - (BOOL)isActiveStyle;
+- (BOOL)usesLightRowBackground;
 - (void)setShouldUseSecondaryHighlightColor:(BOOL)value;
 - (void)_setActiveStyleState:(BOOL)activeStyle;
 - (void)updateTitleDereferencorState;
