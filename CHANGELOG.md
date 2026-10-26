@@ -1,3 +1,27 @@
+nvALT 3.0.6
+-------------------------
+
+#### CHANGED
+
+- The default **note font** is SF Pro at 16 pt. A font you already chose stays as it is.
+- Tell you to paste the **login code** and press Return.
+
+#### NEW
+
+- Set the **note list** font from Fonts & Colors. It starts as SF Pro at 14 pt.
+
+#### IMPROVED
+
+- Leave more room above the first line of a **note**.
+
+#### FIXED
+
+- Open the **notes folder** picker when the saved folder is gone.
+- Keep **alternating rows** lined up with the grid.
+- Keep the **selected note** readable on a light list in Dark Mode when the editor has focus.
+- Submit a **Simplenote login code** once, when you press Return.
+- Say when a **login code** has expired so you can email yourself a new one.
+
 nvALT 3.0.5
 -------------------------
 
