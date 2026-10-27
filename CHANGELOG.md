@@ -1,3 +1,11 @@
+nvALT 3.0.13
+-------------------------
+
+#### CHANGED
+
+- Pasted **URLs** stay plain text unless **Enable Markdown Completion** is on.
+- **Paste Markdown Link** is hidden unless **Enable Markdown Completion** is on.
+
 nvALT 3.0.12
 -------------------------
 
