@@ -1,0 +1,168 @@
+{
+    "darkWindow" : true,
+    "lightWindow" : false,
+    "transparentTitlebar" : true,
+
+    "backgroundColor" : "#434c5f",
+    "foregroundColor" : "#e5e9f0",
+    "caretColor" : "#eceff4",
+    "selectionBackgroundColor" : "#86c0d199",
+
+    "searchField" : {
+        "foregroundColor" : "#e5e9f0",
+        "backgroundColor" : "#3b4253"
+    },
+
+    "tableView" : {
+        "fontName" : "Avenir",
+        "fontSize" : 14,
+        "rowHeight" : 34,
+        "drawBorder" : false,
+        "drawFocusRing": false
+    },
+
+    "tableViewHighlighted" : {
+        "backgroundColor" : "#8ebcbb"
+    },
+
+    "tableViewInactive" : {
+        "backgroundColor" : "#86c0d1aa",
+        "foregroundColor" : "#d8dee9"
+    },
+
+    "textView" : {
+        "backgroundColor" : "#3b4253",
+        "foregroundColor" : "#e5e9f0",
+        "caretColor" : "#86c0d1"
+    },
+
+    "strong" : {
+        "bold" : 1,
+        "foregroundColor" : "#eceff4"
+    },
+    "emphasis" : {
+        "italic" : 1
+    },
+    "superscript" : {
+        "superscript" : 1
+    },
+    "subscript" : {
+        "superscript" : -1
+    },
+    "criticAddition" : {
+        "foregroundColor" : "#a2bf8a"
+    },
+    "criticDeletion" : {
+        "foregroundColor" : "#c66b73"
+    },
+    "criticSubstitution" : {
+        "foregroundColor" : "#d2876d"
+    },
+    "criticHighlight" : {
+        "foregroundColor" : "#eccc87"
+    },
+    "criticComment" : {
+        "foregroundColor" : "#80a0c2"
+    },
+    "blockquote" : {
+        "backgroundColor" : "#7f9ba333",
+        "foregroundColor" : "#d8dee9"
+    },
+    "codeBlock" : {
+        "backgroundColor" : "#2e3440",
+        "foregroundColor" : "#d8dee9",
+        "fontName" : "Menlo",
+        "fontScale" : 0.92,
+        "textAlignment" : 1
+    },
+    "codeSpan" : {
+        "fontName" : "Menlo",
+        "fontScale" : 0.92,
+        "backgroundColor" : "#2e3440",
+        "foregroundColor" : "#d8dee9",
+        "mono"  : 1
+    },
+    "heading" : {
+        "bold" : 1,
+        "foregroundColor" : "#eccc87dd"
+    },
+    "heading1" : {
+        "foregroundColor" : "#eccc87",
+        "fontScale" : 1.4
+    },
+    "heading2" : {
+        "foregroundColor" : "#eccc87ee",
+        "fontScale" : 1.2
+    },
+    "heading3" : {
+        "foregroundColor" : "#eccc87dd",
+        "fontScale" : 1.1
+    },
+    "math" : {
+        "foregroundColor" : "#d8dee9",
+        "backgroundColor" : "#b08fbf2f"
+    },
+    "table" : {
+        "backgroundColor" : "#75657d33",
+        "foregroundColor" : "#8ebcbb"
+    },
+    "pairs" : {
+        "foregroundColor" : "#86c0d1"
+    },
+    "parens" : {
+        "foregroundColor" : "#e5e9f0"
+    },
+    "braces" : {
+        "foregroundColor" : "#e5e9f0"
+    },
+    "linkParens" : {
+        "foregroundColor" : "#86c0d1",
+        "markupForegroundColor": "#eceff4"
+    },
+    "quoteDouble" : {
+        "foregroundColor" : "#eceff4"
+    },
+    "quoteSingle" : {
+        "foregroundColor" : "#eceff4"
+    },
+    "footnote" : {
+        "foregroundColor" : "#8ebcbb"
+    },
+    "abbreviation" : {
+        "foregroundColor" : "#8ebcbb"
+    },
+    "citation" : {
+        "foregroundColor" : "#8ebcbb"
+    },
+    "glossary" : {
+        "foregroundColor" : "#8ebcbb"
+    },
+    "definition" : {
+        "foregroundColor" : "#c7cedb"
+    },
+    "variable" : {
+        "foregroundColor" : "#8ebcbb"
+    },
+    "markup" : {
+        "foregroundColor" : "#b08fbf"
+    },
+    "metadata" : {
+        "backgroundColor" : "#4c566baa",
+        "foregroundColor" : "#aaa"
+    },
+    "definitionAbbreviation" : {
+        "foregroundColor" : "#a2bf8a"
+    },
+    "definitionCitation" : {
+        "foregroundColor" : "#a2bf8a"
+    },
+    "definitionFootnote" : {
+        "foregroundColor" : "#a2bf8a"
+    },
+    "definitionGlossary" : {
+        "foregroundColor" : "#a2bf8a"
+    },
+    "definitionLink" : {
+        "foregroundColor" : "#a2bf8a"
+    }
+}

@@ -1,0 +1,305 @@
+/*
+  Github style for nvUltra by Brett Terpstra and Fletcher Penney
+*/
+body {
+  font-family: -apple-system, BlinkMacSystemFont, Segoe UI, Helvetica, Arial, sans-serif, Apple Color Emoji, Segoe UI Emoji, Segoe UI Symbol;
+  font-size: 16px;
+  line-height: 1.5;
+  word-wrap: break-word;
+  padding: 50px !important;
+  margin: 10px `0px;
+  border: 1px solid #ccc;
+}
+
+body:before {
+  content: "";
+  display: table
+}
+
+body:after {
+  content: "";
+  display: table
+}
+
+body>:first-child {
+  margin-top: 0 !important
+}
+
+body>:last-child {
+  margin-bottom: 0 !important
+}
+
+a:not([href]) {
+  color: inherit;
+  text-decoration: none
+}
+
+a {
+  color: #0366d6;
+  text-decoration: none;
+}
+
+a:active, a:hover {
+  outline-width: 0;
+}
+
+a:hover {
+  text-decoration: underline;
+}
+
+blockquote, details, dl, ol, p, pre, table, ul {
+  margin-bottom: 16px;
+  margin-top: 0
+}
+
+hr {
+  background-color: #e1e4e8;
+  border: 0;
+  height: .25em;
+  margin: 24px 0;
+  padding: 0
+}
+
+blockquote {
+  border-left: .25em solid #dfe2e5;
+  color: #6a737d;
+  padding: 0 1em
+}
+
+blockquote>:first-child {
+  margin-top: 0
+}
+
+blockquote>:last-child {
+  margin-bottom: 0
+}
+
+kbd {
+  background-color: #fafbfc;
+  border: 1px solid #c6cbd1;
+  border-bottom-color: #959da5;
+  border-radius: 3px;
+  box-shadow: inset 0 -1px 0 #959da5;
+  color: #444d56;
+  display: inline-block;
+  font-size: 11px;
+  line-height: 10px;
+  padding: 3px 5px;
+  vertical-align: middle
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-weight: 600;
+  line-height: 1.25;
+  margin-bottom: 16px;
+  margin-top: 24px
+}
+
+h1:hover .anchor .octicon-link, h2:hover .anchor .octicon-link, h3:hover .anchor .octicon-link, h4:hover .anchor .octicon-link, h5:hover .anchor .octicon-link, h6:hover .anchor .octicon-link {
+  visibility: visible
+}
+
+h1 code, h1 tt, h2 code, h2 tt, h3 code, h3 tt, h4 code, h4 tt, h5 code, h5 tt, h6 code, h6 tt {
+  font-size: inherit
+}
+
+h1 {
+  font-size: 2em
+}
+
+h1, h2 {
+  border-bottom: 1px solid #eaecef;
+  padding-bottom: .3em
+}
+
+h2 {
+  font-size: 1.5em
+}
+
+h3 {
+  font-size: 1.25em
+}
+
+h4 {
+  font-size: 1em
+}
+
+h5 {
+  font-size: .875em
+}
+
+h6 {
+  color: #6a737d;
+  font-size: .85em
+}
+
+ol, ul {
+  padding-left: 2em
+}
+
+ol ol, ol ul, ul ol, ul ul {
+  margin-bottom: 0;
+  margin-top: 0
+}
+
+li {
+  word-wrap: break-all
+}
+
+li>p {
+  margin-top: 16px
+}
+
+li+li {
+  margin-top: .25em
+}
+
+dl {
+  padding: 0
+}
+
+dl dt {
+  font-size: 1em;
+  font-style: italic;
+  font-weight: 600;
+  margin-top: 16px;
+  padding: 0
+}
+
+dl dd {
+  margin-bottom: 16px;
+  padding: 0 16px
+}
+
+table {
+  display: block;
+  overflow: auto;
+  width: 100%
+}
+
+table th {
+  font-weight: 600
+}
+
+table td, table th {
+  border: 1px solid #dfe2e5;
+  padding: 6px 13px
+}
+
+table tr {
+  background-color: #fff;
+  border-top: 1px solid #c6cbd1
+}
+
+table tr:nth-child(2n) {
+  background-color: #f6f8fa
+}
+
+table img {
+  background-color: transparent
+}
+
+img {
+  background-color: #fff;
+  box-sizing: content-box;
+  max-width: 100%
+}
+
+img[align=right] {
+  padding-left: 20px
+}
+
+img[align=left] {
+  padding-right: 20px
+}
+
+.emoji {
+  background-color: transparent;
+  max-width: none;
+  vertical-align: text-top
+}
+
+code, tt {
+  background-color: rgba(27, 31, 35, .05);
+  border-radius: 3px;
+  font-size: 85%;
+  margin: 0;
+  padding: .2em .4em
+}
+
+code br, tt br {
+  display: none
+}
+
+del code {
+  text-decoration: inherit
+}
+
+pre {
+  word-wrap: normal
+}
+
+pre>code {
+  background: transparent;
+  border: 0;
+  font-size: 100%;
+  margin: 0;
+  padding: 0;
+  white-space: pre;
+  word-break: normal
+}
+
+.highlight {
+  margin-bottom: 16px
+}
+
+.highlight pre {
+  margin-bottom: 0;
+  word-break: normal
+}
+
+.highlight pre, pre {
+  background-color: #f6f8fa;
+  border-radius: 3px;
+  font-size: 85%;
+  line-height: 1.45;
+  overflow: auto;
+  padding: 16px
+}
+
+pre code, pre tt {
+  background-color: transparent;
+  border: 0;
+  display: inline;
+  line-height: inherit;
+  margin: 0;
+  max-width: auto;
+  overflow: visible;
+  padding: 0;
+  word-wrap: normal
+}
+
+/*
+  CriticMarkup CSS by Fletcher T. Penney
+
+  Shows CSS tricks to improve visibility of CriticMarkup output
+*/
+del {
+  background: #fae6e6;
+}
+
+ins {
+  background: #ecfce6;
+}
+
+span.critic.comment {
+  color: #0000bb;
+}
+
+span.critic.comment::before {
+  content: "{>> ";
+}
+
+span.critic.comment::after {
+  content: " <<}";
+}
