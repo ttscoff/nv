@@ -315,13 +315,33 @@ static const NSUInteger NVThemeMaxDownloadBytes = 2 * 1024 * 1024;
 	NSURLSessionDataTask *task = [[NSURLSession sharedSession] dataTaskWithURL:sourceURL completionHandler:^(NSData *data, NSURLResponse *response, NSError *error) {
 		dispatch_async(dispatch_get_main_queue(), ^{
 			NSString *importError = nil;
-			NSString *filename = [response suggestedFilename];
-			if (![filename length])
-				filename = [sourceURL lastPathComponent];
-			BOOL ok = !error && [self importThemeData:data filename:filename select:YES errorDescription:&importError];
+			// Prefer the name in the link. A text/plain response renames Svelte.theme to Svelte.theme.txt.
+			NSString *filename = [self safeThemeFilename:[sourceURL lastPathComponent]];
+			if (![filename length]) {
+				NSString *suggested = [response suggestedFilename];
+				if ([[suggested pathExtension] caseInsensitiveCompare:@"txt"] == NSOrderedSame) {
+					NSString *stripped = [self safeThemeFilename:[suggested stringByDeletingPathExtension]];
+					if (stripped)
+						suggested = stripped;
+				}
+				filename = [self safeThemeFilename:suggested];
+				if (![filename length])
+					filename = [suggested length] ? suggested : [sourceURL lastPathComponent];
+			}
+			NSInteger status = 0;
+			if ([response isKindOfClass:[NSHTTPURLResponse class]])
+				status = [(NSHTTPURLResponse *)response statusCode];
+			BOOL httpFailed = status >= 400;
+			BOOL ok = !error && !httpFailed && [self importThemeData:data filename:filename select:YES errorDescription:&importError];
 			if (!ok) {
-				if (!importError)
-					importError = [error localizedDescription] ?: NSLocalizedString(@"The download failed.", @"theme download error");
+				if (!importError) {
+					if (error)
+						importError = [error localizedDescription];
+					else if (httpFailed)
+						importError = [NSString stringWithFormat:NSLocalizedString(@"The download failed (%ld).", @"theme http error"), (long)status];
+					else
+						importError = NSLocalizedString(@"The download failed.", @"theme download error");
+				}
 				[self presentThemeMessage:NSLocalizedString(@"Could not import theme", @"theme import title") detail:importError];
 			} else {
 				[NSApp activateIgnoringOtherApps:YES];
