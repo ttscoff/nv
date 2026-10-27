@@ -38,6 +38,7 @@
 #import "BookmarksController.h"
 #import "SyncSessionController.h"
 #import "MultiplePageView.h"
+#import "NVThemeManager.h"
 #import "InvocationRecorder.h"
 #import "LinearDividerShader.h"
 #import "SecureTextEntryManager.h"
@@ -143,6 +144,7 @@ BOOL splitViewAwoke;
         [nc addObserver:self selector:@selector(toggleStatusItem:) name:@"AppShouldToggleStatusItem" object:nil];
         
         [nc addObserver:self selector:@selector(resetModTimers:) name:@"ModTimersShouldReset" object:nil];
+        [nc addObserver:self selector:@selector(themesDidChange:) name:NVThemesDidChangeNotification object:nil];
         [nc addObserver:self selector:@selector(releaseTagEditor:) name:@"TagEditorShouldRelease" object:nil];
         // Setup URL Handling
         NSAppleEventManager *appleEventManager = [NSAppleEventManager sharedAppleEventManager];
@@ -520,12 +522,23 @@ terminateApp:
 	[NSApp terminate:self];
 }
 
+- (void)themesDidChange:(NSNotification *)note {
+	[self updateColorScheme];
+	if (previewController)
+		[previewController themesDidChange:note];
+}
+
 - (void)handleGetURLEvent:(NSAppleEventDescriptor *)event withReplyEvent:(NSAppleEventDescriptor *)replyEvent {
 	
 	NSURL *fullURL = [NSURL URLWithString:[[event paramDescriptorForKeyword:keyDirectObject] stringValue]];
 
 	if ([[fullURL host] isEqualToString:@"share-auth"]) {
 		[previewController handleShareAuthURL:fullURL];
+		return;
+	}
+	NSString *themeCommand = [[fullURL host] lowercaseString];
+	if ([themeCommand isEqualToString:@"add-theme"] || [themeCommand isEqualToString:@"import-theme"]) {
+		[[NVThemeManager sharedManager] importThemeFromAppURL:fullURL];
 		return;
 	}
 	
@@ -2478,8 +2491,16 @@ terminateApp:
 
 - (void)tableView:(NSTableView *)aTableView willDisplayCell:(id)aCell forTableColumn:(NSTableColumn *)aTableColumn row:(NSInteger)rowIndex {
     if (aTableView==notesTableView) {
-        if ([aCell isHighlighted]) {
-            if (([window firstResponder]==notesTableView)||(isEditing&&([notesTableView editedRow]==rowIndex))) {//([notesTableView rowHeight]>30.0)||
+        NVEditorTheme *listTheme = [[NVThemeManager sharedManager] currentEditorTheme];
+        BOOL rowIsFocused = ([window firstResponder]==notesTableView)||(isEditing&&([notesTableView editedRow]==rowIndex));
+        NSColor *rowColor = foregrndColor;
+        if (listTheme) {
+            if ([aCell isHighlighted])
+                rowColor = rowIsFocused ? [listTheme listSelectionForegroundColor] : [listTheme listInactiveSelectionForegroundColor];
+            else
+                rowColor = [listTheme listForegroundColor] ?: foregrndColor;
+        } else if ([aCell isHighlighted]) {
+            if (rowIsFocused) {//([notesTableView rowHeight]>30.0)||
                 [aCell setTextColor:[NSColor whiteColor]];
                 return;
             } else if (![notesTableView usesLightRowBackground]) {
@@ -2490,7 +2511,23 @@ terminateApp:
                 return;
             }
         }
-        [aCell setTextColor:foregrndColor];
+        if (!rowColor)
+            rowColor = foregrndColor;
+        [aCell setTextColor:rowColor];
+        NSAttributedString *shown = [aCell attributedStringValue];
+        if (listTheme && rowColor && [shown length]) {
+            NSMutableAttributedString *colored = [shown mutableCopy];
+            NSRange titleRange = [[colored string] rangeOfString:@"\n"];
+            if ([aCell isHighlighted] || titleRange.location == NSNotFound) {
+                [colored addAttribute:NSForegroundColorAttributeName value:rowColor range:NSMakeRange(0, [colored length])];
+            } else {
+                [colored addAttribute:NSForegroundColorAttributeName value:rowColor range:NSMakeRange(0, titleRange.location)];
+                NSColor *previewColor = [[listTheme listBackgroundColor] blendedColorWithFraction:0.45 ofColor:rowColor] ?: rowColor;
+                [colored addAttribute:NSForegroundColorAttributeName value:previewColor range:NSMakeRange(titleRange.location, [colored length] - titleRange.location)];
+            }
+            [aCell setAttributedStringValue:colored];
+            [colored release];
+        }
     }
 }
 
@@ -2974,6 +3011,17 @@ terminateApp:
     
     [notesTableView setGridColor:foregrndColor];
     [notesTableView setBackgroundColor:backgrndColor];
+    NVEditorTheme *listTheme = [[NVThemeManager sharedManager] currentEditorTheme];
+    if (listTheme) {
+        NSColor *listBackground = [listTheme listBackgroundColor];
+        NSColor *listForeground = [listTheme listForegroundColor];
+        if (listBackground) {
+            [notesTableView setBackgroundColor:listBackground];
+            [[notesTableView enclosingScrollView] setBackgroundColor:listBackground];
+        }
+        if (listForeground)
+            [NotesTableHeaderCell setTxtColor:listForeground];
+    }
     [notesTableView setNeedsDisplay:YES];
     [notationController setForegroundTextColor:foregrndColor];
     

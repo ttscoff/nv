@@ -28,6 +28,7 @@
 #import "UnifiedCell.h"
 #import "HeaderViewWithMenu.h"
 #import "NSString_NV.h"
+#import "NVThemeManager.h"
 #import "NotesTableHeaderCell.h"
 #import "LinkingEditor.h"
 #import "AppController.h"
@@ -223,10 +224,16 @@ static void _CopyItemWithSelectorFromMenu(NSMenu *destMenu, NSMenu *sourceMenu, 
 }
 
 - (BOOL)usesLightRowBackground {
-	NSColor *color = [[self backgroundColor] colorUsingColorSpaceName:NSCalibratedWhiteColorSpace];
+	NSColor *color = [[self backgroundColor] colorUsingColorSpace:[NSColorSpace sRGBColorSpace]];
 	if (!color)
+		color = [[self backgroundColor] colorUsingColorSpaceName:NSCalibratedWhiteColorSpace];
+	if (!color || [color numberOfComponents] < 2)
 		return YES;
-	return [color whiteComponent] >= 0.5;
+	CGFloat components[4] = {0, 0, 0, 0};
+	[color getComponents:components];
+	if ([color numberOfComponents] >= 3)
+		return ((0.299 * components[0]) + (0.587 * components[1]) + (0.114 * components[2])) >= 0.5;
+	return components[0] >= 0.5;
 }
 
 - (void)_setActiveStyleState:(BOOL)activeStyle {
@@ -1406,10 +1413,10 @@ enum { kNext_Tag = 'j', kPrev_Tag = 'k' };
     }else{
         NSColor *backColor=[self backgroundColor];
         NSColor *altColor;
-		if ([[backColor colorUsingColorSpaceName:NSCalibratedWhiteColorSpace]whiteComponent] < 0.5f) {
-			altColor = [backColor blendedColorWithFraction:0.05f ofColor:[NSColor whiteColor]];
-		} else {
+		if ([self usesLightRowBackground]) {
 			altColor = [backColor blendedColorWithFraction:0.05f ofColor:[NSColor blackColor]];
+		} else {
+			altColor = [backColor blendedColorWithFraction:0.05f ofColor:[NSColor whiteColor]];
         }
         
         /* Bands used to be painted at rowHeight + intercellSpacing from y=0.
@@ -1465,7 +1472,24 @@ enum { kNext_Tag = 'j', kPrev_Tag = 'k' };
     if (![self dataSource]) {
 		return;
 	}
+	NVEditorTheme *listTheme = [[NVThemeManager sharedManager] currentEditorTheme];
 	BOOL focused = [[self window] firstResponder] == self || [self currentEditor] != nil;
+	NSColor *themedFill = listTheme ? (focused ? [listTheme listSelectionColor] : [listTheme listInactiveSelectionColor]) : nil;
+	if (themedFill) {
+		[themedFill setFill];
+		NSIndexSet *themedRows = [self selectedRowIndexes];
+		NSUInteger themedRow = [themedRows firstIndex];
+		while (themedRow != NSNotFound) {
+			NSRect rowRect = [self rectOfRow:(NSInteger)themedRow];
+			rowRect.origin.x = 0.0;
+			rowRect.size.width = NSWidth([self bounds]);
+			NSRect drawRect = NSIntersectionRect(rowRect, clipRect);
+			if (!NSIsEmptyRect(drawRect))
+				NSRectFillUsingOperation(drawRect, NSCompositingOperationSourceOver);
+			themedRow = [themedRows indexGreaterThanIndex:themedRow];
+		}
+		return;
+	}
 	/* Dark Mode's inactive selection is a dark bar. On a light list that leaves dark text on it. */
 	if (focused || ![self usesLightRowBackground]) {
 		[super highlightSelectionInClipRect:clipRect];

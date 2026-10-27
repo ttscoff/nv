@@ -106,5 +106,9 @@
 - (IBAction)toggleHideDockIcon:(id)sender;
 - (IBAction)toggleKeepsTextWidthInWindow:(id)sender;
 - (IBAction)setMaxWidth:(id)sender;
+- (IBAction)changedEditorTheme:(id)sender;
+- (IBAction)changedPreviewTheme:(id)sender;
+- (IBAction)importThemes:(id)sender;
+- (IBAction)openThemesFolder:(id)sender;
 
 @end

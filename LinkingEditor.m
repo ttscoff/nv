@@ -20,6 +20,7 @@
 #import "AttributedPlainText.h"
 #import "NSString_NV.h"
 #import "NVPasswordGenerator.h"
+#import "NVThemeManager.h"
 #import "ETClipView.h"
 //#import "NSTextFinder.h"
 //#import "NVTextFinderAdditions.h"
@@ -208,6 +209,27 @@ if ([selectorString isEqualToString:SEL_STR(setNoteBodyFont:sender:)]) {
 }
 
 - (void)updateTextColors {
+	NVEditorTheme *editorTheme = [[NVThemeManager sharedManager] currentEditorTheme];
+	if (editorTheme) {
+		NSColor *appFG = [(AppController *)[NSApp delegate] foregrndColor];
+		NSColor *appBG = [(AppController *)[NSApp delegate] backgrndColor];
+		NSColor *fgColor = [editorTheme editorForegroundColor] ?: appFG ?: [NSColor textColor];
+		NSColor *bgColor = [editorTheme editorBackgroundColor] ?: appBG ?: [NSColor textBackgroundColor];
+		[self setBackgroundColor:bgColor];
+		[[self enclosingScrollView] setBackgroundColor:bgColor];
+		if (IsLionOrLater && [self textFinderIsVisible])
+			[[self window] invalidateCursorRectsForView:[[self enclosingScrollView] findBarView]];
+		NSColor *caret = [editorTheme editorCaretColor] ?: [self _insertionPointColorForForegroundColor:fgColor backgroundColor:bgColor];
+		NSColor *selection = [editorTheme editorSelectionColor] ?: [self _selectionColorForForegroundColor:fgColor backgroundColor:bgColor];
+		[self setInsertionPointColor:caret];
+		[self setLinkTextAttributes:[self preferredLinkAttributes]];
+		[self setSelectedTextAttributes:[NSDictionary dictionaryWithObject:selection forKey:NSBackgroundColorAttributeName]];
+		[self setTypingAttributes:[prefsController noteBodyAttributes]];
+		[[self enclosingScrollView] setNeedsDisplay:YES];
+		[self setNeedsDisplay:YES];
+		[self highlightMarkdownSyntax];
+		return;
+	}
 	NSColor *fgColor = [(AppController *)[NSApp delegate] foregrndColor];
 	NSColor *bgColor = [self backgroundColor];
     if (bgColor!=[(AppController *)[NSApp delegate]backgrndColor]) {
@@ -330,10 +352,21 @@ CGFloat _perceptualColorDifference(NSColor*a, NSColor*b) {
 	if (![prefsController URLsAreClickable])
 		return [NSDictionary dictionary];
 	
+	NSColor *fgColor = [(AppController *)[NSApp delegate] foregrndColor];
+	NSColor *bgColor = [(AppController *)[NSApp delegate] backgrndColor];
+	NVEditorTheme *editorTheme = [[NVThemeManager sharedManager] currentEditorTheme];
+	NSColor *linkColor = nil;
+	if (editorTheme) {
+		fgColor = [editorTheme editorForegroundColor] ?: fgColor;
+		bgColor = [editorTheme editorBackgroundColor] ?: bgColor;
+		linkColor = [[editorTheme styleForKey:@"linkParens"] foregroundColor];
+	}
+	if (!linkColor)
+		linkColor = [self _linkColorForForegroundColor:fgColor backgroundColor:bgColor];
 	return [NSDictionary dictionaryWithObjectsAndKeys:
 			[NSCursor pointingHandCursor], NSCursorAttributeName,
 			[NSNumber numberWithInt:NSUnderlineStyleSingle], NSUnderlineStyleAttributeName,
-			[self _linkColorForForegroundColor:[(AppController *)[NSApp delegate] foregrndColor] backgroundColor:[(AppController *)[NSApp delegate] backgrndColor]],
+			linkColor,
 			NSForegroundColorAttributeName, nil];
 	
 	/*
@@ -896,16 +929,213 @@ static NSColor *NVBlendColors(NSColor *first, NSColor *second, CGFloat fraction,
 	}
 }
 
+- (void)reapplySearchHighlights {
+	if (![prefsController highlightSearchTerms])
+		return;
+	NSString *typed = [(AppController *)[NSApp delegate] typedString];
+	if ([typed length])
+		[self highlightTermsTemporarilyReturningFirstRange:typed avoidHighlight:NO];
+}
+
+- (void)paintThemeRange:(NSRange)range style:(NVThemeStyle *)style baseFont:(NSFont *)baseFont useBaseFont:(BOOL)useBaseFont forceStrikethrough:(BOOL)forceStrikethrough {
+	NSString *string = [self string];
+	if (range.length == 0 || range.location == NSNotFound || NSMaxRange(range) > [string length])
+		return;
+	NSMutableDictionary *attrs = [NSMutableDictionary dictionary];
+	NSColor *foreground = [style foregroundColor];
+	NSColor *background = [style backgroundColor];
+	if (foreground)
+		[attrs setObject:foreground forKey:NSForegroundColorAttributeName];
+	if (background)
+		[attrs setObject:background forKey:NSBackgroundColorAttributeName];
+	NSFont *font = [style fontBasedOnFont:baseFont];
+	if (!font && useBaseFont && baseFont)
+		font = baseFont;
+	if (font)
+		[attrs setObject:font forKey:NSFontAttributeName];
+	if (forceStrikethrough || [style isStrikethrough])
+		[attrs setObject:[NSNumber numberWithInteger:NSUnderlineStyleSingle] forKey:NSStrikethroughStyleAttributeName];
+	if (![attrs count])
+		return;
+	NSTextStorage *storage = [self textStorage];
+	NSLayoutManager *layout = [self layoutManager];
+	NSUInteger index = range.location;
+	NSUInteger end = NSMaxRange(range);
+	while (index < end) {
+		NSRange effective = NSMakeRange(0, 0);
+		id link = [storage attribute:NSLinkAttributeName atIndex:index longestEffectiveRange:&effective inRange:NSMakeRange(0, [string length])];
+		NSRange slice = NSIntersectionRange(range, effective);
+		if (slice.length && !link)
+			[layout addTemporaryAttributes:attrs forCharacterRange:slice];
+		if (NSMaxRange(effective) <= index)
+			break;
+		index = NSMaxRange(effective);
+	}
+}
+
+- (void)paintThemeMatches:(NSRegularExpression *)regex string:(NSString *)string content:(NVThemeStyle *)content marker:(NVThemeStyle *)marker baseFont:(NSFont *)baseFont contentGroup:(NSInteger)contentGroup delimiterGroup:(NSInteger)delimiterGroup hasCloser:(BOOL)hasCloser forceStrikethrough:(BOOL)forceStrikethrough {
+	if (!regex)
+		return;
+	[regex enumerateMatchesInString:string options:0 range:NSMakeRange(0, [string length]) usingBlock:^(NSTextCheckingResult *result, NSMatchingFlags flags, BOOL *stop) {
+		NSRange whole = [result range];
+		[self paintThemeRange:whole style:content baseFont:baseFont useBaseFont:NO forceStrikethrough:forceStrikethrough];
+		if (delimiterGroup > 0 && (NSInteger)[result numberOfRanges] > delimiterGroup) {
+			NSRange opener = [result rangeAtIndex:(NSUInteger)delimiterGroup];
+			if (opener.location != NSNotFound && opener.length) {
+				[self paintThemeRange:opener style:marker baseFont:baseFont useBaseFont:YES forceStrikethrough:NO];
+				if (hasCloser && whole.length >= opener.length * 2) {
+					NSRange closer = NSMakeRange(NSMaxRange(whole) - opener.length, opener.length);
+					if (closer.location >= NSMaxRange(opener))
+						[self paintThemeRange:closer style:marker baseFont:baseFont useBaseFont:YES forceStrikethrough:NO];
+				}
+			}
+		}
+		if (contentGroup > 0 && (NSInteger)[result numberOfRanges] > contentGroup) {
+			NSRange inside = [result rangeAtIndex:(NSUInteger)contentGroup];
+			if (inside.location != NSNotFound && inside.length)
+				[self paintThemeRange:inside style:content baseFont:baseFont useBaseFont:NO forceStrikethrough:forceStrikethrough];
+		}
+	}];
+}
+
+- (void)highlightThemedFencedCodeInString:(NSString *)string code:(NVThemeStyle *)code marker:(NVThemeStyle *)marker baseFont:(NSFont *)baseFont {
+	NSUInteger length = [string length];
+	NSUInteger index = 0;
+	while (index < length) {
+		NSRange lineRange = [string lineRangeForRange:NSMakeRange(index, 0)];
+		NSString *trimmed = [[string substringWithRange:lineRange] stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
+		BOOL backtick = [trimmed hasPrefix:@"```"];
+		BOOL tilde = [trimmed hasPrefix:@"~~~"];
+		if (!backtick && !tilde) {
+			index = NSMaxRange(lineRange);
+			continue;
+		}
+		NSString *fence = backtick ? @"```" : @"~~~";
+		NSRange openLine = lineRange;
+		NSUInteger scan = NSMaxRange(lineRange);
+		BOOL closed = NO;
+		while (scan < length) {
+			NSRange nextLine = [string lineRangeForRange:NSMakeRange(scan, 0)];
+			NSString *nextTrimmed = [[string substringWithRange:nextLine] stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
+			scan = NSMaxRange(nextLine);
+			if ([nextTrimmed hasPrefix:fence]) {
+				[self paintThemeRange:NSMakeRange(openLine.location, scan - openLine.location) style:code baseFont:baseFont useBaseFont:NO forceStrikethrough:NO];
+				[self paintThemeRange:openLine style:marker baseFont:baseFont useBaseFont:YES forceStrikethrough:NO];
+				[self paintThemeRange:nextLine style:marker baseFont:baseFont useBaseFont:YES forceStrikethrough:NO];
+				closed = YES;
+				break;
+			}
+		}
+		if (!closed) {
+			[self paintThemeRange:NSMakeRange(openLine.location, length - openLine.location) style:code baseFont:baseFont useBaseFont:NO forceStrikethrough:NO];
+			[self paintThemeRange:openLine style:marker baseFont:baseFont useBaseFont:YES forceStrikethrough:NO];
+			return;
+		}
+		index = scan;
+	}
+}
+
+- (void)highlightMarkdownSyntaxWithTheme:(NVEditorTheme *)theme {
+	NSLayoutManager *layout = [self layoutManager];
+	NSString *string = [self string];
+	NSRange fullRange = NSMakeRange(0, [string length]);
+	if (layout && fullRange.length) {
+		[layout removeTemporaryAttribute:NSForegroundColorAttributeName forCharacterRange:fullRange];
+		[layout removeTemporaryAttribute:NSBackgroundColorAttributeName forCharacterRange:fullRange];
+		[layout removeTemporaryAttribute:NSStrikethroughStyleAttributeName forCharacterRange:fullRange];
+		[layout removeTemporaryAttribute:NSFontAttributeName forCharacterRange:fullRange];
+	}
+	if (!layout || !fullRange.length || !prefsController) {
+		[self highlightWritingGremlins];
+		[self reapplySearchHighlights];
+		return;
+	}
+	NSFont *baseFont = [prefsController noteBodyFont] ?: [NSFont userFontOfSize:14.0];
+	NSColor *foreground = [theme editorForegroundColor] ?: [NSColor textColor];
+	NVThemeStyle *baseStyle = [NVThemeStyle styleWithForegroundColor:foreground];
+	NVThemeStyle *markup = [theme styleForKey:@"markup"] ?: baseStyle;
+	NVThemeStyle *link = [theme styleForKey:@"linkParens"] ?: [NVThemeStyle styleWithForegroundColor:[[self preferredLinkAttributes] objectForKey:NSForegroundColorAttributeName]];
+	NVThemeStyle *code = [theme styleForKey:@"codeSpan"] ?: [theme styleForKey:@"codeBlock"] ?: baseStyle;
+	NVThemeStyle *codeBlock = [theme styleForKey:@"codeBlock"] ?: code;
+	NVThemeStyle *quote = [theme styleForKey:@"blockquote"] ?: baseStyle;
+	NVThemeStyle *strong = [theme styleForKey:@"strong"] ?: baseStyle;
+	NVThemeStyle *emphasis = [theme styleForKey:@"emphasis"] ?: baseStyle;
+	NVThemeStyle *strike = [theme styleForKey:@"criticDeletion"] ?: baseStyle;
+
+	[self paintThemeRange:fullRange style:baseStyle baseFont:baseFont useBaseFont:NO forceStrikethrough:NO];
+
+	static NSRegularExpression *headingRegex;
+	static NSRegularExpression *quoteRegex;
+	static NSRegularExpression *listRegex;
+	static NSRegularExpression *emphasisRegex;
+	static NSRegularExpression *strikeRegex;
+	static NSRegularExpression *linkRegex;
+	static NSRegularExpression *wikiRegex;
+	static NSRegularExpression *codeRegex;
+	static NSRegularExpression *ruleRegex;
+	static dispatch_once_t once;
+	dispatch_once(&once, ^{
+		headingRegex = [NVMarkdownRegex(@"^(#{1,6})[ \\t]+(.+)$") retain];
+		quoteRegex = [NVMarkdownRegex(@"^([ \\t]{0,3}>)(.*)$") retain];
+		listRegex = [NVMarkdownRegex(@"^[ \\t]*(?:[-+*]|\\d+[.)])(?=[ \\t])") retain];
+		emphasisRegex = [NVMarkdownRegex(@"(?<![A-Za-z0-9])(\\*\\*|__|\\*|_)(?!\\s)([^\\n]+?)(?<!\\s)\\1(?![A-Za-z0-9])") retain];
+		strikeRegex = [NVMarkdownRegex(@"~~(?!\\s)([^\\n]+?)(?<!\\s)~~") retain];
+		linkRegex = [NVMarkdownRegex(@"!?\\[([^\\]\\n]*)\\]\\([^\\)\\n]*\\)") retain];
+		wikiRegex = [NVMarkdownRegex(@"\\[\\[([^\\]\\n]+)\\]\\]") retain];
+		codeRegex = [NVMarkdownRegex(@"(`+)([^`\\n]+?)\\1") retain];
+		ruleRegex = [NVMarkdownRegex(@"^[ \\t]{0,3}(?:(?:\\*[ \\t]*){3,}|(?:-[ \\t]*){3,}|(?:_[ \\t]*){3,})$") retain];
+	});
+
+	[self paintThemeMatches:quoteRegex string:string content:quote marker:markup baseFont:baseFont contentGroup:2 delimiterGroup:1 hasCloser:NO forceStrikethrough:NO];
+	[headingRegex enumerateMatchesInString:string options:0 range:fullRange usingBlock:^(NSTextCheckingResult *result, NSMatchingFlags flags, BOOL *stop) {
+		NSRange hashes = [result rangeAtIndex:1];
+		NSRange text = [result rangeAtIndex:2];
+		NSUInteger level = hashes.length;
+		NVThemeStyle *heading = [theme styleForHeadingLevel:level] ?: baseStyle;
+		[self paintThemeRange:text style:heading baseFont:baseFont useBaseFont:NO forceStrikethrough:NO];
+		[self paintThemeRange:hashes style:markup baseFont:baseFont useBaseFont:YES forceStrikethrough:NO];
+	}];
+	[emphasisRegex enumerateMatchesInString:string options:0 range:fullRange usingBlock:^(NSTextCheckingResult *result, NSMatchingFlags flags, BOOL *stop) {
+		NSRange delimiter = [result rangeAtIndex:1];
+		NSRange text = [result rangeAtIndex:2];
+		NSString *markerText = delimiter.location == NSNotFound ? @"" : [string substringWithRange:delimiter];
+		BOOL isStrong = [markerText length] > 1;
+		[self paintThemeRange:text style:(isStrong ? strong : emphasis) baseFont:baseFont useBaseFont:NO forceStrikethrough:NO];
+		[self paintThemeRange:delimiter style:markup baseFont:baseFont useBaseFont:YES forceStrikethrough:NO];
+		if (delimiter.length && [result range].length >= delimiter.length * 2) {
+			NSRange closer = NSMakeRange(NSMaxRange([result range]) - delimiter.length, delimiter.length);
+			[self paintThemeRange:closer style:markup baseFont:baseFont useBaseFont:YES forceStrikethrough:NO];
+		}
+	}];
+	[self paintThemeMatches:strikeRegex string:string content:strike marker:markup baseFont:baseFont contentGroup:1 delimiterGroup:0 hasCloser:NO forceStrikethrough:YES];
+	[self paintThemeMatches:linkRegex string:string content:link marker:markup baseFont:baseFont contentGroup:1 delimiterGroup:0 hasCloser:NO forceStrikethrough:NO];
+	[self paintThemeMatches:wikiRegex string:string content:link marker:markup baseFont:baseFont contentGroup:1 delimiterGroup:0 hasCloser:NO forceStrikethrough:NO];
+	[self paintThemeMatches:listRegex string:string content:markup marker:markup baseFont:baseFont contentGroup:0 delimiterGroup:0 hasCloser:NO forceStrikethrough:NO];
+	[self paintThemeMatches:ruleRegex string:string content:markup marker:markup baseFont:baseFont contentGroup:0 delimiterGroup:0 hasCloser:NO forceStrikethrough:NO];
+	[self paintThemeMatches:codeRegex string:string content:code marker:markup baseFont:baseFont contentGroup:2 delimiterGroup:1 hasCloser:YES forceStrikethrough:NO];
+	[self highlightThemedFencedCodeInString:string code:codeBlock marker:markup baseFont:baseFont];
+	[self highlightWritingGremlins];
+	[self reapplySearchHighlights];
+}
+
 - (void)highlightMarkdownSyntax {
+	NVEditorTheme *editorTheme = [[NVThemeManager sharedManager] currentEditorTheme];
+	if (editorTheme) {
+		[self highlightMarkdownSyntaxWithTheme:editorTheme];
+		return;
+	}
 	NSLayoutManager *layout = [self layoutManager];
 	NSString *string = [self string];
 	NSRange fullRange = NSMakeRange(0, [string length]);
 	if (layout && fullRange.length) {
 		[layout removeTemporaryAttribute:NSForegroundColorAttributeName forCharacterRange:fullRange];
 		[layout removeTemporaryAttribute:NSStrikethroughStyleAttributeName forCharacterRange:fullRange];
+		[layout removeTemporaryAttribute:NSFontAttributeName forCharacterRange:fullRange];
+		[layout removeTemporaryAttribute:NSBackgroundColorAttributeName forCharacterRange:fullRange];
 	}
 	if (![self markdownCompletionsEnabled] || !layout || !fullRange.length || !prefsController) {
 		[self highlightWritingGremlins];
+		[self reapplySearchHighlights];
 		return;
 	}
 
@@ -950,6 +1180,7 @@ static NSColor *NVBlendColors(NSColor *first, NSColor *second, CGFloat fraction,
 	[self paintMarkdownMatches:codeRegex string:string content:code marker:marker contentGroup:2 delimiterGroup:1 hasCloser:YES strikethrough:NO];
 	[self highlightFencedCodeInString:string code:code marker:marker];
 	[self highlightWritingGremlins];
+	[self reapplySearchHighlights];
 }
 
 - (BOOL)performKeyEquivalent:(NSEvent *)anEvent {

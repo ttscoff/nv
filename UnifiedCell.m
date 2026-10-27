@@ -22,6 +22,7 @@
 #import "NSBezierPath_NV.h"
 #import "NSString_CustomTruncation.h"
 #import "NoteAttributeColumn.h"
+#import "NVThemeManager.h"
 
 @implementation UnifiedCell
 
@@ -184,7 +185,16 @@ NSAttributedString *AttributedStringForSelection(NSAttributedString *str, BOOL w
 	BOOL lightRow = [tv usesLightRowBackground];
 	
 	NSColor *textColor = nil;
-	if ([self isHighlighted] && (isActive || !lightRow))
+	NVEditorTheme *listTheme = [[NVThemeManager sharedManager] currentEditorTheme];
+	if (listTheme) {
+		if ([self isHighlighted])
+			textColor = isActive ? [listTheme listSelectionForegroundColor] : [listTheme listInactiveSelectionForegroundColor];
+		else {
+			NSColor *listForeground = [listTheme listForegroundColor];
+			NSColor *listBackground = [listTheme listBackgroundColor];
+			textColor = (listForeground && listBackground) ? [listBackground blendedColorWithFraction:0.45 ofColor:listForeground] : listForeground;
+		}
+	} else if ([self isHighlighted] && (isActive || !lightRow))
 		textColor = [NSColor whiteColor];
 	else if ([self isHighlighted])
 		textColor = [NSColor colorWithCalibratedWhite:0.35 alpha:1.0];

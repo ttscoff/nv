@@ -16,6 +16,7 @@
 #import "BTTransparentScroller.h"
 #import "NSFileManager_NV.h"
 #import "NSFileManager+DirectoryLocations.h"
+#import "NVThemeManager.h"
 #import <Security/Security.h>
 
 #define kDefaultMarkupPreviewVisible @"markupPreviewVisible"
@@ -350,6 +351,32 @@ static const NSUInteger NVMarkedShareMaxBodyBytes = 500000;
 
 }
 
++ (NSString *)htmlEscapedString:(NSString *)string {
+    if (![string length])
+        return @"";
+    NSMutableString *escaped = [NSMutableString stringWithString:string];
+    [escaped replaceOccurrencesOfString:@"&" withString:@"&amp;" options:0 range:NSMakeRange(0, [escaped length])];
+    [escaped replaceOccurrencesOfString:@"<" withString:@"&lt;" options:0 range:NSMakeRange(0, [escaped length])];
+    [escaped replaceOccurrencesOfString:@">" withString:@"&gt;" options:0 range:NSMakeRange(0, [escaped length])];
+    [escaped replaceOccurrencesOfString:@"\"" withString:@"&quot;" options:0 range:NSMakeRange(0, [escaped length])];
+    return escaped;
+}
+
++ (NSString *)themedHTMLDocumentForTitle:(NSString *)title contentHTML:(NSString *)contentHTML {
+    NSString *css = [[NVThemeManager sharedManager] currentPreviewCSS];
+    if (![css length])
+        return nil;
+    NSString *safeCSS = [css stringByReplacingOccurrencesOfString:@"</style" withString:@"<\\/style" options:NSCaseInsensitiveSearch range:NSMakeRange(0, [css length])];
+    return [NSString stringWithFormat:@"<!DOCTYPE html><html><head><meta charset=\"utf-8\"><title>%@</title><style type=\"text/css\">%@</style></head><body><div id=\"wrapper\">%@</div></body></html>",
+            [self htmlEscapedString:title], safeCSS, contentHTML ?: @""];
+}
+
+- (void)themesDidChange:(NSNotification *)notification {
+    if (self.isPreviewSticky || ![self isWindowLoaded] || ![[self window] isVisible])
+        return;
+    [self preview:[NSApp delegate]];
+}
+
 +(NSString*)html {
     NSFileManager *mgr = [NSFileManager defaultManager];
 
@@ -397,6 +424,21 @@ static const NSUInteger NVMarkedShareMaxBodyBytes = 500000;
         lastNote = [app selectedNoteObject];
     }
     NSString *nvSupportPath = [[NSFileManager defaultManager] applicationSupportDirectory];
+
+    NSString *themedDocument = [[self class] themedHTMLDocumentForTitle:noteTitle contentHTML:previewString];
+    if (themedDocument) {
+        [[preview mainFrame] loadHTMLString:themedDocument baseURL:nil];
+        [preview stringByEvaluatingJavaScriptFromString:[NSString stringWithFormat:@"var body = document.getElementsByTagName('body')[0],oldscroll = %@;body.scrollTop = oldscroll;", lastScrollPosition]];
+        [[self window] setTitle:noteTitle];
+        [sourceView replaceCharactersInRange:NSMakeRange(0, [[sourceView string] length]) withString:processedString];
+        self.isPreviewOutdated = NO;
+        [self updateOpenInMarkedButton];
+        return;
+    }
+    if ([htmlString rangeOfString:@"id=\"wrapper\"" options:NSCaseInsensitiveSearch].location == NSNotFound &&
+        [htmlString rangeOfString:@"id='wrapper'" options:NSCaseInsensitiveSearch].location == NSNotFound) {
+        previewString = [NSString stringWithFormat:@"<div id=\"wrapper\">%@</div>", previewString];
+    }
 
     [outputString replaceOccurrencesOfString:@"{%support%}" withString:nvSupportPath options:0 range:NSMakeRange(0, [outputString length])];
     [outputString replaceOccurrencesOfString:@"{%title%}" withString:noteTitle options:0 range:NSMakeRange(0, [outputString length])];

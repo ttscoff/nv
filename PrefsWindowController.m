@@ -22,6 +22,7 @@
 #import "NotationPrefs.h"
 #import "GlobalPrefs.h"
 #import "BufferUtils.h"
+#import "NVThemeManager.h"
 
 @interface PrefsWindowController () <NSTableViewDataSource, NSTableViewDelegate>
 {
@@ -268,6 +269,132 @@
 		[fontsColorsView addSubview:button];
 		[button release];
 	}
+}
+
+- (NSTextField *)themeLabelWithFrame:(NSRect)frame title:(NSString *)title {
+	NSTextField *label = [[NSTextField alloc] initWithFrame:frame];
+	[label setEditable:NO];
+	[label setSelectable:NO];
+	[label setBezeled:NO];
+	[label setDrawsBackground:NO];
+	[label setAlignment:NSTextAlignmentRight];
+	[label setFont:[NSFont systemFontOfSize:[NSFont systemFontSize]]];
+	[label setStringValue:title];
+	[label setAutoresizingMask:NSViewMinYMargin | NSViewMaxXMargin];
+	return label;
+}
+
+- (void)fillThemePopup:(NSPopUpButton *)popup filenames:(NSArray *)filenames selected:(NSString *)selected {
+	[popup removeAllItems];
+	NSMenuItem *fallback = [[popup menu] addItemWithTitle:NSLocalizedString(@"Default", @"built-in editor or preview theme") action:NULL keyEquivalent:@""];
+	[fallback setRepresentedObject:@""];
+	if ([filenames count])
+		[[popup menu] addItem:[NSMenuItem separatorItem]];
+	NSInteger selectedIndex = 0;
+	for (NSString *filename in filenames) {
+		NSString *title = [filename stringByDeletingPathExtension];
+		if ([popup itemWithTitle:title])
+			title = filename;
+		NSMenuItem *item = [[popup menu] addItemWithTitle:title action:NULL keyEquivalent:@""];
+		[item setRepresentedObject:filename];
+		if ([filename isEqualToString:selected])
+			selectedIndex = [popup indexOfItem:item];
+	}
+	[popup selectItemAtIndex:selectedIndex];
+}
+
+- (void)reloadThemePopups {
+	NVThemeManager *themes = [NVThemeManager sharedManager];
+	NSPopUpButton *editorPopup = (NSPopUpButton *)[fontsColorsView viewWithTag:7310];
+	NSPopUpButton *previewPopup = (NSPopUpButton *)[fontsColorsView viewWithTag:7311];
+	if ([editorPopup isKindOfClass:[NSPopUpButton class]])
+		[self fillThemePopup:editorPopup filenames:[themes editorThemeFilenames] selected:[themes editorThemeFilename]];
+	if ([previewPopup isKindOfClass:[NSPopUpButton class]])
+		[self fillThemePopup:previewPopup filenames:[themes previewThemeFilenames] selected:[themes previewThemeFilename]];
+}
+
+- (void)themesDidChange:(NSNotification *)note {
+	[self performSelector:@selector(reloadThemePopups) withObject:nil afterDelay:0];
+}
+
+- (void)addThemeControls {
+	if (!fontsColorsView || [fontsColorsView viewWithTag:7310])
+		return;
+	CGFloat extra = 128.0;
+	for (NSView *subview in [fontsColorsView subviews]) {
+		NSRect frame = [subview frame];
+		frame.origin.y += extra;
+		[subview setFrame:frame];
+	}
+	NSRect viewFrame = [fontsColorsView frame];
+	viewFrame.size.height += extra;
+	[fontsColorsView setFrame:viewFrame];
+
+	NSTextField *heading = [self themeLabelWithFrame:NSMakeRect(18, 100, 220, 18) title:NSLocalizedString(@"Themes", @"Fonts and Colors theme section")];
+	[heading setAlignment:NSTextAlignmentLeft];
+	[heading setFont:[NSFont boldSystemFontOfSize:[NSFont systemFontSize]]];
+	[fontsColorsView addSubview:heading];
+	[heading release];
+
+	NSTextField *editorLabel = [self themeLabelWithFrame:NSMakeRect(8, 70, 112, 17) title:NSLocalizedString(@"Editor Theme:", @"editor theme popup label")];
+	[fontsColorsView addSubview:editorLabel];
+	[editorLabel release];
+	NSPopUpButton *editorPopup = [[NSPopUpButton alloc] initWithFrame:NSMakeRect(124, 64, 280, 26) pullsDown:NO];
+	[editorPopup setTag:7310];
+	[editorPopup setTarget:self];
+	[editorPopup setAction:@selector(changedEditorTheme:)];
+	[editorPopup setAutoresizingMask:NSViewMinYMargin | NSViewWidthSizable];
+	[fontsColorsView addSubview:editorPopup];
+	[editorPopup release];
+
+	NSTextField *previewLabel = [self themeLabelWithFrame:NSMakeRect(8, 38, 112, 17) title:NSLocalizedString(@"Preview Theme:", @"preview theme popup label")];
+	[fontsColorsView addSubview:previewLabel];
+	[previewLabel release];
+	NSPopUpButton *previewPopup = [[NSPopUpButton alloc] initWithFrame:NSMakeRect(124, 32, 280, 26) pullsDown:NO];
+	[previewPopup setTag:7311];
+	[previewPopup setTarget:self];
+	[previewPopup setAction:@selector(changedPreviewTheme:)];
+	[previewPopup setAutoresizingMask:NSViewMinYMargin | NSViewWidthSizable];
+	[fontsColorsView addSubview:previewPopup];
+	[previewPopup release];
+
+	NSButton *importButton = [[NSButton alloc] initWithFrame:NSMakeRect(124, 2, 90, 24)];
+	[importButton setButtonType:NSButtonTypeMomentaryPushIn];
+	[importButton setBezelStyle:NSBezelStyleRounded];
+	[importButton setTitle:NSLocalizedString(@"Import…", @"import themes button")];
+	[importButton setTarget:self];
+	[importButton setAction:@selector(importThemes:)];
+	[importButton setAutoresizingMask:NSViewMinYMargin | NSViewMaxXMargin];
+	[fontsColorsView addSubview:importButton];
+	[importButton release];
+
+	NSButton *openButton = [[NSButton alloc] initWithFrame:NSMakeRect(220, 2, 184, 24)];
+	[openButton setButtonType:NSButtonTypeMomentaryPushIn];
+	[openButton setBezelStyle:NSBezelStyleRounded];
+	[openButton setTitle:NSLocalizedString(@"Open Themes Folder", @"reveal themes folder button")];
+	[openButton setTarget:self];
+	[openButton setAction:@selector(openThemesFolder:)];
+	[openButton setAutoresizingMask:NSViewMinYMargin | NSViewMaxXMargin];
+	[fontsColorsView addSubview:openButton];
+	[openButton release];
+
+	[self reloadThemePopups];
+}
+
+- (IBAction)changedEditorTheme:(id)sender {
+	[[NVThemeManager sharedManager] setEditorThemeFilename:[[sender selectedItem] representedObject] ?: @""];
+}
+
+- (IBAction)changedPreviewTheme:(id)sender {
+	[[NVThemeManager sharedManager] setPreviewThemeFilename:[[sender selectedItem] representedObject] ?: @""];
+}
+
+- (IBAction)importThemes:(id)sender {
+	[[NVThemeManager sharedManager] beginImportPanelForWindow:window];
+}
+
+- (IBAction)openThemesFolder:(id)sender {
+	[[NVThemeManager sharedManager] openThemesFolder];
 }
 
 - (IBAction)changedUseETScrollbarsOnLion:(id)sender{
@@ -558,6 +685,8 @@
 	[makeURLsClickable setState:[prefsController URLsAreClickable]];
     [rtlButton setState:[prefsController rtl]];
     [self addListFontControls];
+    [self addThemeControls];
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(themesDidChange:) name:NVThemesDidChangeNotification object:nil];
     [self previewNoteBodyFont];
 	[appShortcutField setStringValue:[[prefsController appActivationKeyCombo] description]];
 	[searchHighlightColorWell setColor:[prefsController searchTermHighlightColorRaw:YES]];

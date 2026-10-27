@@ -64,6 +64,10 @@
 		219192D409CFBC8800586B15 /* NoteAttributeColumn.m in Sources */ = {isa = PBXBuildFile; fileRef = 219192D309CFBC8700586B15 /* NoteAttributeColumn.m */; };
 		2191982209D607C600586B15 /* PrefsWindowController.m in Sources */ = {isa = PBXBuildFile; fileRef = 2191982109D607C600586B15 /* PrefsWindowController.m */; };
 		219588D20961D7F200972B8C /* LinkingEditor.m in Sources */ = {isa = PBXBuildFile; fileRef = 219588D10961D7F200972B8C /* LinkingEditor.m */; };
+		A7E100032F0A000100000001 /* NVTheme.m in Sources */ = {isa = PBXBuildFile; fileRef = A7E100022F0A000100000001 /* NVTheme.m */; };
+		A7E100062F0A000100000001 /* NVThemeManager.m in Sources */ = {isa = PBXBuildFile; fileRef = A7E100052F0A000100000001 /* NVThemeManager.m */; };
+		A7E100082F0A000100000001 /* Paper.theme in Resources */ = {isa = PBXBuildFile; fileRef = A7E100072F0A000100000001 /* Paper.theme */; };
+		A7E1000A2F0A000100000001 /* Paper.css in Resources */ = {isa = PBXBuildFile; fileRef = A7E100092F0A000100000001 /* Paper.css */; };
 		219739FB0AFE42A10046683E /* PassphraseRetriever.m in Sources */ = {isa = PBXBuildFile; fileRef = 219739FA0AFE42A10046683E /* PassphraseRetriever.m */; };
 		21973FF10B0060C80046683E /* Security.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 21973FBC0B0060C80046683E /* Security.framework */; };
 		219D1BB3110EA66A005E7DF5 /* TBAlert.png in Resources */ = {isa = PBXBuildFile; fileRef = 219D1BB2110EA66A005E7DF5 /* TBAlert.png */; };
@@ -421,6 +425,12 @@
 		2191982109D607C600586B15 /* PrefsWindowController.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; path = PrefsWindowController.m; sourceTree = "<group>"; };
 		219588D00961D7F200972B8C /* LinkingEditor.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = LinkingEditor.h; sourceTree = "<group>"; };
 		219588D10961D7F200972B8C /* LinkingEditor.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = LinkingEditor.m; sourceTree = "<group>"; };
+		A7E100012F0A000100000001 /* NVTheme.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = NVTheme.h; sourceTree = "<group>"; };
+		A7E100022F0A000100000001 /* NVTheme.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = NVTheme.m; sourceTree = "<group>"; };
+		A7E100042F0A000100000001 /* NVThemeManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = NVThemeManager.h; sourceTree = "<group>"; };
+		A7E100052F0A000100000001 /* NVThemeManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = NVThemeManager.m; sourceTree = "<group>"; };
+		A7E100072F0A000100000001 /* Paper.theme */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = Paper.theme; sourceTree = "<group>"; };
+		A7E100092F0A000100000001 /* Paper.css */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.css; path = Paper.css; sourceTree = "<group>"; };
 		219739F90AFE42A10046683E /* PassphraseRetriever.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = PassphraseRetriever.h; sourceTree = "<group>"; };
 		219739FA0AFE42A10046683E /* PassphraseRetriever.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; path = PassphraseRetriever.m; sourceTree = "<group>"; };
 		21973FBC0B0060C80046683E /* Security.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Security.framework; path = /System/Library/Frameworks/Security.framework; sourceTree = "<absolute>"; };
@@ -910,6 +920,10 @@
 				212B84610978422300F3597F /* NSString_NV.m */,
 				D3EEC9FF106F66C70023D7F8 /* NVPasswordGenerator.h */,
 				D3EEC9FE106F66C70023D7F8 /* NVPasswordGenerator.m */,
+				A7E100012F0A000100000001 /* NVTheme.h */,
+				A7E100022F0A000100000001 /* NVTheme.m */,
+				A7E100042F0A000100000001 /* NVThemeManager.h */,
+				A7E100052F0A000100000001 /* NVThemeManager.m */,
 				2191982009D607C600586B15 /* PrefsWindowController.h */,
 				2191982109D607C600586B15 /* PrefsWindowController.m */,
 				5CA10F18131C297000DE1F91 /* PreviewController.h */,
@@ -1286,6 +1300,8 @@
 			isa = PBXGroup;
 			children = (
 				934C3FAE14FDA069000D14BA /* custom.css */,
+				A7E100092F0A000100000001 /* Paper.css */,
+				A7E100072F0A000100000001 /* Paper.theme */,
 				934C3FAF14FDA069000D14BA /* customclean.css */,
 				934C3FB014FDA069000D14BA /* template.html */,
 				934C3FB114FDA069000D14BA /* templateclean.html */,
@@ -1614,6 +1630,8 @@
 				5CE5B0081422795300FB554C /* PTKeyComboPanel.xib in Resources */,
 				5CD1B00714F4593900AC948E /* Add.tiff in Resources */,
 				934C3FB214FDA069000D14BA /* custom.css in Resources */,
+				A7E1000A2F0A000100000001 /* Paper.css in Resources */,
+				A7E100082F0A000100000001 /* Paper.theme in Resources */,
 				934C3FB314FDA06A000D14BA /* customclean.css in Resources */,
 				934C3FB414FDA06A000D14BA /* template.html in Resources */,
 				934C3FB514FDA06A000D14BA /* templateclean.html in Resources */,
@@ -1656,6 +1674,8 @@
 				5C4366A01DA283720086FF84 /* ETNoteScrollView.m in Sources */,
 				2114C2A80958D24800614E74 /* hmacsha1.c in Sources */,
 				219588D20961D7F200972B8C /* LinkingEditor.m in Sources */,
+				A7E100032F0A000100000001 /* NVTheme.m in Sources */,
+				A7E100062F0A000100000001 /* NVThemeManager.m in Sources */,
 				217D4282096545A000E84749 /* LabelObject.m in Sources */,
 				21A30EA70971D11D0071E9AF /* FastListDataSource.m in Sources */,
 				21A6E6FD0974204F008436A9 /* LabelsListController.m in Sources */,

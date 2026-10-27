@@ -51,6 +51,9 @@
 	NSString *cssString = [[PreviewController class] css];
 	NSMutableString *outputString = [NSMutableString stringWithString:(NSString *)htmlString];
 	NSString *noteTitle =  ([app selectedNoteObject]) ? [NSString stringWithFormat:@"%@",titleOfNote([app selectedNoteObject])] : @"";
+	NSString *themedDocument = [PreviewController themedHTMLDocumentForTitle:noteTitle contentHTML:processedString];
+	if (themedDocument)
+		return themedDocument;
 		
 		NSString *nvSupportPath = [[NSFileManager defaultManager] applicationSupportDirectory];
 

@@ -72,4 +72,6 @@
 -(IBAction)openShareURL:(id)sender;
 +(NSString *)css;
 +(NSString *)html;
++(NSString *)themedHTMLDocumentForTitle:(NSString *)title contentHTML:(NSString *)contentHTML;
+-(void)themesDidChange:(NSNotification *)notification;
 @end

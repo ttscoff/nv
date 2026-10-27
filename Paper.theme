@@ -1,0 +1,73 @@
+{
+    "backgroundColor" : "#f4f1ea",
+    "foregroundColor" : "#2c2825",
+    "caretColor" : "#8c3a32",
+    "selectionBackgroundColor" : "#e4d3a188",
+
+    "textView" : {
+        "backgroundColor" : "#fbfaf7",
+        "foregroundColor" : "#2c2825",
+        "caretColor" : "#8c3a32"
+    },
+
+    "strong" : {
+        "bold" : 1,
+        "foregroundColor" : "#1f1c19"
+    },
+    "emphasis" : {
+        "italic" : 1,
+        "foregroundColor" : "#3d3833"
+    },
+    "blockquote" : {
+        "backgroundColor" : "#f3eee4",
+        "foregroundColor" : "#5c564e"
+    },
+    "codeBlock" : {
+        "backgroundColor" : "#f0ebe3",
+        "foregroundColor" : "#6b2d2d",
+        "fontName" : "Menlo",
+        "fontScale" : 0.92,
+        "mono" : 1
+    },
+    "codeSpan" : {
+        "backgroundColor" : "#f0ebe3",
+        "foregroundColor" : "#6b2d2d",
+        "fontName" : "Menlo",
+        "fontScale" : 0.92,
+        "mono" : 1
+    },
+    "heading" : {
+        "bold" : 1,
+        "foregroundColor" : "#8c3a32"
+    },
+    "heading1" : {
+        "foregroundColor" : "#8c3a32",
+        "fontScale" : 1.35
+    },
+    "heading2" : {
+        "foregroundColor" : "#8c3a32",
+        "fontScale" : 1.2
+    },
+    "heading3" : {
+        "foregroundColor" : "#a3563a",
+        "fontScale" : 1.08
+    },
+    "markup" : {
+        "foregroundColor" : "#a3988c"
+    },
+    "linkParens" : {
+        "foregroundColor" : "#1f6f8c",
+        "markupForegroundColor" : "#a3988c"
+    },
+    "footnote" : {
+        "foregroundColor" : "#1f6f8c"
+    },
+    "criticDeletion" : {
+        "foregroundColor" : "#8c3a32",
+        "strikethrough" : 1
+    },
+    "metadata" : {
+        "backgroundColor" : "#f3eee4",
+        "foregroundColor" : "#6e675f"
+    }
+}
