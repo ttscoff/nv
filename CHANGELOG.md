@@ -1,3 +1,11 @@
+nvALT 3.0.9
+-------------------------
+
+#### FIXED
+
+- **Theme links** import a .theme file when the server sends it as plain text.
+- A failed **theme download** reports the server error.
+
 nvALT 3.0.8
 -------------------------
 
