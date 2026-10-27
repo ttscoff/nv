@@ -1,3 +1,22 @@
+nvALT 3.0.8
+-------------------------
+
+#### NEW
+
+- Choose an **editor theme** and a **preview theme** in Settings, Fonts and Colors, with Import and Open Themes Folder.
+- Import **MultiMarkdown Composer** themes and **Marked** preview stylesheets.
+- Install a theme from a link with **nvalt://add-theme** or **nv://add-theme**.
+- The **notes list** uses the editor theme's table colors, and the note body keeps the text view colors.
+- A preview theme wraps the note in **#wrapper** so Marked CSS applies directly.
+- A sample **Paper** editor theme and preview stylesheet are copied into the themes folder.
+- An editor theme's **window background** colors the title bar, the divider, and the scrollbars.
+- The **scrollbar knob** uses the window foreground color when it stays visible against the track.
+
+#### FIXED
+
+- With no editor theme, that chrome follows system **light and dark** mode.
+- Margins around a **readable note width** use the same window color.
+
 nvALT 3.0.7
 -------------------------
 
