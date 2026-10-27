@@ -157,7 +157,7 @@ if ([selectorString isEqualToString:SEL_STR(setNoteBodyFont:sender:)]) {
 		if (![prefsController highlightSearchTerms]) {
 			[self removeHighlightedTerms];
 		} else {
-			NSString *typedString = [(AppController *)[NSApp delegate] typedString];
+			NSString *typedString = [(AppController *)[NSApp delegate] searchStringForHighlighting];
 			if (typedString)
 				[self highlightTermsTemporarilyReturningFirstRange:typedString avoidHighlight:NO];
 		}
@@ -941,9 +941,13 @@ static NSColor *NVBlendColors(NSColor *first, NSColor *second, CGFloat fraction,
 - (void)reapplySearchHighlights {
 	if (![prefsController highlightSearchTerms])
 		return;
-	NSString *typed = [(AppController *)[NSApp delegate] typedString];
+	NSString *typed = [(AppController *)[NSApp delegate] searchStringForHighlighting];
 	if ([typed length])
 		[self highlightTermsTemporarilyReturningFirstRange:typed avoidHighlight:NO];
+}
+
+- (void)cancelOperation:(id)sender {
+	[[NSApp delegate] cancelOperation:sender];
 }
 
 - (void)paintThemeRange:(NSRange)range style:(NVThemeStyle *)style baseFont:(NSFont *)baseFont useBaseFont:(BOOL)useBaseFont forceStrikethrough:(BOOL)forceStrikethrough {

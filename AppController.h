@@ -175,6 +175,7 @@ void outletObjectAwoke(id sender);
 - (NSString*)fieldSearchString;
 - (void)cacheTypedStringIfNecessary:(NSString*)aString;
 - (NSString*)typedString;
+- (NSString*)searchStringForHighlighting;
 
 - (IBAction)showHelpDocument:(id)sender;
 - (IBAction)showPreferencesWindow:(id)sender;

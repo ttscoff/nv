@@ -1314,6 +1314,8 @@ terminateApp:
         }
 		[field setStringValue:@""];
 		typedStringIsCached = NO;
+		[typedString release];
+		typedString = nil;
 		
 		[notesTableView deselectAll:sender];//thiss
 		[notationController filterNotesFromString:@""];
@@ -1489,6 +1491,18 @@ terminateApp:
 	if (typedStringIsCached)
 		return typedString;
 	
+	return nil;
+}
+
+- (NSString*)searchStringForHighlighting {
+	if (![typedString length])
+		return nil;
+	// While a note is selected the field shows its title, so the typed query is hidden.
+	// Only highlight a search the user can still see and clear.
+	if (isFilteringFromTyping)
+		return typedString;
+	if ([[field stringValue] isEqualToString:typedString])
+		return typedString;
 	return nil;
 }
 
@@ -1816,8 +1830,9 @@ terminateApp:
 		//[textView setAutomaticallySelectedRange:NSMakeRange(0,0)];
 		
 		//highlight terms--delay this, too
-		if ((unsigned)noteIndex != [notationController preferredSelectedNoteIndex])
-			firstFoundTermRange = [textView highlightTermsTemporarilyReturningFirstRange:typedString avoidHighlight:
+		NSString *highlightString = [self searchStringForHighlighting];
+		if (highlightString && (unsigned)noteIndex != [notationController preferredSelectedNoteIndex])
+			firstFoundTermRange = [textView highlightTermsTemporarilyReturningFirstRange:highlightString avoidHighlight:
 								   ![prefsController highlightSearchTerms]];
 		
 		//if there was nothing selected, select the first found range
