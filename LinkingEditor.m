@@ -1666,18 +1666,13 @@ static NSColor *NVBlendColors(NSColor *first, NSColor *second, CGFloat fraction,
         }
         return YES;
     }else if (action==@selector(pasteMarkdownLink:)) {
-        
-      //  if ([[NSUserDefaults standardUserDefaults]boolForKey:@"UsesMarkdownCompletions"]) {  
-           // [menuItem setHidden:NO];
-            if ([self clipboardHasLink]) {                
-                return YES;
-            }
-            
-       // }
-//        else{
-//            
-//            [menuItem setHidden:YES];
-//        }
+        if (![self markdownCompletionsEnabled]) {
+            [menuItem setHidden:YES];
+            return NO;
+        }
+        [menuItem setHidden:NO];
+        if ([self clipboardHasLink])
+            return YES;
         return NO;
     }
 	
@@ -3389,6 +3384,10 @@ static BOOL NVBulletMarker(NSString *line, NSUInteger contentLength, NSUInteger 
 }
 
 - (IBAction)pasteMarkdownLink:(id)sender{
+    if (![self markdownCompletionsEnabled]) {
+        [super paste:sender];
+        return;
+    }
     NSString *aftaString=[self.activeParagraphPastCursor stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceCharacterSet]];
     NSString *bifoString=[self.activeParagraphBeforeCursor stringByTrimmingCharactersInSet:[NSCharacterSet characterSetWithCharactersInString:@" https://"]];
     NSPredicate *bifoRefPred=[NSPredicate predicateWithFormat:@"SELF LIKE[cd] %@ OR SELF LIKE[cd] %@",@"*[*]",@"*[*]("];
@@ -3858,6 +3857,10 @@ static NSString *NVCoreOfLine(NSString *line) {
 }
 
 - (void)paste:(id)sender {
+	if (![self markdownCompletionsEnabled]) {
+		[super paste:sender];
+		return;
+	}
 	NSString *urlString = [self singleURLOnPasteboard:[NSPasteboard generalPasteboard]];
 	if (![urlString length]) {
 		[super paste:sender];
