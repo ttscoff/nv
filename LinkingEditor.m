@@ -21,6 +21,7 @@
 #import "NSString_NV.h"
 #import "NVPasswordGenerator.h"
 #import "NVThemeManager.h"
+#import "ETScrollView.h"
 #import "ETClipView.h"
 //#import "NSTextFinder.h"
 //#import "NVTextFinderAdditions.h"
@@ -217,6 +218,8 @@ if ([selectorString isEqualToString:SEL_STR(setNoteBodyFont:sender:)]) {
 		NSColor *bgColor = [editorTheme editorBackgroundColor] ?: appBG ?: [NSColor textBackgroundColor];
 		[self setBackgroundColor:bgColor];
 		[[self enclosingScrollView] setBackgroundColor:bgColor];
+		[[[self enclosingScrollView] contentView] setBackgroundColor:bgColor];
+		[[[self enclosingScrollView] contentView] setDrawsBackground:YES];
 		if (IsLionOrLater && [self textFinderIsVisible])
 			[[self window] invalidateCursorRectsForView:[[self enclosingScrollView] findBarView]];
 		NSColor *caret = [editorTheme editorCaretColor] ?: [self _insertionPointColorForForegroundColor:fgColor backgroundColor:bgColor];
@@ -228,6 +231,8 @@ if ([selectorString isEqualToString:SEL_STR(setNoteBodyFont:sender:)]) {
 		[[self enclosingScrollView] setNeedsDisplay:YES];
 		[self setNeedsDisplay:YES];
 		[self highlightMarkdownSyntax];
+		if ([[self enclosingScrollView] respondsToSelector:@selector(nv_updateScrollerChrome)])
+			[(ETScrollView *)[self enclosingScrollView] nv_updateScrollerChrome];
 		return;
 	}
 	NSColor *fgColor = [(AppController *)[NSApp delegate] foregrndColor];
@@ -237,6 +242,8 @@ if ([selectorString isEqualToString:SEL_STR(setNoteBodyFont:sender:)]) {
         [self setBackgroundColor:bgColor];
     }
 	[[self enclosingScrollView] setBackgroundColor:bgColor];
+	[[[self enclosingScrollView] contentView] setBackgroundColor:bgColor];
+	[[[self enclosingScrollView] contentView] setDrawsBackground:YES];
     if (IsLionOrLater&&[self textFinderIsVisible]) {
         [[self window]invalidateCursorRectsForView:[[self enclosingScrollView]findBarView]];
     }
@@ -254,6 +261,8 @@ if ([selectorString isEqualToString:SEL_STR(setNoteBodyFont:sender:)]) {
 //    [[[self enclosingScrollView]contentView]setNeedsDisplay:YES];
     [self setNeedsDisplay:YES];
 	[self scheduleMarkdownHighlight];
+	if ([[self enclosingScrollView] respondsToSelector:@selector(nv_updateScrollerChrome)])
+		[(ETScrollView *)[self enclosingScrollView] nv_updateScrollerChrome];
 }
 
 #define _CM(__ch) ((__ch) * 255.0)

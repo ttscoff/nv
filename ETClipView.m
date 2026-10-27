@@ -9,6 +9,8 @@
 #import "GlobalPrefs.h"
 #import "AppController.h"
 #import "LinkingEditor.h"
+#import "ETScrollView.h"
+#import "NVTheme.h"
 
 
 @implementation ETClipView
@@ -43,6 +45,9 @@
         }
     }
     [super setFrame:frameRect];
+    NSScrollView *scrollView = [self enclosingScrollView];
+    if ([scrollView respondsToSelector:@selector(nv_showWindowChromeMargins)])
+        [(ETScrollView *)scrollView nv_showWindowChromeMargins];
 }
 
 - (BOOL)clipRect:(NSRect *)clipRect forFrameRect:(NSRect)frameRect{
@@ -66,6 +71,9 @@
         docRect.size.width=frameRect.size.width;
         [[self documentView] setConstrainedFrameSize:docRect.size];
         [super setFrame:frameRect];
+        NSScrollView *scrollView = [self enclosingScrollView];
+        if ([scrollView respondsToSelector:@selector(nv_showWindowChromeMargins)])
+            [(ETScrollView *)scrollView nv_showWindowChromeMargins];
         return YES;
     }else{
         NSScrollView *scrollV=[[self documentView] enclosingScrollView];

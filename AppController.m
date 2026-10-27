@@ -48,7 +48,7 @@
 #import "ETContentView.h"
 #import "PreviewController.h"
 #import "ETClipView.h"
-//#import "ETScrollView.h"
+#import "ETScrollView.h"
 #import "NSFileManager+DirectoryLocations.h"
 #import "nvaDevConfig.h"
 #import <Sparkle/Sparkle.h>
@@ -73,6 +73,23 @@ NSInteger ModFlagger;
 NSInteger popped;
 BOOL splitViewAwoke;
 
+
+@interface AppController (NVDividerChrome)
+- (void)applyWindowChrome;
+- (void)refreshListEditorDivider;
+@end
+
+static BOOL nvApplyingWindowChrome;
+
+@implementation RBSplitView (NVSystemAppearance)
+
+- (void)viewDidChangeEffectiveAppearance {
+	[super viewDidChangeEffectiveAppearance];
+	if ([[self delegate] respondsToSelector:@selector(refreshListEditorDivider)])
+		[[self delegate] performSelector:@selector(refreshListEditorDivider)];
+}
+
+@end
 
 @implementation AppController
 
@@ -2426,10 +2443,44 @@ terminateApp:
 	return NO;
 }
 
+- (void)applyWindowChrome {
+	if (nvApplyingWindowChrome || !window)
+		return;
+	nvApplyingWindowChrome = YES;
+	NSColor *chrome = NVWindowChromeColor();
+	BOOL themedWindow = [[[NVThemeManager sharedManager] currentEditorTheme] windowBackgroundColor] != nil;
+	[window setTitlebarAppearsTransparent:YES];
+	[window setTitlebarSeparatorStyle:NSTitlebarSeparatorStyleNone];
+	[window setToolbarStyle:NSWindowToolbarStyleUnified];
+	[toolbar setShowsBaselineSeparator:NO];
+	[window setBackgroundColor:chrome];
+	if (mainView)
+		[mainView setBackgroundColor:chrome];
+	NSAppearance *appearance = nil;
+	if (themedWindow && chrome)
+		appearance = [NSAppearance appearanceNamed:(NVThemeColorIsLight(chrome) ? NSAppearanceNameAqua : NSAppearanceNameDarkAqua)];
+	if ([window appearance] != appearance && (!appearance || ![[window appearance] isEqual:appearance]))
+		[window setAppearance:appearance];
+	nvApplyingWindowChrome = NO;
+}
+
+- (void)refreshListEditorDivider {
+	[self applyWindowChrome];
+	if (notesScrollView && notesSubview)
+		[notesScrollView setFrame:[notesSubview bounds]];
+	if (textScrollView && splitSubview)
+		[textScrollView setFrame:[splitSubview bounds]];
+	if (splitView)
+		[splitView setNeedsDisplay:YES];
+}
+
 - (NSRect)splitView:(RBSplitView*)sender willDrawDividerInRect:(NSRect)dividerRect betweenView:(RBSplitSubview*)leading
 			andView:(RBSplitSubview*)trailing withProposedRect:(NSRect)imageRect {
-	[dividerShader drawDividerInRect:dividerRect withDimpleRect:imageRect blendVertically:![prefsController horizontalLayout]];
-	
+	NSColor *fill = NVWindowChromeColor();
+	if (fill) {
+		[fill setFill];
+		NSRectFillUsingOperation(dividerRect, NSCompositingOperationSourceOver);
+	}
 	return NSZeroRect;
 }
 
@@ -3032,7 +3083,9 @@ terminateApp:
         [self contentsUpdatedForNote:currentNote];
     }
     [dividerShader updateColorsWithBackgroundColor:backgrndColor andForegroundColor:foregrndColor];
-    [splitView setNeedsDisplay:YES];
+    [notesScrollView nv_updateScrollerChrome];
+    [textScrollView nv_updateScrollerChrome];
+    [self refreshListEditorDivider];
     
 }
 

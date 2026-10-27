@@ -12,7 +12,13 @@
 @interface ETScrollView : NSScrollView {
     Class scrollerClass;
     BOOL needsOverlayTiling;
+    BOOL updatingScrollerChrome;
+    BOOL installingChromeMargin;
+    NSView *nvChromeMargin;
 }
+
+- (void)nv_updateScrollerChrome;
+- (void)nv_showWindowChromeMargins;
 
 //- (void)setNeedsOverlayTiling:(BOOL)overlay;
 //- (void)setScrollerClassWithString:(NSString *)scrollerClassName;

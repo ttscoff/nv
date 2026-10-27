@@ -21,9 +21,12 @@
     float knobAlpha;
 //    BOOL isOverlay;
     BOOL fillBackground;
+    NSColor *nvKnobColor;
+    NSColor *nvTrackColor;
 }
 
 - (void)setFillBackground:(BOOL)fillIt;
+- (void)nv_setExplicitKnobColor:(NSColor *)knob trackColor:(NSColor *)track;
 
 
 @end

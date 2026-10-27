@@ -4,6 +4,7 @@
 //
 
 #import "NVTheme.h"
+#import "NVThemeManager.h"
 
 static NSColor *NVColorFromThemeValue(id value) {
 	if ([value isKindOfClass:[NSColor class]])
@@ -329,6 +330,14 @@ static BOOL NVThemeValueIsPresent(id value) {
 	return [base styleByOverlayingStyle:specific];
 }
 
+- (NSColor *)windowBackgroundColor {
+	return windowBackgroundColor;
+}
+
+- (NSColor *)windowForegroundColor {
+	return windowForegroundColor;
+}
+
 - (NSColor *)editorBackgroundColor {
 	return backgroundColor;
 }
@@ -345,7 +354,7 @@ static BOOL NVThemeValueIsPresent(id value) {
 	return selectionBackgroundColor;
 }
 
-static BOOL NVThemeColorIsLight(NSColor *color) {
+BOOL NVThemeColorIsLight(NSColor *color) {
 	NSColor *rgb = [color colorUsingColorSpace:[NSColorSpace sRGBColorSpace]];
 	if (!rgb || [rgb numberOfComponents] < 2)
 		return YES;
@@ -354,6 +363,20 @@ static BOOL NVThemeColorIsLight(NSColor *color) {
 	if ([rgb numberOfComponents] >= 3)
 		return ((0.299 * components[0]) + (0.587 * components[1]) + (0.114 * components[2])) >= 0.55;
 	return components[0] >= 0.55;
+}
+
+NSColor *NVColorResolvedInAppearance(NSColor *color, NSAppearance *appearance) {
+	if (!color)
+		return nil;
+	if (!appearance)
+		appearance = [NSApp effectiveAppearance];
+	__block NSColor *resolved = color;
+	[appearance performAsCurrentDrawingAppearance:^{
+		NSColor *components = [color colorUsingType:NSColorTypeComponentBased];
+		if (components)
+			resolved = components;
+	}];
+	return resolved;
 }
 
 - (NSColor *)listBackgroundColor {
@@ -391,3 +414,22 @@ static BOOL NVThemeColorIsLight(NSColor *color) {
 }
 
 @end
+
+NSColor *NVWindowChromeColor(void) {
+	NSColor *color = [[[NVThemeManager sharedManager] currentEditorTheme] windowBackgroundColor];
+	if (color)
+		return color;
+	return NVColorResolvedInAppearance([NSColor windowBackgroundColor], [NSApp effectiveAppearance]);
+}
+
+NSColor *NVWindowChromeKnobColor(void) {
+	NSColor *track = NVWindowChromeColor();
+	NSColor *foreground = [[[NVThemeManager sharedManager] currentEditorTheme] windowForegroundColor];
+	if (foreground && track && (NVThemeColorIsLight(foreground) != NVThemeColorIsLight(track))) {
+		if ([foreground alphaComponent] < 0.85)
+			foreground = [foreground colorWithAlphaComponent:0.85];
+		return foreground;
+	}
+	BOOL light = !track || NVThemeColorIsLight(track);
+	return [NSColor colorWithCalibratedWhite:(light ? 0.22 : 0.92) alpha:1.0];
+}

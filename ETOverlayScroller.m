@@ -25,8 +25,7 @@
 }
 
 + (NSScrollerStyle)preferredScrollerStyle{
-   
-    return [[NSScroller class]preferredScrollerStyle];
+    return [NSScroller preferredScrollerStyle];
 }
 
 #endif

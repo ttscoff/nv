@@ -61,6 +61,8 @@ enum {
 - (NSString *)filename;
 - (NVThemeStyle *)styleForKey:(NSString *)key;
 - (NVThemeStyle *)styleForHeadingLevel:(NSUInteger)level;
+- (NSColor *)windowBackgroundColor;
+- (NSColor *)windowForegroundColor;
 - (NSColor *)editorBackgroundColor;
 - (NSColor *)editorForegroundColor;
 - (NSColor *)editorCaretColor;
@@ -73,3 +75,8 @@ enum {
 - (NSColor *)listInactiveSelectionForegroundColor;
 
 @end
+
+BOOL NVThemeColorIsLight(NSColor *color);
+NSColor *NVColorResolvedInAppearance(NSColor *color, NSAppearance *appearance);
+NSColor *NVWindowChromeColor(void);
+NSColor *NVWindowChromeKnobColor(void);

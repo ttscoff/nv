@@ -60,6 +60,8 @@ Themes are stored in:
 
 Editor themes are MultiMarkdown Composer themes. nvALT reads `.theme` files (JSON), plus `.plist` and `.json` files that use the same keys: `textView` colors, `caretColor`, `selectionBackgroundColor`, list colors (`tableView`, `tableViewHighlighted`, `tableViewInactive`), and syntax styles such as `heading`, `strong`, `emphasis`, `codeBlock`, `codeSpan`, `blockquote`, `markup`, and `linkParens`. A Composer theme can be imported as-is.
 
+With no editor theme, the title bar, the divider, and the scrollbars use the system window color, so they follow light and dark mode. An editor theme's window `backgroundColor` (the color at the top of the theme, outside `textView`) colors that same chrome. The scrollbar knob uses the window `foregroundColor` when that color stays visible against it.
+
 ### Preview themes
 
 Preview themes are CSS files (`.css`). The note is wrapped in `<div id="wrapper">`, so a Marked theme can be dropped in and used directly. Style `#wrapper` and the elements inside it.
