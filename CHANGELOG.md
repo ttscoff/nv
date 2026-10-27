@@ -1,3 +1,11 @@
+nvALT 3.0.11
+-------------------------
+
+#### FIXED
+
+- A leftover **search** no longer highlights part of what you typed after the field shows the note title.
+- **Escape** in the editor clears that search.
+
 nvALT 3.0.10
 -------------------------
 
