@@ -280,7 +280,7 @@
 	[label setAlignment:NSTextAlignmentRight];
 	[label setFont:[NSFont systemFontOfSize:[NSFont systemFontSize]]];
 	[label setStringValue:title];
-	[label setAutoresizingMask:NSViewMinYMargin | NSViewMaxXMargin];
+	[label setAutoresizingMask:NSViewMaxYMargin | NSViewMaxXMargin];
 	return label;
 }
 
@@ -321,7 +321,13 @@
 	if (!fontsColorsView || [fontsColorsView viewWithTag:7310])
 		return;
 	CGFloat extra = 128.0;
-	for (NSView *subview in [fontsColorsView subviews]) {
+	NSArray *subviews = [[fontsColorsView subviews] copy];
+	NSMutableArray *savedMasks = [[NSMutableArray alloc] initWithCapacity:[subviews count]];
+	for (NSView *subview in subviews) {
+		[savedMasks addObject:[NSNumber numberWithUnsignedInteger:[subview autoresizingMask]]];
+		[subview setAutoresizingMask:NSViewNotSizable];
+	}
+	for (NSView *subview in subviews) {
 		NSRect frame = [subview frame];
 		frame.origin.y += extra;
 		[subview setFrame:frame];
@@ -329,6 +335,11 @@
 	NSRect viewFrame = [fontsColorsView frame];
 	viewFrame.size.height += extra;
 	[fontsColorsView setFrame:viewFrame];
+	NSUInteger maskIndex = 0;
+	for (NSView *subview in subviews)
+		[subview setAutoresizingMask:[[savedMasks objectAtIndex:maskIndex++] unsignedIntegerValue]];
+	[savedMasks release];
+	[subviews release];
 
 	NSTextField *heading = [self themeLabelWithFrame:NSMakeRect(18, 100, 220, 18) title:NSLocalizedString(@"Themes", @"Fonts and Colors theme section")];
 	[heading setAlignment:NSTextAlignmentLeft];
@@ -343,7 +354,7 @@
 	[editorPopup setTag:7310];
 	[editorPopup setTarget:self];
 	[editorPopup setAction:@selector(changedEditorTheme:)];
-	[editorPopup setAutoresizingMask:NSViewMinYMargin | NSViewWidthSizable];
+	[editorPopup setAutoresizingMask:NSViewMaxYMargin | NSViewWidthSizable];
 	[fontsColorsView addSubview:editorPopup];
 	[editorPopup release];
 
@@ -354,7 +365,7 @@
 	[previewPopup setTag:7311];
 	[previewPopup setTarget:self];
 	[previewPopup setAction:@selector(changedPreviewTheme:)];
-	[previewPopup setAutoresizingMask:NSViewMinYMargin | NSViewWidthSizable];
+	[previewPopup setAutoresizingMask:NSViewMaxYMargin | NSViewWidthSizable];
 	[fontsColorsView addSubview:previewPopup];
 	[previewPopup release];
 
@@ -364,7 +375,7 @@
 	[importButton setTitle:NSLocalizedString(@"Import…", @"import themes button")];
 	[importButton setTarget:self];
 	[importButton setAction:@selector(importThemes:)];
-	[importButton setAutoresizingMask:NSViewMinYMargin | NSViewMaxXMargin];
+	[importButton setAutoresizingMask:NSViewMaxYMargin | NSViewMaxXMargin];
 	[fontsColorsView addSubview:importButton];
 	[importButton release];
 
@@ -374,7 +385,7 @@
 	[openButton setTitle:NSLocalizedString(@"Open Themes Folder", @"reveal themes folder button")];
 	[openButton setTarget:self];
 	[openButton setAction:@selector(openThemesFolder:)];
-	[openButton setAutoresizingMask:NSViewMinYMargin | NSViewMaxXMargin];
+	[openButton setAutoresizingMask:NSViewMaxYMargin | NSViewMaxXMargin];
 	[fontsColorsView addSubview:openButton];
 	[openButton release];
 
