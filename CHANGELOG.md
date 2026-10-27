@@ -1,3 +1,10 @@
+nvALT 3.0.10
+-------------------------
+
+#### FIXED
+
+- **Fonts & Colors** keeps the top controls on screen and places the theme options under the note width slider.
+
 nvALT 3.0.9
 -------------------------
 
