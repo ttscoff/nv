@@ -23,6 +23,7 @@
 #import "NotationDirectoryManager.h"
 #import "NotationFileManager.h"
 #import "NSString_NV.h"
+#import "TagSearch.h"
 #import "NSString_CustomTruncation.h"
 #import "NSFileManager_NV.h"
 #import "EncodingsManager.h"
@@ -1499,11 +1500,14 @@ terminateApp:
 		return nil;
 	// While a note is selected the field shows its title, so the typed query is hidden.
 	// Only highlight a search the user can still see and clear.
+	NSString *highlight = nil;
 	if (isFilteringFromTyping)
-		return typedString;
-	if ([[field stringValue] isEqualToString:typedString])
-		return typedString;
-	return nil;
+		highlight = typedString;
+	else if ([[field stringValue] isEqualToString:typedString])
+		highlight = typedString;
+	if (!highlight)
+		return nil;
+	return NVHighlightStringByRemovingTagWords(highlight);
 }
 
 - (void)cacheTypedStringIfNecessary:(NSString*)aString {
