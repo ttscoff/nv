@@ -3,6 +3,28 @@ nvALT 3.0.13
 
 #### CHANGED
 
+- **Search highlighting** skips #tag words and still marks the other words in the query.
+- **Search field** corners are rounded, and the field lines up with the note editor and grows from the right when the window resizes.
+- **Selected note** stays highlighted while its tags are being edited.
+- **Svelte** theme uses dark text on the highlighted and inactive note rows.
+
+#### NEW
+
+- **Tag search** in the search field. #unix lists notes whose tags start with unix, and mixes with normal search words.
+- **Tag tokens** in the notes list and the multi-note panel. Tags on every selected note are solid chips, and tags on only some notes stay dimmed until you apply them to the rest.
+
+#### FIXED
+
+- **Tag search** after a lone #. Typing on to #unix lists tagged notes again.
+- **Tag search** while typing a second tag. #unix #shell keeps notes that have both tags.
+- **Tag editing** text stays readable on a dark editor theme.
+- **Notes list** does not jump to another note while you are editing that row's tags.
+
+nvALT 3.0.13
+-------------------------
+
+#### CHANGED
+
 - Pasted **URLs** stay plain text unless **Enable Markdown Completion** is on.
 - **Paste Markdown Link** is hidden unless **Enable Markdown Completion** is on.
 
