@@ -22,12 +22,13 @@
     },
 
     "tableViewHighlighted" : {
-        "backgroundColor" : "#8ebcbb"
+        "backgroundColor" : "#8fbcbb",
+        "foregroundColor" : "#2e3440"
     },
 
     "tableViewInactive" : {
-        "backgroundColor" : "#86c0d1aa",
-        "foregroundColor" : "#d8dee9"
+        "backgroundColor" : "#a3d0cf",
+        "foregroundColor" : "#2e3440"
     },
 
     "textView" : {

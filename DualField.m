@@ -24,6 +24,7 @@
 #define MAX_STATE_IMG_DIM 16.0
 #define CLEAR_BUTTON_IMG_DIM 16.0
 #define TEXT_LEFT_OFFSET (MAX_STATE_IMG_DIM + BORDER_LEFT_OFFSET)
+#define SEARCH_FIELD_CORNER_RADIUS 8.0
 
 @implementation DualFieldCell
 
@@ -270,6 +271,8 @@
 
 - (void)resetCursorRects {
 	NSRect bounds = [self bounds];
+	if (![[self cell] respondsToSelector:@selector(textAreaForBounds:)])
+		return;
 	
 	NSRect textArea = [[self cell] textAreaForBounds:bounds];
 	NSRect clearButtonArea = [[self cell] clearButtonRectForBounds:bounds];
@@ -424,26 +427,33 @@
 	return [image autorelease];
 }
 
+- (BOOL)isOpaque {
+	return NO;
+}
+
+- (void)drawFocusRingMask {
+	[[NSBezierPath bezierPathWithRoundRectInRect:[self bounds] radius:SEARCH_FIELD_CORNER_RADIUS] fill];
+}
+
+- (NSRect)focusRingMaskBounds {
+	return [self bounds];
+}
+
 - (void)drawRect:(NSRect)rect {
 //	[super drawRect:rect];
 	
 	NSWindow *window = [self window];
 	BOOL isActiveWin = [window isMainWindow];
 	
-	[NSGraphicsContext saveGraphicsState];
-	[[NSGraphicsContext currentContext] setShouldAntialias:NO];
-	
 	NSRect tBounds = [self bounds];
-
+	NSBezierPath *background = [NSBezierPath bezierPathWithRoundRectInRect:tBounds radius:SEARCH_FIELD_CORNER_RADIUS];
 	[[NSColor whiteColor] set];
-	NSRectFill(tBounds);
+	[background fill];
 
 	NSImage *docIcon = [NSImage imageNamed: showsDocumentIcon ? @"Pencil" : @"Search" ];
 //	[docIcon setFlipped:YES];
 	NSRect docImageRect = NSMakeRect(BORDER_LEFT_OFFSET, BORDER_TOP_OFFSET, [docIcon size].width, [docIcon size].height);
 	[docIcon drawInRect:docImageRect fromRect:NSZeroRect operation:NSCompositeSourceOver fraction:1.0 respectFlipped:YES hints:nil];
-	
-	[NSGraphicsContext restoreGraphicsState];
 	
 	//drawWithFrame: would make sense to override, but this works, too
 	[[self cell] drawWithFrame:NSMakeRect(0, 0, NSWidth(tBounds), NSHeight(tBounds)) inView:self];
@@ -457,12 +467,10 @@
 			NSRect focusRect = NSInsetRect(tBounds, 0.0f, 0.5f);
 			focusRect.origin.y -= 0.5f;
 			//drawing could be sped up by a measurable amount if this were cached in a (partially transparent) image
-			[[NSBezierPath bezierPathWithRoundRectInRect:focusRect radius:1.0f] fill];
+			[[NSBezierPath bezierPathWithRoundRectInRect:focusRect radius:SEARCH_FIELD_CORNER_RADIUS] fill];
 			[NSGraphicsContext restoreGraphicsState];
 		}
-	}	
-	
-	
+	}
 }
 
 //elasticwork

@@ -32,6 +32,19 @@
 #import "NotesTableHeaderCell.h"
 #import "LinkingEditor.h"
 #import "AppController.h"
+#import "TagEditingManager.h"
+
+@interface NotesTableView () {
+	NSTokenField *nvTokenField;
+	NVTagTokenController *nvTokenController;
+	NoteObject *nvTokenNote;
+	NSInteger nvTokenRow;
+	BOOL nvTokenCommitting;
+	BOOL nvTokenEditTitleNext;
+}
+- (void)nv_beginTokenEditAtColumn:(NSInteger)columnIndex row:(NSInteger)rowIndex;
+- (void)nv_removeTokenField;
+@end
 //#import "NotesTableCornerView.h"
 
 #define STATUS_STRING_FONT_SIZE 16.0f
@@ -40,6 +53,13 @@
 #define SYNTHETIC_TAGS_COLUMN_INDEX 200
 
 static void _CopyItemWithSelectorFromMenu(NSMenu *destMenu, NSMenu *sourceMenu, SEL aSel, id target, NSInteger tag);
+
+static BOOL NVAppearanceIsDark(NSAppearance *appearance) {
+	if (!appearance)
+		return NO;
+	NSAppearanceName match = [appearance bestMatchFromAppearancesWithNames:@[NSAppearanceNameAqua, NSAppearanceNameDarkAqua]];
+	return [match isEqualToString:NSAppearanceNameDarkAqua];
+}
 
 @implementation NotesTableView
 
@@ -248,7 +268,7 @@ static void _CopyItemWithSelectorFromMenu(NSMenu *destMenu, NSMenu *sourceMenu, 
 
 - (void)updateTitleDereferencorState {
 	NSWindow *win = [self window];
-	[self _setActiveStyleState: [win isMainWindow] && ([win firstResponder] == self || [self currentEditor]) ];
+	[self _setActiveStyleState: [win isMainWindow] && ([win firstResponder] == self || [self currentEditor] || nvTokenField) ];
    
 }
 
@@ -259,12 +279,13 @@ static void _CopyItemWithSelectorFromMenu(NSMenu *destMenu, NSMenu *sourceMenu, 
 }
 
 - (BOOL)resignFirstResponder {	
-	[self _setActiveStyleState:NO];
+	if (!nvTokenField)
+		[self _setActiveStyleState:NO];
 	return [super resignFirstResponder];
 }
 
 - (void)reloadDataIfNotEditing {
-	if (![self currentEditor]) {
+	if (![self currentEditor] && !nvTokenField) {
 		[self reloadData];
 	}
 }
@@ -1078,6 +1099,26 @@ enum { kNext_Tag = 'j', kPrev_Tag = 'k' };
 	return YES;
 }
 
+- (NSDictionary *)textView:(NSTextView *)view shouldChangeTypingAttributes:(NSDictionary *)oldTypingAttributes toAttributes:(NSDictionary *)newTypingAttributes {
+	if (view != (NSTextView *)[self currentEditor])
+		return newTypingAttributes;
+	NSMutableDictionary *attrs = [newTypingAttributes mutableCopy];
+	if (!attrs)
+		attrs = [[NSMutableDictionary alloc] init];
+	NVEditorTheme *theme = [[NVThemeManager sharedManager] currentEditorTheme];
+	NSColor *windowBG = [theme windowBackgroundColor];
+	BOOL dark = NVAppearanceIsDark([[self window] appearance]);
+	if (windowBG && !NVThemeColorIsLight(windowBG))
+		dark = YES;
+	NSColor *textColor = [NSColor blackColor];
+	if (dark) {
+		NSColor *windowFG = [theme windowForegroundColor];
+		textColor = (windowFG && NVThemeColorIsLight(windowFG)) ? windowFG : [NSColor whiteColor];
+	}
+	[attrs setObject:textColor forKey:NSForegroundColorAttributeName];
+	return [attrs autorelease];
+}
+
 - (id)labelsListSource {
 	return labelsListSource;
 }
@@ -1159,6 +1200,145 @@ enum { kNext_Tag = 'j', kPrev_Tag = 'k' };
 	return lastEventActivatedTagEdit;
 }
 
+- (void)nv_contrastFieldEditor:(NSTextView *)editor {
+	static BOOL applying = NO;
+	if (applying || ![editor isKindOfClass:[NSTextView class]])
+		return;
+	applying = YES;
+	/* The theme window, not system light/dark, decides this field. Highlighted tag text was forced black, which is the color in the field. */
+	NVEditorTheme *theme = [[NVThemeManager sharedManager] currentEditorTheme];
+	NSColor *windowBG = [theme windowBackgroundColor];
+	BOOL dark = NVAppearanceIsDark([[self window] appearance]);
+	if (windowBG && !NVThemeColorIsLight(windowBG))
+		dark = YES;
+	NSColor *textColor = [NSColor blackColor];
+	if (dark) {
+		NSColor *windowFG = [theme windowForegroundColor];
+		textColor = (windowFG && NVThemeColorIsLight(windowFG)) ? windowFG : [NSColor whiteColor];
+	}
+	[editor setTextColor:textColor];
+	[editor setInsertionPointColor:textColor];
+	NSTextStorage *storage = [editor textStorage];
+	if ([storage length]) {
+		[storage beginEditing];
+		[storage addAttribute:NSForegroundColorAttributeName value:textColor range:NSMakeRange(0, [storage length])];
+		[storage endEditing];
+	}
+	NSMutableDictionary *typing = [[editor typingAttributes] mutableCopy];
+	if (!typing)
+		typing = [[NSMutableDictionary alloc] init];
+	[typing setObject:textColor forKey:NSForegroundColorAttributeName];
+	[editor setTypingAttributes:typing];
+	[typing release];
+
+	NSMutableDictionary *selected = [[editor selectedTextAttributes] mutableCopy];
+	if (!selected)
+		selected = [[NSMutableDictionary alloc] init];
+	[selected setObject:textColor forKey:NSForegroundColorAttributeName];
+	if (dark)
+		[selected setObject:[NSColor colorWithCalibratedWhite:1.0 alpha:0.22] forKey:NSBackgroundColorAttributeName];
+	[editor setSelectedTextAttributes:selected];
+	[selected release];
+	applying = NO;
+}
+
+- (NSInteger)nv_tagEditingRow {
+	return nvTokenField ? nvTokenRow : -1;
+}
+
+- (NSRect)nv_tokenRectForColumn:(NSInteger)columnIndex row:(NSInteger)rowIndex {
+	NSRect cellFrame = [self frameOfCellAtColumn:columnIndex row:rowIndex];
+	NSCell *cell = [self preparedCellAtColumn:columnIndex row:rowIndex];
+	if ([cell respondsToSelector:@selector(nv_tagsRectForFrame:)])
+		cellFrame = [(id)cell nv_tagsRectForFrame:cellFrame];
+	if (cellFrame.size.height < 22.0) {
+		CGFloat grow = 22.0 - cellFrame.size.height;
+		cellFrame.origin.y -= grow;
+		cellFrame.size.height = 22.0;
+	}
+	return NSInsetRect(cellFrame, 3.0, 0.0);
+}
+
+- (void)nv_removeTokenField {
+	NSTokenField *field = nvTokenField;
+	NVTagTokenController *controller = nvTokenController;
+	nvTokenField = nil;
+	nvTokenController = nil;
+	nvTokenRow = -1;
+	[nvTokenNote release];
+	nvTokenNote = nil;
+	[field removeFromSuperview];
+	[field release];
+	[controller autorelease];
+}
+
+- (void)nv_beginTokenEditAtColumn:(NSInteger)columnIndex row:(NSInteger)rowIndex {
+	if (rowIndex < 0 || rowIndex >= [self numberOfRows] || columnIndex < 0)
+		return;
+	NoteObject *note = [(FastListDataSource *)[self dataSource] immutableObjects][rowIndex];
+	NSRect rect = [self nv_tokenRectForColumn:columnIndex row:rowIndex];
+	NSTokenField *field = [[NSTokenField alloc] initWithFrame:rect];
+	[field setFont:[globalPrefs tableFont]];
+	[field setFocusRingType:NSFocusRingTypeNone];
+	[[field cell] setScrollable:YES];
+	[field setAutoresizingMask:NSViewMinYMargin];
+	nvTokenField = field;
+	nvTokenRow = rowIndex;
+	[nvTokenNote release];
+	nvTokenNote = [note retain];
+	nvTokenController = [[NVTagTokenController alloc] init];
+	[nvTokenController setDelegate:self];
+	[nvTokenController setLabelsSource:labelsListSource];
+	[self addSubview:nvTokenField];
+	[nvTokenController attachToField:nvTokenField];
+	[nvTokenController showTitles:[labelsOfNote(note) labelCompatibleWords] partialTitles:nil];
+	[[self window] makeFirstResponder:nvTokenField];
+	[self _setActiveStyleState:YES];
+}
+
+- (void)tagTokenController:(NVTagTokenController *)controller didEndWithTitles:(NSArray *)titles cancelled:(BOOL)wasCancelled {
+	if (controller != nvTokenController)
+		return;
+	BOOL editTitle = nvTokenEditTitleNext;
+	nvTokenEditTitleNext = NO;
+	/* The list re-sorts when a tag changes the note. Keep the note from when editing started, not whatever later occupies that row. */
+	NoteObject *note = wasCancelled ? nil : [nvTokenNote retain];
+	NSString *joined = nil;
+	NSString *existing = note ? (labelsOfNote(note) ?: @"") : nil;
+	if (note) {
+		NSString *separator = ([existing rangeOfString:@","].location != NSNotFound) ? @"," : @" ";
+		joined = [titles count] ? [titles componentsJoinedByString:separator] : @"";
+	}
+	[self nv_removeTokenField];
+	lastEventActivatedTagEdit = NO;
+	if (note && joined && ![joined isEqualToString:existing]) {
+		nvTokenCommitting = YES;
+		[note setLabelString:joined];
+		nvTokenCommitting = NO;
+	}
+	[note release];
+	[(AppController *)[self delegate] setIsEditing:NO];
+	[self updateTitleDereferencorState];
+	if (editTitle)
+		[self editRowAtColumnWithIdentifier:NoteTitleColumnString];
+	else
+		[[self window] makeFirstResponder:self];
+}
+
+- (BOOL)tagTokenController:(NVTagTokenController *)controller textView:(NSTextView *)textView doCommandBySelector:(SEL)command {
+	if (command == @selector(insertBacktab:) && [globalPrefs horizontalLayout]) {
+		nvTokenEditTitleNext = YES;
+		nvTokenCommitting = YES;
+		[nvTokenField validateEditing];
+		[[self window] makeFirstResponder:self];
+		if (nvTokenField)
+			[nvTokenController endEditing];
+		nvTokenCommitting = NO;
+		return YES;
+	}
+	return NO;
+}
+
 - (void)editColumn:(NSInteger)columnIndex row:(NSInteger)rowIndex withEvent:(NSEvent *)event select:(BOOL)flag {
     
     [(AppController *)[self delegate] setIsEditing:YES];
@@ -1168,17 +1348,31 @@ enum { kNext_Tag = 'j', kPrev_Tag = 'k' };
 	BOOL tagsInTitleColumn = [globalPrefs horizontalLayout] && ((isTitleCol && [self eventIsTagEdit:event forColumn:columnIndex row:rowIndex]) ||
 																SYNTHETIC_TAGS_COLUMN_INDEX == columnIndex);
 	
+	BOOL labelsColumn = NO;
+	if (![globalPrefs horizontalLayout] && columnIndex >= 0 && columnIndex < (NSInteger)[[self tableColumns] count])
+		labelsColumn = [[[[self tableColumns] objectAtIndex:columnIndex] identifier] isEqualToString:NoteLabelsColumnString];
+	
 	if ([self editedRow] == rowIndex && [self currentEditor]) {
 		//this row is currently being edited; finish editing before start it again anywhere else
 		[[self window] makeFirstResponder:self];
 	}
-	lastEventActivatedTagEdit = tagsInTitleColumn;
+	if (nvTokenField) {
+		nvTokenCommitting = YES;
+		[nvTokenField validateEditing];
+		[[self window] makeFirstResponder:self];
+		if (nvTokenField)
+			[nvTokenController endEditing];
+		nvTokenCommitting = NO;
+	}
+	lastEventActivatedTagEdit = tagsInTitleColumn || labelsColumn;
 	
-	if (tagsInTitleColumn && !ColumnIsSet(NoteLabelsColumn, [globalPrefs tableColumnsBitmap])) {
-		[self addPermanentTableColumn:[self noteAttributeColumnForIdentifier:NoteLabelsColumnString]];
+	if (tagsInTitleColumn || labelsColumn) {
+		[self nv_beginTokenEditAtColumn:(tagsInTitleColumn ? 0 : columnIndex) row:rowIndex];
+		[self updateTitleDereferencorState];
+		return;
 	}
 	
-	[super editColumn:tagsInTitleColumn ? 0 : columnIndex row:rowIndex withEvent:event select:flag];
+	[super editColumn:columnIndex row:rowIndex withEvent:event select:flag];
 	
 	//become/resignFirstResponder can't handle the field-editor case for row-highlighting style, so do it here:
 	[self updateTitleDereferencorState];
@@ -1205,7 +1399,10 @@ enum { kNext_Tag = 'j', kPrev_Tag = 'k' };
 #endif
 		
 		if (flag) [editor setSelectedRange:range];
-	}	
+	}
+	NSTextView *fieldEditor = (NSTextView *)[self currentEditor];
+	if ([fieldEditor isKindOfClass:[NSTextView class]])
+		[self nv_contrastFieldEditor:fieldEditor];
 }
 
 - (void)textDidEndEditing:(NSNotification *)aNotification {
@@ -1215,6 +1412,8 @@ enum { kNext_Tag = 'j', kPrev_Tag = 'k' };
 
 
 - (BOOL)abortEditing {
+	if (nvTokenField && !nvTokenCommitting && ![nvTokenController isAwaitingEndEditing])
+		[nvTokenController cancelEditing];
     [(AppController *)[self delegate] setIsEditing:NO];
 	BOOL result = [super abortEditing];
 	[self updateTitleDereferencorState];
@@ -1227,18 +1426,18 @@ enum { kNext_Tag = 'j', kPrev_Tag = 'k' };
 }
 
 - (void)textDidChange:(NSNotification *)aNotification {
+	NSTextView *editor = [aNotification object];
 	NSInteger col = [self editedColumn];
 	if (col > -1 && [self attributeSetterForColumn:[[self tableColumns] objectAtIndex:col]] == @selector(setLabelString:)) {
 		//text changed while editing tags; autocomplete!
-		
-		NSTextView *editor = [aNotification object];
-		
 		if (!isAutocompleting && !wasDeleting) {
 			isAutocompleting = YES;
 			[editor complete:self];
 			isAutocompleting = NO;
 		}
 	}
+	if ([editor isKindOfClass:[NSTextView class]])
+		[self nv_contrastFieldEditor:editor];
 }
 
 - (NSArray *)labelCompletionsForString:(NSString *)fieldString index:(NSInteger)index{
@@ -1473,7 +1672,7 @@ enum { kNext_Tag = 'j', kPrev_Tag = 'k' };
 		return;
 	}
 	NVEditorTheme *listTheme = [[NVThemeManager sharedManager] currentEditorTheme];
-	BOOL focused = [[self window] firstResponder] == self || [self currentEditor] != nil;
+	BOOL focused = [[self window] firstResponder] == self || [self currentEditor] != nil || nvTokenField != nil;
 	NSColor *themedFill = listTheme ? (focused ? [listTheme listSelectionColor] : [listTheme listInactiveSelectionColor]) : nil;
 	if (themedFill) {
 		[themedFill setFill];

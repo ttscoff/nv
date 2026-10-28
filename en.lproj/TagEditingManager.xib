@@ -34,11 +34,6 @@
                         </textFieldCell>
                         <connections>
                             <action selector="multiTag:" target="-1" id="425"/>
-                            <binding destination="-2" name="value" keyPath="tagFieldString" id="438">
-                                <dictionary key="options">
-                                    <bool key="NSContinuouslyUpdatesValue" value="YES"/>
-                                </dictionary>
-                            </binding>
                         </connections>
                     </textField>
                 </subviews>

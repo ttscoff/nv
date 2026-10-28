@@ -36,6 +36,13 @@
 	return YES;
 }
 
+- (NSText *)setUpFieldEditorAttributes:(NSText *)textObj {
+	NSText *editor = [super setUpFieldEditorAttributes:textObj];
+	if ([editor isKindOfClass:[NSTextView class]] && [[self controlView] isKindOfClass:[NotesTableView class]])
+		[(NotesTableView *)[self controlView] nv_contrastFieldEditor:(NSTextView *)editor];
+	return editor;
+}
+
 
 - (NoteObject*)noteObject {
 	return noteObject;

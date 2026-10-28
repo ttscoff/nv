@@ -64,11 +64,20 @@
 //}
 //#endif
 
+- (NSText *)setUpFieldEditorAttributes:(NSText *)textObj {
+	NSText *editor = [super setUpFieldEditorAttributes:textObj];
+	if ([editor isKindOfClass:[NSTextView class]] && [[self controlView] isKindOfClass:[NotesTableView class]])
+		[(NotesTableView *)[self controlView] nv_contrastFieldEditor:(NSTextView *)editor];
+	return editor;
+}
+
 - (void)selectWithFrame:(NSRect)aRect inView:(NSView *)controlView editor:(NSText *)textObj 
 			   delegate:(id)anObject start:(NSInteger)selStart length:(NSInteger)selLength {
 	
 	NSRect rect = [(NotesTableView*)controlView lastEventActivatedTagEdit] ? [self nv_tagsRectForFrame:aRect] : [self nv_titleRectForFrame:aRect];
 	[super selectWithFrame:rect inView:controlView editor:textObj delegate:anObject start:selStart length:selLength];
+	if ([textObj isKindOfClass:[NSTextView class]])
+		[(NotesTableView *)controlView nv_contrastFieldEditor:(NSTextView *)textObj];
 	
 	[controlView setKeyboardFocusRingNeedsDisplayInRect:NSInsetRect([self nv_tagsRectForFrame:aRect], -3, -3)];
 }

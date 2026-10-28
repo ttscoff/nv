@@ -1030,7 +1030,8 @@ terminateApp:
         NSPoint cPoint=NSMakePoint(NSMidX(linkingFrame), NSMaxY(linkingFrame));
         
         //Multiple Notes selected, use ElasticThreads' multitagging implementation
-        tagEditor = [[[TagEditingManager alloc] initWithDelegate:self commonTags:[self commonLabelsForNotesAtIndexes:selIndexes] atPoint:cPoint] retain];
+        NSArray *notes = [notationController notesAtIndexes:selIndexes];
+        tagEditor = [[TagEditingManager alloc] initWithDelegate:self notes:notes labelsSource:[notationController labelsListDataSource] atPoint:cPoint];
         
 		//Multiple Notes selected, use ElasticThreads' multitagging implementation
 	} else if ([selIndexes count] == 1) {
@@ -1583,39 +1584,7 @@ terminateApp:
 		
 		isFilteringFromTyping = NO;
         
-	} else if ([tagEditor isMultitagging]) { //<--for elasticthreads multitagging
-        if (!isAutocompleting&&!wasDeleting) {
-            isAutocompleting = YES;
-            NSTextView *editor = [tagEditor tagFieldEditor];
-            NSRange selRange = [editor selectedRange];
-            NSString *tagString = [NSString stringWithString:tagEditor.tagFieldString];
-            NSString *searchString = tagString;
-            if (selRange.length>0) {
-                searchString = [searchString substringWithRange:selRange];
-            }
-            searchString = [[searchString componentsSeparatedByCharactersInSet:[NSCharacterSet characterSetWithCharactersInString:@", "]] lastObject];
-            selRange = [tagString rangeOfString:searchString options:NSBackwardsSearch];
-            NSArray *theTags = [notesTableView labelCompletionsForString:searchString index:0];
-            if ((theTags)&&([theTags count]>0)&&(![[theTags objectAtIndex:0] isEqualToString:@""])){
-                NSString *useStr;
-                for (useStr in theTags) {
-                    if ([tagString rangeOfString:useStr].location==NSNotFound) {
-                        break;
-                    }
-                }
-                if (useStr) {
-                    tagString = [tagString substringToIndex:selRange.location];
-                    tagString = [tagString stringByAppendingString:useStr];
-                    selRange = NSMakeRange(selRange.location + selRange.length, useStr.length - searchString.length );
-                    [tagEditor setTF:tagString];
-                    [editor setSelectedRange:selRange];
-                }
-            }
-            isAutocompleting = NO;
-            //            [tagString release];
-        }
-        wasDeleting = NO;
-    }
+	}
 }
 
 - (void)tableViewSelectionIsChanging:(NSNotification *)aNotification {
@@ -2136,7 +2105,7 @@ terminateApp:
 - (BOOL)notationListShouldChange:(NotationController*)someNotation {
 	
 	if (someNotation == notationController) {
-		if ([notesTableView currentEditor])
+		if ([notesTableView currentEditor] || [notesTableView nv_tagEditingRow] >= 0)
 			return NO;
 	}
 	
@@ -2411,6 +2380,101 @@ terminateApp:
 
 #pragma mark SplitView Delegate methods
 
+- (void)nv_pinViewLeftEdge:(NSView *)view {
+	// Fixed left margin, flexible width: window resize grows the right edge only.
+	NSUInteger mask = [view autoresizingMask];
+	mask &= ~(NSViewMinXMargin | NSViewMaxXMargin);
+	mask |= NSViewWidthSizable;
+	[view setAutoresizingMask:mask];
+}
+
+- (void)alignSearchFieldWithEditor {
+	static BOOL aligning = NO;
+	if (aligning || !field || !splitView || !notesSubview || !window)
+		return;
+	NSView *container = [field superview];
+	NSView *titlebar = [[window standardWindowButton:NSWindowCloseButton] superview];
+	if (!container || !titlebar || [container window] != window || [notesSubview window] != window)
+		return;
+	if (NSWidth([container bounds]) < 1.0 || NSHeight([container bounds]) < 1.0)
+		return;
+	// Old fullscreen mode hosts the field in the content view, not the titlebar.
+	if (dualFieldView && [container superview] == dualFieldView)
+		return;
+
+	NSRect titlebarInWindow = [titlebar convertRect:[titlebar bounds] toView:nil];
+	CGFloat right = NSMaxX(titlebarInWindow) - 6.0;
+	CGFloat left = NSMinX(titlebarInWindow);
+	if ([splitView isVertical] && ![notesSubview isCollapsed]) {
+		NSRect listInWindow = [notesSubview convertRect:[notesSubview bounds] toView:nil];
+		left = NSMaxX(listInWindow);
+	}
+	NSButton *zoomButton = [window standardWindowButton:NSWindowZoomButton];
+	if (zoomButton && [zoomButton superview]) {
+		NSRect zoomInWindow = [[zoomButton superview] convertRect:[zoomButton frame] toView:nil];
+		CGFloat minLeft = ceil(NSMaxX(zoomInWindow) + 4.0);
+		if (minLeft > NSMinX(titlebarInWindow) && minLeft < NSMaxX(titlebarInWindow) * 0.5 && left < minLeft)
+			left = minLeft;
+	}
+	left = round(left);
+	if (right - left < 50.0)
+		return;
+
+	NSRect containerInWindow = [container convertRect:[container bounds] toView:nil];
+	BOOL alreadyPinned = [container superview] == titlebar
+		&& fabs(NSMinX(containerInWindow) - left) <= 0.5
+		&& fabs(NSMaxX(containerInWindow) - right) <= 0.5
+		&& fabs(NSMinX([field frame])) <= 0.5
+		&& fabs(NSWidth([field frame]) - NSWidth([container bounds])) <= 0.5;
+	if (alreadyPinned)
+		return;
+
+	aligning = YES;
+	// The toolbar item slot cannot start left of the title. Host the field in the
+	// titlebar itself so its left edge can sit on the notes list.
+	if ([container superview] != titlebar) {
+		[container retain];
+		if (dualFieldItem && [dualFieldItem view] == container) {
+			NSView *placeholder = [[[NSView alloc] initWithFrame:NSMakeRect(0, 0, 0, NSHeight(containerInWindow))] autorelease];
+			[dualFieldItem setMinSize:NSMakeSize(0, NSHeight(containerInWindow))];
+			[dualFieldItem setMaxSize:NSMakeSize(0, NSHeight(containerInWindow))];
+			[dualFieldItem setView:placeholder];
+		}
+		[container removeFromSuperview];
+		[titlebar addSubview:container];
+		[container release];
+	}
+
+	NSRect desired = NSMakeRect(left, NSMinY(containerInWindow), right - left, NSHeight(containerInWindow));
+	NSRect frame = [titlebar convertRect:desired fromView:nil];
+	frame.origin.x = round(frame.origin.x);
+	frame.origin.y = round(frame.origin.y);
+	frame.size.width = round(NSWidth(frame));
+	[container setFrame:frame];
+	[self nv_pinViewLeftEdge:container];
+
+	NSRect fieldFrame = [field frame];
+	fieldFrame.origin.x = 0.0;
+	fieldFrame.size.width = NSWidth([container bounds]);
+	[field setFrame:fieldFrame];
+	[container setNeedsDisplay:YES];
+	NSTextView *editor = (NSTextView *)[field currentEditor];
+	NSCell *searchCell = [field cell];
+	/* Nib load can lay this out before DualField swaps in DualFieldCell. */
+	if ([editor isKindOfClass:[NSTextView class]] && [searchCell respondsToSelector:@selector(textAreaForBounds:)])
+		[editor setFrame:[(id)searchCell textAreaForBounds:[field bounds]]];
+	aligning = NO;
+}
+
+- (void)windowDidLayout:(NSNotification *)notification {
+	[self alignSearchFieldWithEditor];
+}
+
+- (void)didAdjustSubviews:(RBSplitView*)sender {
+	if (sender == splitView)
+		[self alignSearchFieldWithEditor];
+}
+
 - (void)splitView:(RBSplitView*)sender wasResizedFrom:(CGFloat)oldDimension to:(CGFloat)newDimension {
 	if (sender == splitView) {
 		[sender adjustSubviewsExcepting:notesSubview];
@@ -2562,7 +2626,7 @@ terminateApp:
 - (void)tableView:(NSTableView *)aTableView willDisplayCell:(id)aCell forTableColumn:(NSTableColumn *)aTableColumn row:(NSInteger)rowIndex {
     if (aTableView==notesTableView) {
         NVEditorTheme *listTheme = [[NVThemeManager sharedManager] currentEditorTheme];
-        BOOL rowIsFocused = ([window firstResponder]==notesTableView)||(isEditing&&([notesTableView editedRow]==rowIndex));
+        BOOL rowIsFocused = ([window firstResponder]==notesTableView)||(isEditing&&([notesTableView editedRow]==rowIndex))||([notesTableView nv_tagEditingRow]==rowIndex);
         NSColor *rowColor = foregrndColor;
         if (listTheme) {
             if ([aCell isHighlighted])
@@ -2651,79 +2715,13 @@ terminateApp:
 }
 
 - (IBAction)multiTag:(id)sender {
-	NSString *tagString = [tagEditor.tagFieldString stringByTrimmingCharactersInSet:[NSCharacterSet labelSeparatorCharacterSet]];
-	NSArray *newTags;
-    if (tagString&&(tagString.length>0)) {
-        newTags=[tagString labelCompatibleWords];
-    }else{
-        newTags=[NSArray array];
-    }
-    NSArray *commonLabs=tagEditor.commonTags;
-    if (![newTags isEqualToArray:commonLabs]) {
-        
-        NSArray *selNotes = [notationController notesAtIndexes:[notesTableView selectedRowIndexes]];
-        if (!selNotes||([selNotes count]==0)) {
-            return;
-        }
-        tagString=nil;
-        
-        BOOL gotNewLabels=(newTags&&([newTags count]>0));
-        BOOL gotCommonLabels=(commonLabs&&([commonLabs count]>0));
-        NSPredicate *pred;
-        if (gotCommonLabels&&gotNewLabels) {
-            pred=[NSPredicate predicateWithFormat:@"NOT %@ CONTAINS[cd] SELF",newTags];
-            commonLabs=[commonLabs filteredArrayUsingPredicate:pred];
-        }
-        NSMutableArray *finalTags = [NSMutableArray new];
-        for (NoteObject *aNote in selNotes) {
-            NSString *separator=@" ";
-            tagString=labelsOfNote(aNote);
-            NSArray *filteredTags;
-            
-            if (tagString&&(tagString.length>0)) {
-                if (([tagString rangeOfString:@","].location!=NSNotFound)) {
-                    separator=@",";
-                }
-                filteredTags=[tagString labelCompatibleWords];
-                if (gotCommonLabels) {
-                    pred=[NSPredicate predicateWithFormat:@"NOT %@ CONTAINS[cd] SELF",commonLabs];
-                    filteredTags=[filteredTags filteredArrayUsingPredicate:pred];
-                }
-                if (filteredTags&&([filteredTags count]>0)) {
-                    [finalTags addObjectsFromArray:filteredTags];
-                }
-            }
-            if (gotNewLabels) {
-                if (finalTags&&([finalTags count]>0)) {
-                    pred=[NSPredicate predicateWithFormat:@"NOT %@ CONTAINS[cd] SELF",finalTags];
-                    filteredTags=[newTags filteredArrayUsingPredicate:pred];
-                    if (filteredTags&&([filteredTags count]>0)) {
-                        [finalTags addObjectsFromArray:filteredTags];
-                    }
-                }else{
-                    [finalTags addObjectsFromArray:newTags];
-                }
-            }
-            if (finalTags&&([finalTags count]>0)) {
-                tagString = [finalTags componentsJoinedByString:separator];
-            }else{
-                tagString=@"";
-            }
-        
-            [aNote setLabelString:tagString];
-            [finalTags removeAllObjects];
-        }
-        
-		[notesTableView scrollRowToVisible:[[notesTableView selectedRowIndexes] firstIndex]];
-        [finalTags release];
-    }
-	[tagEditor closeTP:self];
+	[tagEditor commitTokens:sender];
 }
 
 - (void)releaseTagEditor:(NSNotification *)note{
-    if (tagEditor) {
-        [tagEditor release];
-    }
+    TagEditingManager *editor = tagEditor;
+    tagEditor = nil;
+    [editor release];
 }
 
 #pragma mark splitview/toolbar management
@@ -3122,10 +3120,9 @@ terminateApp:
     
     if (self.isEditing) {
         [theFieldEditor setDrawsBackground:NO];
-        [theFieldEditor setTextColor:foregrndColor];
         [theFieldEditor setSelectedTextAttributes:fieldAttributes];
-        [theFieldEditor setInsertionPointColor:foregrndColor];
-        
+        if ([notesTableView respondsToSelector:@selector(nv_contrastFieldEditor:)])
+            [notesTableView nv_contrastFieldEditor:theFieldEditor];
     }
     
 }
@@ -3431,11 +3428,9 @@ terminateApp:
                 }
                 [theFieldEditor setDrawsBackground:NO];
                 // [theFieldEditor setBackgroundColor:backgrndColor];
-                if ([theFieldEditor textColor] != foregrndColor) {
-                    [theFieldEditor setTextColor:foregrndColor];
-                }
                 [theFieldEditor setSelectedTextAttributes:fieldAttributes];
-                [theFieldEditor setInsertionPointColor:foregrndColor];
+                if ([notesTableView respondsToSelector:@selector(nv_contrastFieldEditor:)])
+                    [notesTableView nv_contrastFieldEditor:theFieldEditor];
                 
                 // [notesTableView setNeedsDisplay:YES];
             }

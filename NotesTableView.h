@@ -104,6 +104,8 @@ typedef struct _ViewLocationContext {
 - (NSArray *)labelCompletionsForString:(NSString *)fieldString index:(NSInteger)index;
 - (BOOL)needsGridLines;
 - (void)updateGrid;
+- (void)nv_contrastFieldEditor:(NSTextView *)editor;
+- (NSInteger)nv_tagEditingRow;
 
 @end
 
