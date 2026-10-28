@@ -22,6 +22,7 @@
 		212089B10B0C24F500A15A69 /* AlienNoteImporter.m in Sources */ = {isa = PBXBuildFile; fileRef = 212089B00B0C24F500A15A69 /* AlienNoteImporter.m */; };
 		212089D80B0C2CA500A15A69 /* StickiesDocument.m in Sources */ = {isa = PBXBuildFile; fileRef = 212089D70B0C2CA500A15A69 /* StickiesDocument.m */; };
 		212B84620978422300F3597F /* NSString_NV.m in Sources */ = {isa = PBXBuildFile; fileRef = 212B84610978422300F3597F /* NSString_NV.m */; };
+		B7E1AA031F0A000100000003 /* TagSearch.m in Sources */ = {isa = PBXBuildFile; fileRef = B7E1AA021F0A000100000002 /* TagSearch.m */; };
 		212C6952110E1940004DD82C /* TitlebarButton.m in Sources */ = {isa = PBXBuildFile; fileRef = 212C6951110E1940004DD82C /* TitlebarButton.m */; };
 		212C6A2A110E371B004DD82C /* TBSynchronizingWhite.png in Resources */ = {isa = PBXBuildFile; fileRef = 212C6A23110E371B004DD82C /* TBSynchronizingWhite.png */; };
 		212C6A2C110E371B004DD82C /* TBDownArrowWhite.png in Resources */ = {isa = PBXBuildFile; fileRef = 212C6A25110E371B004DD82C /* TBDownArrowWhite.png */; };
@@ -334,6 +335,8 @@
 		212089D70B0C2CA500A15A69 /* StickiesDocument.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = StickiesDocument.m; sourceTree = "<group>"; };
 		212B84600978422300F3597F /* NSString_NV.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = NSString_NV.h; sourceTree = "<group>"; };
 		212B84610978422300F3597F /* NSString_NV.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; path = NSString_NV.m; sourceTree = "<group>"; };
+		B7E1AA011F0A000100000001 /* TagSearch.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TagSearch.h; sourceTree = "<group>"; };
+		B7E1AA021F0A000100000002 /* TagSearch.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TagSearch.m; sourceTree = "<group>"; };
 		212C6950110E1940004DD82C /* TitlebarButton.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TitlebarButton.h; sourceTree = "<group>"; };
 		212C6951110E1940004DD82C /* TitlebarButton.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TitlebarButton.m; sourceTree = "<group>"; };
 		212C6A22110E371B004DD82C /* TBAlertWhite.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = TBAlertWhite.png; path = Images/TBAlertWhite.png; sourceTree = "<group>"; };
@@ -918,6 +921,8 @@
 				21DB4BE512DE4E3D0057F52B /* NSString_CustomTruncation.m */,
 				212B84600978422300F3597F /* NSString_NV.h */,
 				212B84610978422300F3597F /* NSString_NV.m */,
+				B7E1AA011F0A000100000001 /* TagSearch.h */,
+				B7E1AA021F0A000100000002 /* TagSearch.m */,
 				D3EEC9FF106F66C70023D7F8 /* NVPasswordGenerator.h */,
 				D3EEC9FE106F66C70023D7F8 /* NVPasswordGenerator.m */,
 				A7E100012F0A000100000001 /* NVTheme.h */,
@@ -1680,6 +1685,7 @@
 				21A30EA70971D11D0071E9AF /* FastListDataSource.m in Sources */,
 				21A6E6FD0974204F008436A9 /* LabelsListController.m in Sources */,
 				212B84620978422300F3597F /* NSString_NV.m in Sources */,
+				B7E1AA031F0A000100000003 /* TagSearch.m in Sources */,
 				21DC788F097894B600E59B09 /* NSCollection_utils.m in Sources */,
 				2155DEA6097B5F0300163A10 /* BufferUtils.c in Sources */,
 				2155DF44097C992800163A10 /* AttributedPlainText.m in Sources */,

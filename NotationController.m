@@ -27,6 +27,7 @@
 #import "NoteObject.h"
 #import "DeletedNoteObject.h"
 #import "NSString_NV.h"
+#import "TagSearch.h"
 #import "NSFileManager_NV.h"
 #import "BufferUtils.h"
 #import "GlobalPrefs.h"
@@ -1354,6 +1355,10 @@ bail:
     [delegate notationListDidChange:self];
 }
 
+static BOOL noteHasTagPrefix(NoteObject *note, void *context) {
+	return NVTagTitlesMatchPrefix([note orderedLabelTitles], (NSString *)context);
+}
+
 - (BOOL)filterNotesFromUTF8String:(const char*)searchString forceUncached:(BOOL)forceUncached {
     BOOL stringHasExistingPrefix = YES;
     BOOL didFilterNotes = NO;
@@ -1388,6 +1393,8 @@ bail:
 	//perhaps we could add some additional delimiters like punctuation marks here
     char *token, *separators = (strchr(searchString, '"') ? "\"" : " :\t\r\n");
     manglingString = replaceString(manglingString, searchString);
+
+    BOOL queryHasTagWord = NVQueryContainsTagWord([NSString stringWithUTF8String:searchString]);
     
     BOOL touchedNotes = NO;
     
@@ -1397,17 +1404,30 @@ bail:
 		
 		char *preMangler = manglingString + lastWordInFilterStr;
 		while ((token = strsep(&preMangler, separators))) {
-			
+
 			if (*token != '\0') {
-				//if this is the same token that we had scanned previously
-				filterContext.useCachedPositions = stringHasExistingPrefix && (token == manglingString + lastWordInFilterStr);
-				filterContext.needle = token;
-				
-				touchedNotes = YES;
-				
-				if ([notesListDataSource filterArrayUsingFunction:(BOOL (*)(id, void*))noteContainsUTF8String context:&filterContext])
-					didFilterNotes = YES;
-								
+				NSString *tagPrefix = nil;
+				BOOL tagWord = NO;
+				if (queryHasTagWord) {
+					NSString *word = [NSString stringWithUTF8String:token];
+					tagWord = NVSearchWordIsTagPrefix(word, &tagPrefix);
+				}
+
+				if (tagWord) {
+					touchedNotes = YES;
+					if ([notesListDataSource filterArrayUsingFunction:(BOOL (*)(id, void*))noteHasTagPrefix context:(void *)tagPrefix])
+						didFilterNotes = YES;
+				} else {
+					//if this is the same token that we had scanned previously
+					filterContext.useCachedPositions = stringHasExistingPrefix && (token == manglingString + lastWordInFilterStr);
+					filterContext.needle = token;
+
+					touchedNotes = YES;
+
+					if ([notesListDataSource filterArrayUsingFunction:(BOOL (*)(id, void*))noteContainsUTF8String context:&filterContext])
+						didFilterNotes = YES;
+				}
+
 				lastWordInFilterStr = token - manglingString;
 			}
 		}
@@ -1437,7 +1457,7 @@ bail:
 	//which will still influence note title prefixes 
 	selectedNoteIndex = NSNotFound;
 	
-    if (newLen && [prefsController autoCompleteSearches]) {
+    if (newLen && [prefsController autoCompleteSearches] && !queryHasTagWord) {
 
 		for (i=0; i<filteredNoteCount; i++) {			
 			//because we already searched word-by-word up there, this is just way simpler
