@@ -59,4 +59,4 @@ nvalt.taskpaper
 .github/prompts/
 commit_message.txt
 buildnotes.md
-.worktrees/
+.worktrees
