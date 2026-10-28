@@ -48,8 +48,18 @@ BOOL NVQueryContainsTagWord(NSString *query) {
 	return NO;
 }
 
+static NSUInteger NVTagWordCount(NSString *query) {
+	NSArray *words = NVSearchWords(query);
+	NSUInteger i, count = 0;
+	for (i = 0; i < [words count]; i++) {
+		if (NVSearchWordIsTagPrefix([words objectAtIndex:i], NULL))
+			count++;
+	}
+	return count;
+}
+
 BOOL NVQueryNewlyHasTagWord(NSString *previousQuery, NSString *query) {
-	return NVQueryContainsTagWord(query) && !NVQueryContainsTagWord(previousQuery);
+	return NVTagWordCount(query) > NVTagWordCount(previousQuery);
 }
 
 NSString *NVStringByRemovingTagWords(NSString *query) {

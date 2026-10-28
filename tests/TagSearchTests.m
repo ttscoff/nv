@@ -59,6 +59,9 @@ int main(int argc, const char *argv[]) {
 	expectTrue(NVQueryNewlyHasTagWord(@"shell", @"shell") == NO, "plain stays plain");
 	expectTrue(NVQueryNewlyHasTagWord(nil, nil) == NO, "nil to nil");
 	expectTrue(NVQueryNewlyHasTagWord(@"", @"#") == NO, "empty to lone hash");
+	expectTrue(NVQueryNewlyHasTagWord(@"#unix #", @"#unix #s") == YES, "second tag starts");
+	expectTrue(NVQueryNewlyHasTagWord(@"#unix #s", @"#unix #sh") == NO, "second tag grows");
+	expectTrue(NVQueryNewlyHasTagWord(@"shell #unix", @"shell #unix #s") == YES, "tag after text grows");
 
 	expectEqual(NVStringByRemovingTagWords(@"#unix shell"), @"shell", "drop tag");
 	expectEqual(NVStringByRemovingTagWords(@"shell #unix script"), @"shell script", "keep both sides");
