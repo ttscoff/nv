@@ -1368,9 +1368,15 @@ static BOOL noteHasTagPrefix(NoteObject *note, void *context) {
 	NSAssert(searchString != NULL, @"filterNotesFromUTF8String requires a non-NULL argument");
 	
 	newLen = strlen(searchString);
+
+	NSString *newQuery = [NSString stringWithUTF8String:searchString];
+	BOOL queryHasTagWord = NVQueryContainsTagWord(newQuery);
+	NSString *previousQuery = currentFilterStr ? [NSString stringWithUTF8String:currentFilterStr] : nil;
+	BOOL queryNewlyHasTagWord = NVQueryNewlyHasTagWord(previousQuery, newQuery);
     
 	//PHASE 1: determine whether notes can be searched from where they are--if not, start on all the notes
-    if (!currentFilterStr || forceUncached || ((oldLen = strlen(currentFilterStr)) > newLen) ||
+    if (!currentFilterStr || forceUncached || queryNewlyHasTagWord ||
+		((oldLen = strlen(currentFilterStr)) > newLen) ||
 		strncmp(currentFilterStr, searchString, oldLen)) {
 		
 		//the search must be re-initialized; our strings don't have the same prefix
@@ -1393,8 +1399,6 @@ static BOOL noteHasTagPrefix(NoteObject *note, void *context) {
 	//perhaps we could add some additional delimiters like punctuation marks here
     char *token, *separators = (strchr(searchString, '"') ? "\"" : " :\t\r\n");
     manglingString = replaceString(manglingString, searchString);
-
-    BOOL queryHasTagWord = NVQueryContainsTagWord([NSString stringWithUTF8String:searchString]);
     
     BOOL touchedNotes = NO;
     

@@ -51,6 +51,15 @@ int main(int argc, const char *argv[]) {
 	expectTrue(NVQueryContainsTagWord(@"\"#unix:admin\"") == YES, "quoted tag");
 	expectTrue(NVQueryContainsTagWord(nil) == NO, "nil query");
 
+	expectTrue(NVQueryNewlyHasTagWord(@"#", @"#u") == YES, "hash to #u");
+	expectTrue(NVQueryNewlyHasTagWord(@"#", @"#unix") == YES, "hash to #unix");
+	expectTrue(NVQueryNewlyHasTagWord(nil, @"#unix") == YES, "nil to #unix");
+	expectTrue(NVQueryNewlyHasTagWord(@"#uni", @"#unix") == NO, "grow tag prefix");
+	expectTrue(NVQueryNewlyHasTagWord(@"#unix", @"#unix shell") == NO, "tag plus word");
+	expectTrue(NVQueryNewlyHasTagWord(@"shell", @"shell") == NO, "plain stays plain");
+	expectTrue(NVQueryNewlyHasTagWord(nil, nil) == NO, "nil to nil");
+	expectTrue(NVQueryNewlyHasTagWord(@"", @"#") == NO, "empty to lone hash");
+
 	expectEqual(NVStringByRemovingTagWords(@"#unix shell"), @"shell", "drop tag");
 	expectEqual(NVStringByRemovingTagWords(@"shell #unix script"), @"shell script", "keep both sides");
 	expectEqual(NVStringByRemovingTagWords(@"#unix \"shell script\""), @"\"shell script\"", "keep phrase");

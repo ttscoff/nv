@@ -48,6 +48,10 @@ BOOL NVQueryContainsTagWord(NSString *query) {
 	return NO;
 }
 
+BOOL NVQueryNewlyHasTagWord(NSString *previousQuery, NSString *query) {
+	return NVQueryContainsTagWord(query) && !NVQueryContainsTagWord(previousQuery);
+}
+
 NSString *NVStringByRemovingTagWords(NSString *query) {
 	BOOL quoted = (query && [query rangeOfString:@"\""].location != NSNotFound);
 	NSArray *words = NVSearchWords(query);
