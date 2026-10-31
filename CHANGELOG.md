@@ -1,3 +1,15 @@
+nvALT 3.0.16 (144)
+-------------------------
+
+#### NEW
+
+- **Safari extension** is included with nvALT. Turn it on in Safari Settings.
+- Add a built-in Markdownifier, not reliant on Python scripts
+
+#### FIXED
+
+- **Safari extension** includes its toolbar icons and uses the app version.
+
 nvALT 3.0.15
 -------------------------
 
