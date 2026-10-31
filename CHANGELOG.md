@@ -1,3 +1,17 @@
+nvALT 3.0.18 (144)
+-------------------------
+
+#### NEW
+
+- **Import URL** opens with Shift-Command-U while nvALT is focused.
+
+nvALT 3.0.17 (144)
+-------------------------
+
+#### NEW
+
+- **Import URL** opens with Shift-Command-U while nvALT is focused.
+
 nvALT 3.0.16 (144)
 -------------------------
 
