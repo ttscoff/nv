@@ -1,3 +1,20 @@
+nvALT 3.0.15
+-------------------------
+
+#### CHANGED
+
+- **URL import** converts HTML inside the app with HTML2Text and Readability, following the Convert imported URLs and Process with Readability preferences.
+
+#### NEW
+
+- **Import URL** on the Note menu asks for an address and creates a note. A copied web address fills the field, and holding Option turns on Readability for that import.
+- **markdownify** URL scheme (`nvalt://` and `nv://`) turns a page URL or raw HTML into a Markdown note, with an optional title and Readability override. It converts even when Convert imported URLs to Markdown is off.
+
+#### FIXED
+
+- **Imported URL** is selected right away. The search field is set to the new note's title, so the list no longer looks empty until the search is cleared.
+- **Option-drag** onto the notes list forces Readability for that import.
+
 nvALT 3.0.14
 -------------------------
 
