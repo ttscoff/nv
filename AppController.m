@@ -510,6 +510,7 @@ void outletObjectAwoke(id sender) {
 	
 	if (URLToInterpretOnLaunch) {
 		[self interpretNVURL:[NSURL URLWithString:URLToInterpretOnLaunch]];
+		[URLToInterpretOnLaunch release];
 		URLToInterpretOnLaunch = nil;
 	}
 	
@@ -564,7 +565,8 @@ terminateApp:
 		if (![self interpretNVURL:fullURL])
 			NSBeep();
 	} else {
-		URLToInterpretOnLaunch = [[fullURL path]retain];
+		[URLToInterpretOnLaunch release];
+		URLToInterpretOnLaunch = [[fullURL absoluteString] retain];
 	}
 }
 
@@ -1041,13 +1043,96 @@ terminateApp:
 }
 
 - (void)noteImporter:(AlienNoteImporter*)importer importedNotes:(NSArray*)notes {
-	
+	NoteObject *importedNote = nil;
+	if ([importer focusesImportedNote] && [notes count] == 1)
+		importedNote = [notes lastObject];
+
 	[notationController addNotes:notes];
+
+	if (importedNote) {
+		[self focusSearchOnImportedNote:importedNote];
+		[self revealNote:importedNote options:NVOrderFrontWindow];
+		[field setSnapbackString:nil];
+	}
+}
+
+- (void)focusSearchOnImportedNote:(NoteObject *)note {
+	NSString *title = titleOfNote(note);
+	if (![title length])
+		return;
+
+	[typedString release];
+	typedString = [title copy];
+	typedStringIsCached = YES;
+	isFilteringFromTyping = NO;
+
+	NSText *editor = [field currentEditor];
+	if ([editor isKindOfClass:[NSText class]])
+		[editor setString:title];
+	[field setStringValue:title];
+	[[field cell] setShowsClearButton:YES];
+	[field setSnapbackString:nil];
+	[notationController filterNotesFromString:title];
 }
 - (IBAction)importNotes:(id)sender {
 	AlienNoteImporter *importer = [[AlienNoteImporter alloc] init];
 	[importer importNotesFromDialogAroundWindow:window receptionDelegate:self];
 	[importer autorelease];
+}
+
+static NSURL *NVHTTPURLFromImportString(NSString *entered) {
+	if (![entered length])
+		return nil;
+	NSString *candidate = entered;
+	if ([candidate rangeOfString:@"://"].location == NSNotFound)
+		candidate = [@"https://" stringByAppendingString:candidate];
+	NSURL *url = [NSURL URLWithString:candidate];
+	NSString *scheme = [[url scheme] lowercaseString];
+	if (![url host] || !([scheme isEqualToString:@"http"] || [scheme isEqualToString:@"https"] || [scheme isEqualToString:@"ftp"]))
+		return nil;
+	return url;
+}
+
+- (IBAction)importURL:(id)sender {
+	(void)sender;
+	NSAlert *alert = [[NSAlert alloc] init];
+	[alert setMessageText:NSLocalizedString(@"Import URL", @"title of import URL dialog")];
+	[alert setInformativeText:NSLocalizedString(@"Enter the address of a web page to import as a note.", @"message of import URL dialog")];
+	[alert addButtonWithTitle:NSLocalizedString(@"Import", @"title of button in import dialog")];
+	[alert addButtonWithTitle:NSLocalizedString(@"Cancel", nil)];
+
+	NSTextField *field = [[NSTextField alloc] initWithFrame:NSMakeRect(0, 0, 360, 24)];
+	[field setPlaceholderString:@"https://example.com"];
+	NSString *clip = [[[NSPasteboard generalPasteboard] stringForType:NSStringPboardType] stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
+	if ([clip rangeOfCharacterFromSet:[NSCharacterSet newlineCharacterSet]].location == NSNotFound && [clip superficiallyResemblesAnHTTPURL])
+		[field setStringValue:clip];
+	[alert setAccessoryView:field];
+	[alert layout];
+	[[alert window] makeFirstResponder:field];
+
+	NSModalResponse response = [alert runModal];
+	NSString *entered = [[field stringValue] stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
+	[field release];
+	[alert release];
+
+	if (response != NSAlertFirstButtonReturn || ![entered length])
+		return;
+
+	NSURL *url = NVHTTPURLFromImportString(entered);
+	if (!url) {
+		NSAlert *badURLAlert = [[NSAlert alloc] init];
+		[badURLAlert setMessageText:NSLocalizedString(@"That address could not be imported.", @"title when an import URL is invalid")];
+		[badURLAlert setInformativeText:entered];
+		[badURLAlert addButtonWithTitle:NSLocalizedString(@"OK", nil)];
+		[badURLAlert runModal];
+		[badURLAlert release];
+		return;
+	}
+
+	AlienNoteImporter *importer = [[[AlienNoteImporter alloc] init] autorelease];
+	if (([[NSApp currentEvent] modifierFlags] & NSAlternateKeyMask) != 0)
+		[importer setShouldUseReadability:YES];
+	[importer importURLInBackground:url linkTitle:nil receptionDelegate:self];
 }
 
 - (void)settingChangedForSelectorString:(NSString*)selectorString {

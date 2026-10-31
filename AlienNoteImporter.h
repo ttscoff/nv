@@ -35,9 +35,14 @@ extern NSString *RetrievedPasswordKey;
 	
 	id source;
 	NSMutableDictionary *documentSettings;
-	BOOL shouldGrabCreationDates;
+    BOOL shouldGrabCreationDates;
     
     BOOL shouldUseReadability;
+    BOOL hasReadabilityOverride;
+    BOOL readabilityOverrideValue;
+    BOOL focusesImportedNote;
+    NSString *markdownBaseURL;
+    NSString *lastMarkdownTitle;
 }
 
 //a directory containing notes, a custom bundle, or custom file format in which more than one note could be expected
@@ -65,10 +70,13 @@ extern NSString *RetrievedPasswordKey;
 
 - (BOOL)shouldUseReadability;
 - (void)setShouldUseReadability:(BOOL)value;
+- (void)setReadabilityOverride:(BOOL)value;
+- (BOOL)focusesImportedNote;
+- (NSString *)lastMarkdownTitle;
 
 - (NSString*) contentUsingReadability: (NSString *)htmlFile;
 - (NSString*) markdownFromSource: (NSString *)htmlString;
-- (NSString*) markdownFromHTMLFile: (NSString *)htmlFile;
+- (NSString*) markdownFromHTMLFile: (NSString *)htmlFile readability:(BOOL)readability;
 @end
 
 @interface AlienNoteImporter (DialogDelegate)

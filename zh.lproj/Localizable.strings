@@ -247,6 +247,15 @@
 /* title of import dialog */
 "Import Notes" = "导入笔记";
 
+/* title of import URL dialog */
+"Import URL" = "导入 URL";
+
+/* message of import URL dialog */
+"Enter the address of a web page to import as a note." = "输入要作为笔记导入的网页地址。";
+
+/* title when an import URL is invalid */
+"That address could not be imported." = "无法导入该地址。";
+
 /* No comment provided by engineer. */
 "None of the selected files could be imported." = "选定的文件没有可导入的内容。";
 

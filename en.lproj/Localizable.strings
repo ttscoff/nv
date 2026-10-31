@@ -247,6 +247,15 @@
 /* title of import dialog */
 "Import Notes" = "Import Notes";
 
+/* title of import URL dialog */
+"Import URL" = "Import URL";
+
+/* message of import URL dialog */
+"Enter the address of a web page to import as a note." = "Enter the address of a web page to import as a note.";
+
+/* title when an import URL is invalid */
+"That address could not be imported." = "That address could not be imported.";
+
 /* No comment provided by engineer. */
 "None of the selected files could be imported." = "None of the selected files could be imported.";
 

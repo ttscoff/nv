@@ -29,6 +29,7 @@
 #import "NotationPrefs.h"
 #import "NotationController.h"
 #import "NoteObject.h"
+#import "nvALT-Swift.h"
 
 NSString *PasswordWasRetrievedFromKeychainKey = @"PasswordRetrievedFromKeychain";
 NSString *RetrievedPasswordKey = @"RetrievedPassword";
@@ -135,6 +136,8 @@ NSString *ShouldImportCreationDates = @"ShouldImportCreationDates";
 - (void)dealloc {
 	[documentSettings release];
 	[source release];
+	[markdownBaseURL release];
+	[lastMarkdownTitle release];
 	
 	[super dealloc];
 }
@@ -254,6 +257,8 @@ NSString *ShouldImportCreationDates = @"ShouldImportCreationDates";
 	if ([receptionDelegate respondsToSelector:@selector(noteImporter:importedNotes:)]) {
 
 		if (filename) {
+			[markdownBaseURL release];
+			markdownBaseURL = [[[getter url] absoluteString] copy];
 			NSArray *notes = [self notesInFile:filename];
 			if ([notes count]) {
 				NSMutableAttributedString *content = [[[GlobalPrefs defaultPrefs] pastePreservesStyle] ? [[[notes lastObject] contentString] mutableCopy] :
@@ -264,7 +269,10 @@ NSString *ShouldImportCreationDates = @"ShouldImportCreationDates";
 					[content santizeForeignStylesForImporting];
 					
 					[[notes lastObject] setContentString:content];
-					if ([getter userData]) [[notes lastObject] setTitleString:[getter userData]];
+					if ([getter userData])
+						[[notes lastObject] setTitleString:[getter userData]];
+					else if ([lastMarkdownTitle length])
+						[[notes lastObject] setTitleString:lastMarkdownTitle];
 					
 					//prefixing should push existing selections forward:
 					NSRange selRange = [[notes lastObject] lastSelectedRange];
@@ -305,6 +313,7 @@ NSString *ShouldImportCreationDates = @"ShouldImportCreationDates";
 - (void)importURLInBackground:(NSURL*)aURL linkTitle:(NSString*)linkTitle receptionDelegate:(id)receiver {
 	
 	receptionDelegate = receiver;
+	focusesImportedNote = YES;
 		
 	[self retain];
 	
@@ -357,15 +366,15 @@ NSString *ShouldImportCreationDates = @"ShouldImportCreationDates";
 	NSString *sourceIdentifierString = nil;
 	
 	NSMutableAttributedString *attributedStringFromData = nil;
+	[lastMarkdownTitle release];
+	lastMarkdownTitle = nil;
 
 	if (fileType == HTML_TYPE_ID || [extension isEqualToString:@"htm"] || [extension isEqualToString:@"html"] || [extension isEqualToString:@"shtml"]) {
 		//should convert to text with markdown here
         if ([[GlobalPrefs defaultPrefs] useMarkdownImport]) {
-			if ([[GlobalPrefs defaultPrefs] useReadability] || [self shouldUseReadability]) {
-				attributedStringFromData = [[NSMutableAttributedString alloc] initWithString:[self contentUsingReadability:filename] 
-																				  attributes:[[GlobalPrefs defaultPrefs] noteBodyAttributes]];
-			} else {
-				attributedStringFromData = [[NSMutableAttributedString alloc] initWithString:[self markdownFromHTMLFile:filename] 
+			NSString *markdown = [self markdownFromHTMLFile:filename readability:[self readabilityEnabled]];
+			if ([markdown length]) {
+				attributedStringFromData = [[NSMutableAttributedString alloc] initWithString:markdown
 																				  attributes:[[GlobalPrefs defaultPrefs] noteBodyAttributes]];
 			}
         } else {
@@ -527,113 +536,46 @@ NSString *ShouldImportCreationDates = @"ShouldImportCreationDates";
 	return nil;
 }
 
-- (NSString *) contentUsingReadability: (NSString *)htmlFile
-{
-    NSBundle *bundle = [NSBundle mainBundle];
-    NSString *readabilityPath = [bundle pathForResource:@"readability" ofType:@"py"];
-//    readabilityPath = [bundle pathForAuxiliaryExecutable: @"readability.py"];
-	
-    NSTask *task = [[NSTask alloc] init];
-    [task setLaunchPath: readabilityPath];
-	
-	NSArray *arguments;
-    arguments = [NSArray arrayWithObjects: htmlFile, nil];
-    [task setArguments: arguments];
-	
-	NSPipe *rpipe;
-    rpipe = [NSPipe pipe];
-    [task setStandardOutput: rpipe];
-	
-    NSFileHandle *file;
-    file = [rpipe fileHandleForReading];
-	
-    [task launch];
-	
-    NSData *data;
-    data = [file readDataToEndOfFile];
-	
-    NSString *string;
-    string = [[[NSString alloc] initWithData: data
-								   encoding: NSUTF8StringEncoding] autorelease];
-    [task release];
-	return [self markdownFromSource:string];
+- (NSString *)htmlStringFromFile:(NSString *)htmlFile {
+	NSData *data = [NSData dataWithContentsOfFile:htmlFile];
+	if (![data length])
+		return nil;
+	NSString *html = [[[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding] autorelease];
+	if (html)
+		return html;
+	html = [[[NSString alloc] initWithData:data encoding:NSUTF16StringEncoding] autorelease];
+	if (html)
+		return html;
+	return [[[NSString alloc] initWithData:data encoding:NSWindowsCP1252StringEncoding] autorelease];
 }
 
-- (NSString *) markdownFromHTMLFile: (NSString *)htmlFile
-{
-    NSBundle *bundle = [NSBundle mainBundle];
-    NSString *readabilityPath = [bundle pathForResource:@"html2text" ofType:@"py"];
-//    readabilityPath = [bundle pathForAuxiliaryExecutable: @"html2text.py"];
-	
-    NSTask *task = [[NSTask alloc] init];
-    [task setLaunchPath: readabilityPath];
-	
-	NSArray *arguments;
-    arguments = [NSArray arrayWithObjects: htmlFile, nil];
-    [task setArguments: arguments];
-	
-	NSPipe *rpipe;
-    rpipe = [NSPipe pipe];
-    [task setStandardOutput: rpipe];
-	
-    NSFileHandle *file;
-    file = [rpipe fileHandleForReading];
-	
-    [task launch];
-	
-    NSData *data;
-    data = [file readDataToEndOfFile];
-	
-    NSString *string;
-    string = [[[NSString alloc] initWithData: data
-								   encoding: NSUTF8StringEncoding] autorelease];
-	[task release];
-	return string;
+- (NSString *)markdownByConvertingHTML:(NSString *)htmlString readability:(BOOL)readability {
+	if (![htmlString length])
+		return @"";
+	NVMarkdownResult *result = [NVMarkdownifier resultFromHTML:htmlString sourceURL:markdownBaseURL readability:readability];
+	[lastMarkdownTitle release];
+	lastMarkdownTitle = [[result title] copy];
+	return [result markdown] ? [result markdown] : @"";
 }
 
-- (NSString *) markdownFromSource: (NSString *)htmlString
-{
-    NSBundle *bundle = [NSBundle mainBundle];
-    NSString *readabilityPath = [bundle pathForResource:@"html2text" ofType:@"py"];
-//    readabilityPath = [bundle pathForAuxiliaryExecutable: @"html2text.py"];
-
-	
-    NSTask *task = [[NSTask alloc] init];
-    [task setLaunchPath: readabilityPath];
-	
-    NSPipe *readPipe = [NSPipe pipe];
-    NSFileHandle *readHandle = [readPipe fileHandleForReading];
-	
-    NSPipe *writePipe = [NSPipe pipe];
-    NSFileHandle *writeHandle = [writePipe fileHandleForWriting];
-	
-    [task setStandardInput: writePipe];
-    [task setStandardOutput: readPipe];
-	
-    [task launch];
-	
-    [writeHandle writeData: [htmlString dataUsingEncoding: NSUTF8StringEncoding]];
-    [writeHandle closeFile];
-	
-    NSMutableData *data = [[NSMutableData alloc] init];
-    NSData *readData;
-	
-    while ((readData = [readHandle availableData])
-           && [readData length]) {
-        [data appendData: readData];
-    }
-	
-    NSString *strippedString;
-    strippedString = [[NSString alloc]
-					  initWithData: data
-					  encoding: NSUTF8StringEncoding];
-	
-    [task release];
-    [data release];
-    [strippedString autorelease];
-	
-    return (strippedString);
+- (NSString *)contentUsingReadability:(NSString *)htmlFile {
+	return [self markdownFromHTMLFile:htmlFile readability:YES];
 }
+
+- (NSString *)markdownFromHTMLFile:(NSString *)htmlFile readability:(BOOL)readability {
+	return [self markdownByConvertingHTML:[self htmlStringFromFile:htmlFile] readability:readability];
+}
+
+- (NSString *)markdownFromSource:(NSString *)htmlString {
+	return [self markdownByConvertingHTML:htmlString readability:NO];
+}
+
+- (BOOL)readabilityEnabled {
+	if (hasReadabilityOverride)
+		return readabilityOverrideValue;
+	return [[GlobalPrefs defaultPrefs] useReadability] || shouldUseReadability;
+}
+
 -(BOOL)shouldUseReadability
 {
     return shouldUseReadability;
@@ -642,6 +584,19 @@ NSString *ShouldImportCreationDates = @"ShouldImportCreationDates";
 -(void) setShouldUseReadability:(BOOL)value
 {
 	shouldUseReadability = value;
+}
+
+- (void)setReadabilityOverride:(BOOL)value {
+	hasReadabilityOverride = YES;
+	readabilityOverrideValue = value;
+}
+
+- (BOOL)focusesImportedNote {
+	return focusesImportedNote;
+}
+
+- (NSString *)lastMarkdownTitle {
+	return lastMarkdownTitle;
 }
 
 @end

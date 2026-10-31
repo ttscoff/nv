@@ -148,6 +148,8 @@ void outletObjectAwoke(id sender);
 - (IBAction)printNote:(id)sender;
 - (IBAction)tagNote:(id)sender;
 - (IBAction)importNotes:(id)sender;
+- (IBAction)importURL:(id)sender;
+- (void)focusSearchOnImportedNote:(NoteObject *)note;
 - (IBAction)switchViewLayout:(id)sender;
 
 - (IBAction)fieldAction:(id)sender;

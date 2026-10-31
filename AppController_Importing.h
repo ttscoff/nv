@@ -22,6 +22,7 @@
 @interface AppController (Importing)
 
 - (BOOL)addNotesFromPasteboard:(NSPasteboard*)pasteboard;
+- (BOOL)addNotesFromPasteboard:(NSPasteboard*)pasteboard forceReadability:(BOOL)forceReadability;
 - (BOOL)interpretNVURL:(NSURL*)aURL;
 - (NSString*)stringWithNoteURLsOnPasteboard:(NSPasteboard*)pboard;
 

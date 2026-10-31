@@ -33,10 +33,15 @@
 #import "NSCollection_utils.h"
 #import "NoteObject.h"
 #import "NotationPrefs.h"
+#import "nvALT-Swift.h"
 
 @implementation AppController (Importing)
 
 - (BOOL)addNotesFromPasteboard:(NSPasteboard*)pasteboard {
+	return [self addNotesFromPasteboard:pasteboard forceReadability:NO];
+}
+
+- (BOOL)addNotesFromPasteboard:(NSPasteboard*)pasteboard forceReadability:(BOOL)forceReadability {
 	
 	NSArray *types = [pasteboard types];
 	NSMutableAttributedString *newString = nil;
@@ -83,7 +88,10 @@
 					linkTitleType = [NSString customPasteboardTypeOfCode:0x75726C64];
 					linkTitle = [types containsObject:linkTitleType] ? [[pasteboard stringForType:linkTitleType] syntheticTitleAndTrimmedBody:NULL] : nil;
 				}
-				[[[[AlienNoteImporter alloc] init] autorelease] importURLInBackground:url linkTitle:linkTitle receptionDelegate:self];
+				AlienNoteImporter *importer = [[[AlienNoteImporter alloc] init] autorelease];
+				if (forceReadability)
+					[importer setShouldUseReadability:YES];
+				[importer importURLInBackground:url linkTitle:linkTitle receptionDelegate:self];
 				return YES;
 			}
 		}		
@@ -203,6 +211,9 @@
 		if (foundNote) [self revealNote:foundNote options:NVOrderFrontWindow];
 		return YES;
 		
+	} else if ([[aURL host] caseInsensitiveCompare:@"markdownify"] == NSOrderedSame) {
+		return [self importMarkdownifiedURL:aURL];
+
 	} else if ([[aURL host] isEqualToString:@"make"]) {
 		
 		NSArray *params = [[aURL query] componentsSeparatedByString:@"&"];
@@ -334,6 +345,87 @@
 		}
 	}
 	return allURLsString;
+}
+
+- (NSNumber *)readabilityOverrideForQueryValue:(NSString *)value {
+	if (![value length])
+		return nil;
+	NSString *lower = [value lowercaseString];
+	if ([lower isEqualToString:@"1"] || [lower isEqualToString:@"true"] || [lower isEqualToString:@"yes"] || [lower isEqualToString:@"on"])
+		return [NSNumber numberWithBool:YES];
+	if ([lower isEqualToString:@"0"] || [lower isEqualToString:@"false"] || [lower isEqualToString:@"no"] || [lower isEqualToString:@"off"])
+		return [NSNumber numberWithBool:NO];
+	return nil;
+}
+
+- (BOOL)addNoteFromMarkdownifiedHTML:(NSString *)html sourceURL:(NSString *)sourceURL title:(NSString *)title readability:(BOOL)readability {
+	NVMarkdownResult *result = [NVMarkdownifier resultFromHTML:html sourceURL:sourceURL readability:readability];
+	NSString *markdown = [result markdown];
+	if (![markdown length]) {
+		if ([sourceURL length])
+			markdown = sourceURL;
+		else
+			return NO;
+	}
+
+	NSMutableAttributedString *body = [[NSMutableAttributedString alloc] initWithString:markdown attributes:[prefsController noteBodyAttributes]];
+	if ([sourceURL length])
+		[body prefixWithSourceString:sourceURL];
+	[body removeAttachments];
+	[body santizeForeignStylesForImporting];
+
+	NSString *noteTitle = title;
+	if (![noteTitle length])
+		noteTitle = [result title];
+	if (![noteTitle length]) {
+		NSUInteger bodyLoc = 0;
+		noteTitle = [markdown syntheticTitleAndSeparatorWithContext:NULL bodyLoc:&bodyLoc maxTitleLen:60];
+	}
+	if (![noteTitle length])
+		noteTitle = [sourceURL length] ? sourceURL : NSLocalizedString(@"Imported page", @"title when a markdownified page has no title");
+
+	NoteObject *note = [[[NoteObject alloc] initWithNoteBody:[body autorelease] title:noteTitle delegate:notationController
+													  format:[notationController currentNoteStorageFormat] labels:nil] autorelease];
+	[notationController addNewNote:note];
+	[self focusSearchOnImportedNote:note];
+	[self revealNote:note options:NVOrderFrontWindow | NVEditNoteToReveal];
+	[field setSnapbackString:nil];
+	return note != nil;
+}
+
+- (BOOL)importMarkdownifiedURL:(NSURL *)aURL {
+	NSURLComponents *components = [NSURLComponents componentsWithURL:aURL resolvingAgainstBaseURL:NO];
+	NSString *pageURL = nil;
+	NSString *html = nil;
+	NSString *title = nil;
+	NSNumber *readability = nil;
+	NSEnumerator *items = [[components queryItems] objectEnumerator];
+	NSURLQueryItem *item = nil;
+	while ((item = [items nextObject])) {
+		if ([item.name isEqualToString:@"html"])
+			html = item.value;
+		else if ([item.name isEqualToString:@"url"])
+			pageURL = item.value;
+		else if ([item.name isEqualToString:@"title"])
+			title = item.value;
+		else if ([item.name isEqualToString:@"readability"])
+			readability = [self readabilityOverrideForQueryValue:item.value];
+	}
+
+	BOOL useReadability = readability ? [readability boolValue] : [[GlobalPrefs defaultPrefs] useReadability];
+	if ([html length])
+		return [self addNoteFromMarkdownifiedHTML:html sourceURL:pageURL title:title readability:useReadability];
+
+	NSURL *remote = [pageURL length] ? [NSURL URLWithString:pageURL] : nil;
+	if (!remote || !([[remote scheme] caseInsensitiveCompare:@"http"] == NSOrderedSame ||
+					 [[remote scheme] caseInsensitiveCompare:@"https"] == NSOrderedSame))
+		return NO;
+
+	AlienNoteImporter *importer = [[[AlienNoteImporter alloc] init] autorelease];
+	if (readability)
+		[importer setReadabilityOverride:[readability boolValue]];
+	[importer importURLInBackground:remote linkTitle:title receptionDelegate:self];
+	return YES;
 }
 
 @end

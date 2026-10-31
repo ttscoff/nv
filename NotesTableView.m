@@ -228,7 +228,8 @@ static BOOL NVAppearanceIsDark(NSAppearance *appearance) {
 	if ([sender draggingSource] == self)
 		return NO;
 	
-	return [[NSApp delegate] addNotesFromPasteboard:[sender draggingPasteboard]];
+	BOOL optionDown = ([[NSApp currentEvent] modifierFlags] & NSAlternateKeyMask) != 0;
+	return [[NSApp delegate] addNotesFromPasteboard:[sender draggingPasteboard] forceReadability:optionDown];
 }
 
 - (void)paste:(id)sender {

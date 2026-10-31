@@ -249,6 +249,9 @@
 		93B90E86138601C100BEC5FB /* ODBEditor.m in Sources */ = {isa = PBXBuildFile; fileRef = 93B90E82138601C100BEC5FB /* ODBEditor.m */; };
 		93B90E921386072E00BEC5FB /* TemporaryFileCachePreparer.m in Sources */ = {isa = PBXBuildFile; fileRef = 93B90E911386072E00BEC5FB /* TemporaryFileCachePreparer.m */; };
 		A1B2C3D42F00000100A1B2C3 /* NVApexMarkdown.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1B2C3D42F00000200A1B2C3 /* NVApexMarkdown.swift */; };
+		B7E1BB052F0B000100000005 /* HTML2Text in Frameworks */ = {isa = PBXBuildFile; productRef = B7E1BB032F0B000100000003 /* HTML2Text */; };
+		B7E1BB062F0B000100000006 /* Readability in Frameworks */ = {isa = PBXBuildFile; productRef = B7E1BB042F0B000100000004 /* Readability */; };
+		B7E1BB082F0B000100000008 /* NVMarkdownifier.swift in Sources */ = {isa = PBXBuildFile; fileRef = B7E1BB072F0B000100000007 /* NVMarkdownifier.swift */; };
 		A1B2C3D42F20000100A1B2C3 /* HTMLToMarkdownConverter.m in Sources */ = {isa = PBXBuildFile; fileRef = A1B2C3D42F20000200A1B2C3 /* HTMLToMarkdownConverter.m */; settings = {COMPILER_FLAGS = "-fobjc-arc"; }; };
 		A1B2C3D42F20000400A1B2C3 /* NVRTFConverter.m in Sources */ = {isa = PBXBuildFile; fileRef = A1B2C3D42F20000500A1B2C3 /* NVRTFConverter.m */; settings = {COMPILER_FLAGS = "-fobjc-arc"; }; };
 		A1B2C3D42F20000700A1B2C3 /* AppController_Markdown.m in Sources */ = {isa = PBXBuildFile; fileRef = A1B2C3D42F20000800A1B2C3 /* AppController_Markdown.m */; };
@@ -811,6 +814,7 @@
 		93B90E901386072E00BEC5FB /* TemporaryFileCachePreparer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TemporaryFileCachePreparer.h; sourceTree = "<group>"; };
 		93B90E911386072E00BEC5FB /* TemporaryFileCachePreparer.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TemporaryFileCachePreparer.m; sourceTree = "<group>"; };
 		A1B2C3D42F00000200A1B2C3 /* NVApexMarkdown.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NVApexMarkdown.swift; sourceTree = "<group>"; };
+		B7E1BB072F0B000100000007 /* NVMarkdownifier.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NVMarkdownifier.swift; sourceTree = "<group>"; };
 		A1B2C3D42F20000200A1B2C3 /* HTMLToMarkdownConverter.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = HTMLToMarkdownConverter.m; sourceTree = "<group>"; };
 		A1B2C3D42F20000300A1B2C3 /* HTMLToMarkdownConverter.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = HTMLToMarkdownConverter.h; sourceTree = "<group>"; };
 		A1B2C3D42F20000500A1B2C3 /* NVRTFConverter.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = NVRTFConverter.m; sourceTree = "<group>"; };
@@ -855,6 +859,8 @@
 				219D254A1113FE34005E7DF5 /* SystemConfiguration.framework in Frameworks */,
 				21B54C021134F2E800E163A1 /* IOKit.framework in Frameworks */,
 				A1B2C3D42F00000500A1B2C3 /* Apex in Frameworks */,
+				B7E1BB052F0B000100000005 /* HTML2Text in Frameworks */,
+				B7E1BB062F0B000100000006 /* Readability in Frameworks */,
 				5C8BCF6A1DA25C810036FA7E /* Sparkle.framework in Frameworks */,
 				2191926709C52AA600586B15 /* libz.dylib in Frameworks */,
 			);
@@ -1372,6 +1378,7 @@
 				5C96F5A9131C37DF00A2E4AC /* NSString_MultiMarkdown.h */,
 				5C96F5AA131C37DF00A2E4AC /* NSString_MultiMarkdown.m */,
 				A1B2C3D42F00000200A1B2C3 /* NVApexMarkdown.swift */,
+				B7E1BB072F0B000100000007 /* NVMarkdownifier.swift */,
 				A1B2C3D42F20000300A1B2C3 /* HTMLToMarkdownConverter.h */,
 				A1B2C3D42F20000200A1B2C3 /* HTMLToMarkdownConverter.m */,
 				A1B2C3D42F20000600A1B2C3 /* NVRTFConverter.h */,
@@ -1457,7 +1464,6 @@
 			buildConfigurationList = 212B842309780B5000F3597F /* Build configuration list for PBXNativeTarget "Notation" */;
 			buildPhases = (
 				8D1107290486CEB800E47090 /* Resources */,
-				5C96F565131C35A300A2E4AC /* CopyFiles */,
 				8D11072C0486CEB800E47090 /* Sources */,
 				8D11072E0486CEB800E47090 /* Frameworks */,
 				213FB6AD0B52E1B2004C74BD /* CopyFiles */,
@@ -1470,6 +1476,8 @@
 			name = Notation;
 			packageProductDependencies = (
 				A1B2C3D42F00000400A1B2C3 /* Apex */,
+				B7E1BB032F0B000100000003 /* HTML2Text */,
+				B7E1BB042F0B000100000004 /* Readability */,
 			);
 			productInstallPath = "$(HOME)/Applications";
 			productName = Notation;
@@ -1512,6 +1520,8 @@
 			mainGroup = 29B97314FDCFA39411CA2CEA /* Notation */;
 			packageReferences = (
 				A1B2C3D42F00000300A1B2C3 /* XCLocalSwiftPackageReference "ThirdParty/apex" */,
+				B7E1BB012F0B000100000001 /* XCRemoteSwiftPackageReference "html2text-swift" */,
+				B7E1BB022F0B000100000002 /* XCRemoteSwiftPackageReference "read-swift" */,
 			);
 			projectDirPath = "";
 			projectRoot = "";
@@ -1764,6 +1774,7 @@
 				5C96F504131C2FA800A2E4AC /* BTTransparentScroller.m in Sources */,
 				5C96F5AF131C37DF00A2E4AC /* NSString_MultiMarkdown.m in Sources */,
 				A1B2C3D42F00000100A1B2C3 /* NVApexMarkdown.swift in Sources */,
+				B7E1BB082F0B000100000008 /* NVMarkdownifier.swift in Sources */,
 				A1B2C3D42F20000100A1B2C3 /* HTMLToMarkdownConverter.m in Sources */,
 				A1B2C3D42F20000400A1B2C3 /* NVRTFConverter.m in Sources */,
 				A1B2C3D42F20000700A1B2C3 /* AppController_Markdown.m in Sources */,
@@ -2412,11 +2423,40 @@
 		};
 /* End XCLocalSwiftPackageReference section */
 
+/* Begin XCRemoteSwiftPackageReference section */
+		B7E1BB012F0B000100000001 /* XCRemoteSwiftPackageReference "html2text-swift" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/ttscoff/html2text-swift.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 3.200.7;
+			};
+		};
+		B7E1BB022F0B000100000002 /* XCRemoteSwiftPackageReference "read-swift" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/ttscoff/read-swift.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 1.0.0;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
 /* Begin XCSwiftPackageProductDependency section */
 		A1B2C3D42F00000400A1B2C3 /* Apex */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = A1B2C3D42F00000300A1B2C3 /* XCLocalSwiftPackageReference "ThirdParty/apex" */;
 			productName = Apex;
+		};
+		B7E1BB032F0B000100000003 /* HTML2Text */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = B7E1BB012F0B000100000001 /* XCRemoteSwiftPackageReference "html2text-swift" */;
+			productName = HTML2Text;
+		};
+		B7E1BB042F0B000100000004 /* Readability */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = B7E1BB022F0B000100000002 /* XCRemoteSwiftPackageReference "read-swift" */;
+			productName = Readability;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};

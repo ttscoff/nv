@@ -126,6 +126,11 @@ CA
                                     <action selector="importNotes:" target="213" id="986"/>
                                 </connections>
                             </menuItem>
+                            <menuItem title="Import URL…" id="nvU1">
+                                <connections>
+                                    <action selector="importURL:" target="213" id="nvU2"/>
+                                </connections>
+                            </menuItem>
                             <menuItem title="Export…" tag="94" keyEquivalent="e" id="396">
                                 <connections>
                                     <action selector="exportNote:" target="213" id="988"/>
