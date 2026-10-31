@@ -277,6 +277,8 @@
 		B69E26F616F0B523001C6E4B /* Pencil@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = B69E26EE16F0B523001C6E4B /* Pencil@2x.png */; };
 		B69E26F716F0B523001C6E4B /* Search@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = B69E26EF16F0B523001C6E4B /* Search@2x.png */; };
 		D3EECA00106F66C70023D7F8 /* NVPasswordGenerator.m in Sources */ = {isa = PBXBuildFile; fileRef = D3EEC9FE106F66C70023D7F8 /* NVPasswordGenerator.m */; };
+		C0FFEE001F31000000000005 /* SafariWebExtensionHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0FFEE001F31000000000001 /* SafariWebExtensionHandler.swift */; };
+		C0FFEE001F31000000000006 /* nvALT Safari Extension.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = C0FFEE001F31000000000002 /* nvALT Safari Extension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -306,6 +308,17 @@
 				5C96F56D131C35AB00A2E4AC /* url_helpers.py in CopyFiles */,
 				5C96F56E131C35AB00A2E4AC /* url_helpers.pyc in CopyFiles */,
 			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		C0FFEE001F3100000000000D /* Embed Foundation Extensions */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 13;
+			files = (
+				C0FFEE001F31000000000006 /* nvALT Safari Extension.appex in Embed Foundation Extensions */,
+			);
+			name = "Embed Foundation Extensions";
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXCopyFilesBuildPhase section */
@@ -842,6 +855,11 @@
 		B69E26EF16F0B523001C6E4B /* Search@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "Search@2x.png"; path = "Images/Search@2x.png"; sourceTree = "<group>"; };
 		D3EEC9FE106F66C70023D7F8 /* NVPasswordGenerator.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = NVPasswordGenerator.m; sourceTree = "<group>"; };
 		D3EEC9FF106F66C70023D7F8 /* NVPasswordGenerator.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = NVPasswordGenerator.h; sourceTree = "<group>"; };
+		C0FFEE001F31000000000001 /* SafariWebExtensionHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SafariWebExtensionHandler.swift; sourceTree = "<group>"; };
+		C0FFEE001F31000000000002 /* nvALT Safari Extension.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = "nvALT Safari Extension.appex"; sourceTree = BUILT_PRODUCTS_DIR; };
+		C0FFEE001F31000000000003 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		C0FFEE001F31000000000004 /* nvALTSafariExtension.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = "nvALTSafariExtension.entitlements"; sourceTree = "<group>"; };
+		C0FFEE001F31000000000013 /* Resources */ = {isa = PBXFileReference; lastKnownFileType = folder; path = Resources; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -863,6 +881,13 @@
 				B7E1BB062F0B000100000006 /* Readability in Frameworks */,
 				5C8BCF6A1DA25C810036FA7E /* Sparkle.framework in Frameworks */,
 				2191926709C52AA600586B15 /* libz.dylib in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		C0FFEE001F31000000000009 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -994,6 +1019,7 @@
 			isa = PBXGroup;
 			children = (
 				8D1107320486CEB800E47090 /* nvALT.app */,
+				C0FFEE001F31000000000002 /* nvALT Safari Extension.appex */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -1278,6 +1304,7 @@
 				29B97323FDCFA39411CA2CEA /* Frameworks */,
 				19C28FACFE9D520D11CA2CBB /* Products */,
 				57F27F7A11973A7F00C63ACF /* Notation.sdef */,
+				C0FFEE001F31000000000007 /* SafariExtension */,
 			);
 			name = Notation;
 			sourceTree = "<group>";
@@ -1456,6 +1483,17 @@
 			path = ODBEditor;
 			sourceTree = "<group>";
 		};
+		C0FFEE001F31000000000007 /* SafariExtension */ = {
+			isa = PBXGroup;
+			children = (
+				C0FFEE001F31000000000001 /* SafariWebExtensionHandler.swift */,
+				C0FFEE001F31000000000003 /* Info.plist */,
+				C0FFEE001F31000000000004 /* nvALTSafariExtension.entitlements */,
+				C0FFEE001F31000000000013 /* Resources */,
+			);
+			path = SafariExtension;
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
@@ -1468,10 +1506,12 @@
 				8D11072E0486CEB800E47090 /* Frameworks */,
 				213FB6AD0B52E1B2004C74BD /* CopyFiles */,
 				A1B2C3D42F00000600A1B2C3 /* Re-sign Sparkle */,
+				C0FFEE001F3100000000000D /* Embed Foundation Extensions */,
 			);
 			buildRules = (
 			);
 			dependencies = (
+				C0FFEE001F3100000000000F /* PBXTargetDependency */,
 			);
 			name = Notation;
 			packageProductDependencies = (
@@ -1484,7 +1524,43 @@
 			productReference = 8D1107320486CEB800E47090 /* nvALT.app */;
 			productType = "com.apple.product-type.application";
 		};
+		C0FFEE001F3100000000000B /* nvALT Safari Extension */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = C0FFEE001F31000000000012 /* Build configuration list for PBXNativeTarget "nvALT Safari Extension" */;
+			buildPhases = (
+				C0FFEE001F31000000000008 /* Sources */,
+				C0FFEE001F31000000000009 /* Frameworks */,
+				C0FFEE001F3100000000000A /* Resources */,
+				C0FFEE001F3100000000000C /* Copy Web Extension Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = "nvALT Safari Extension";
+			productName = "nvALT Safari Extension";
+			productReference = C0FFEE001F31000000000002 /* nvALT Safari Extension.appex */;
+			productType = "com.apple.product-type.app-extension";
+		};
 /* End PBXNativeTarget section */
+
+/* Begin PBXContainerItemProxy section */
+		C0FFEE001F3100000000000E /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 29B97313FDCFA39411CA2CEA /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = C0FFEE001F3100000000000B;
+			remoteInfo = "nvALT Safari Extension";
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXTargetDependency section */
+		C0FFEE001F3100000000000F /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = C0FFEE001F3100000000000B /* nvALT Safari Extension */;
+			targetProxy = C0FFEE001F3100000000000E /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
 
 /* Begin PBXProject section */
 		29B97313FDCFA39411CA2CEA /* Project object */ = {
@@ -1494,6 +1570,10 @@
 				ORGANIZATIONNAME = elasticthreads;
 				TargetAttributes = {
 					8D1107260486CEB800E47090 = {
+						DevelopmentTeam = 47TRS7H4BH;
+						ProvisioningStyle = Automatic;
+					};
+					C0FFEE001F3100000000000B = {
 						DevelopmentTeam = 47TRS7H4BH;
 						ProvisioningStyle = Automatic;
 					};
@@ -1527,6 +1607,7 @@
 			projectRoot = "";
 			targets = (
 				8D1107260486CEB800E47090 /* Notation */,
+				C0FFEE001F3100000000000B /* nvALT Safari Extension */,
 			);
 		};
 /* End PBXProject section */
@@ -1673,6 +1754,13 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		C0FFEE001F3100000000000A /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
@@ -1795,6 +1883,14 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		C0FFEE001F31000000000008 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				C0FFEE001F31000000000005 /* SafariWebExtensionHandler.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXShellScriptBuildPhase section */
@@ -1812,6 +1908,20 @@
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
 			shellScript = "set -e\nFW=\"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/Sparkle.framework\"\nSIGN_ID=\"${EXPANDED_CODE_SIGN_IDENTITY}\"\nif [ -z \"$SIGN_ID\" ]; then\n  SIGN_ID=\"-\"\nfi\nsign()\n{\n  codesign --force --sign \"$SIGN_ID\" --options runtime --preserve-metadata=identifier,entitlements --timestamp=none \"$1\"\n}\nsign \"$FW/Versions/B/XPCServices/Downloader.xpc\"\nsign \"$FW/Versions/B/XPCServices/Installer.xpc\"\nsign \"$FW/Versions/B/Autoupdate\"\nsign \"$FW/Versions/B/Updater.app\"\nsign \"$FW\"\n";
+		};
+		C0FFEE001F3100000000000C /* Copy Web Extension Resources */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			name = "Copy Web Extension Resources";
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "set -euo pipefail\nSRC=\"$SRCROOT/SafariExtension/Resources\"\nDEST=\"$TARGET_BUILD_DIR/$UNLOCALIZED_RESOURCES_FOLDER_PATH\"\nmkdir -p \"$DEST\"\nif [ -d \"$SRC\" ]; then\n  rsync -a --delete --exclude '.DS_Store' \"$SRC/\" \"$DEST/\"\nfi\n";
 		};
 /* End PBXShellScriptBuildPhase section */
 
@@ -2393,6 +2503,66 @@
 			};
 			name = ForBuilding;
 		};
+		C0FFEE001F31000000000010 /* Development */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_ENTITLEMENTS = SafariExtension/nvALTSafariExtension.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = 47TRS7H4BH;
+				ENABLE_APP_SANDBOX = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = NO;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = SafariExtension/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = "Send to nvALT";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+					"@executable_path/../../../../Frameworks",
+				);
+				MACOSX_DEPLOYMENT_TARGET = 12.3;
+				OTHER_LDFLAGS = (
+					"-framework",
+					SafariServices,
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = net.elasticthreads.nv.safari-extension;
+				PRODUCT_MODULE_NAME = nvALTSafariExtension;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+				SWIFT_VERSION = 5.0;
+				WRAPPER_EXTENSION = appex;
+			};
+			name = Development;
+		};
+		C0FFEE001F31000000000011 /* ForBuilding */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_ENTITLEMENTS = SafariExtension/nvALTSafariExtension.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = 47TRS7H4BH;
+				ENABLE_APP_SANDBOX = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = NO;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = SafariExtension/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = "Send to nvALT";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+					"@executable_path/../../../../Frameworks",
+				);
+				MACOSX_DEPLOYMENT_TARGET = 12.3;
+				OTHER_LDFLAGS = (
+					"-framework",
+					SafariServices,
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = net.elasticthreads.nv.safari-extension;
+				PRODUCT_MODULE_NAME = nvALTSafariExtension;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+				SWIFT_VERSION = 5.0;
+				WRAPPER_EXTENSION = appex;
+			};
+			name = ForBuilding;
+		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
@@ -2410,6 +2580,15 @@
 			buildConfigurations = (
 				5C9CB58B134A7F0400073277 /* ForBuilding */,
 				212B842809780B5000F3597F /* Development */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Development;
+		};
+		C0FFEE001F31000000000012 /* Build configuration list for PBXNativeTarget "nvALT Safari Extension" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				C0FFEE001F31000000000011 /* ForBuilding */,
+				C0FFEE001F31000000000010 /* Development */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Development;
