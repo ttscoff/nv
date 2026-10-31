@@ -2508,6 +2508,7 @@
 			buildSettings = {
 				CODE_SIGN_ENTITLEMENTS = SafariExtension/nvALTSafariExtension.entitlements;
 				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 144;
 				DEVELOPMENT_TEAM = 47TRS7H4BH;
 				ENABLE_APP_SANDBOX = YES;
 				ENABLE_USER_SCRIPT_SANDBOXING = NO;
@@ -2520,6 +2521,7 @@
 					"@executable_path/../../../../Frameworks",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 12.3;
+				MARKETING_VERSION = 3.0.15;
 				OTHER_LDFLAGS = (
 					"-framework",
 					SafariServices,
@@ -2538,6 +2540,7 @@
 			buildSettings = {
 				CODE_SIGN_ENTITLEMENTS = SafariExtension/nvALTSafariExtension.entitlements;
 				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 144;
 				DEVELOPMENT_TEAM = 47TRS7H4BH;
 				ENABLE_APP_SANDBOX = YES;
 				ENABLE_USER_SCRIPT_SANDBOXING = NO;
@@ -2550,6 +2553,7 @@
 					"@executable_path/../../../../Frameworks",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 12.3;
+				MARKETING_VERSION = 3.0.15;
 				OTHER_LDFLAGS = (
 					"-framework",
 					SafariServices,
