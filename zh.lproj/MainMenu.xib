@@ -126,7 +126,7 @@ CA
                                     <action selector="importNotes:" target="213" id="986"/>
                                 </connections>
                             </menuItem>
-                            <menuItem title="导入 URL…" id="nvU1">
+                            <menuItem title="导入 URL…" keyEquivalent="U" id="nvU1">
                                 <connections>
                                     <action selector="importURL:" target="213" id="nvU2"/>
                                 </connections>

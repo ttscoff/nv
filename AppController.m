@@ -92,6 +92,10 @@ static BOOL nvApplyingWindowChrome;
 
 @end
 
+@interface AppController ()
+- (void)applyImportURLMenuShortcut;
+@end
+
 @implementation AppController
 
 @synthesize isEditing;
@@ -361,6 +365,7 @@ void outletObjectAwoke(id sender) {
     [self updateNoteMenus];
     [textView setupFontMenu];
     [prefsController registerAppActivationKeystrokeWithTarget:self selector:@selector(toggleNVActivation:)];
+    [self applyImportURLMenuShortcut];
     [notationController updateLabelConnectionsAfterDecoding];
     [notationController checkIfNotationIsTrashed];
     [[SecureTextEntryManager sharedInstance] checkForIncompatibleApps];
@@ -1091,6 +1096,20 @@ static NSURL *NVHTTPURLFromImportString(NSString *entered) {
 	if (![url host] || !([scheme isEqualToString:@"http"] || [scheme isEqualToString:@"https"] || [scheme isEqualToString:@"ftp"]))
 		return nil;
 	return url;
+}
+
+- (void)applyImportURLMenuShortcut {
+	NSMenu *mainMenu = [NSApp mainMenu];
+	for (NSInteger i = 0; i < [mainMenu numberOfItems]; i++) {
+		NSMenu *submenu = [[mainMenu itemAtIndex:i] submenu];
+		for (NSInteger j = 0; j < [submenu numberOfItems]; j++) {
+			NSMenuItem *item = [submenu itemAtIndex:j];
+			if ([item action] == @selector(importURL:)) {
+				[item setKeyEquivalent:@"U"];
+				[item setKeyEquivalentModifierMask:NSEventModifierFlagCommand];
+			}
+		}
+	}
 }
 
 - (IBAction)importURL:(id)sender {
