@@ -1,4 +1,5 @@
 #import "TagSearch.h"
+#import <string.h>
 
 static NSString *NVCanonicalLowercase(NSString *string) {
 	if (![string length])
@@ -86,8 +87,40 @@ NSString *NVHighlightStringByRemovingTagWords(NSString *query) {
 		return nil;
 	if (!NVQueryContainsTagWord(query))
 		return query;
-	NSString *stripped = NVStringByRemovingTagWords(query);
-	return [stripped length] ? stripped : nil;
+	// Keep #words so a hashtag written in the note is marked, and still split
+	// colon words so #unix:admin highlights #unix and admin.
+	BOOL quoted = ([query rangeOfString:@"\""].location != NSNotFound);
+	NSArray *words = NVSearchWords(query);
+	NSMutableArray *kept = [NSMutableArray array];
+	NSUInteger i;
+	for (i = 0; i < [words count]; i++) {
+		NSString *word = [words objectAtIndex:i];
+		NSString *trimmed = [word stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
+		if (![trimmed length])
+			continue;
+		if (quoted && (i % 2 == 1))
+			trimmed = [NSString stringWithFormat:@"\"%@\"", trimmed];
+		[kept addObject:trimmed];
+	}
+	return [kept count] ? [kept componentsJoinedByString:@" "] : nil;
+}
+
+NSString *NVStringByTrimmingHighlightTerm(NSString *term) {
+	if (!term)
+		return nil;
+	return [term stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
+}
+
+static BOOL NVBufferContainsLiteral(const char *haystack, const char *needle) {
+	if (!haystack || !needle || needle[0] == '\0')
+		return NO;
+	return strstr(haystack, needle) != NULL;
+}
+
+BOOL NVNoteMatchesTagWord(NSArray *tagTitles, const char *title, const char *body, const char *labels, NSString *prefix, const char *literal) {
+	if (NVTagTitlesMatchPrefix(tagTitles, prefix))
+		return YES;
+	return NVBufferContainsLiteral(title, literal) || NVBufferContainsLiteral(body, literal) || NVBufferContainsLiteral(labels, literal);
 }
 
 BOOL NVTagTitlesMatchPrefix(NSArray *tagTitles, NSString *prefix) {

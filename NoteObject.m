@@ -22,6 +22,7 @@
 
 
 #import "NoteObject.h"
+#import "TagSearch.h"
 #import "GlobalPrefs.h"
 #import "LabelObject.h"
 #import "WALController.h"
@@ -1818,6 +1819,14 @@ force_inline void resetFoundPtrsForNote(NoteObject *note) {
 	note->cTitleFoundPtr = note->cTitle;
 	note->cContentsFoundPtr = note->cContents;
 	note->cLabelsFoundPtr = note->cLabels;	
+}
+
+BOOL noteMatchesTagWord(NoteObject *note, NVTagWordFilterContext *context) {
+	if (!note || !context)
+		return NO;
+	// Read the base buffers and leave the scan pointers alone, so a later
+	// normal word still matches anywhere in the note.
+	return NVNoteMatchesTagWord([note orderedLabelTitles], note->cTitle, note->cContents, note->cLabels, context->prefix, context->literal);
 }
 
 BOOL noteContainsUTF8String(NoteObject *note, NoteFilterContext *context) {

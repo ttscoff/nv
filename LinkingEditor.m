@@ -21,6 +21,7 @@
 #import "NSString_NV.h"
 #import "NVPasswordGenerator.h"
 #import "NVThemeManager.h"
+#import "TagSearch.h"
 #import "ETScrollView.h"
 #import "ETClipView.h"
 //#import "NSTextFinder.h"
@@ -694,7 +695,9 @@ copyRTFType:
 		
 		for (termIndex = 0; termIndex < CFArrayGetCount(terms); termIndex++) {
 			CFStringRef term = CFArrayGetValueAtIndex(terms, termIndex);
-			if (CFStringGetLength(term) > 0) {
+			NSString *trimmedTerm = NVStringByTrimmingHighlightTerm((NSString *)term);
+			if ([trimmedTerm length] > 0) {
+				term = (CFStringRef)trimmedTerm;
 				CFArrayRef ranges = CFStringCreateArrayWithFindResults(NULL, bodyString, term, CFRangeMake(0, CFStringGetLength(bodyString)),
 																	   kCFCompareCaseInsensitive);
 				if (!ranges)

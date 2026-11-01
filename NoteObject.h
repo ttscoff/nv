@@ -36,6 +36,11 @@ typedef struct _NoteFilterContext {
 	BOOL useCachedPositions;
 } NoteFilterContext;
 
+typedef struct {
+	NSString *prefix;
+	const char *literal;
+} NVTagWordFilterContext;
+
 @interface NoteObject : NSObject <NSCoding, SynchronizedNote> {
 	NSAttributedString *tableTitleString;
 	NSMutableAttributedString *contentString;
@@ -142,6 +147,7 @@ NSInteger compareFileSize(id *a, id *b);
 
 	void resetFoundPtrsForNote(NoteObject *note);
 	BOOL noteContainsUTF8String(NoteObject *note, NoteFilterContext *context);
+	BOOL noteMatchesTagWord(NoteObject *note, NVTagWordFilterContext *context);
 	BOOL noteTitleHasPrefixOfUTF8String(NoteObject *note, const char* fullString, size_t stringLen);
 	BOOL noteTitleIsAPrefixOfOtherNoteTitle(NoteObject *longerNote, NoteObject *shorterNote);
 

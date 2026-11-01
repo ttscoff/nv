@@ -73,13 +73,34 @@ int main(int argc, const char *argv[]) {
 	expectEqual(NVStringByRemovingTagWords(@"\"#unix:admin\""), @"", "quoted tag dropped");
 
 	expectEqual(NVHighlightStringByRemovingTagWords(@"hello:world"), @"hello:world", "plain highlight unchanged");
-	expectEqual(NVHighlightStringByRemovingTagWords(@"#unix shell"), @"shell", "highlight drops tag");
-	expectEqual(NVHighlightStringByRemovingTagWords(@"#unix \"shell script\""), @"\"shell script\"", "highlight phrase");
-	expectEqual(NVHighlightStringByRemovingTagWords(@"#unix:admin"), @"admin", "highlight admin");
+	expectEqual(NVHighlightStringByRemovingTagWords(@"#unix shell"), @"#unix shell", "highlight keeps hashtag");
+	expectEqual(NVHighlightStringByRemovingTagWords(@"shell #unix script"), @"shell #unix script", "highlight keeps hashtag between words");
+	expectEqual(NVHighlightStringByRemovingTagWords(@"#unix \"shell script\""), @"#unix \"shell script\"", "highlight keeps hashtag and phrase");
+	expectEqual(NVHighlightStringByRemovingTagWords(@"#unix:admin"), @"#unix admin", "highlight keeps hashtag and admin");
+	expectEqual(NVHighlightStringByRemovingTagWords(@"\"#unix:admin\""), @"\"#unix:admin\"", "highlight quoted hashtag");
 	expectEqual(NVHighlightStringByRemovingTagWords(@"#"), @"#", "highlight lone hash");
-	expectEqual(NVHighlightStringByRemovingTagWords(@"#unix"), nil, "nothing to highlight");
+	expectEqual(NVHighlightStringByRemovingTagWords(@"#unix"), @"#unix", "highlight a lone hashtag");
 	expectEqual(NVHighlightStringByRemovingTagWords(nil), nil, "nil highlight");
 	expectEqual(NVHighlightStringByRemovingTagWords(@""), nil, "empty highlight");
+	expectEqual(NVStringByTrimmingHighlightTerm(@"#unix "), @"#unix", "trim hashtag term");
+	expectEqual(NVStringByTrimmingHighlightTerm(@" shell script "), @"shell script", "trim phrase term");
+	expectEqual(NVStringByTrimmingHighlightTerm(@"  "), @"", "trim blank term");
+	expectEqual(NVStringByTrimmingHighlightTerm(nil), nil, "trim nil term");
+
+	NSArray *unixTag = [NSArray arrayWithObject:@"unix"];
+	expectTrue(NVNoteMatchesTagWord(unixTag, "", "no hash here", "", @"unix", "#unix") == YES, "tag still matches");
+	expectTrue(NVNoteMatchesTagWord(nil, "", "see #unix today", "", @"unix", "#unix") == YES, "body hashtag");
+	expectTrue(NVNoteMatchesTagWord(nil, "#unix notes", "", NULL, @"unix", "#unix") == YES, "title hashtag");
+	expectTrue(NVNoteMatchesTagWord(nil, "", "plain", "#unix", @"unix", "#unix") == YES, "label hashtag");
+	expectTrue(NVNoteMatchesTagWord(nil, "", "unix without a hash", "", @"unix", "#unix") == NO, "bare word is not a hashtag");
+	expectTrue(NVNoteMatchesTagWord(nil, "", "see #shell today", "", @"unix", "#unix") == NO, "different hashtag");
+	expectTrue(NVNoteMatchesTagWord(nil, "", "talk #unix-admin", "", @"uni", "#uni") == YES, "body hashtag prefix");
+	expectTrue(NVNoteMatchesTagWord([NSArray arrayWithObject:@"unix-admin"], "", "", "", @"uni", "#uni") == YES, "tag prefix still matches");
+	expectTrue(NVNoteMatchesTagWord([NSArray arrayWithObject:@"admin-unix"], "", "admin-unix", "", @"unix", "#unix") == NO, "suffix tag and no hash");
+	expectTrue(NVNoteMatchesTagWord(nil, "", "##unix", "", @"#unix", "##unix") == YES, "double hash literal");
+	expectTrue(NVNoteMatchesTagWord(nil, "", "#unix", "", @"#unix", "##unix") == NO, "single hash is not a double hash");
+	expectTrue(NVNoteMatchesTagWord(nil, NULL, NULL, NULL, @"unix", "#unix") == NO, "empty note");
+	expectTrue(NVNoteMatchesTagWord(unixTag, NULL, NULL, NULL, @"unix", NULL) == YES, "tag match ignores a missing literal");
 
 	NSArray *tags = [NSArray arrayWithObjects:@"unix", @"unix-admin", @"admin-unix", @"Unix:admin", nil];
 	expectTrue(NVTagTitlesMatchPrefix(tags, @"unix") == YES, "exact unix");

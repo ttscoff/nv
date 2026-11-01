@@ -1355,10 +1355,6 @@ bail:
     [delegate notationListDidChange:self];
 }
 
-static BOOL noteHasTagPrefix(NoteObject *note, void *context) {
-	return NVTagTitlesMatchPrefix([note orderedLabelTitles], (NSString *)context);
-}
-
 - (BOOL)filterNotesFromUTF8String:(const char*)searchString forceUncached:(BOOL)forceUncached {
     BOOL stringHasExistingPrefix = YES;
     BOOL didFilterNotes = NO;
@@ -1411,15 +1407,20 @@ static BOOL noteHasTagPrefix(NoteObject *note, void *context) {
 
 			if (*token != '\0') {
 				NSString *tagPrefix = nil;
+				NSString *word = nil;
 				BOOL tagWord = NO;
 				if (queryHasTagWord) {
-					NSString *word = [NSString stringWithUTF8String:token];
+					word = [NSString stringWithUTF8String:token];
 					tagWord = NVSearchWordIsTagPrefix(word, &tagPrefix);
 				}
 
 				if (tagWord) {
+					NSString *literal = [word stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
+					NVTagWordFilterContext tagContext;
+					tagContext.prefix = tagPrefix;
+					tagContext.literal = [literal UTF8String];
 					touchedNotes = YES;
-					if ([notesListDataSource filterArrayUsingFunction:(BOOL (*)(id, void*))noteHasTagPrefix context:(void *)tagPrefix])
+					if ([notesListDataSource filterArrayUsingFunction:(BOOL (*)(id, void*))noteMatchesTagWord context:&tagContext])
 						didFilterNotes = YES;
 				} else {
 					//if this is the same token that we had scanned previously
