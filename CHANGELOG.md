@@ -1,3 +1,11 @@
+nvALT 3.0.19 (144)
+-------------------------
+
+#### FIXED
+
+- **#tag search** matches a tag prefix or the same #tag written in the title, body, or labels
+- **Search highlights** mark a #tag in the note again
+
 nvALT 3.0.18 (144)
 -------------------------
 
