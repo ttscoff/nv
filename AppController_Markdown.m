@@ -105,7 +105,6 @@ static BOOL nvMarkdownConversionInProgress = NO;
 	}
 
 	nvMarkdownConversionInProgress = YES;
-	[window setEnabled:NO];
 
 	NSRect panelFrame = NSMakeRect(0, 0, 380, 84);
 	NSWindow *progressWindow = [[NSWindow alloc] initWithContentRect:panelFrame
@@ -167,7 +166,6 @@ static BOOL nvMarkdownConversionInProgress = NO;
 	[progressWindow orderOut:nil];
 	[progressWindow release];
 	[notes release];
-	[window setEnabled:YES];
 	nvMarkdownConversionInProgress = NO;
 
 	if (failedName) {
@@ -184,7 +182,7 @@ static BOOL nvMarkdownConversionInProgress = NO;
 		return;
 	}
 	NSData *alias = [NSData aliasDataForFSRef:&folderRef];
-	[[GlobalPrefs defaultPrefs] setAliasDataForDefaultDirectory:alias sender:self];
+	[[GlobalPrefs defaultPrefs] setAliasDataForDefaultDirectory:alias sender:nil];
 
 	NSString *now = [[notationController notesDirectoryPath] stringByStandardizingPath];
 	if (!now || [now caseInsensitiveCompare:folder] != NSOrderedSame)
