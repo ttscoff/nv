@@ -23,6 +23,8 @@
 		212089D80B0C2CA500A15A69 /* StickiesDocument.m in Sources */ = {isa = PBXBuildFile; fileRef = 212089D70B0C2CA500A15A69 /* StickiesDocument.m */; };
 		212B84620978422300F3597F /* NSString_NV.m in Sources */ = {isa = PBXBuildFile; fileRef = 212B84610978422300F3597F /* NSString_NV.m */; };
 		B7E1AA031F0A000100000003 /* TagSearch.m in Sources */ = {isa = PBXBuildFile; fileRef = B7E1AA021F0A000100000002 /* TagSearch.m */; };
+		C4E1AA031F0B000100000003 /* PreviewRender.m in Sources */ = {isa = PBXBuildFile; fileRef = C4E1AA021F0B000100000002 /* PreviewRender.m */; };
+		C4E1AA051F0B000100000005 /* preview-js in Resources */ = {isa = PBXBuildFile; fileRef = C4E1AA041F0B000100000004 /* preview-js */; };
 		212C6952110E1940004DD82C /* TitlebarButton.m in Sources */ = {isa = PBXBuildFile; fileRef = 212C6951110E1940004DD82C /* TitlebarButton.m */; };
 		212C6A2A110E371B004DD82C /* TBSynchronizingWhite.png in Resources */ = {isa = PBXBuildFile; fileRef = 212C6A23110E371B004DD82C /* TBSynchronizingWhite.png */; };
 		212C6A2C110E371B004DD82C /* TBDownArrowWhite.png in Resources */ = {isa = PBXBuildFile; fileRef = 212C6A25110E371B004DD82C /* TBDownArrowWhite.png */; };
@@ -353,6 +355,9 @@
 		212B84610978422300F3597F /* NSString_NV.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; path = NSString_NV.m; sourceTree = "<group>"; };
 		B7E1AA011F0A000100000001 /* TagSearch.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TagSearch.h; sourceTree = "<group>"; };
 		B7E1AA021F0A000100000002 /* TagSearch.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TagSearch.m; sourceTree = "<group>"; };
+		C4E1AA011F0B000100000001 /* PreviewRender.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PreviewRender.h; sourceTree = "<group>"; };
+		C4E1AA021F0B000100000002 /* PreviewRender.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PreviewRender.m; sourceTree = "<group>"; };
+		C4E1AA041F0B000100000004 /* preview-js */ = {isa = PBXFileReference; lastKnownFileType = folder; path = preview-js; sourceTree = "<group>"; };
 		212C6950110E1940004DD82C /* TitlebarButton.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TitlebarButton.h; sourceTree = "<group>"; };
 		212C6951110E1940004DD82C /* TitlebarButton.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TitlebarButton.m; sourceTree = "<group>"; };
 		212C6A22110E371B004DD82C /* TBAlertWhite.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = TBAlertWhite.png; path = Images/TBAlertWhite.png; sourceTree = "<group>"; };
@@ -954,6 +959,8 @@
 				212B84610978422300F3597F /* NSString_NV.m */,
 				B7E1AA011F0A000100000001 /* TagSearch.h */,
 				B7E1AA021F0A000100000002 /* TagSearch.m */,
+				C4E1AA011F0B000100000001 /* PreviewRender.h */,
+				C4E1AA021F0B000100000002 /* PreviewRender.m */,
 				D3EEC9FF106F66C70023D7F8 /* NVPasswordGenerator.h */,
 				D3EEC9FE106F66C70023D7F8 /* NVPasswordGenerator.m */,
 				A7E100012F0A000100000001 /* NVTheme.h */,
@@ -1342,6 +1349,7 @@
 				A7E100072F0A000100000001 /* Paper.theme */,
 				934C3FAF14FDA069000D14BA /* customclean.css */,
 				934C3FB014FDA069000D14BA /* template.html */,
+				C4E1AA041F0B000100000004 /* preview-js */,
 				934C3FB114FDA069000D14BA /* templateclean.html */,
 				5C49E553131C72FD00696B68 /* dsa_pub.pem */,
 				21813561105AF27400A0AE18 /* Acknowledgments.txt */,
@@ -1651,6 +1659,7 @@
 				5C96F4FF131C2F9500A2E4AC /* TabClose_Front_Pressed.tif in Resources */,
 				5C96F501131C2F9500A2E4AC /* TabClose_Front.tif in Resources */,
 				5C96F616131C380100A2E4AC /* Textile_2.12 in Resources */,
+				C4E1AA051F0B000100000005 /* preview-js in Resources */,
 				5C96F61C131C380C00A2E4AC /* Markdown_1.0.1 in Resources */,
 				5C96F709131C49D400A2E4AC /* TransparentButtonFillN.tiff in Resources */,
 				5C96F70B131C49D400A2E4AC /* TransparentButtonLeftN.tiff in Resources */,
@@ -1784,6 +1793,7 @@
 				21A6E6FD0974204F008436A9 /* LabelsListController.m in Sources */,
 				212B84620978422300F3597F /* NSString_NV.m in Sources */,
 				B7E1AA031F0A000100000003 /* TagSearch.m in Sources */,
+				C4E1AA031F0B000100000003 /* PreviewRender.m in Sources */,
 				21DC788F097894B600E59B09 /* NSCollection_utils.m in Sources */,
 				2155DEA6097B5F0300163A10 /* BufferUtils.c in Sources */,
 				2155DF44097C992800163A10 /* AttributedPlainText.m in Sources */,

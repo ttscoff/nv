@@ -17,6 +17,7 @@
 #import "NSFileManager_NV.h"
 #import "NSFileManager+DirectoryLocations.h"
 #import "NVThemeManager.h"
+#import "PreviewRender.h"
 #import <Security/Security.h>
 
 #define kDefaultMarkupPreviewVisible @"markupPreviewVisible"
@@ -422,6 +423,10 @@ static const NSUInteger NVMarkedShareMaxBodyBytes = 500000;
         cssString = [[[self class] css] retain];
         htmlString = [[[self class] html] retain];
         lastNote = [app selectedNoteObject];
+    }
+    if (previewString) {
+        NSString *previewAssets = [[[NSBundle mainBundle] resourcePath] stringByAppendingPathComponent:@"preview-js"];
+        previewString = NVPreviewHTMLForDisplay(previewString, previewAssets);
     }
     NSString *nvSupportPath = [[NSFileManager defaultManager] applicationSupportDirectory];
 
