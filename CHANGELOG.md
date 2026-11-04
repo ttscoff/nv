@@ -10,6 +10,11 @@ nvALT 3.0.20 (144)
 
 - **Math and Mermaid** are bundled in the app and load only when a note uses them
 
+#### FIXED
+
+- **Convert to Markdown** writes the notes instead of stopping before the first file. Thanks to Don Patterson (djp3).
+- **Convert to Markdown** switches to the new folder and reports when it finishes. Thanks to Don Patterson (djp3).
+
 nvALT 3.0.19 (144)
 -------------------------
 
