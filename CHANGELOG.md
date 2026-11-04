@@ -1,3 +1,15 @@
+nvALT 3.0.20 (144)
+-------------------------
+
+#### NEW
+
+- **Preview** typesets math with MathJax, including `$...$`, `$$...$$`, `\(...\)`, and `\[...\]`
+- **Preview** draws a fenced Mermaid diagram
+
+#### IMPROVED
+
+- **Math and Mermaid** are bundled in the app and load only when a note uses them
+
 nvALT 3.0.19 (144)
 -------------------------
 
