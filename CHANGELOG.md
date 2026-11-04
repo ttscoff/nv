@@ -1,3 +1,11 @@
+nvALT 3.0.21 (144)
+-------------------------
+
+#### FIXED
+
+- **Convert to Markdown** writes the notes instead of stopping before the first file
+- **Convert to Markdown** switches to the new folder and reports when it finishes
+
 nvALT 3.0.20 (144)
 -------------------------
 
