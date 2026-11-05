@@ -940,7 +940,12 @@
 	NSUInteger index = [[self settingsPaneNames] indexOfObject:selected];
 	if (index == NSNotFound)
 		index = 0;
+	/* Row 0 is already selected by the time the delegate exists: attaching the
+	   data source selects it because an empty selection is not allowed, and that
+	   happens before setDelegate:. Selecting General again sends no notification,
+	   so the pane would stay empty until another row is chosen. */
 	[sidebarTable selectRowIndexes:[NSIndexSet indexSetWithIndex:index] byExtendingSelection:NO];
+	[self showSettingsPaneNamed:[[self settingsPaneNames] objectAtIndex:index]];
 }
 
 - (void)showSettingsPaneNamed:(NSString *)name {
