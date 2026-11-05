@@ -123,6 +123,30 @@ int main(int argc, const char *argv[]) {
 
 	expectTrue(NVPreviewHTMLForDisplay(nil, dir) == nil, "nil html");
 
+	BOOL needsMath = YES, needsMermaid = YES, needsWiki = YES;
+	NSString *prepared = NVPreviewHTMLPreparingContent(plain, &needsMath, &needsMermaid, &needsWiki);
+	expectTrue([prepared isEqualToString:plain] && !needsMath && !needsMermaid && !needsWiki, "prepare: plain html unchanged and needs nothing");
+	prepared = NVPreviewHTMLPreparingContent(both, &needsMath, &needsMermaid, &needsWiki);
+	expectContains(prepared, @"<pre class=\"mermaid\">", "prepare: rewrites mermaid fences");
+	expectOmits(prepared, @"<script", "prepare: adds no script tags");
+	expectTrue(needsMath && needsMermaid && !needsWiki, "prepare: reports math and mermaid");
+	prepared = NVPreviewHTMLPreparingContent(wiki, &needsMath, &needsMermaid, &needsWiki);
+	expectTrue([prepared isEqualToString:wiki] && !needsMath && !needsMermaid && needsWiki, "prepare: reports wiki links and leaves the brackets");
+	expectTrue(NVPreviewHTMLPreparingContent(nil, &needsMath, &needsMermaid, &needsWiki) == nil && !needsMath && !needsMermaid && !needsWiki, "prepare: nil html clears the flags");
+	expectTrue(NVPreviewHTMLPreparingContent(plain, NULL, NULL, NULL) != nil, "prepare: flags are optional");
+	expectTrue(NVPreviewRendererScripts(dir, NO, NO, NO) == nil, "scripts: none when nothing is needed");
+	NSString *mathOnly = NVPreviewRendererScripts(dir, YES, NO, NO);
+	expectContains(mathOnly, @"tex-svg.js", "scripts: math loads mathjax");
+	expectOmits(mathOnly, @"mermaid.min.js", "scripts: math alone does not load mermaid");
+	expectOmits(mathOnly, @"wiki-linker", "scripts: math alone does not inline the wiki linker");
+	NSString *wikiOnly = NVPreviewRendererScripts(dir, NO, NO, YES);
+	expectContains(wikiOnly, @"wiki-linker", "scripts: wiki links inline the linker");
+	expectOmits(wikiOnly, @"tex-svg.js", "scripts: wiki links alone do not load mathjax");
+	expectTrue(NVPreviewRendererScripts(noMermaidDir, NO, YES, NO) == nil, "scripts: missing mermaid file gives none");
+	expectTrue(NVPreviewRendererScripts(noMermaidDir, NO, NO, YES) == nil, "scripts: missing wiki script gives none");
+	NSString *assembled = [NVPreviewHTMLPreparingContent(both, NULL, NULL, NULL) stringByAppendingString:NVPreviewRendererScripts(dir, YES, YES, NO)];
+	expectTrue([NVPreviewHTMLForDisplay(both, dir) isEqualToString:assembled], "display output is prepared content plus scripts");
+
 	if (gFailures) {
 		fprintf(stderr, "%d preview render tests failed\n", gFailures);
 		[pool drain];
