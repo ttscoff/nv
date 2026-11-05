@@ -98,6 +98,23 @@ int main(int argc, const char *argv[]) {
 
 	expectTrue(NVPreviewHTMLForDisplay(nil, dir) == nil, "nil html");
 
+	BOOL needsMath = YES, needsMermaid = YES;
+	NSString *prepared = NVPreviewHTMLPreparingContent(plain, &needsMath, &needsMermaid);
+	expectTrue([prepared isEqualToString:plain] && !needsMath && !needsMermaid, "prepare: plain html unchanged and needs nothing");
+	prepared = NVPreviewHTMLPreparingContent(both, &needsMath, &needsMermaid);
+	expectContains(prepared, @"<pre class=\"mermaid\">", "prepare: rewrites mermaid fences");
+	expectOmits(prepared, @"<script", "prepare: adds no script tags");
+	expectTrue(needsMath && needsMermaid, "prepare: reports math and mermaid");
+	expectTrue(NVPreviewHTMLPreparingContent(nil, &needsMath, &needsMermaid) == nil && !needsMath && !needsMermaid, "prepare: nil html clears the flags");
+	expectTrue(NVPreviewHTMLPreparingContent(plain, NULL, NULL) != nil, "prepare: flags are optional");
+	expectTrue(NVPreviewRendererScripts(dir, NO, NO) == nil, "scripts: none when nothing is needed");
+	NSString *mathOnly = NVPreviewRendererScripts(dir, YES, NO);
+	expectContains(mathOnly, @"tex-svg.js", "scripts: math loads mathjax");
+	expectOmits(mathOnly, @"mermaid.min.js", "scripts: math alone does not load mermaid");
+	expectTrue(NVPreviewRendererScripts(noMermaidDir, NO, YES) == nil, "scripts: missing mermaid file gives none");
+	NSString *assembled = [NVPreviewHTMLPreparingContent(both, NULL, NULL) stringByAppendingString:NVPreviewRendererScripts(dir, YES, YES)];
+	expectTrue([NVPreviewHTMLForDisplay(both, dir) isEqualToString:assembled], "display output is prepared content plus scripts");
+
 	if (gFailures) {
 		fprintf(stderr, "%d preview render tests failed\n", gFailures);
 		[pool drain];
