@@ -1,3 +1,10 @@
+nvALT 3.0.24 (144)
+-------------------------
+
+#### FIXED
+
+- Opening **Settings** on **General** shows its controls when that pane was open at quit
+
 nvALT 3.0.23 (144)
 -------------------------
 
