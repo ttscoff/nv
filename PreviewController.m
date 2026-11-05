@@ -269,7 +269,7 @@ static const NSUInteger NVMarkedShareMaxBodyBytes = 500000;
 
     cssString = [[[self class] css] retain];
     htmlString = [[[self class] html] retain];
-    lastNote = [[NSApp delegate] selectedNoteObject];
+    lastNote = [[[NSApp delegate] selectedNoteObject] retain];
     [sourceView setTextContainerInset:NSMakeSize(10.0,12.0)];
     NSScrollView *scrlView=[sourceView enclosingScrollView];
     if (!IsLionOrLater) {
@@ -578,7 +578,10 @@ static const NSUInteger NVMarkedShareMaxBodyBytes = 500000;
         [htmlString release];
         cssString = [[[self class] css] retain];
         htmlString = [[[self class] html] retain];
-        lastNote = [app selectedNoteObject];
+        // Owned, so a deleted note cannot be freed and its address reused by a
+        // new note that would then pass the sameNote check above.
+        [lastNote release];
+        lastNote = [[app selectedNoteObject] retain];
     }
     NSString *newPendingState = [scrollState copy];
     [pendingScrollState release];
