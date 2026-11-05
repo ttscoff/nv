@@ -19,9 +19,11 @@
 #import "NSCollection_utils.h"
 #import "AttributedPlainText.h"
 #import "NSString_NV.h"
+#import "NVAutoPair.h"
 #import "NVPasswordGenerator.h"
 #import "NVThemeManager.h"
 #import "TagSearch.h"
+#import "LinkReferenceCompletion.h"
 #import "ETScrollView.h"
 #import "ETClipView.h"
 //#import "NSTextFinder.h"
@@ -592,7 +594,7 @@ copyRTFType:
 
 - (void)bold:(id)sender {	
     if ([[NSUserDefaults standardUserDefaults]boolForKey:@"UsesMarkdownCompletions"]) {
-        [self changeMarkdownAttribute:@"**"];
+        [self changeMarkdownAttribute:[prefsController markdownBoldMarker]];
     }else{
         [self applyStyleOfTrait:NSBoldFontMask alternateAttributeName:NSStrokeWidthAttributeName 
         alternateAttributeValue:[NSNumber numberWithFloat:(float)STROKE_WIDTH_FOR_BOLD]];
@@ -602,7 +604,7 @@ copyRTFType:
 
 - (void)italic:(id)sender {
     if ([[NSUserDefaults standardUserDefaults]boolForKey:@"UsesMarkdownCompletions"]) {
-        [self changeMarkdownAttribute:@"*"];
+        [self changeMarkdownAttribute:[prefsController markdownItalicMarker]];
     }else{
         [self applyStyleOfTrait:NSItalicFontMask alternateAttributeName:NSObliquenessAttributeName 
         alternateAttributeValue:[NSNumber numberWithFloat:(float)OBLIQUENESS_FOR_ITALIC]];
@@ -1753,7 +1755,35 @@ static NSColor *NVBlendColors(NSColor *first, NSColor *second, CGFloat fraction,
 	}
 }
 
+- (BOOL)linkReferenceCompletionIsOpen {
+	NSRange selection = [self selectedRange];
+	if (selection.length || selection.location > [[self string] length])
+		return NO;
+	NVLinkCompletionContext context = NVLinkCompletionContextAtLocation([self string], selection.location);
+	return context.kind != NVLinkCompletionNone && context.range.location != NSNotFound && NSMaxRange(context.range) <= [[self string] length];
+}
+
+- (void)completeSuggestedLinks {
+	if (isAutocompleting || wasDeleting)
+		return;
+	if ([[self undoManager] isUndoing] || [[self undoManager] isRedoing])
+		return;
+	if (![prefsController linksAutoSuggested] && ![self linkReferenceCompletionIsOpen])
+		return;
+	isAutocompleting = YES;
+	[self complete:self];
+	isAutocompleting = NO;
+}
+
 - (NSRange)rangeForUserCompletion {
+	NSRange selection = [self selectedRange];
+	NSString *document = [self string];
+	if (selection.length == 0 && selection.location <= [document length]) {
+		NVLinkCompletionContext context = NVLinkCompletionContextAtLocation(document, selection.location);
+		if (context.kind != NVLinkCompletionNone && context.range.location != NSNotFound && NSMaxRange(context.range) <= [document length])
+			return context.range;
+	}
+
 	NSRange completionRange = [super rangeForUserCompletion];
 	//NSLog(@"completionRange: %@", [[self string] substringWithRange:completionRange]);
 	
@@ -1784,10 +1814,35 @@ cancelCompetion:
 - (void)insertCompletion:(NSString *)word forPartialWordRange:(NSRange)charRange movement:(NSInteger)movement isFinal:(BOOL)isFinal {
 	NSString *str = [self string];
 	BOOL finalizedCompletion = NO;
+	BOOL referenceCompletion = NO;
+	BOOL hasClosingBracket = NO;
 	
 	isFinal = isFinal && movement != NSRightTextMovement;
+
+	if (charRange.location != NSNotFound && NSMaxRange(charRange) <= [str length]) {
+		NVLinkCompletionContext context = NVLinkCompletionContextAtLocation(str, NSMaxRange(charRange));
+		referenceCompletion = (context.kind != NVLinkCompletionNone && NSEqualRanges(context.range, charRange));
+		if (referenceCompletion) {
+			// The inline preview selects the characters added past the typed id, so an
+			// existing ']' sits after that selection rather than after charRange.
+			NSUInteger end = NSMaxRange(charRange);
+			NSRange selected = [self selectedRange];
+			if (selected.length && selected.location >= charRange.location && selected.location <= end && NSMaxRange(selected) <= [str length])
+				end = MAX(end, NSMaxRange(selected));
+			if (end < [str length] && [str characterAtIndex:end] == ']')
+				hasClosingBracket = YES;
+		}
+	}
 	
-	if (isFinal && [word length] && (movement == NSReturnTextMovement || movement == NSTabTextMovement)) {
+	if (referenceCompletion) {
+		// Return, Tab, and a click all accept. The opening complete: call can also
+		// report a final insertion while the list is still up; leave that as a preview.
+		BOOL choose = (movement == NSReturnTextMovement || movement == NSTabTextMovement || movement == NSOtherTextMovement);
+		if (isFinal && !isAutocompleting && [word length] && choose) {
+			word = NVLinkCompletionInsert(word, hasClosingBracket);
+			finalizedCompletion = YES;
+		}
+	} else if (isFinal && [word length] && (movement == NSReturnTextMovement || movement == NSTabTextMovement)) {
 		
 		//automatically add a trailing double-bracket if one does not already exist
 		NSRange endRange = NSMakeRange(charRange.location + [word length], 2);
@@ -1798,12 +1853,18 @@ cancelCompetion:
 	}
 	
 	//preserve capitalization by transferring charRange substring into word
-	if (!finalizedCompletion && charRange.length <= [word length]) { 
+	if (!referenceCompletion && !finalizedCompletion && charRange.length <= [word length]) { 
 		NSString *existingWord = [str substringWithRange:charRange];
 		word = [existingWord stringByAppendingString:[word substringFromIndex:[existingWord length]]];
 	}
 	
 	[super insertCompletion:word forPartialWordRange:charRange movement:movement isFinal:isFinal];
+
+	if (referenceCompletion && finalizedCompletion && hasClosingBracket) {
+		NSUInteger caret = [self selectedRange].location;
+		if (caret < [[self string] length] && [[self string] characterAtIndex:caret] == ']')
+			[self setSelectedRange:NSMakeRange(caret + 1, 0)];
+	}
 }
 
 - (void)didChangeText {
@@ -1823,12 +1884,7 @@ cancelCompetion:
 	
 	[[self textStorage] addStrikethroughNearDoneTagsForRange:changedRange];
 	
-	if (!isAutocompleting && !wasDeleting && [prefsController linksAutoSuggested] && 
-		![[self undoManager] isUndoing] && ![[self undoManager] isRedoing]) {
-		isAutocompleting = YES;
-		[self complete:self];
-		isAutocompleting = NO;
-	}
+	[self completeSuggestedLinks];
 	
 	//[[self window] invalidateCursorRectsForView:self];
 	
@@ -2346,70 +2402,24 @@ static long (*GetGetScriptManagerVariablePointer())(short) {
 
 - (void)insertText:(id)string {
     if([prefsController useAutoPairing]){
-        NSString *oppositeAppend;
-        NSInteger pairCode;
+        NSString *oppositeAppend = nil;
         NSString *insertString;
         if([string isKindOfClass:[NSAttributedString class]]){
             insertString=[(NSAttributedString *)string string];
         }else{
             insertString=(NSString *)string;
         }
-        if((pairCode=[insertString isPairedCharacterWithMatchString:&oppositeAppend])>=0){
+        NSInteger pairCode = [insertString isPairedCharacterWithMatchString:&oppositeAppend];
+        if(pairCode>=0){
             NSString *appendString = insertString;
             NSRange selRange = [self selectedRange];
-            NSString *postString = self.activeParagraphPastCursor;
-            
-            NSInteger autoPair=-1;
-            if ((postString.length==0)||(selRange.length>0)||![[NSCharacterSet alphanumericCharacterSet]characterIsMember:[postString characterAtIndex:0]]) {
-                autoPair=0;
+            NVAutoPairAction action = NVAutoPairActionForInsert(appendString, oppositeAppend, pairCode, self.activeParagraphBeforeCursor, self.activeParagraphPastCursor, selRange.length);
+            if (action == NVAutoPairTypeOver) {
+                selRange.location+=1;
+                [self selectRangeAndRegisterUndo:selRange];
+                return;
             }
-            NSString *preStr=self.activeParagraphBeforeCursor;
-            if (pairCode==2&&autoPair==0) {
-                NSUInteger closingIdx=[postString rangeOfString:oppositeAppend].location;
-                if (closingIdx!=NSNotFound) {
-                    NSUInteger openingIdx=[[postString substringToIndex:closingIdx] rangeOfString:appendString].location;
-                    if (openingIdx==NSNotFound) {
-                        openingIdx=[preStr rangeOfString:appendString options:NSBackwardsSearch].location;
-                        if (openingIdx!=NSNotFound) {
-                            NSUInteger opIdx=[preStr rangeOfString:oppositeAppend options:NSBackwardsSearch].location;
-                            //                              NSLog(@"opIdx :>%lu<  op:%lu",opIdx,openingIdx);
-                            if ((opIdx==NSNotFound)||(opIdx<openingIdx)) {
-                                closingIdx=NSNotFound;
-                            }
-                        }
-                    }else{
-                        closingIdx=NSNotFound;
-                    }
-                }
-                if (closingIdx==NSNotFound) {
-                    autoPair=1;
-                }
-            }else{
-                NSUInteger openingIdx=[postString rangeOfString:appendString].location;
-                BOOL advance=NO;
-                if (pairCode==1) {
-                    advance=(openingIdx==0);
-                    if (!advance&&autoPair==0) {
-                        NSUInteger aftCt=([[postString componentsSeparatedByString:appendString] count]%2);
-                        NSUInteger befCt=([[preStr componentsSeparatedByString:appendString] count]%2);
-                        if (befCt==aftCt) {
-                            autoPair=1;
-                        }
-                    }
-                }else{
-                    advance=(openingIdx==0);
-                }
-                if (advance&&(selRange.length==0)) {
-                    openingIdx=[preStr rangeOfString:oppositeAppend options:NSBackwardsSearch].location;
-                    NSUInteger clIdx=[preStr rangeOfString:appendString options:NSBackwardsSearch].location;
-                    if ((openingIdx!=NSNotFound)&&((clIdx==NSNotFound)||(openingIdx>=clIdx))) {
-                        selRange.location+=1;
-                        [self selectRangeAndRegisterUndo:selRange];
-                        return;
-                    }
-                }
-            }
-            if (autoPair==1) {
+            if (action == NVAutoPairWrapOrInsert) {
                 if (selRange.length>0) {
                     [[[self undoManager] prepareWithInvocationTarget:self] setSelectedRange:selRange];
                     NSRange insRange=selRange;
@@ -2418,12 +2428,15 @@ static long (*GetGetScriptManagerVariablePointer())(short) {
                     insRange.location+=(selRange.length+1); //add appendstr.length
                     [super insertText:oppositeAppend replacementRange:insRange];
                     insRange.location+=1;  //add oppappendstr.length
-                    //                    selRange.length+=2;
                     [self setSelectedRange:insRange];
                     return;
                 }else {
                     [super insertText:[appendString stringByAppendingString:oppositeAppend]];
                     [self setSelectedRange:NSMakeRange(selRange.location+appendString.length, 0)];
+                    // The pair is inserted with the caret after the closer, then moved between
+                    // the brackets. Offer link ids once the caret is actually inside.
+                    if ([appendString isEqualToString:@"["])
+                        [self completeSuggestedLinks];
                     return;
                 }
             }
@@ -2877,6 +2890,166 @@ static BOOL NVBulletMarker(NSString *line, NSUInteger contentLength, NSUInteger 
 	return YES;
 }
 
+- (NSArray *)nv_lineRangesForSelection:(NSRange)selection inText:(NSString *)text {
+	NSMutableArray *lines = [NSMutableArray array];
+	if (!text || selection.location > [text length])
+		return lines;
+	if (![text length]) {
+		[lines addObject:[NSValue valueWithRange:NSMakeRange(0, 0)]];
+		return lines;
+	}
+	NSUInteger start = MIN(selection.location, [text length]);
+	NSUInteger endLocation = selection.length ? NSMaxRange(selection) - 1 : start;
+	if (endLocation >= [text length])
+		endLocation = [text length] - 1;
+	NSRange firstLine = [text lineRangeForRange:NSMakeRange(start, 0)];
+	NSRange lastLine = [text lineRangeForRange:NSMakeRange(endLocation, 0)];
+	NSUInteger scan = firstLine.location;
+	while (scan <= lastLine.location && scan <= [text length]) {
+		NSRange lineRange = [text lineRangeForRange:NSMakeRange(MIN(scan, [text length]), 0)];
+		[lines addObject:[NSValue valueWithRange:lineRange]];
+		if (NSMaxRange(lineRange) <= scan)
+			break;
+		scan = NSMaxRange(lineRange);
+	}
+	return lines;
+}
+
+- (NSRange)nv_markerRangeInLine:(NSString *)line contentLength:(NSUInteger)contentLength markerIndex:(NSUInteger)markerIndex {
+	NSRange digits = NSMakeRange(NSNotFound, 0);
+	if (NVNumberedMarker(line, contentLength, markerIndex, &digits, NULL)) {
+		NSUInteger markerEnd = digits.location + digits.length + 1;
+		while (markerEnd < contentLength && [[NSCharacterSet whitespaceCharacterSet] characterIsMember:[line characterAtIndex:markerEnd]])
+			markerEnd++;
+		return NSMakeRange(digits.location, markerEnd - digits.location);
+	}
+	if (NVBulletMarker(line, contentLength, markerIndex)) {
+		NSUInteger markerEnd = markerIndex + 1;
+		while (markerEnd < contentLength && [[NSCharacterSet whitespaceCharacterSet] characterIsMember:[line characterAtIndex:markerEnd]])
+			markerEnd++;
+		return NSMakeRange(markerIndex, markerEnd - markerIndex);
+	}
+	return NSMakeRange(NSNotFound, 0);
+}
+
+- (NSRange)nv_rangeCoveringLineCount:(NSUInteger)count fromLocation:(NSUInteger)start {
+	NSString *text = [self string];
+	if (start > [text length])
+		start = [text length];
+	NSUInteger location = start;
+	NSRange lastLine = NSMakeRange(start, 0);
+	NSUInteger remaining = count;
+	while (remaining && location <= [text length]) {
+		lastLine = [text lineRangeForRange:NSMakeRange(MIN(location, [text length]), 0)];
+		remaining--;
+		if (!remaining || NSMaxRange(lastLine) <= location)
+			break;
+		location = NSMaxRange(lastLine);
+	}
+	NSRange covered = NSUnionRange(NSMakeRange(start, 0), lastLine);
+	if (covered.location > [text length])
+		covered.location = [text length];
+	if (NSMaxRange(covered) > [text length])
+		covered.length = [text length] - covered.location;
+	return covered;
+}
+
+- (BOOL)nv_cycleListMarkersOnLineRanges:(NSArray *)lines {
+	NSString *text = [self string];
+	NSUInteger tabWidth = [self listTabWidth];
+	NSUInteger plainCount = 0;
+	NSUInteger bulletCount = 0;
+	NSUInteger numberedCount = 0;
+	for (NSValue *value in lines) {
+		NSRange lineRange = [value rangeValue];
+		if (NSMaxRange(lineRange) > [text length])
+			continue;
+		NSString *line = [text substringWithRange:lineRange];
+		NSUInteger contentLength = [line length];
+		while (contentLength && [[NSCharacterSet newlineCharacterSet] characterIsMember:[line characterAtIndex:contentLength - 1]])
+			contentLength--;
+		NSUInteger markerIndex = 0;
+		NVListIndentWidth(line, contentLength, tabWidth, &markerIndex);
+		if (markerIndex >= contentLength)
+			continue;
+		NSRange marker = [self nv_markerRangeInLine:line contentLength:contentLength markerIndex:markerIndex];
+		if (marker.location == NSNotFound)
+			plainCount++;
+		else if (NVNumberedMarker(line, contentLength, markerIndex, NULL, NULL))
+			numberedCount++;
+		else
+			bulletCount++;
+	}
+	if (!plainCount && !bulletCount && !numberedCount)
+		return YES;
+	/* Mixed lines clear back to plain text. A uniform bullet selection becomes
+	   numbers, and a uniform numbered selection is the step that clears them. */
+	BOOL remove = (plainCount && (bulletCount || numberedCount)) || (numberedCount && !bulletCount);
+	BOOL number = !remove && bulletCount > 0;
+	NSString *bullet = [[prefsController markdownListMarker] stringByAppendingString:@" "];
+	NSUInteger firstLocation = [[lines objectAtIndex:0] rangeValue].location;
+	[[self undoManager] beginUndoGrouping];
+	BOOL changed = NO;
+	NSInteger lineIndex;
+	for (lineIndex = (NSInteger)[lines count] - 1; lineIndex >= 0; lineIndex--) {
+		text = [self string];
+		NSRange lineRange = [[lines objectAtIndex:(NSUInteger)lineIndex] rangeValue];
+		if (NSMaxRange(lineRange) > [text length])
+			continue;
+		NSString *line = [text substringWithRange:lineRange];
+		NSUInteger contentLength = [line length];
+		while (contentLength && [[NSCharacterSet newlineCharacterSet] characterIsMember:[line characterAtIndex:contentLength - 1]])
+			contentLength--;
+		NSUInteger markerIndex = 0;
+		NVListIndentWidth(line, contentLength, tabWidth, &markerIndex);
+		NSRange marker = [self nv_markerRangeInLine:line contentLength:contentLength markerIndex:markerIndex];
+		NSRange edited = NSMakeRange(NSNotFound, 0);
+		NSString *replacement = nil;
+		if (remove) {
+			if (marker.location == NSNotFound)
+				continue;
+			edited = NSMakeRange(lineRange.location + marker.location, marker.length);
+			replacement = @"";
+		} else if (number) {
+			if (marker.location == NSNotFound || NVNumberedMarker(line, contentLength, markerIndex, NULL, NULL))
+				continue;
+			edited = NSMakeRange(lineRange.location + marker.location, marker.length);
+			replacement = @"1. ";
+		} else {
+			if (marker.location != NSNotFound || markerIndex >= contentLength)
+				continue;
+			edited = NSMakeRange(lineRange.location + markerIndex, 0);
+			replacement = bullet;
+		}
+		if (![self shouldChangeTextInRange:edited replacementString:replacement])
+			continue;
+		[self replaceCharactersInRange:edited withString:replacement];
+		changed = YES;
+	}
+	if (changed) {
+		NSRange covered = [self nv_rangeCoveringLineCount:[lines count] fromLocation:firstLocation];
+		[self setSelectedRange:covered];
+		if (number) {
+			renumberingNumberedLists = YES;
+			[self didChangeText];
+			renumberingNumberedLists = NO;
+			[self renumberNumberedLists];
+			NSUInteger renumberedStart = [self selectedRange].location;
+			[self setSelectedRange:[self nv_rangeCoveringLineCount:[lines count] fromLocation:renumberedStart]];
+		} else {
+			[self didChangeText];
+		}
+		NSString *actionName = NSLocalizedString(@"Add List Markers", nil);
+		if (remove)
+			actionName = NSLocalizedString(@"Remove List Markers", nil);
+		else if (number)
+			actionName = NSLocalizedString(@"Number List", nil);
+		[[self undoManager] setActionName:actionName];
+	}
+	[[self undoManager] endUndoGrouping];
+	return YES;
+}
+
 - (BOOL)cycleListMarkerOnCurrentLine {
 	if (![prefsController autoFormatsListBullets])
 		return NO;
@@ -2884,6 +3057,11 @@ static BOOL NVBulletMarker(NSString *line, NSUInteger contentLength, NSUInteger 
 	NSRange selection = [self selectedRange];
 	if (selection.location > [text length])
 		return NO;
+	if ([text length] && selection.length) {
+		NSArray *lines = [self nv_lineRangesForSelection:selection inText:text];
+		if ([lines count] > 1)
+			return [self nv_cycleListMarkersOnLineRanges:lines];
+	}
 	NSRange lineRange = [text lineRangeForRange:NSMakeRange(MIN(selection.location, [text length]), 0)];
 	NSString *line = [text substringWithRange:lineRange];
 	NSUInteger contentLength = [line length];
@@ -2917,13 +3095,13 @@ static BOOL NVBulletMarker(NSString *line, NSUInteger contentLength, NSUInteger 
 		BOOL bareMarker = [[NSCharacterSet listBulletsCharacterSet] characterIsMember:character] || [[NSCharacterSet decimalDigitCharacterSet] characterIsMember:character];
 		if (bareMarker)
 			return YES;
-		replacement = @"* ";
+		replacement = [[prefsController markdownListMarker] stringByAppendingString:@" "];
 		replaceRange = NSMakeRange(lineRange.location + markerIndex, 0);
-		cursorDelta = 2;
+		cursorDelta = (NSInteger)[replacement length];
 	} else {
-		replacement = @"* ";
+		replacement = [[prefsController markdownListMarker] stringByAppendingString:@" "];
 		replaceRange = NSMakeRange(lineRange.location + markerIndex, 0);
-		cursorDelta = 2;
+		cursorDelta = (NSInteger)[replacement length];
 	}
 	if (![self shouldChangeTextInRange:replaceRange replacementString:replacement])
 		return YES;
@@ -3085,11 +3263,10 @@ static BOOL NVBulletMarker(NSString *line, NSUInteger contentLength, NSUInteger 
 
 - (BOOL)cursorAtRange:(NSRange)charRange isBetweenEmptyPairsInLineRange:(NSRange)actRange{
     NSUInteger keyLoc=charRange.location;
-    if ((keyLoc>actRange.location)&&(keyLoc<NSMaxRange(actRange))) {     
-        keyLoc=[@"([{\"'" rangeOfString:[NSString stringWithFormat:@"%C",[[self string] characterAtIndex:keyLoc-1]]].location;
-        if ((keyLoc!=NSNotFound)&&(keyLoc==[@")]}\"'" rangeOfString:[NSString stringWithFormat:@"%C",[[self string] characterAtIndex:charRange.location]]].location)) {
+    if ((keyLoc>actRange.location)&&(keyLoc<NSMaxRange(actRange))) {
+        NSString *string = [self string];
+        if (NVCharactersFormEmptyPair([string characterAtIndex:keyLoc - 1], [string characterAtIndex:keyLoc]))
             return YES;
-        }
     }
     return NO;
 }

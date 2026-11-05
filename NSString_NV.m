@@ -16,6 +16,7 @@
      or promote products derived from this software without specific prior written permission. */
 
 #import "NSString_NV.h"
+#import "NVAutoPair.h"
 #import "NSData_transformations.h"
 #import <Security/Security.h>
 #import "NSFileManager_NV.h"
@@ -550,47 +551,9 @@ BOOL IsHardLineBreakUnichar(unichar uchar, NSString *str, unsigned charIndex) {
 }
 
 - (NSInteger)isPairedCharacterWithMatchString:(NSString **)matchString{
-    if (self.length==1) {
-        unichar ch=[self characterAtIndex:0];
-        NSInteger chNum=(NSInteger)ch;
-        if (chNum==34){
-             *matchString=@"\"";
-            return 1;
-        }
-        static NSCharacterSet *leftSidePairCharacterSet;
-        if(!leftSidePairCharacterSet){
-            leftSidePairCharacterSet=[[NSCharacterSet characterSetWithCharactersInString:@"([{"] retain];
-        }
-        static NSCharacterSet *rightSidePairCharacterSet;
-        if(!rightSidePairCharacterSet){
-            rightSidePairCharacterSet=[[NSCharacterSet characterSetWithCharactersInString:@")]}"] retain];
-        }
-        
-        if ([leftSidePairCharacterSet characterIsMember:ch]){
-            if (chNum==91){//[@"[" isEqualToString:self]) {
-                *matchString=@"]";
-    //            return @"]";
-            }else if (chNum==40){//([@"(" isEqualToString:self]) {
-                *matchString=@")";
-    //            return @")";
-            }else if (chNum==123){//([@"{" isEqualToString:self]) {
-                *matchString=@"}";
-    //            return @"}";
-            }
-            return 2;
-        }else if ([rightSidePairCharacterSet characterIsMember:ch]) {
-             if (chNum==93){//if ([@"]" isEqualToString:self]) {
-                *matchString=@"[";
-            }else  if (chNum==41){//if ([@")" isEqualToString:self]) {
-                *matchString=@"(";
-            }else if (chNum==125){// if ([@"}" isEqualToString:self]) {
-                *matchString=@"{";
-            }
-            return 0;
-        }        
-    }
-    return -1;
-//    return @"";
+    if ([self length] != 1)
+        return -1;
+    return NVPairedCharacterCode([self characterAtIndex:0], matchString);
 }
 
 @end

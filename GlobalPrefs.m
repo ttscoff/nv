@@ -87,6 +87,9 @@ static NSString *RTLKey = @"rtl";
 static NSString *ShowWordCount = @"ShowWordCount";
 static NSString *markupPreviewMode = @"markupPreviewMode";
 static NSString *UseAutoPairing = @"UseAutoPairing";
+static NSString *MarkdownBoldMarkerKey = @"MarkdownBoldMarker";
+static NSString *MarkdownItalicMarkerKey = @"MarkdownItalicMarker";
+static NSString *MarkdownListMarkerKey = @"MarkdownListMarker";
 static NSString *UseETScrollbarsOnLion = @"UseETScrollbarsOnLion";
 static NSString *UsesMarkdownCompletions = @"UsesMarkdownCompletions";
 static NSString *UseFinderTagsKey = @"UseFinderTags";
@@ -163,6 +166,9 @@ static void sendCallbacksForGlobalPrefs(GlobalPrefs* self, SEL selector, id orig
             [NSNumber numberWithBool:YES], ShowGridKey,
             [NSNumber numberWithBool:NO], AlternatingRowsKey,
             [NSNumber numberWithBool:NO], UseAutoPairing,
+            @"*", MarkdownBoldMarkerKey,
+            @"*", MarkdownItalicMarkerKey,
+            @"*", MarkdownListMarkerKey,
             [NSNumber numberWithBool:NO], UseETScrollbarsOnLion,
             [NSNumber numberWithBool:YES], UsesMarkdownCompletions,
 
@@ -547,6 +553,43 @@ static void sendCallbacksForGlobalPrefs(GlobalPrefs* self, SEL selector, id orig
 
 - (BOOL)useAutoPairing{
 	return [defaults boolForKey:UseAutoPairing];
+}
+
+static NSString *NVAllowedMarker(NSString *stored, NSString *allowed, NSString *fallback) {
+	if ([stored length] == 1 && [allowed rangeOfString:stored].location != NSNotFound)
+		return stored;
+	return fallback;
+}
+
+- (void)setMarkdownBoldMarker:(NSString *)marker {
+	NSString *chosen = NVAllowedMarker(marker, @"*_", nil);
+	if (chosen)
+		[defaults setObject:chosen forKey:MarkdownBoldMarkerKey];
+}
+
+- (NSString *)markdownBoldMarker {
+	NSString *chosen = NVAllowedMarker([defaults stringForKey:MarkdownBoldMarkerKey], @"*_", @"*");
+	return [chosen stringByAppendingString:chosen];
+}
+
+- (void)setMarkdownItalicMarker:(NSString *)marker {
+	NSString *chosen = NVAllowedMarker(marker, @"*_", nil);
+	if (chosen)
+		[defaults setObject:chosen forKey:MarkdownItalicMarkerKey];
+}
+
+- (NSString *)markdownItalicMarker {
+	return NVAllowedMarker([defaults stringForKey:MarkdownItalicMarkerKey], @"*_", @"*");
+}
+
+- (void)setMarkdownListMarker:(NSString *)marker {
+	NSString *chosen = NVAllowedMarker(marker, @"-*+", nil);
+	if (chosen)
+		[defaults setObject:chosen forKey:MarkdownListMarkerKey];
+}
+
+- (NSString *)markdownListMarker {
+	return NVAllowedMarker([defaults stringForKey:MarkdownListMarkerKey], @"-*+", @"*");
 }
 
 - (void)setShouldHighlightSearchTerms:(BOOL)shouldHighlight sender:(id)sender {

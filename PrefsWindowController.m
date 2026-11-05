@@ -392,6 +392,91 @@
 	[self reloadThemePopups];
 }
 
+- (NSPopUpButton *)markdownMarkerPopupWithFrame:(NSRect)frame tag:(NSInteger)tag titles:(NSArray *)titles values:(NSArray *)values selected:(NSString *)selected {
+	NSPopUpButton *popup = [[NSPopUpButton alloc] initWithFrame:frame pullsDown:NO];
+	[popup setTag:tag];
+	[popup setTarget:self];
+	[popup setAction:@selector(changedMarkdownMarker:)];
+	[popup setAutoresizingMask:NSViewMaxYMargin | NSViewMaxXMargin];
+	NSInteger index = 0;
+	NSInteger selectedIndex = 0;
+	for (NSString *title in titles) {
+		NSString *value = [values objectAtIndex:index];
+		NSMenuItem *item = [[popup menu] addItemWithTitle:title action:NULL keyEquivalent:@""];
+		[item setRepresentedObject:value];
+		if ([value isEqualToString:selected] || [title isEqualToString:selected])
+			selectedIndex = index;
+		index++;
+	}
+	[popup selectItemAtIndex:selectedIndex];
+	return popup;
+}
+
+- (void)addMarkdownMarkerControls {
+	if (!editingView || [editingView viewWithTag:7320])
+		return;
+	CGFloat extra = 132.0;
+	NSArray *subviews = [[editingView subviews] copy];
+	NSMutableArray *savedMasks = [[NSMutableArray alloc] initWithCapacity:[subviews count]];
+	for (NSView *subview in subviews) {
+		[savedMasks addObject:[NSNumber numberWithUnsignedInteger:[subview autoresizingMask]]];
+		[subview setAutoresizingMask:NSViewNotSizable];
+	}
+	for (NSView *subview in subviews) {
+		NSRect frame = [subview frame];
+		frame.origin.y += extra;
+		[subview setFrame:frame];
+	}
+	NSRect viewFrame = [editingView frame];
+	viewFrame.size.height += extra;
+	[editingView setFrame:viewFrame];
+	NSUInteger maskIndex = 0;
+	for (NSView *subview in subviews)
+		[subview setAutoresizingMask:[[savedMasks objectAtIndex:maskIndex++] unsignedIntegerValue]];
+	[savedMasks release];
+	[subviews release];
+
+	NSTextField *heading = [self themeLabelWithFrame:NSMakeRect(18, 104, 220, 18) title:NSLocalizedString(@"Markdown", @"Editing settings marker section")];
+	[heading setAlignment:NSTextAlignmentLeft];
+	[heading setFont:[NSFont boldSystemFontOfSize:[NSFont systemFontSize]]];
+	[editingView addSubview:heading];
+	[heading release];
+
+	NSArray *emphasisTitles = [NSArray arrayWithObjects:@"*", @"_", nil];
+	NSTextField *boldLabel = [self themeLabelWithFrame:NSMakeRect(8, 78, 136, 17) title:NSLocalizedString(@"Bold:", @"bold marker popup label")];
+	[editingView addSubview:boldLabel];
+	[boldLabel release];
+	NSPopUpButton *boldPopup = [self markdownMarkerPopupWithFrame:NSMakeRect(148, 72, 72, 26) tag:7320 titles:[NSArray arrayWithObjects:@"**", @"__", nil] values:emphasisTitles selected:[prefsController markdownBoldMarker]];
+	[editingView addSubview:boldPopup];
+	[boldPopup release];
+
+	NSTextField *italicLabel = [self themeLabelWithFrame:NSMakeRect(8, 46, 136, 17) title:NSLocalizedString(@"Italic:", @"italic marker popup label")];
+	[editingView addSubview:italicLabel];
+	[italicLabel release];
+	NSPopUpButton *italicPopup = [self markdownMarkerPopupWithFrame:NSMakeRect(148, 40, 72, 26) tag:7321 titles:emphasisTitles values:emphasisTitles selected:[prefsController markdownItalicMarker]];
+	[editingView addSubview:italicPopup];
+	[italicPopup release];
+
+	NSTextField *listLabel = [self themeLabelWithFrame:NSMakeRect(8, 14, 136, 17) title:NSLocalizedString(@"Unordered List:", @"list marker popup label")];
+	[editingView addSubview:listLabel];
+	[listLabel release];
+	NSArray *listMarkers = [NSArray arrayWithObjects:@"-", @"*", @"+", nil];
+	NSPopUpButton *listPopup = [self markdownMarkerPopupWithFrame:NSMakeRect(148, 8, 72, 26) tag:7322 titles:listMarkers values:listMarkers selected:[prefsController markdownListMarker]];
+	[editingView addSubview:listPopup];
+	[listPopup release];
+}
+
+- (IBAction)changedMarkdownMarker:(id)sender {
+	NSString *value = [[sender selectedItem] representedObject];
+	NSInteger tag = [sender tag];
+	if (tag == 7320)
+		[prefsController setMarkdownBoldMarker:value];
+	else if (tag == 7321)
+		[prefsController setMarkdownItalicMarker:value];
+	else if (tag == 7322)
+		[prefsController setMarkdownListMarker:value];
+}
+
 - (IBAction)changedEditorTheme:(id)sender {
 	[[NVThemeManager sharedManager] setEditorThemeFilename:[[sender selectedItem] representedObject] ?: @""];
 }
@@ -697,6 +782,7 @@
     [rtlButton setState:[prefsController rtl]];
     [self addListFontControls];
     [self addThemeControls];
+    [self addMarkdownMarkerControls];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(themesDidChange:) name:NVThemesDidChangeNotification object:nil];
     [self previewNoteBodyFont];
 	[appShortcutField setStringValue:[[prefsController appActivationKeyCombo] description]];

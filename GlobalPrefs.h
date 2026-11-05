@@ -209,6 +209,13 @@ BOOL ColorsEqualWith8BitChannels(NSColor *c1, NSColor *c2);
 - (BOOL)alternatingRows;
 - (void)setUseAutoPairing:(BOOL)value;
 - (BOOL)useAutoPairing;
+
+- (void)setMarkdownBoldMarker:(NSString *)marker;
+- (NSString *)markdownBoldMarker;
+- (void)setMarkdownItalicMarker:(NSString *)marker;
+- (NSString *)markdownItalicMarker;
+- (void)setMarkdownListMarker:(NSString *)marker;
+- (NSString *)markdownListMarker;
 - (void)setMaxNoteBodyWidth:(CGFloat)maxWidth sender:(id)sender;
 - (void)setManagesTextWidthInWindow:(BOOL)manageIt sender:(id)sender;
 - (BOOL)managesTextWidthInWindow;

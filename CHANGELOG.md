@@ -1,6 +1,10 @@
 nvALT 3.0.21 (144)
 -------------------------
 
+#### NEW
+
+- **Link ids** complete inside `[text][id]` from definitions already in the note, and a new `[id]:` line offers ids that are still unused
+
 #### FIXED
 
 - **Convert to Markdown** writes the notes instead of stopping before the first file

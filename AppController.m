@@ -24,6 +24,7 @@
 #import "NotationFileManager.h"
 #import "NSString_NV.h"
 #import "TagSearch.h"
+#import "LinkReferenceCompletion.h"
 #import "NSString_CustomTruncation.h"
 #import "NSFileManager_NV.h"
 #import "EncodingsManager.h"
@@ -1999,7 +2000,17 @@ static NSURL *NVHTTPURLFromImportString(NSString *entered) {
 
 - (NSArray *)textView:(NSTextView *)aTextView completions:(NSArray *)words
   forPartialWordRange:(NSRange)charRange indexOfSelectedItem:(NSInteger *)anIndex {
-	NSArray *noteTitles = [notationController noteTitlesPrefixedByString:[[aTextView string] substringWithRange:charRange] indexOfSelectedItem:anIndex];
+	NSString *document = [aTextView string];
+	if (aTextView == textView && charRange.location != NSNotFound && NSMaxRange(charRange) <= [document length]) {
+		NVLinkCompletionContext context = NVLinkCompletionContextAtLocation(document, NSMaxRange(charRange));
+		if (context.kind != NVLinkCompletionNone && NSEqualRanges(context.range, charRange)) {
+			NSArray *identifiers = NVLinkCompletionCandidates(document, context.kind, [document substringWithRange:charRange]);
+			if (anIndex)
+				*anIndex = [identifiers count] ? 0 : NSNotFound;
+			return identifiers;
+		}
+	}
+	NSArray *noteTitles = [notationController noteTitlesPrefixedByString:[document substringWithRange:charRange] indexOfSelectedItem:anIndex];
 	return noteTitles;
 }
 

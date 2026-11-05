@@ -23,6 +23,8 @@
 		212089D80B0C2CA500A15A69 /* StickiesDocument.m in Sources */ = {isa = PBXBuildFile; fileRef = 212089D70B0C2CA500A15A69 /* StickiesDocument.m */; };
 		212B84620978422300F3597F /* NSString_NV.m in Sources */ = {isa = PBXBuildFile; fileRef = 212B84610978422300F3597F /* NSString_NV.m */; };
 		B7E1AA031F0A000100000003 /* TagSearch.m in Sources */ = {isa = PBXBuildFile; fileRef = B7E1AA021F0A000100000002 /* TagSearch.m */; };
+		D5A1BB031F0C000100000003 /* NVAutoPair.m in Sources */ = {isa = PBXBuildFile; fileRef = D5A1BB021F0C000100000002 /* NVAutoPair.m */; };
+		E6B2CC031F0D000100000003 /* LinkReferenceCompletion.m in Sources */ = {isa = PBXBuildFile; fileRef = E6B2CC021F0D000100000002 /* LinkReferenceCompletion.m */; };
 		C4E1AA031F0B000100000003 /* PreviewRender.m in Sources */ = {isa = PBXBuildFile; fileRef = C4E1AA021F0B000100000002 /* PreviewRender.m */; };
 		C4E1AA051F0B000100000005 /* preview-js in Resources */ = {isa = PBXBuildFile; fileRef = C4E1AA041F0B000100000004 /* preview-js */; };
 		212C6952110E1940004DD82C /* TitlebarButton.m in Sources */ = {isa = PBXBuildFile; fileRef = 212C6951110E1940004DD82C /* TitlebarButton.m */; };
@@ -355,6 +357,10 @@
 		212B84610978422300F3597F /* NSString_NV.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; path = NSString_NV.m; sourceTree = "<group>"; };
 		B7E1AA011F0A000100000001 /* TagSearch.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TagSearch.h; sourceTree = "<group>"; };
 		B7E1AA021F0A000100000002 /* TagSearch.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TagSearch.m; sourceTree = "<group>"; };
+		D5A1BB011F0C000100000001 /* NVAutoPair.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = NVAutoPair.h; sourceTree = "<group>"; };
+		D5A1BB021F0C000100000002 /* NVAutoPair.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = NVAutoPair.m; sourceTree = "<group>"; };
+		E6B2CC011F0D000100000001 /* LinkReferenceCompletion.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LinkReferenceCompletion.h; sourceTree = "<group>"; };
+		E6B2CC021F0D000100000002 /* LinkReferenceCompletion.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = LinkReferenceCompletion.m; sourceTree = "<group>"; };
 		C4E1AA011F0B000100000001 /* PreviewRender.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PreviewRender.h; sourceTree = "<group>"; };
 		C4E1AA021F0B000100000002 /* PreviewRender.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PreviewRender.m; sourceTree = "<group>"; };
 		C4E1AA041F0B000100000004 /* preview-js */ = {isa = PBXFileReference; lastKnownFileType = folder; path = preview-js; sourceTree = "<group>"; };
@@ -959,6 +965,10 @@
 				212B84610978422300F3597F /* NSString_NV.m */,
 				B7E1AA011F0A000100000001 /* TagSearch.h */,
 				B7E1AA021F0A000100000002 /* TagSearch.m */,
+				D5A1BB011F0C000100000001 /* NVAutoPair.h */,
+				D5A1BB021F0C000100000002 /* NVAutoPair.m */,
+				E6B2CC011F0D000100000001 /* LinkReferenceCompletion.h */,
+				E6B2CC021F0D000100000002 /* LinkReferenceCompletion.m */,
 				C4E1AA011F0B000100000001 /* PreviewRender.h */,
 				C4E1AA021F0B000100000002 /* PreviewRender.m */,
 				D3EEC9FF106F66C70023D7F8 /* NVPasswordGenerator.h */,
@@ -1793,6 +1803,8 @@
 				21A6E6FD0974204F008436A9 /* LabelsListController.m in Sources */,
 				212B84620978422300F3597F /* NSString_NV.m in Sources */,
 				B7E1AA031F0A000100000003 /* TagSearch.m in Sources */,
+				D5A1BB031F0C000100000003 /* NVAutoPair.m in Sources */,
+				E6B2CC031F0D000100000003 /* LinkReferenceCompletion.m in Sources */,
 				C4E1AA031F0B000100000003 /* PreviewRender.m in Sources */,
 				21DC788F097894B600E59B09 /* NSCollection_utils.m in Sources */,
 				2155DEA6097B5F0300163A10 /* BufferUtils.c in Sources */,
