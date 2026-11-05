@@ -9,11 +9,10 @@
 
 
 @interface WordCountToken : NSTokenField {
-	//NSColor *txtColor;
-	//NSColor *fldColor;
-	//NSGradient *theGrad;
-
+	NSColor *themeColor;
 }
+
+- (void)applyForegroundColor:(NSColor *)color;
 
 //- (void)drawTokenInRect:(CGRect)rect color:(NSColor *)color text:(NSString *)text;
 //- (void)setTxtColor:(NSColor *)inColor;

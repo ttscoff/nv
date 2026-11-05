@@ -3217,8 +3217,23 @@ static NSURL *NVHTTPURLFromImportString(NSString *entered) {
     [dividerShader updateColorsWithBackgroundColor:backgrndColor andForegroundColor:foregrndColor];
     [notesScrollView nv_updateScrollerChrome];
     [textScrollView nv_updateScrollerChrome];
+    [self updateWordCounterChrome];
     [self refreshListEditorDivider];
     
+}
+
+- (void)updateWordCounterChrome {
+    if (!wordCounter)
+        return;
+    NVEditorTheme *theme = [[NVThemeManager sharedManager] currentEditorTheme];
+    NSColor *preferred = [[theme styleForKey:@"searchField"] foregroundColor];
+    if (!preferred)
+        preferred = [theme windowForegroundColor] ?: [theme editorForegroundColor] ?: foregrndColor;
+    /* The counter is drawn on the search field, which fills white. A dark window
+       appearance would otherwise leave this token in the light control color. */
+    NSColor *color = NVReadableTextColor(preferred, [NSColor whiteColor]);
+    [wordCounter setAppearance:[NSAppearance appearanceNamed:NSAppearanceNameAqua]];
+    [wordCounter applyForegroundColor:color];
 }
 
 - (void)updateFieldAttributes{
@@ -3324,6 +3339,7 @@ static NSURL *NVHTTPURLFromImportString(NSString *entered) {
             }else {
                 [wordCounter setStringValue:@""];
             }
+            [self updateWordCounterChrome];
         }
     }
     

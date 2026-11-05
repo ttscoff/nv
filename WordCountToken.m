@@ -20,11 +20,39 @@
 
 - (void)awakeFromNib{
 	[self refusesFirstResponder];
-	//theGrad =  [[[NSGradient alloc] initWithStartingColor:[NSColor colorWithCalibratedWhite:0.2f alpha:0.28f] endingColor:[NSColor colorWithCalibratedWhite:0.74f alpha:0.18f]] retain];
-	
-	//[self setTxtColor:[[NSApp delegate] foregrndColor]];
-	//[self setFldColor:[[NSApp delegate] backgrndColor]];
-	
+	[self setTokenStyle:NSTokenStyleNone];
+	[self setBordered:NO];
+	[self setBezeled:NO];
+	[self setDrawsBackground:NO];
+	[self setEditable:NO];
+	[self setSelectable:NO];
+}
+
+- (void)dealloc {
+	[themeColor release];
+	[super dealloc];
+}
+
+- (void)applyForegroundColor:(NSColor *)color {
+	if (color != themeColor) {
+		[themeColor release];
+		themeColor = [color retain];
+	}
+	[self setTokenStyle:NSTokenStyleNone];
+	[self setTextColor:themeColor ?: [NSColor labelColor]];
+	[[self cell] setTextColor:themeColor ?: [NSColor labelColor]];
+	NSString *value = [self stringValue];
+	if ([value length] && themeColor) {
+		NSMutableDictionary *attrs = [NSMutableDictionary dictionaryWithObject:themeColor forKey:NSForegroundColorAttributeName];
+		NSFont *font = [self font];
+		if (font)
+			[attrs setObject:font forKey:NSFontAttributeName];
+		NSMutableParagraphStyle *style = [[[NSMutableParagraphStyle alloc] init] autorelease];
+		[style setAlignment:[self alignment]];
+		[attrs setObject:style forKey:NSParagraphStyleAttributeName];
+		[self setAttributedStringValue:[[[NSAttributedString alloc] initWithString:value attributes:attrs] autorelease]];
+	}
+	[self setNeedsDisplay:YES];
 }
 
 - (void)mouseDown:(NSEvent *)theEvent{

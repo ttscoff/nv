@@ -61,6 +61,15 @@ static long (*GetGetScriptManagerVariablePointer())(short);
 @end
 
 
+@interface LinkingEditor (NVCompletionTheme)
+- (NSColor *)nv_themeForegroundColor;
+- (NSColor *)nv_linkBracketColor;
+- (void)nv_applyCompletionSelectionColor;
+- (void)nv_restoreSelectedTextAttributes;
+- (void)nv_recolorCompletionBrackets;
+- (void)nv_reapplyCompletionColors;
+@end
+
 @implementation LinkingEditor
 
 @synthesize beforeString;
@@ -228,8 +237,11 @@ if ([selectorString isEqualToString:SEL_STR(setNoteBodyFont:sender:)]) {
 		NSColor *caret = [editorTheme editorCaretColor] ?: [self _insertionPointColorForForegroundColor:fgColor backgroundColor:bgColor];
 		NSColor *selection = [editorTheme editorSelectionColor] ?: [self _selectionColorForForegroundColor:fgColor backgroundColor:bgColor];
 		[self setInsertionPointColor:caret];
+		[self setTextColor:fgColor];
 		[self setLinkTextAttributes:[self preferredLinkAttributes]];
 		[self setSelectedTextAttributes:[NSDictionary dictionaryWithObject:selection forKey:NSBackgroundColorAttributeName]];
+		if (completionSelectionColored)
+			[self nv_applyCompletionSelectionColor];
 		[self setTypingAttributes:[prefsController noteBodyAttributes]];
 		[[self enclosingScrollView] setNeedsDisplay:YES];
 		[self setNeedsDisplay:YES];
@@ -256,9 +268,13 @@ if ([selectorString isEqualToString:SEL_STR(setNoteBodyFont:sender:)]) {
 	//[[self enclosingScrollView] setNeedsDisplay:YES];
     
 	[self setInsertionPointColor:[self _insertionPointColorForForegroundColor:fgColor backgroundColor:bgColor]];
+	if (fgColor)
+		[self setTextColor:fgColor];
 	[self setLinkTextAttributes:[self preferredLinkAttributes]];
 	[self setSelectedTextAttributes:[NSDictionary dictionaryWithObject:[self _selectionColorForForegroundColor:fgColor backgroundColor:bgColor] 
 																forKey:NSBackgroundColorAttributeName]];
+	if (completionSelectionColored)
+		[self nv_applyCompletionSelectionColor];
 	[self setTypingAttributes:[prefsController noteBodyAttributes]];
     [[self enclosingScrollView]setNeedsDisplay:YES];
 //    [[[self enclosingScrollView]contentView]setNeedsDisplay:YES];
@@ -433,6 +449,19 @@ CGFloat _perceptualColorDifference(NSColor*a, NSColor*b) {
 
 - (void)layoutManager:(NSLayoutManager *)aLayoutManager didCompleteLayoutForTextContainer:(NSTextContainer *)aTextContainer atEnd:(BOOL)flag {
 	didRenderFully = YES;
+}
+
+- (NSDictionary *)layoutManager:(NSLayoutManager *)layoutManager shouldUseTemporaryAttributes:(NSDictionary *)attrs forDrawingToScreen:(BOOL)toScreen atCharacterIndex:(NSUInteger)charIndex effectiveRange:(NSRangePointer)effectiveCharRange {
+	if (!toScreen || !completionSelectionColored || !completionColoredRange.length || !NSLocationInRange(charIndex, completionColoredRange))
+		return attrs;
+	NSColor *color = [self nv_themeForegroundColor];
+	if (!color)
+		return attrs;
+	NSMutableDictionary *modified = attrs ? [[attrs mutableCopy] autorelease] : [NSMutableDictionary dictionary];
+	[modified setObject:color forKey:NSForegroundColorAttributeName];
+	if (effectiveCharRange)
+		*effectiveCharRange = NSMakeRange(charIndex, 1);
+	return modified;
 }
 - (void)layoutManagerDidInvalidateLayout:(NSLayoutManager *)aLayoutManager {
 	didRenderFully = NO;	
@@ -1066,6 +1095,7 @@ static NSColor *NVBlendColors(NSColor *first, NSColor *second, CGFloat fraction,
 	if (!layout || !fullRange.length || !prefsController) {
 		[self highlightWritingGremlins];
 		[self reapplySearchHighlights];
+		[self nv_reapplyCompletionColors];
 		return;
 	}
 	NSFont *baseFont = [prefsController noteBodyFont] ?: [NSFont userFontOfSize:14.0];
@@ -1134,6 +1164,7 @@ static NSColor *NVBlendColors(NSColor *first, NSColor *second, CGFloat fraction,
 	[self highlightThemedFencedCodeInString:string code:codeBlock marker:markup baseFont:baseFont];
 	[self highlightWritingGremlins];
 	[self reapplySearchHighlights];
+	[self nv_reapplyCompletionColors];
 }
 
 - (void)highlightMarkdownSyntax {
@@ -1154,6 +1185,7 @@ static NSColor *NVBlendColors(NSColor *first, NSColor *second, CGFloat fraction,
 	if (![self markdownCompletionsEnabled] || !layout || !fullRange.length || !prefsController) {
 		[self highlightWritingGremlins];
 		[self reapplySearchHighlights];
+		[self nv_reapplyCompletionColors];
 		return;
 	}
 
@@ -1199,6 +1231,7 @@ static NSColor *NVBlendColors(NSColor *first, NSColor *second, CGFloat fraction,
 	[self highlightFencedCodeInString:string code:code marker:marker];
 	[self highlightWritingGremlins];
 	[self reapplySearchHighlights];
+	[self nv_reapplyCompletionColors];
 }
 
 - (BOOL)performKeyEquivalent:(NSEvent *)anEvent {
@@ -1811,6 +1844,118 @@ cancelCompetion:
 	return NSMakeRange(NSNotFound, 0);
 }
 
+static BOOL NVIsLinkBracket(unichar character) {
+	return character == '[' || character == ']' || character == '(' || character == ')';
+}
+
+- (NSColor *)nv_themeForegroundColor {
+	NVEditorTheme *theme = [[NVThemeManager sharedManager] currentEditorTheme];
+	NSColor *color = [theme editorForegroundColor];
+	if (!color)
+		color = [(AppController *)[NSApp delegate] foregrndColor];
+	if (!color)
+		color = [NSColor textColor];
+	return color;
+}
+
+- (NSColor *)nv_linkBracketColor {
+	NVEditorTheme *theme = [[NVThemeManager sharedManager] currentEditorTheme];
+	NVThemeStyle *link = [theme styleForKey:@"linkParens"];
+	NSColor *markup = [link markupForegroundColor];
+	if (markup)
+		return markup;
+	NSColor *foreground = [link foregroundColor];
+	if (foreground)
+		return foreground;
+	NVThemeStyle *generic = [theme styleForKey:@"markup"];
+	return [generic foregroundColor] ?: [self nv_themeForegroundColor];
+}
+
+- (void)nv_applyCompletionSelectionColor {
+	NSColor *color = [self nv_themeForegroundColor];
+	if (!color)
+		return;
+	completionSelectionColored = YES;
+	NSMutableDictionary *attributes = [[[self selectedTextAttributes] mutableCopy] autorelease];
+	if (!attributes)
+		attributes = [NSMutableDictionary dictionary];
+	[attributes setObject:color forKey:NSForegroundColorAttributeName];
+	[self setSelectedTextAttributes:attributes];
+	NSUInteger length = [[self string] length];
+	if (completionColoredRange.length && completionColoredRange.location < length) {
+		NSRange word = completionColoredRange;
+		if (NSMaxRange(word) > length)
+			word.length = length - word.location;
+		[[self layoutManager] addTemporaryAttribute:NSForegroundColorAttributeName value:color forCharacterRange:word];
+	}
+}
+
+- (void)nv_restoreSelectedTextAttributes {
+	NSColor *background = [[self selectedTextAttributes] objectForKey:NSBackgroundColorAttributeName];
+	if (background)
+		[self setSelectedTextAttributes:[NSDictionary dictionaryWithObject:background forKey:NSBackgroundColorAttributeName]];
+}
+
+- (void)nv_paintLinkBracketsFrom:(NSUInteger)index towardEnd:(BOOL)towardEnd {
+	NSString *string = [self string];
+	NSUInteger length = [string length];
+	NSColor *color = [self nv_linkBracketColor];
+	NSLayoutManager *layout = [self layoutManager];
+	if (!color || !layout || index > length)
+		return;
+	if (!towardEnd) {
+		while (index > 0) {
+			unichar character = [string characterAtIndex:index - 1];
+			if (character == '\n' || character == '\r')
+				return;
+			if (NVIsLinkBracket(character)) {
+				NSUInteger end = index;
+				do {
+					index--;
+				} while (index > 0 && NVIsLinkBracket([string characterAtIndex:index - 1]));
+				[layout addTemporaryAttribute:NSForegroundColorAttributeName value:color forCharacterRange:NSMakeRange(index, end - index)];
+				return;
+			}
+			index--;
+		}
+		return;
+	}
+	while (index < length) {
+		unichar character = [string characterAtIndex:index];
+		if (character == '\n' || character == '\r')
+			return;
+		if (NVIsLinkBracket(character)) {
+			NSUInteger start = index;
+			do {
+				index++;
+			} while (index < length && NVIsLinkBracket([string characterAtIndex:index]));
+			[layout addTemporaryAttribute:NSForegroundColorAttributeName value:color forCharacterRange:NSMakeRange(start, index - start)];
+			return;
+		}
+		index++;
+	}
+}
+
+- (void)nv_recolorCompletionBrackets {
+	if (!completionSelectionColored)
+		return;
+	NSRange selected = [self selectedRange];
+	if (selected.location == NSNotFound || selected.location > [[self string] length])
+		return;
+	[self nv_paintLinkBracketsFrom:selected.location towardEnd:NO];
+	NSUInteger after = NSMaxRange(selected);
+	if (after > [[self string] length])
+		after = [[self string] length];
+	[self nv_paintLinkBracketsFrom:after towardEnd:YES];
+}
+
+- (void)nv_reapplyCompletionColors {
+	if (!completionSelectionColored)
+		return;
+	[self nv_applyCompletionSelectionColor];
+	[self nv_recolorCompletionBrackets];
+}
+
 - (void)insertCompletion:(NSString *)word forPartialWordRange:(NSRange)charRange movement:(NSInteger)movement isFinal:(BOOL)isFinal {
 	NSString *str = [self string];
 	BOOL finalizedCompletion = NO;
@@ -1859,6 +2004,21 @@ cancelCompetion:
 	}
 	
 	[super insertCompletion:word forPartialWordRange:charRange movement:movement isFinal:isFinal];
+
+	[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(nv_reapplyCompletionColors) object:nil];
+	if (isFinal) {
+		completionColoredRange = NSMakeRange(NSNotFound, 0);
+		if (completionSelectionColored) {
+			completionSelectionColored = NO;
+			[self nv_restoreSelectedTextAttributes];
+		}
+	} else if (charRange.location != NSNotFound && [word length] && charRange.location <= [[self string] length]) {
+		NSUInteger wordLength = MIN([word length], [[self string] length] - charRange.location);
+		completionColoredRange = NSMakeRange(charRange.location, wordLength);
+		[self nv_applyCompletionSelectionColor];
+		[self nv_recolorCompletionBrackets];
+		[self performSelector:@selector(nv_reapplyCompletionColors) withObject:nil afterDelay:0];
+	}
 
 	if (referenceCompletion && finalizedCompletion && hasClosingBracket) {
 		NSUInteger caret = [self selectedRange].location;

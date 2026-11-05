@@ -365,6 +365,15 @@ BOOL NVThemeColorIsLight(NSColor *color) {
 	return components[0] >= 0.55;
 }
 
+NSColor *NVReadableTextColor(NSColor *preferred, NSColor *background) {
+	NSColor *surface = background ?: [NSColor whiteColor];
+	if (preferred && NVThemeColorIsLight(preferred) != NVThemeColorIsLight(surface))
+		return preferred;
+	if (NVThemeColorIsLight(surface))
+		return [NSColor colorWithSRGBRed:0.18 green:0.20 blue:0.23 alpha:1.0];
+	return [NSColor colorWithSRGBRed:0.93 green:0.94 blue:0.95 alpha:1.0];
+}
+
 NSColor *NVColorResolvedInAppearance(NSColor *color, NSAppearance *appearance) {
 	if (!color)
 		return nil;

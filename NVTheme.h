@@ -77,6 +77,7 @@ enum {
 @end
 
 BOOL NVThemeColorIsLight(NSColor *color);
+NSColor *NVReadableTextColor(NSColor *preferred, NSColor *background);
 NSColor *NVColorResolvedInAppearance(NSColor *color, NSAppearance *appearance);
 NSColor *NVWindowChromeColor(void);
 NSColor *NVWindowChromeKnobColor(void);

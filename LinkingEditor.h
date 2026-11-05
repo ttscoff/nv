@@ -38,7 +38,8 @@
 	NSUInteger markdownSelectionAnchor;
 	NSRange lastAutomaticallySelectedRange;
 	NSRange changedRange;
-	BOOL isAutocompleting, wasDeleting;
+	BOOL isAutocompleting, wasDeleting, completionSelectionColored;
+	NSRange completionColoredRange;
 	
 	BOOL backgroundIsDark, mouseInside;
 	
