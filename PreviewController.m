@@ -44,9 +44,10 @@ static NSString * const NVMarkedShareConnectURL = @"https://share.markedapp.com/
     "var els=document.querySelectorAll('[id]');for(var i=0;i<els.length;i++){var e=els[i];if(e.scrollTop>0)s[e.id]=e.scrollTop;}" \
     "return s;})()"
 #define NV_JS_RESTORE_SCROLL \
-    "(function(s){for(var k in s){var e=(k==='')?" NV_JS_SCROLLER ":document.getElementById(k);if(!e)continue;" \
-    "if(k===''){document.documentElement.style.overflowAnchor='none';if(document.body)document.body.style.overflowAnchor='none';}" \
-    "e.style.overflowAnchor='none';e.scrollTop=s[k];}})"
+    "(function(s){for(var k in s){var e;" \
+    "if(k===''){e=" NV_JS_SCROLLER ";document.documentElement.style.overflowAnchor='none';if(document.body)document.body.style.overflowAnchor='none';}" \
+    "else{e=document.getElementById(k);if(!e)continue;e.style.overflowAnchor='none';}" \
+    "e.scrollTop=s[k];}})"
 
 // Used when a full document load cannot be avoided: the saved state is replayed
 // into the new document (see -preview: and -webView:didFinishLoadForFrame:).
@@ -65,17 +66,19 @@ static NSString * const NVPreviewUpdateInPlaceScript =
     "var saved=" NV_JS_CAPTURE_SCROLL ";var restore=function(){(" NV_JS_RESTORE_SCROLL ")(saved);};"
     "var p=s.parentNode;while(s.nextSibling&&s.nextSibling!==e)p.removeChild(s.nextSibling);"
     "var t=document.createElement('template');t.innerHTML=a[0];p.insertBefore(t.content,e);"
-    "restore();"
     "document.title=a[1];var h=document.getElementsByClassName('doctitle');for(var i=0;i<h.length;i++)h[i].textContent=a[1];"
     // MathJax's promise API (typesetPromise) chains on startup.promise, which never
     // settles inside the legacy WebView, so drive the document directly;
     // handleRetriesFor covers glyphs whose font data MathJax still has to load.
-    // The offset is applied again after each renderer finishes, since rendering
-    // changes the page height and the earlier restore may have been clamped.
     "if(window.MathJax&&MathJax.startup&&MathJax.startup.document){try{var d=MathJax.startup.document;d.clear();"
     "var mj=MathJax._&&MathJax._.mathjax&&MathJax._.mathjax.mathjax;"
-    "if(mj&&mj.handleRetriesFor){mj.handleRetriesFor(function(){d.render();}).then(restore,function(){});}else{d.render();}}catch(x){}restore();}"
+    "if(mj&&mj.handleRetriesFor){mj.handleRetriesFor(function(){d.render();}).then(restore,function(){});}else{d.render();}}catch(x){}}"
     "if(window.mermaid&&mermaid.run){try{mermaid.run().then(restore,function(){});}catch(x){}}"
+    // Nothing above repaints, so one restore here sees the swapped content and
+    // MathJax's synchronous pass. The renderers call it again when their
+    // asynchronous work changes the page height, which also undoes a restore
+    // that was clamped at the bottom of a note.
+    "restore();"
     "return '1';})(%@)";
 
 static const NSUInteger NVMarkedShareMaxBodyBytes = 500000;
