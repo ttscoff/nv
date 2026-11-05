@@ -1,3 +1,11 @@
+nvALT 3.0.25 (144)
+-------------------------
+
+#### FIXED
+
+- Editing a note no longer jumps the **preview** back to the top or flashes on each keystroke
+- Links to **anchors** in the same note scroll the preview
+
 nvALT 3.0.24 (144)
 -------------------------
 
