@@ -38,16 +38,26 @@ static NSString * const NVMarkedShareConnectURL = @"https://share.markedapp.com/
 // scrolls: WebKit would otherwise move the offset again whenever MathJax, Mermaid or
 // an image changes the height of content above the viewport, which made the view
 // creep by that height on every keystroke.
+// The restore takes an optional record of what earlier calls achieved. A later
+// call only touches an element whose offset still equals that record, so a reader
+// who scrolled while a renderer or a load was still working is left alone.
 #define NV_JS_SCROLLER "(document.scrollingElement||document.documentElement||document.body)"
 #define NV_JS_CAPTURE_SCROLL \
     "(function(){var s={};var d=" NV_JS_SCROLLER ";if(d&&d.scrollTop>0)s['']=d.scrollTop;" \
     "var els=document.querySelectorAll('[id]');for(var i=0;i<els.length;i++){var e=els[i];if(e.scrollTop>0)s[e.id]=e.scrollTop;}" \
     "return s;})()"
 #define NV_JS_RESTORE_SCROLL \
-    "(function(s){for(var k in s){var e;" \
+    "(function(s,a){for(var k in s){var e;" \
     "if(k===''){e=" NV_JS_SCROLLER ";document.documentElement.style.overflowAnchor='none';if(document.body)document.body.style.overflowAnchor='none';}" \
     "else{e=document.getElementById(k);if(!e)continue;e.style.overflowAnchor='none';}" \
-    "e.scrollTop=s[k];}})"
+    "if(a&&(k in a)&&e.scrollTop!==a[k])continue;" \
+    "e.scrollTop=s[k];if(a)a[k]=e.scrollTop;}})"
+
+// The two restores around a full load: inline while the page parses, recording
+// what was achieved on the page, and once more when the load has finished, which
+// yields if the reader scrolled in between.
+#define NV_JS_RESTORE_INLINE_FORMAT @"(" NV_JS_RESTORE_SCROLL ")(%@,window.nvScrollApplied={});"
+#define NV_JS_RESTORE_AFTER_LOAD_FORMAT @"(" NV_JS_RESTORE_SCROLL ")(%@,window.nvScrollApplied||{});"
 
 // Used when a full document load cannot be avoided: the saved state is replayed
 // into the new document (see -preview: and -webView:didFinishLoadForFrame:).
@@ -63,7 +73,7 @@ static NSString * const NVPreviewUpdateInPlaceScript =
     "var it=document.createNodeIterator(document.documentElement,NodeFilter.SHOW_COMMENT),n,s=null,e=null;"
     "while((n=it.nextNode())){if(n.nodeValue==='nv-content-start')s=n;else if(n.nodeValue==='nv-content-end')e=n;}"
     "if(!s||!e||s.parentNode!==e.parentNode)return '0';"
-    "var saved=" NV_JS_CAPTURE_SCROLL ";var restore=function(){(" NV_JS_RESTORE_SCROLL ")(saved);};"
+    "var saved=" NV_JS_CAPTURE_SCROLL ",applied={};var restore=function(){(" NV_JS_RESTORE_SCROLL ")(saved,applied);};"
     "var p=s.parentNode;while(s.nextSibling&&s.nextSibling!==e)p.removeChild(s.nextSibling);"
     "var t=document.createElement('template');t.innerHTML=a[0];p.insertBefore(t.content,e);"
     "document.title=a[1];var h=document.getElementsByClassName('doctitle');for(var i=0;i<h.length;i++)h[i].textContent=a[1];"
@@ -77,7 +87,8 @@ static NSString * const NVPreviewUpdateInPlaceScript =
     // Nothing above repaints, so one restore here sees the swapped content and
     // MathJax's synchronous pass. The renderers call it again when their
     // asynchronous work changes the page height, which also undoes a restore
-    // that was clamped at the bottom of a note.
+    // that was clamped at the bottom of a note; those later calls yield if the
+    // reader has scrolled in the meantime.
     "restore();"
     "return '1';})(%@)";
 
@@ -300,13 +311,14 @@ static const NSUInteger NVMarkedShareMaxBodyBytes = 500000;
 }
 
 // Re-apply the saved scroll position once the new document has fully loaded, in
-// case layout moved after the inline restore ran (images, fonts, scripts).
+// case layout moved after the inline restore ran (images, fonts, scripts). The
+// script leaves the page alone if the reader scrolled after the inline restore.
 - (void)webView:(WebView *)sender didFinishLoadForFrame:(WebFrame *)frame
 {
     if (frame != [sender mainFrame])
         return;
     if (pendingScrollState) {
-        [sender stringByEvaluatingJavaScriptFromString:[self javaScriptRestoringPreviewScrollState:pendingScrollState]];
+        [sender stringByEvaluatingJavaScriptFromString:[self javaScriptReapplyingPreviewScrollState:pendingScrollState]];
         [pendingScrollState release];
         pendingScrollState = nil;
     }
@@ -480,9 +492,19 @@ static const NSUInteger NVMarkedShareMaxBodyBytes = 500000;
     return [state stringByReplacingOccurrencesOfString:@"<" withString:@"\\u003c"];
 }
 
+// Inline script for a full load: applies the state while the page parses and
+// records what it achieved, so the post-load restore can tell whether the reader
+// has scrolled since.
 - (NSString *)javaScriptRestoringPreviewScrollState:(NSString *)state
 {
-    return [NSString stringWithFormat:@NV_JS_RESTORE_SCROLL "(%@);", state];
+    return [NSString stringWithFormat:NV_JS_RESTORE_INLINE_FORMAT, state];
+}
+
+// Run when the load has finished: applies the state again unless the reader
+// moved the scroll bar after the inline restore.
+- (NSString *)javaScriptReapplyingPreviewScrollState:(NSString *)state
+{
+    return [NSString stringWithFormat:NV_JS_RESTORE_AFTER_LOAD_FORMAT, state];
 }
 
 // Swaps the rendered note into the page that is already showing. Returns NO when
