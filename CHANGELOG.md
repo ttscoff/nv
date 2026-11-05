@@ -1,3 +1,10 @@
+nvALT 3.0.23 (144)
+-------------------------
+
+#### FIXED
+
+- Clicking **below the last line** places the caret at the end of the note, including a trailing newline, a blank line that contains spaces, and a last line of text
+
 nvALT 3.0.22 (144)
 -------------------------
 
