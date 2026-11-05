@@ -117,6 +117,23 @@ int main(int argc, const char *argv[]) {
 	NSString *firstWins = @"[Spec]: https://example.com/a\n[spec]: https://example.com/b\nRead [more][";
 	expectLabels(labelsAtEnd(firstWins), [NSArray arrayWithObject:@"Spec"], "first definition wins");
 
+	NSMutableArray *highlighted = [NSMutableArray array];
+	NSArray *complete = NVCompleteReferenceLinkRanges(doc);
+	NSUInteger i;
+	for (i = 0; i < [complete count]; i++)
+		[highlighted addObject:[doc substringWithRange:[[complete objectAtIndex:i] rangeValue]]];
+	expectLabels(highlighted, [NSArray arrayWithObjects:@"[the spec][spec]", @"![diagram][diagram]", nil], "defined references are complete");
+
+	NSString *mixed = @"[Missing][nope] and [the spec][SPEC] plus [Foo   Bar][].\n[spec]: https://example.com\n[foo bar]: https://example.com/foo";
+	highlighted = [NSMutableArray array];
+	complete = NVCompleteReferenceLinkRanges(mixed);
+	for (i = 0; i < [complete count]; i++)
+		[highlighted addObject:[mixed substringWithRange:[[complete objectAtIndex:i] rangeValue]]];
+	expectLabels(highlighted, [NSArray arrayWithObjects:@"[the spec][SPEC]", @"[Foo   Bar][]", nil], "case and whitespace still match");
+
+	expectLabels(NVCompleteReferenceLinkRanges(@"[orphan][missing]"), [NSArray array], "undefined reference is not complete");
+	expectLabels(NVCompleteReferenceLinkRanges(@"See [the spec](https://example.com)"), [NSArray array], "inline link is not a square-bracket reference");
+
 	if (gFailures) {
 		fprintf(stderr, "%d link reference tests failed\n", gFailures);
 		[pool drain];

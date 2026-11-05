@@ -145,6 +145,62 @@ static void NVCollectLinkReferences(NSString *document, NSMutableArray *definiti
 	}
 }
 
+static void NVEnumerateLinkLines(NSString *document, void (^body)(NSString *line, NSUInteger lineLocation)) {
+	if (!document || !body)
+		return;
+	unichar fence = 0;
+	NSUInteger length = [document length];
+	NSUInteger index = 0;
+	while (index < length) {
+		NSRange lineRange = [document lineRangeForRange:NSMakeRange(index, 0)];
+		NSString *line = NVStringByStrippingTrailingNewlines([document substringWithRange:lineRange]);
+		index = NSMaxRange(lineRange);
+		unichar marker = NVFenceMarker(line);
+		if (marker) {
+			fence = !fence ? marker : (fence == marker ? 0 : fence);
+			continue;
+		}
+		if (fence)
+			continue;
+		body(line, lineRange.location);
+	}
+}
+
+NSArray *NVCompleteReferenceLinkRanges(NSString *document) {
+	if (![document length])
+		return [NSArray array];
+	NSMutableSet *defined = [NSMutableSet set];
+	NVEnumerateLinkLines(document, ^(NSString *line, NSUInteger lineLocation) {
+		NSTextCheckingResult *definition = [NVLinkDefinitionRegex() firstMatchInString:line options:0 range:NSMakeRange(0, [line length])];
+		if (!definition || [definition numberOfRanges] < 2)
+			return;
+		NSString *label = NVNormalizeLinkLabel([line substringWithRange:[definition rangeAtIndex:1]]);
+		if ([label length])
+			[defined addObject:NVLinkLabelKey(label)];
+	});
+	if (![defined count])
+		return [NSArray array];
+	NSMutableArray *ranges = [NSMutableArray array];
+	NSRegularExpression *usage = NVLinkUsageRegex();
+	if (!usage)
+		return [NSArray array];
+	NVEnumerateLinkLines(document, ^(NSString *line, NSUInteger lineLocation) {
+		[usage enumerateMatchesInString:line options:0 range:NSMakeRange(0, [line length]) usingBlock:^(NSTextCheckingResult *match, NSMatchingFlags flags, BOOL *stop) {
+			if ([match numberOfRanges] < 3)
+				return;
+			NSString *explicit = NVNormalizeLinkLabel([line substringWithRange:[match rangeAtIndex:2]]);
+			NSString *text = NVNormalizeLinkLabel([line substringWithRange:[match rangeAtIndex:1]]);
+			NSString *label = [explicit length] ? explicit : text;
+			if (![label length] || ![defined containsObject:NVLinkLabelKey(label)])
+				return;
+			NSRange range = [match range];
+			range.location += lineLocation;
+			[ranges addObject:[NSValue valueWithRange:range]];
+		}];
+	});
+	return ranges;
+}
+
 static NSRange NVLinePrefixRange(NSString *document, NSUInteger location) {
 	if (location > [document length])
 		location = [document length];

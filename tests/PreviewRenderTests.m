@@ -26,12 +26,14 @@ int main(int argc, const char *argv[]) {
 	[fm removeItemAtPath:dir error:NULL];
 	[fm createDirectoryAtPath:[dir stringByAppendingPathComponent:@"mathjax/output/svg/fonts"] withIntermediateDirectories:YES attributes:nil error:NULL];
 	[fm createFileAtPath:[dir stringByAppendingPathComponent:@"mermaid.min.js"] contents:[NSData data] attributes:nil];
+	[fm createFileAtPath:[dir stringByAppendingPathComponent:@"wikilinks.js"] contents:[@"/* wiki-linker */" dataUsingEncoding:NSUTF8StringEncoding] attributes:nil];
 	[fm createFileAtPath:[dir stringByAppendingPathComponent:@"mathjax/tex-svg.js"] contents:[NSData data] attributes:nil];
 	[fm createDirectoryAtPath:[dir stringByAppendingPathComponent:@"mathjax/fonts"] withIntermediateDirectories:YES attributes:nil error:NULL];
 
 	NSString *plain = @"<p>Hello</p>";
 	NSString *plainOut = NVPreviewHTMLForDisplay(plain, dir);
 	expectTrue([plainOut isEqualToString:plain], "plain html unchanged");
+	expectOmits(plainOut, @"wiki-linker", "plain html skips wiki links");
 
 	NSString *math = @"<p><span class=\"math inline\">\\(e=mc^2\\)</span></p>";
 	NSString *mathOut = NVPreviewHTMLForDisplay(math, dir);
@@ -42,6 +44,7 @@ int main(int argc, const char *argv[]) {
 	expectContains(mathOut, @"loader:{paths:{fonts:", "points mathjax fonts at the bundle");
 	expectContains(mathOut, @"mathjax/fonts", "font path stays inside preview-js");
 	expectOmits(mathOut, @"mermaid.min.js", "math note skips mermaid");
+	expectOmits(mathOut, @"wiki-linker", "math config brackets are not wiki links");
 
 	NSString *fence = @"<pre><code class=\"language-mermaid\">graph TD\nA-->B\n</code></pre>";
 	NSString *fenceOut = NVPreviewHTMLForDisplay(fence, dir);
@@ -95,6 +98,28 @@ int main(int argc, const char *argv[]) {
 	NSString *missing = NVPreviewHTMLForDisplay(fence, noMermaidDir);
 	expectContains(missing, @"<pre class=\"mermaid\">", "rewrite even when the script is missing");
 	expectOmits(missing, @"mermaid.min.js", "missing mermaid file adds no script");
+
+	NSString *wiki = @"<p>See [[Hello]] and [[My Note]].</p>";
+	NSString *wikiOut = NVPreviewHTMLForDisplay(wiki, dir);
+	expectContains(wikiOut, @"wiki-linker", "wiki markup inlines the linker");
+	expectOmits(wikiOut, @"wikilinks.js", "wiki linker is not a file url");
+	expectContains(wikiOut, @"[[Hello]]", "leaves brackets for the script");
+	expectContains(wikiOut, @"[[My Note]]", "leaves spaced titles for the script");
+
+	NSString *wikiDoc = @"<html><body><p>[[Hello]]</p></body></html>";
+	NSString *wikiDocOut = NVPreviewHTMLForDisplay(wikiDoc, dir);
+	NSRange wikiScript = [wikiDocOut rangeOfString:@"wiki-linker"];
+	NSRange wikiClose = [wikiDocOut rangeOfString:@"</body>" options:NSBackwardsSearch];
+	expectTrue(wikiScript.location != NSNotFound && wikiClose.location != NSNotFound && wikiScript.location < wikiClose.location, "wiki script before closing body");
+
+	NSString *wikiCode = @"<p>[[Hello]]</p><pre><code>[[Not a note]]</code></pre>";
+	NSString *wikiCodeOut = NVPreviewHTMLForDisplay(wikiCode, dir);
+	expectContains(wikiCodeOut, @"wiki-linker", "wiki script still loads beside code");
+	expectContains(wikiCodeOut, @"<code>[[Not a note]]</code>", "code brackets stay in the html");
+
+	NSString *missingWiki = NVPreviewHTMLForDisplay(wiki, noMermaidDir);
+	expectContains(missingWiki, @"[[Hello]]", "brackets stay when the script is missing");
+	expectOmits(missingWiki, @"wiki-linker", "missing wiki script adds no tag");
 
 	expectTrue(NVPreviewHTMLForDisplay(nil, dir) == nil, "nil html");
 

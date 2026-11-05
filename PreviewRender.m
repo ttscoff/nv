@@ -29,6 +29,18 @@ static NSString *NVScriptTagForFile(NSString *path) {
 	return [NSString stringWithFormat:@"<script src=\"%@\"></script>", url];
 }
 
+/* Inline a small script. The preview document is loaded with a nil base URL,
+   which can refuse file-URL subresources, so the wiki linker has to travel
+   inside the HTML. */
+static NSString *NVInlineScriptForFile(NSString *path) {
+	NSString *source = [NSString stringWithContentsOfFile:path encoding:NSUTF8StringEncoding error:NULL];
+	if (![source length])
+		return nil;
+	NSMutableString *safe = [NSMutableString stringWithString:source];
+	[safe replaceOccurrencesOfString:@"</" withString:@"<\\/" options:NSCaseInsensitiveSearch range:NSMakeRange(0, [safe length])];
+	return [NSString stringWithFormat:@"<script>\n%@\n</script>", safe];
+}
+
 static BOOL NVHTMLContains(NSString *html, NSString *needle) {
 	return [html rangeOfString:needle options:NSCaseInsensitiveSearch].location != NSNotFound;
 }
@@ -43,7 +55,8 @@ NSString *NVPreviewHTMLForDisplay(NSString *html, NSString *assetDirectory) {
 
 	BOOL needsMath = NVHTMLContains(result, @"class=\"math ") || NVHTMLContains(result, @"class=\"math\"");
 	BOOL needsMermaid = NVHTMLContains(result, @"class=\"mermaid\"");
-	if (!needsMath && !needsMermaid)
+	BOOL needsWiki = [result rangeOfString:@"[[" options:NSLiteralSearch].location != NSNotFound;
+	if (!needsMath && !needsMermaid && !needsWiki)
 		return result;
 
 	NSMutableString *scripts = [NSMutableString string];
@@ -65,6 +78,13 @@ NSString *NVPreviewHTMLForDisplay(NSString *html, NSString *assetDirectory) {
 		if (tag) {
 			[scripts appendString:tag];
 			[scripts appendString:@"\n<script>mermaid.initialize({startOnLoad:true,securityLevel:\"strict\"});</script>\n"];
+		}
+	}
+	if (needsWiki) {
+		NSString *tag = NVInlineScriptForFile([assetDirectory stringByAppendingPathComponent:@"wikilinks.js"]);
+		if (tag) {
+			[scripts appendString:tag];
+			[scripts appendString:@"\n"];
 		}
 	}
 	if (![scripts length])

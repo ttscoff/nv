@@ -97,6 +97,7 @@
 - (void)setupFontMenu;
 
 - (BOOL)didRenderFully;
+- (void)redisplayAfterNoteChange;
 
 #pragma mark - nvALT additions
 - (void)setMouseInside:(BOOL)inside;

@@ -31,3 +31,9 @@ NSString *NVLinkCompletionInsert(NSString *label, BOOL hasClosingBracket);
 
 // YES when location sits just after the '[' that opens a usage or definition.
 BOOL NVLinkReferenceJustOpened(NSString *document, NSUInteger location);
+
+// Full ranges of [text][id], [text][], and ![alt][id] whose id matches a
+// definition in the document. Matching ignores case and repeated whitespace.
+// Usages and definitions inside fenced code are ignored. An id with no
+// definition is left out.
+NSArray *NVCompleteReferenceLinkRanges(NSString *document);

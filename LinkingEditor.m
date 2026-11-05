@@ -447,6 +447,20 @@ CGFloat _perceptualColorDifference(NSColor*a, NSColor*b) {
 	return didRenderFully;
 }
 
+- (void)redisplayAfterNoteChange {
+	/* AppKit invalidates glyphs that still exist. A shorter note, such as one
+	   opened from a link, leaves the previous note's tail on screen. */
+	NSLayoutManager *layout = [self layoutManager];
+	NSUInteger length = [[self string] length];
+	if (layout && length)
+		[layout invalidateDisplayForCharacterRange:NSMakeRange(0, length)];
+	NSRect visible = [self visibleRect];
+	if (NSIsEmptyRect(visible))
+		visible = [self bounds];
+	[self setNeedsDisplayInRect:visible avoidAdditionalLayout:NO];
+	[[[self enclosingScrollView] contentView] setNeedsDisplay:YES];
+}
+
 - (void)layoutManager:(NSLayoutManager *)aLayoutManager didCompleteLayoutForTextContainer:(NSTextContainer *)aTextContainer atEnd:(BOOL)flag {
 	didRenderFully = YES;
 }
@@ -1082,6 +1096,24 @@ static NSColor *NVBlendColors(NSColor *first, NSColor *second, CGFloat fraction,
 	}
 }
 
+- (void)highlightCompleteReferenceLinksInString:(NSString *)string style:(NVThemeStyle *)style baseFont:(NSFont *)baseFont {
+	if (!style)
+		return;
+	NSArray *ranges = NVCompleteReferenceLinkRanges(string);
+	NSUInteger i;
+	for (i = 0; i < [ranges count]; i++)
+		[self paintThemeRange:[[ranges objectAtIndex:i] rangeValue] style:style baseFont:baseFont useBaseFont:NO forceStrikethrough:NO];
+}
+
+- (void)highlightCompleteReferenceLinksInString:(NSString *)string color:(NSColor *)color {
+	if (!color)
+		return;
+	NSArray *ranges = NVCompleteReferenceLinkRanges(string);
+	NSUInteger i;
+	for (i = 0; i < [ranges count]; i++)
+		[self paintMarkdownRange:[[ranges objectAtIndex:i] rangeValue] color:color strikethrough:NO];
+}
+
 - (void)highlightMarkdownSyntaxWithTheme:(NVEditorTheme *)theme {
 	NSLayoutManager *layout = [self layoutManager];
 	NSString *string = [self string];
@@ -1158,6 +1190,7 @@ static NSColor *NVBlendColors(NSColor *first, NSColor *second, CGFloat fraction,
 	[self paintThemeMatches:strikeRegex string:string content:strike marker:markup baseFont:baseFont contentGroup:1 delimiterGroup:0 hasCloser:NO forceStrikethrough:YES];
 	[self paintThemeMatches:linkRegex string:string content:link marker:markup baseFont:baseFont contentGroup:1 delimiterGroup:0 hasCloser:NO forceStrikethrough:NO];
 	[self paintThemeMatches:wikiRegex string:string content:link marker:markup baseFont:baseFont contentGroup:1 delimiterGroup:0 hasCloser:NO forceStrikethrough:NO];
+	[self highlightCompleteReferenceLinksInString:string style:link baseFont:baseFont];
 	[self paintThemeMatches:listRegex string:string content:markup marker:markup baseFont:baseFont contentGroup:0 delimiterGroup:0 hasCloser:NO forceStrikethrough:NO];
 	[self paintThemeMatches:ruleRegex string:string content:markup marker:markup baseFont:baseFont contentGroup:0 delimiterGroup:0 hasCloser:NO forceStrikethrough:NO];
 	[self paintThemeMatches:codeRegex string:string content:code marker:markup baseFont:baseFont contentGroup:2 delimiterGroup:1 hasCloser:YES forceStrikethrough:NO];
@@ -1225,6 +1258,7 @@ static NSColor *NVBlendColors(NSColor *first, NSColor *second, CGFloat fraction,
 	[self paintMarkdownMatches:strikeRegex string:string content:foreground marker:marker contentGroup:1 delimiterGroup:0 hasCloser:NO strikethrough:YES];
 	[self paintMarkdownMatches:linkRegex string:string content:link marker:marker contentGroup:1 delimiterGroup:0 hasCloser:NO strikethrough:NO];
 	[self paintMarkdownMatches:wikiRegex string:string content:link marker:marker contentGroup:1 delimiterGroup:0 hasCloser:NO strikethrough:NO];
+	[self highlightCompleteReferenceLinksInString:string color:link];
 	[self paintMarkdownMatches:listRegex string:string content:marker marker:marker contentGroup:0 delimiterGroup:0 hasCloser:NO strikethrough:NO];
 	[self paintMarkdownMatches:ruleRegex string:string content:marker marker:marker contentGroup:0 delimiterGroup:0 hasCloser:NO strikethrough:NO];
 	[self paintMarkdownMatches:codeRegex string:string content:code marker:marker contentGroup:2 delimiterGroup:1 hasCloser:YES strikethrough:NO];
