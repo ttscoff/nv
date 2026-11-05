@@ -335,8 +335,13 @@ static const NSUInteger NVMarkedShareMaxBodyBytes = 500000;
 // Above webView methods from <http://stackoverflow.com/questions/2288582/embedded-webkit-script-callbacks-how/2293305#2293305>
 
 - (void)webView:(WebView *)sender decidePolicyForNavigationAction:(NSDictionary *)actionInformation request:(NSURLRequest *)request frame:(WebFrame *)frame decisionListener:(id<WebPolicyDecisionListener>)listener {
-    NSString *targetURL = [[request URL] scheme];
-
+    // A link to an anchor in the note itself (href="#section") scrolls the
+    // preview. Everything else a click asks for opens outside, as before. The
+    // page loaded from a string has no request URL, so ask the document itself.
+    if (NVPreviewURLIsFragmentOfDocument([request URL], [NSURL URLWithString:[[frame DOMDocument] URL]])) {
+        [listener use];
+        return;
+    }
     if (![[actionInformation objectForKey:@"WebActionNavigationTypeKey"] isEqualToNumber:[NSNumber numberWithInt:5]]) {
         [[NSWorkspace sharedWorkspace] openURL:[request URL]];
         [listener ignore];

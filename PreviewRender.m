@@ -80,6 +80,19 @@ NSString *NVPreviewRendererScripts(NSString *assetDirectory, BOOL needsMath, BOO
 	return [scripts length] ? scripts : nil;
 }
 
+static NSString *NVURLStringWithoutFragment(NSURL *url) {
+	NSString *string = [url absoluteString];
+	NSRange hash = [string rangeOfString:@"#"];
+	return hash.location == NSNotFound ? string : [string substringToIndex:hash.location];
+}
+
+BOOL NVPreviewURLIsFragmentOfDocument(NSURL *url, NSURL *documentURL) {
+	if (!url || !documentURL || ![url fragment])
+		return NO;
+	NSString *target = NVURLStringWithoutFragment(url);
+	return [target length] > 0 && [target isEqualToString:NVURLStringWithoutFragment(documentURL)];
+}
+
 NSString *NVPreviewHTMLForDisplay(NSString *html, NSString *assetDirectory) {
 	BOOL needsMath = NO, needsMermaid = NO;
 	NSString *prepared = NVPreviewHTMLPreparingContent(html, &needsMath, &needsMermaid);

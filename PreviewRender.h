@@ -12,3 +12,8 @@ NSString *NVPreviewRendererScripts(NSString *assetDirectory, BOOL needsMath, BOO
 /* Both of the above: the prepared HTML with the script tags placed before
    </body>, or appended when there is none. */
 NSString *NVPreviewHTMLForDisplay(NSString *html, NSString *assetDirectory);
+
+/* YES when url names an anchor inside the page at documentURL: the same page,
+   differing only in the fragment. Such a link scrolls the preview instead of
+   opening elsewhere. */
+BOOL NVPreviewURLIsFragmentOfDocument(NSURL *url, NSURL *documentURL);

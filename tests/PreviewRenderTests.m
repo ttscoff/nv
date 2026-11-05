@@ -115,6 +115,14 @@ int main(int argc, const char *argv[]) {
 	NSString *assembled = [NVPreviewHTMLPreparingContent(both, NULL, NULL) stringByAppendingString:NVPreviewRendererScripts(dir, YES, YES)];
 	expectTrue([NVPreviewHTMLForDisplay(both, dir) isEqualToString:assembled], "display output is prepared content plus scripts");
 
+	NSURL *page = [NSURL URLWithString:@"applewebdata://ABC-123"];
+	expectTrue(NVPreviewURLIsFragmentOfDocument([NSURL URLWithString:@"applewebdata://ABC-123#section-2"], page), "fragment: anchor in the same page");
+	expectTrue(NVPreviewURLIsFragmentOfDocument([NSURL URLWithString:@"applewebdata://ABC-123#a"], [NSURL URLWithString:@"applewebdata://ABC-123#b"]), "fragment: page already at another anchor");
+	expectTrue(!NVPreviewURLIsFragmentOfDocument([NSURL URLWithString:@"applewebdata://OTHER#section"], page), "fragment: anchor in another page");
+	expectTrue(!NVPreviewURLIsFragmentOfDocument([NSURL URLWithString:@"https://example.com/#top"], page), "fragment: external link with an anchor");
+	expectTrue(!NVPreviewURLIsFragmentOfDocument([NSURL URLWithString:@"applewebdata://ABC-123"], page), "fragment: same page without an anchor is not a fragment jump");
+	expectTrue(!NVPreviewURLIsFragmentOfDocument(nil, page) && !NVPreviewURLIsFragmentOfDocument([NSURL URLWithString:@"applewebdata://ABC-123#x"], nil), "fragment: missing urls");
+
 	if (gFailures) {
 		fprintf(stderr, "%d preview render tests failed\n", gFailures);
 		[pool drain];
