@@ -570,8 +570,9 @@ static const NSUInteger NVMarkedShareMaxBodyBytes = 500000;
     if (sameNote) {
         // Keep the reader's place across the reload. If the previous reload is
         // still in flight the new document may not be scrolled yet, so reuse
-        // what we saved.
-        scrollState = ([preview isLoading] && pendingScrollState) ? pendingScrollState : [self currentPreviewScrollState];
+        // what we saved. The retain/autorelease keeps that object alive for the
+        // rest of this method even though pendingScrollState is replaced below.
+        scrollState = ([preview isLoading] && pendingScrollState) ? [[pendingScrollState retain] autorelease] : [self currentPreviewScrollState];
     } else {
         [cssString release];
         [htmlString release];
