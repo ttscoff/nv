@@ -43,6 +43,11 @@
 	IBOutlet NSView *accessoryView;
 	
 	NoteObject *lastNote;
+	NSString *pendingScrollState;
+	BOOL previewHasMathJax;
+	BOOL previewHasMermaid;
+	BOOL previewHasWiki;
+	BOOL previewNeedsFullReload;
 }
 
 @property (assign) BOOL isPreviewOutdated;

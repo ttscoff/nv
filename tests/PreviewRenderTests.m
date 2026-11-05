@@ -123,6 +123,38 @@ int main(int argc, const char *argv[]) {
 
 	expectTrue(NVPreviewHTMLForDisplay(nil, dir) == nil, "nil html");
 
+	BOOL needsMath = YES, needsMermaid = YES, needsWiki = YES;
+	NSString *prepared = NVPreviewHTMLPreparingContent(plain, &needsMath, &needsMermaid, &needsWiki);
+	expectTrue([prepared isEqualToString:plain] && !needsMath && !needsMermaid && !needsWiki, "prepare: plain html unchanged and needs nothing");
+	prepared = NVPreviewHTMLPreparingContent(both, &needsMath, &needsMermaid, &needsWiki);
+	expectContains(prepared, @"<pre class=\"mermaid\">", "prepare: rewrites mermaid fences");
+	expectOmits(prepared, @"<script", "prepare: adds no script tags");
+	expectTrue(needsMath && needsMermaid && !needsWiki, "prepare: reports math and mermaid");
+	prepared = NVPreviewHTMLPreparingContent(@"<p>[[Hello]]</p>", &needsMath, &needsMermaid, &needsWiki);
+	expectTrue(needsWiki && !needsMath && !needsMermaid, "prepare: wiki markup needs the linker");
+	expectOmits(prepared, @"<script", "prepare: wiki markup adds no script");
+	expectTrue(NVPreviewHTMLPreparingContent(nil, &needsMath, &needsMermaid, &needsWiki) == nil && !needsMath && !needsMermaid && !needsWiki, "prepare: nil html clears the flags");
+	expectTrue(NVPreviewHTMLPreparingContent(plain, NULL, NULL, NULL) != nil, "prepare: flags are optional");
+	expectTrue(NVPreviewRendererScripts(dir, NO, NO, NO) == nil, "scripts: none when nothing is needed");
+	NSString *mathOnly = NVPreviewRendererScripts(dir, YES, NO, NO);
+	expectContains(mathOnly, @"tex-svg.js", "scripts: math loads mathjax");
+	expectOmits(mathOnly, @"mermaid.min.js", "scripts: math alone does not load mermaid");
+	expectOmits(mathOnly, @"wiki-linker", "scripts: math alone does not load the wiki linker");
+	expectTrue(NVPreviewRendererScripts(noMermaidDir, NO, YES, NO) == nil, "scripts: missing mermaid file gives none");
+	NSString *wikiScripts = NVPreviewRendererScripts(dir, NO, NO, YES);
+	expectContains(wikiScripts, @"wiki-linker", "scripts: wiki inlines the linker");
+	expectOmits(wikiScripts, @"wikilinks.js", "scripts: wiki linker is not a file url");
+	NSString *assembled = [NVPreviewHTMLPreparingContent(both, NULL, NULL, NULL) stringByAppendingString:NVPreviewRendererScripts(dir, YES, YES, NO)];
+	expectTrue([NVPreviewHTMLForDisplay(both, dir) isEqualToString:assembled], "display output is prepared content plus scripts");
+
+	NSURL *page = [NSURL URLWithString:@"applewebdata://ABC-123"];
+	expectTrue(NVPreviewURLIsFragmentOfDocument([NSURL URLWithString:@"applewebdata://ABC-123#section-2"], page), "fragment: anchor in the same page");
+	expectTrue(NVPreviewURLIsFragmentOfDocument([NSURL URLWithString:@"applewebdata://ABC-123#a"], [NSURL URLWithString:@"applewebdata://ABC-123#b"]), "fragment: page already at another anchor");
+	expectTrue(!NVPreviewURLIsFragmentOfDocument([NSURL URLWithString:@"applewebdata://OTHER#section"], page), "fragment: anchor in another page");
+	expectTrue(!NVPreviewURLIsFragmentOfDocument([NSURL URLWithString:@"https://example.com/#top"], page), "fragment: external link with an anchor");
+	expectTrue(!NVPreviewURLIsFragmentOfDocument([NSURL URLWithString:@"applewebdata://ABC-123"], page), "fragment: same page without an anchor is not a fragment jump");
+	expectTrue(!NVPreviewURLIsFragmentOfDocument(nil, page) && !NVPreviewURLIsFragmentOfDocument([NSURL URLWithString:@"applewebdata://ABC-123#x"], nil), "fragment: missing urls");
+
 	if (gFailures) {
 		fprintf(stderr, "%d preview render tests failed\n", gFailures);
 		[pool drain];

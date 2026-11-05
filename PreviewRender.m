@@ -45,7 +45,13 @@ static BOOL NVHTMLContains(NSString *html, NSString *needle) {
 	return [html rangeOfString:needle options:NSCaseInsensitiveSearch].location != NSNotFound;
 }
 
-NSString *NVPreviewHTMLForDisplay(NSString *html, NSString *assetDirectory) {
+NSString *NVPreviewHTMLPreparingContent(NSString *html, BOOL *needsMath, BOOL *needsMermaid, BOOL *needsWiki) {
+	if (needsMath)
+		*needsMath = NO;
+	if (needsMermaid)
+		*needsMermaid = NO;
+	if (needsWiki)
+		*needsWiki = NO;
 	if (!html)
 		return nil;
 
@@ -53,11 +59,18 @@ NSString *NVPreviewHTMLForDisplay(NSString *html, NSString *assetDirectory) {
 	NVReplaceMermaidFences(result, @"<pre\\b[^>]*>\\s*<code\\b[^>]*\\bclass=\"language-\\{?mermaid\\}?\"[^>]*>([\\s\\S]*?)</code></pre>");
 	NVReplaceMermaidFences(result, @"<pre\\b[^>]*\\blang=\"\\{?mermaid\\}?\"[^>]*>\\s*<code\\b[^>]*>([\\s\\S]*?)</code></pre>");
 
-	BOOL needsMath = NVHTMLContains(result, @"class=\"math ") || NVHTMLContains(result, @"class=\"math\"");
-	BOOL needsMermaid = NVHTMLContains(result, @"class=\"mermaid\"");
-	BOOL needsWiki = [result rangeOfString:@"[[" options:NSLiteralSearch].location != NSNotFound;
+	if (needsMath)
+		*needsMath = NVHTMLContains(result, @"class=\"math ") || NVHTMLContains(result, @"class=\"math\"");
+	if (needsMermaid)
+		*needsMermaid = NVHTMLContains(result, @"class=\"mermaid\"");
+	if (needsWiki)
+		*needsWiki = [result rangeOfString:@"[[" options:NSLiteralSearch].location != NSNotFound;
+	return result;
+}
+
+NSString *NVPreviewRendererScripts(NSString *assetDirectory, BOOL needsMath, BOOL needsMermaid, BOOL needsWiki) {
 	if (!needsMath && !needsMermaid && !needsWiki)
-		return result;
+		return nil;
 
 	NSMutableString *scripts = [NSMutableString string];
 	if (needsMath) {
@@ -87,9 +100,32 @@ NSString *NVPreviewHTMLForDisplay(NSString *html, NSString *assetDirectory) {
 			[scripts appendString:@"\n"];
 		}
 	}
-	if (![scripts length])
-		return result;
+	return [scripts length] ? scripts : nil;
+}
 
+static NSString *NVURLStringWithoutFragment(NSURL *url) {
+	NSString *string = [url absoluteString];
+	NSRange hash = [string rangeOfString:@"#"];
+	return hash.location == NSNotFound ? string : [string substringToIndex:hash.location];
+}
+
+BOOL NVPreviewURLIsFragmentOfDocument(NSURL *url, NSURL *documentURL) {
+	if (!url || !documentURL || ![url fragment])
+		return NO;
+	NSString *target = NVURLStringWithoutFragment(url);
+	return [target length] > 0 && [target isEqualToString:NVURLStringWithoutFragment(documentURL)];
+}
+
+NSString *NVPreviewHTMLForDisplay(NSString *html, NSString *assetDirectory) {
+	BOOL needsMath = NO, needsMermaid = NO, needsWiki = NO;
+	NSString *prepared = NVPreviewHTMLPreparingContent(html, &needsMath, &needsMermaid, &needsWiki);
+	if (!prepared)
+		return nil;
+	NSString *scripts = NVPreviewRendererScripts(assetDirectory, needsMath, needsMermaid, needsWiki);
+	if (!scripts)
+		return prepared;
+
+	NSMutableString *result = [NSMutableString stringWithString:prepared];
 	NSRange body = [result rangeOfString:@"</body>" options:NSCaseInsensitiveSearch | NSBackwardsSearch];
 	if (body.location != NSNotFound)
 		[result insertString:scripts atIndex:body.location];

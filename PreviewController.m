@@ -27,6 +27,80 @@ static NSString * const NVMarkedShareTokenAccount = @"api_token";
 static NSString * const NVMarkedShareDeviceAccount = @"device_key";
 static NSString * const NVMarkedShareAPIURL = @"https://share.markedapp.com/api/v1/documents";
 static NSString * const NVMarkedShareConnectURL = @"https://share.markedapp.com/auth/marked?return_to=nvalt%3A%2F%2Fshare-auth%2Fcallback&label=nvALT";
+
+// Scroll bookkeeping for the preview. The themed document scrolls as a whole
+// (document.scrollingElement; body.scrollTop is always 0 in standards mode),
+// while the legacy template scrolls a fixed-position #contentdiv, so every
+// element with an id is checked rather than assuming one. NV_JS_CAPTURE_SCROLL
+// evaluates to an object mapping element ids ("" for the document itself) to
+// their scrollTop; NV_JS_RESTORE_SCROLL is a function that applies such an object.
+// Restoring also turns off scroll anchoring (overflow-anchor) for the elements it
+// scrolls: WebKit would otherwise move the offset again whenever MathJax, Mermaid or
+// an image changes the height of content above the viewport, which made the view
+// creep by that height on every keystroke.
+// The restore takes an optional record of what earlier calls achieved. A later
+// call only touches an element whose offset still equals that record, so a reader
+// who scrolled while a renderer or a load was still working is left alone.
+#define NV_JS_SCROLLER "(document.scrollingElement||document.documentElement||document.body)"
+#define NV_JS_CAPTURE_SCROLL \
+    "(function(){var s={};var d=" NV_JS_SCROLLER ";if(d&&d.scrollTop>0)s['']=d.scrollTop;" \
+    "var els=document.querySelectorAll('[id]');for(var i=0;i<els.length;i++){var e=els[i];if(e.scrollTop>0)s[e.id]=e.scrollTop;}" \
+    "return s;})()"
+#define NV_JS_RESTORE_SCROLL \
+    "(function(s,a){for(var k in s){var e;" \
+    "if(k===''){e=" NV_JS_SCROLLER ";document.documentElement.style.overflowAnchor='none';if(document.body)document.body.style.overflowAnchor='none';}" \
+    "else{e=document.getElementById(k);if(!e)continue;e.style.overflowAnchor='none';}" \
+    "if(a&&(k in a)&&e.scrollTop!==a[k])continue;" \
+    "e.scrollTop=s[k];if(a)a[k]=e.scrollTop;}})"
+
+// The two restores around a full load: inline while the page parses, recording
+// what was achieved on the page, and once more when the load has finished, which
+// yields if the reader scrolled in between.
+#define NV_JS_RESTORE_INLINE_FORMAT @"(" NV_JS_RESTORE_SCROLL ")(%@,window.nvScrollApplied={});"
+#define NV_JS_RESTORE_AFTER_LOAD_FORMAT @"(" NV_JS_RESTORE_SCROLL ")(%@,window.nvScrollApplied||{});"
+
+// Used when a full document load cannot be avoided: the saved state is replayed
+// into the new document (see -preview: and -webView:didFinishLoadForFrame:).
+static NSString * const NVPreviewScrollStateScript = @"JSON.stringify(" NV_JS_CAPTURE_SCROLL ")";
+
+// Replaces the rendered note between the nv-content marker comments without
+// reloading the document, so nothing flashes and the scroll position is kept.
+// Takes a JSON array [html, title]. Returns "1", or "0" when the markers are not
+// there (nothing loaded yet, or a stray closing tag in the note pushed the end
+// marker out of the container) and the caller must load a full document. MathJax
+// and Mermaid, when the page has them, are asked to render the new content.
+static NSString * const NVPreviewUpdateInPlaceScript =
+    @"(function(a){"
+    "var it=document.createNodeIterator(document.documentElement,NodeFilter.SHOW_COMMENT),n,s=null,e=null;"
+    "while((n=it.nextNode())){if(n.nodeValue==='nv-content-start')s=n;else if(n.nodeValue==='nv-content-end')e=n;}"
+    "if(!s||!e)return '0';"
+    // A note whose raw HTML leaves an element open makes the parser nest the end
+    // marker inside that element. Climb to the child of the start marker's parent
+    // that holds the end marker: the note is everything up to and including it.
+    // A fresh end marker is placed as a sibling so the next edit finds it directly.
+    "var p=s.parentNode,last=e;while(last&&last.parentNode!==p)last=last.parentNode;"
+    "if(!last)return '0';"
+    "var saved=" NV_JS_CAPTURE_SCROLL ",applied={};var restore=function(){(" NV_JS_RESTORE_SCROLL ")(saved,applied);};"
+    "while(s.nextSibling&&s.nextSibling!==last)p.removeChild(s.nextSibling);p.removeChild(last);"
+    "var t=document.createElement('template');t.innerHTML=a[0];t.content.appendChild(document.createComment('nv-content-end'));"
+    "p.insertBefore(t.content,s.nextSibling);"
+    "if(window.nvLinkWikiText){try{window.nvLinkWikiText(p);}catch(x){}}"
+    "document.title=a[1];var h=document.getElementsByClassName('doctitle');for(var i=0;i<h.length;i++)h[i].textContent=a[1];"
+    // MathJax's promise API (typesetPromise) chains on startup.promise, which never
+    // settles inside the legacy WebView, so drive the document directly;
+    // handleRetriesFor covers glyphs whose font data MathJax still has to load.
+    "if(window.MathJax&&MathJax.startup&&MathJax.startup.document){try{var d=MathJax.startup.document;d.clear();"
+    "var mj=MathJax._&&MathJax._.mathjax&&MathJax._.mathjax.mathjax;"
+    "if(mj&&mj.handleRetriesFor){mj.handleRetriesFor(function(){d.render();}).then(restore,function(){});}else{d.render();}}catch(x){}}"
+    "if(window.mermaid&&mermaid.run){try{mermaid.run().then(restore,function(){});}catch(x){}}"
+    // Nothing above repaints, so one restore here sees the swapped content and
+    // MathJax's synchronous pass. The renderers call it again when their
+    // asynchronous work changes the page height, which also undoes a restore
+    // that was clamped at the bottom of a note; those later calls yield if the
+    // reader has scrolled in the meantime.
+    "restore();"
+    "return '1';})(%@)";
+
 static const NSUInteger NVMarkedShareMaxBodyBytes = 500000;
 
 @interface PreviewController (MarkedShare)
@@ -196,7 +270,7 @@ static const NSUInteger NVMarkedShareMaxBodyBytes = 500000;
 
     cssString = [[[self class] css] retain];
     htmlString = [[[self class] html] retain];
-    lastNote = [[NSApp delegate] selectedNoteObject];
+    lastNote = [[[NSApp delegate] selectedNoteObject] retain];
     [sourceView setTextContainerInset:NSMakeSize(10.0,12.0)];
     NSScrollView *scrlView=[sourceView enclosingScrollView];
     if (!IsLionOrLater) {
@@ -245,11 +319,30 @@ static const NSUInteger NVMarkedShareMaxBodyBytes = 500000;
     [windowScriptObject setValue:self forKey:@"Cocoa"];
 }
 
+// Re-apply the saved scroll position once the new document has fully loaded, in
+// case layout moved after the inline restore ran (images, fonts, scripts). The
+// script leaves the page alone if the reader scrolled after the inline restore.
+- (void)webView:(WebView *)sender didFinishLoadForFrame:(WebFrame *)frame
+{
+    if (frame != [sender mainFrame])
+        return;
+    if (pendingScrollState) {
+        [sender stringByEvaluatingJavaScriptFromString:[self javaScriptReapplyingPreviewScrollState:pendingScrollState]];
+        [pendingScrollState release];
+        pendingScrollState = nil;
+    }
+}
+
 // Above webView methods from <http://stackoverflow.com/questions/2288582/embedded-webkit-script-callbacks-how/2293305#2293305>
 
 - (void)webView:(WebView *)sender decidePolicyForNavigationAction:(NSDictionary *)actionInformation request:(NSURLRequest *)request frame:(WebFrame *)frame decisionListener:(id<WebPolicyDecisionListener>)listener {
-    NSString *targetURL = [[request URL] scheme];
-
+    // A link to an anchor in the note itself (href="#section") scrolls the
+    // preview. Everything else a click asks for opens outside, as before. The
+    // page loaded from a string has no request URL, so ask the document itself.
+    if (NVPreviewURLIsFragmentOfDocument([request URL], [NSURL URLWithString:[[frame DOMDocument] URL]])) {
+        [listener use];
+        return;
+    }
     if (![[actionInformation objectForKey:@"WebActionNavigationTypeKey"] isEqualToNumber:[NSNumber numberWithInt:5]]) {
         [[NSWorkspace sharedWorkspace] openURL:[request URL]];
         [listener ignore];
@@ -373,6 +466,9 @@ static const NSUInteger NVMarkedShareMaxBodyBytes = 500000;
 }
 
 - (void)themesDidChange:(NSNotification *)notification {
+    // The CSS changed, so the next preview must rebuild the page rather than
+    // swap the note into the one that is showing.
+    previewNeedsFullReload = YES;
     if (self.isPreviewSticky || ![self isWindowLoaded] || ![[self window] isVisible])
         return;
     [self preview:[NSApp delegate]];
@@ -397,61 +493,146 @@ static const NSUInteger NVMarkedShareMaxBodyBytes = 500000;
     //	}
 }
 
+#pragma mark - Preview scroll position
+
+// Returns a JSON object mapping element ids ("" for the document itself) to their
+// scrollTop, or nil when nothing is scrolled.
+- (NSString *)currentPreviewScrollState
+{
+    NSString *state = [preview stringByEvaluatingJavaScriptFromString:NVPreviewScrollStateScript];
+    if ([state length] < 3 || ![state hasPrefix:@"{"] || ![state hasSuffix:@"}"])
+        return nil;
+    // Keep the literal safe to embed inside an inline <script> element.
+    return [state stringByReplacingOccurrencesOfString:@"<" withString:@"\\u003c"];
+}
+
+// Inline script for a full load: applies the state while the page parses and
+// records what it achieved, so the post-load restore can tell whether the reader
+// has scrolled since.
+- (NSString *)javaScriptRestoringPreviewScrollState:(NSString *)state
+{
+    return [NSString stringWithFormat:NV_JS_RESTORE_INLINE_FORMAT, state];
+}
+
+// Run when the load has finished: applies the state again unless the reader
+// moved the scroll bar after the inline restore.
+- (NSString *)javaScriptReapplyingPreviewScrollState:(NSString *)state
+{
+    return [NSString stringWithFormat:NV_JS_RESTORE_AFTER_LOAD_FORMAT, state];
+}
+
+// Swaps the rendered note into the page that is already showing. Returns NO when
+// the page has no markers (nothing loaded yet), in which case the caller loads a
+// full document instead.
+- (BOOL)updatePreviewInPlaceWithContent:(NSString *)content title:(NSString *)title
+{
+    NSData *args = [NSJSONSerialization dataWithJSONObject:@[content ?: @"", title ?: @""] options:0 error:NULL];
+    if (!args)
+        return NO;
+    NSString *argsString = [[[NSString alloc] initWithData:args encoding:NSUTF8StringEncoding] autorelease];
+    // JSON leaves the Unicode line and paragraph separators raw, but older
+    // JavaScript engines reject them inside a string literal; escape them.
+    argsString = [argsString stringByReplacingOccurrencesOfString:@"\u2028" withString:@"\\u2028"];
+    argsString = [argsString stringByReplacingOccurrencesOfString:@"\u2029" withString:@"\\u2029"];
+    NSString *result = [preview stringByEvaluatingJavaScriptFromString:[NSString stringWithFormat:NVPreviewUpdateInPlaceScript, argsString]];
+    return [result isEqualToString:@"1"];
+}
+
 -(void)preview:(id)object
 {
     if (self.isPreviewSticky) {
         [self updateOpenInMarkedButton];
         return;
     }
-    NSString *lastScrollPosition = [preview stringByEvaluatingJavaScriptFromString:@"document.getElementsByTagName('body')[0].scrollTop"];
-    //	NSString *lastScrollPosition = [[preview windowScriptObject] evaluateWebScript:@"document.getElementsByTagName('body')[0].scrollTop"];
     AppController *app = object;
     NSString *rawString = [app noteContent];
 
     SEL mode = [self markupProcessorSelector:[app currentPreviewMode]];
     NSString *processedString = [NSString performSelector:mode withObject:rawString];
-    NSString *previewString = processedString;
-    NSMutableString *outputString = [NSMutableString stringWithString:(NSString *)htmlString];
     NSString *noteTitle =  ([app selectedNoteObject]) ? [NSString stringWithFormat:@"%@",titleOfNote([app selectedNoteObject])] : @"";
+    NSString *previewAssets = [[[NSBundle mainBundle] resourcePath] stringByAppendingPathComponent:@"preview-js"];
 
-    if (lastNote == [app selectedNoteObject]) {
-        NSString *restoreScrollPosition = [NSString stringWithFormat:@"\n<script>var body = document.getElementsByTagName('body')[0],oldscroll = %@;body.scrollTop = oldscroll;</script>",lastScrollPosition];
-        previewString = [processedString stringByAppendingString:restoreScrollPosition];
-    } else {
-        [cssString release];
-        [htmlString release];
-        cssString = [[[self class] css] retain];
-        htmlString = [[[self class] html] retain];
-        lastNote = [app selectedNoteObject];
-    }
-    if (previewString) {
-        NSString *previewAssets = [[[NSBundle mainBundle] resourcePath] stringByAppendingPathComponent:@"preview-js"];
-        previewString = NVPreviewHTMLForDisplay(previewString, previewAssets);
-    }
-    NSString *nvSupportPath = [[NSFileManager defaultManager] applicationSupportDirectory];
+    BOOL needsMath = NO, needsMermaid = NO, needsWiki = NO;
+    NSString *content = NVPreviewHTMLPreparingContent(processedString, &needsMath, &needsMermaid, &needsWiki) ?: @"";
+    BOOL sameNote = (lastNote == [app selectedNoteObject]);
 
-    NSString *themedDocument = [[self class] themedHTMLDocumentForTitle:noteTitle contentHTML:previewString];
-    if (themedDocument) {
-        [[preview mainFrame] loadHTMLString:themedDocument baseURL:nil];
-        [preview stringByEvaluatingJavaScriptFromString:[NSString stringWithFormat:@"var body = document.getElementsByTagName('body')[0],oldscroll = %@;body.scrollTop = oldscroll;", lastScrollPosition]];
+    // Editing the note that is already showing: swap the rendered note into the
+    // existing page instead of reloading it, so nothing flashes and the scroll
+    // position is untouched. A full load is still needed when the theme changed,
+    // when a load is in flight, or when the note newly needs a renderer
+    // (MathJax, Mermaid) or the wiki linker that this page has not loaded.
+
+    if (sameNote && !previewNeedsFullReload && ![preview isLoading]
+        && (!needsMath || previewHasMathJax) && (!needsMermaid || previewHasMermaid) && (!needsWiki || previewHasWiki)
+        && [self updatePreviewInPlaceWithContent:content title:noteTitle]) {
         [[self window] setTitle:noteTitle];
         [sourceView replaceCharactersInRange:NSMakeRange(0, [[sourceView string] length]) withString:processedString];
         self.isPreviewOutdated = NO;
         [self updateOpenInMarkedButton];
         return;
     }
+
+    NSString *scrollState = nil;
+    if (sameNote) {
+        // Keep the reader's place across the reload. If the previous reload is
+        // still in flight the new document may not be scrolled yet, so reuse
+        // what we saved. The retain/autorelease keeps that object alive for the
+        // rest of this method even though pendingScrollState is replaced below.
+        scrollState = ([preview isLoading] && pendingScrollState) ? [[pendingScrollState retain] autorelease] : [self currentPreviewScrollState];
+    } else {
+        [cssString release];
+        [htmlString release];
+        cssString = [[[self class] css] retain];
+        htmlString = [[[self class] html] retain];
+        // Owned, so a deleted note cannot be freed and its address reused by a
+        // new note that would then pass the sameNote check above.
+        [lastNote release];
+        lastNote = [[app selectedNoteObject] retain];
+    }
+    NSString *newPendingState = [scrollState copy];
+    [pendingScrollState release];
+    pendingScrollState = newPendingState;
+
+    // The marker comments let later edits replace just the note; see
+    // -updatePreviewInPlaceWithContent:title:. The scroll restore goes before
+    // the renderer scripts so it is not held up by loading them.
+    NSMutableString *previewString = [NSMutableString stringWithFormat:@"<!--nv-content-start-->%@<!--nv-content-end-->", content];
+    if (scrollState) {
+        [previewString appendFormat:@"\n<script>%@</script>", [self javaScriptRestoringPreviewScrollState:scrollState]];
+    }
+    NSString *rendererScripts = NVPreviewRendererScripts(previewAssets, needsMath, needsMermaid, needsWiki);
+    if (rendererScripts) {
+        [previewString appendString:rendererScripts];
+    }
+    previewHasMathJax = needsMath;
+    previewHasMermaid = needsMermaid;
+    previewHasWiki = needsWiki;
+    previewNeedsFullReload = NO;
+
+    NSString *nvSupportPath = [[NSFileManager defaultManager] applicationSupportDirectory];
+
+    NSString *themedDocument = [[self class] themedHTMLDocumentForTitle:noteTitle contentHTML:previewString];
+    if (themedDocument) {
+        [[preview mainFrame] loadHTMLString:themedDocument baseURL:nil];
+        [[self window] setTitle:noteTitle];
+        [sourceView replaceCharactersInRange:NSMakeRange(0, [[sourceView string] length]) withString:processedString];
+        self.isPreviewOutdated = NO;
+        [self updateOpenInMarkedButton];
+        return;
+    }
+    NSMutableString *outputString = [NSMutableString stringWithString:(NSString *)htmlString];
+    NSString *bodyString = previewString;
     if ([htmlString rangeOfString:@"id=\"wrapper\"" options:NSCaseInsensitiveSearch].location == NSNotFound &&
         [htmlString rangeOfString:@"id='wrapper'" options:NSCaseInsensitiveSearch].location == NSNotFound) {
-        previewString = [NSString stringWithFormat:@"<div id=\"wrapper\">%@</div>", previewString];
+        bodyString = [NSString stringWithFormat:@"<div id=\"wrapper\">%@</div>", previewString];
     }
 
     [outputString replaceOccurrencesOfString:@"{%support%}" withString:nvSupportPath options:0 range:NSMakeRange(0, [outputString length])];
     [outputString replaceOccurrencesOfString:@"{%title%}" withString:noteTitle options:0 range:NSMakeRange(0, [outputString length])];
-    [outputString replaceOccurrencesOfString:@"{%content%}" withString:previewString options:0 range:NSMakeRange(0, [outputString length])];
+    [outputString replaceOccurrencesOfString:@"{%content%}" withString:bodyString options:0 range:NSMakeRange(0, [outputString length])];
     [outputString replaceOccurrencesOfString:@"{%style%}" withString:cssString options:0 range:NSMakeRange(0, [outputString length])];
 
     [[preview mainFrame] loadHTMLString:outputString baseURL:nil];
-    [preview stringByEvaluatingJavaScriptFromString:[NSString stringWithFormat:@"var body = document.getElementsByTagName('body')[0],oldscroll = %@;body.scrollTop = oldscroll;",lastScrollPosition]];
     [[self window] setTitle:noteTitle];
 
     [sourceView replaceCharactersInRange:NSMakeRange(0, [[sourceView string] length]) withString:processedString];
@@ -988,6 +1169,7 @@ static const NSUInteger NVMarkedShareMaxBodyBytes = 500000;
     [htmlString release];
     [cssString release];
     [lastNote release];
+    [pendingScrollState release];
     [shareButton release];
     [saveButton release];
     [tabSwitcher release];

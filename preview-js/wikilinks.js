@@ -68,6 +68,8 @@
 		}
 	}
 
+	window.nvLinkWikiText = linkWikiText;
+
 	function run() {
 		linkWikiText(document.body);
 	}
