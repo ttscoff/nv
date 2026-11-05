@@ -66,16 +66,24 @@ static NSString * const NVPreviewScrollStateScript = @"JSON.stringify(" NV_JS_CA
 // Replaces the rendered note between the nv-content marker comments without
 // reloading the document, so nothing flashes and the scroll position is kept.
 // Takes a JSON array [html, title]. Returns "1", or "0" when the markers are not
-// there (nothing loaded yet) and the caller must load a full document. MathJax
+// there (nothing loaded yet, or a stray closing tag in the note pushed the end
+// marker out of the container) and the caller must load a full document. MathJax
 // and Mermaid, when the page has them, are asked to render the new content.
 static NSString * const NVPreviewUpdateInPlaceScript =
     @"(function(a){"
     "var it=document.createNodeIterator(document.documentElement,NodeFilter.SHOW_COMMENT),n,s=null,e=null;"
     "while((n=it.nextNode())){if(n.nodeValue==='nv-content-start')s=n;else if(n.nodeValue==='nv-content-end')e=n;}"
-    "if(!s||!e||s.parentNode!==e.parentNode)return '0';"
+    "if(!s||!e)return '0';"
+    // A note whose raw HTML leaves an element open makes the parser nest the end
+    // marker inside that element. Climb to the child of the start marker's parent
+    // that holds the end marker: the note is everything up to and including it.
+    // A fresh end marker is placed as a sibling so the next edit finds it directly.
+    "var p=s.parentNode,last=e;while(last&&last.parentNode!==p)last=last.parentNode;"
+    "if(!last)return '0';"
     "var saved=" NV_JS_CAPTURE_SCROLL ",applied={};var restore=function(){(" NV_JS_RESTORE_SCROLL ")(saved,applied);};"
-    "var p=s.parentNode;while(s.nextSibling&&s.nextSibling!==e)p.removeChild(s.nextSibling);"
-    "var t=document.createElement('template');t.innerHTML=a[0];p.insertBefore(t.content,e);"
+    "while(s.nextSibling&&s.nextSibling!==last)p.removeChild(s.nextSibling);p.removeChild(last);"
+    "var t=document.createElement('template');t.innerHTML=a[0];t.content.appendChild(document.createComment('nv-content-end'));"
+    "p.insertBefore(t.content,s.nextSibling);"
     "document.title=a[1];var h=document.getElementsByClassName('doctitle');for(var i=0;i<h.length;i++)h[i].textContent=a[1];"
     // MathJax's promise API (typesetPromise) chains on startup.promise, which never
     // settles inside the legacy WebView, so drive the document directly;
@@ -516,6 +524,10 @@ static const NSUInteger NVMarkedShareMaxBodyBytes = 500000;
     if (!args)
         return NO;
     NSString *argsString = [[[NSString alloc] initWithData:args encoding:NSUTF8StringEncoding] autorelease];
+    // JSON leaves the Unicode line and paragraph separators raw, but older
+    // JavaScript engines reject them inside a string literal; escape them.
+    argsString = [argsString stringByReplacingOccurrencesOfString:@"\u2028" withString:@"\\u2028"];
+    argsString = [argsString stringByReplacingOccurrencesOfString:@"\u2029" withString:@"\\u2029"];
     NSString *result = [preview stringByEvaluatingJavaScriptFromString:[NSString stringWithFormat:NVPreviewUpdateInPlaceScript, argsString]];
     return [result isEqualToString:@"1"];
 }
