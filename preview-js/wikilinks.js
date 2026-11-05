@@ -72,6 +72,10 @@
 		linkWikiText(document.body);
 	}
 
+	/* The preview swaps an edited note into the loaded page instead of reloading
+	   it, then links the new text through this. */
+	window.nvLinkWikiText = linkWikiText;
+
 	if (document.body)
 		run();
 	else

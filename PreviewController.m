@@ -85,6 +85,9 @@ static NSString * const NVPreviewUpdateInPlaceScript =
     "var t=document.createElement('template');t.innerHTML=a[0];t.content.appendChild(document.createComment('nv-content-end'));"
     "p.insertBefore(t.content,s.nextSibling);"
     "document.title=a[1];var h=document.getElementsByClassName('doctitle');for(var i=0;i<h.length;i++)h[i].textContent=a[1];"
+    // The wiki linker ran once when the page loaded; link the swapped-in note too,
+    // before MathJax and Mermaid rewrite their blocks, as on a full load.
+    "if(window.nvLinkWikiText){try{nvLinkWikiText(p);}catch(x){}}"
     // MathJax's promise API (typesetPromise) chains on startup.promise, which never
     // settles inside the legacy WebView, so drive the document directly;
     // handleRetriesFor covers glyphs whose font data MathJax still has to load.
