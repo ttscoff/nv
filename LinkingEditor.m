@@ -24,6 +24,7 @@
 #import "NVThemeManager.h"
 #import "TagSearch.h"
 #import "LinkReferenceCompletion.h"
+#import "ClickBelowText.h"
 #import "ETScrollView.h"
 #import "ETClipView.h"
 //#import "NSTextFinder.h"
@@ -1631,6 +1632,65 @@ static NSColor *NVBlendColors(NSColor *first, NSColor *second, CGFloat fraction,
     
     //fix for tooltip hanging around
     [super mouseExited:anEvent];
+}
+
+- (BOOL)nv_viewPointIsBelowText:(NSPoint)viewPoint {
+	NSLayoutManager *layout = [self layoutManager];
+	NSTextContainer *container = [self textContainer];
+	if (!layout || !container || ![[self string] length])
+		return NO;
+	NSUInteger glyphs = [layout numberOfGlyphs];
+	if (!glyphs)
+		return NO;
+	[layout ensureLayoutForGlyphRange:NSMakeRange(0, glyphs)];
+	NSPoint origin = [self textContainerOrigin];
+	NSRect lastLine = [layout lineFragmentRectForGlyphAtIndex:glyphs - 1 effectiveRange:NULL];
+	NSRect extra = [layout extraLineFragmentRect];
+	return NVClickIsPastLastLine(viewPoint.y - origin.y, NSMaxY(lastLine), !NSIsEmptyRect(extra), extra.origin.y);
+}
+
+- (void)nv_selectFromAnchor:(NSUInteger)anchor toIndex:(NSUInteger)index stillSelecting:(BOOL)stillSelecting {
+	NSUInteger length = [[self string] length];
+	if (anchor > length)
+		anchor = length;
+	if (index > length)
+		index = length;
+	NSUInteger start = MIN(anchor, index);
+	NSSelectionAffinity affinity = index < anchor ? NSSelectionAffinityUpstream : NSSelectionAffinityDownstream;
+	[self setSelectedRange:NSMakeRange(start, (anchor > index) ? anchor - index : index - anchor) affinity:affinity stillSelecting:stillSelecting];
+}
+
+- (void)mouseDown:(NSEvent *)event {
+	NSUInteger flags = [event modifierFlags] & NSDeviceIndependentModifierFlagsMask;
+	NSPoint viewPoint = [self convertPoint:[event locationInWindow] fromView:nil];
+	/* Control-click still brings up the menu. A double-click keeps the usual
+	   word selection. A plain click past the last line goes to the end, including
+	   a blank line that only holds spaces and a last line that holds text. */
+	if ([event clickCount] != 1 || (flags & NSControlKeyMask) || ![self nv_viewPointIsBelowText:viewPoint]) {
+		[super mouseDown:event];
+		return;
+	}
+
+	NSWindow *window = [self window];
+	BOOL extend = window && [window firstResponder] == self && (flags & NSShiftKeyMask);
+	NSUInteger anchor = extend ? [self selectedRange].location : [[self string] length];
+	[window makeFirstResponder:self];
+	NSUInteger length = [[self string] length];
+	if (!extend)
+		anchor = length;
+	[self nv_selectFromAnchor:anchor toIndex:length stillSelecting:NO];
+
+	NSEvent *tracked = event;
+	while (tracked && [tracked type] != NSLeftMouseUp) {
+		tracked = [NSApp nextEventMatchingMask:NSLeftMouseDraggedMask | NSLeftMouseUpMask untilDate:[NSDate distantFuture] inMode:NSEventTrackingRunLoopMode dequeue:YES];
+		if (!tracked || [tracked type] != NSLeftMouseDragged)
+			continue;
+		NSPoint draggedPoint = [self convertPoint:[tracked locationInWindow] fromView:nil];
+		NSUInteger index = [self nv_viewPointIsBelowText:draggedPoint] ? length : [self characterIndexForInsertionAtPoint:draggedPoint];
+		[self nv_selectFromAnchor:anchor toIndex:index stillSelecting:YES];
+		[self autoscroll:tracked];
+	}
+	[self setSelectedRange:[self selectedRange] affinity:[self selectionAffinity] stillSelecting:NO];
 }
 
 - (void)_fixCursorForBackgroundUpdatingMouseInside:(NSNumber*)num {
