@@ -1,3 +1,24 @@
+nvALT 3.0.22 (144)
+-------------------------
+
+#### NEW
+
+- **Editing** settings choose the marker for **bold** (`**` or `__`), **italic** (`*` or `_`), and **unordered lists** (`-`, `*`, or `+`)
+- **Link ids** complete inside `[text][id]` from definitions already in the note, and a new `[id]:` line offers ids that are still unused
+- **Backticks** wrap a selection or the caret, the next backtick types over the closer, and a third backtick stays single so ``` is a fence
+- **Wiki links** in the preview open the named note. The brackets stay visible, and the same text in code, math, or a diagram stays plain
+- Defined **reference links** pick up the link color, including collapsed references and images. Undefined ids and fenced code stay plain
+
+#### IMPROVED
+
+- **Command-Option-L** on a multiline selection adds that list marker, turns a solid bullet list into numbers, clears a numbered list, and strips markers when only some lines have one. Indents stay put
+
+#### FIXED
+
+- **Autocomplete** text, including the letters already typed and the brackets inside a link, stays the theme foreground instead of turning black
+- **Word count** in the toolbar stays readable on dark themes instead of drawing as a light cyan token
+- Opening a shorter note, including from a **note link**, no longer leaves the previous note's tail on screen
+
 nvALT 3.0.21 (144)
 -------------------------
 
