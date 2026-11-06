@@ -1,3 +1,10 @@
+nvALT 3.0.29 (144)
+-------------------------
+
+#### FIXED
+
+- Selected notes in **Vertical Layout** with the **Default** theme use the system selection bar again instead of white text on the list background
+
 nvALT 3.0.28 (144)
 -------------------------
 
