@@ -1,3 +1,15 @@
+nvALT 3.0.28 (144)
+-------------------------
+
+#### NEW
+
+- **Enter in list renames note** in Editing settings stays on by default. Turn it off and Enter in the notes list jumps to the editor
+
+#### FIXED
+
+- Collapsing the **notes list** in Vertical Layout no longer leaves it visible behind the search field
+- **Convert to Markdown** in Notes settings stays below the deletion checkbox instead of covering its title
+
 nvALT 3.0.27 (144)
 -------------------------
 
