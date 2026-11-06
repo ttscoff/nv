@@ -1,0 +1,174 @@
+{
+    "comment" : "Ocean - Night. Sand on deep water, with sage and clay for accent.",
+
+    "darkWindow" : true,
+    "lightWindow" : false,
+    "transparentTitlebar" : true,
+
+    "windowBackgroundColor" : "#04395e",
+    "backgroundColor" : "#04395e",
+    "foregroundColor" : "#dab785",
+    "caretColor" : "#d5896f",
+    "selectionBackgroundColor" : "#70a28848",
+
+    "searchField" : {
+        "foregroundColor" : "#dab785",
+        "backgroundColor" : "#031d44"
+    },
+
+    "tableView" : {
+        "fontName" : "Avenir",
+        "fontSize" : 14,
+        "rowHeight" : 34,
+        "drawBorder" : false,
+        "drawFocusRing": false
+    },
+
+    "tableViewHighlighted" : {
+        "backgroundColor" : "#d5896f",
+        "foregroundColor" : "#031d44"
+    },
+
+    "tableViewInactive" : {
+        "backgroundColor" : "#70a288",
+        "foregroundColor" : "#031d44"
+    },
+
+    "textView" : {
+        "backgroundColor" : "#031d44",
+        "foregroundColor" : "#dab785",
+        "caretColor" : "#d5896f"
+    },
+
+    "strong" : {
+        "bold" : 1,
+        "foregroundColor" : "#dab785"
+    },
+    "emphasis" : {
+        "italic" : 1
+    },
+    "superscript" : {
+        "superscript" : 1
+    },
+    "subscript" : {
+        "superscript" : -1
+    },
+    "criticAddition" : {
+        "foregroundColor" : "#70a288"
+    },
+    "criticDeletion" : {
+        "foregroundColor" : "#d5896f",
+        "strikethrough" : 1
+    },
+    "criticSubstitution" : {
+        "foregroundColor" : "#d5896f"
+    },
+    "criticHighlight" : {
+        "foregroundColor" : "#70a288"
+    },
+    "criticComment" : {
+        "foregroundColor" : "#70a288"
+    },
+    "blockquote" : {
+        "backgroundColor" : "#d5896f33",
+        "foregroundColor" : "#dab785",
+        "markupForegroundColor" : "#d5896f"
+    },
+    "codeBlock" : {
+        "backgroundColor" : "#04395e",
+        "foregroundColor" : "#dab785",
+        "fontName" : "Menlo",
+        "fontScale" : 0.92,
+        "textAlignment" : 1
+    },
+    "codeSpan" : {
+        "fontName" : "Menlo",
+        "fontScale" : 0.92,
+        "backgroundColor" : "#04395e",
+        "foregroundColor" : "#dab785",
+        "mono" : 1
+    },
+    "heading" : {
+        "bold" : 1,
+        "foregroundColor" : "#d5896f"
+    },
+    "heading1" : {
+        "foregroundColor" : "#d5896f",
+        "fontScale" : 1.4
+    },
+    "heading2" : {
+        "foregroundColor" : "#70a288",
+        "fontScale" : 1.2
+    },
+    "heading3" : {
+        "foregroundColor" : "#dab785",
+        "fontScale" : 1.1
+    },
+    "math" : {
+        "foregroundColor" : "#d5896f",
+        "backgroundColor" : "#70a28833"
+    },
+    "table" : {
+        "backgroundColor" : "#04395e55",
+        "foregroundColor" : "#70a288"
+    },
+    "pairs" : {
+        "foregroundColor" : "#70a288"
+    },
+    "parens" : {
+        "foregroundColor" : "#dab785"
+    },
+    "braces" : {
+        "foregroundColor" : "#dab785"
+    },
+    "linkParens" : {
+        "foregroundColor" : "#70a288",
+        "markupForegroundColor": "#d5896f"
+    },
+    "quoteDouble" : {
+        "foregroundColor" : "#d5896f"
+    },
+    "quoteSingle" : {
+        "foregroundColor" : "#d5896f"
+    },
+    "footnote" : {
+        "foregroundColor" : "#70a288"
+    },
+    "abbreviation" : {
+        "foregroundColor" : "#70a288"
+    },
+    "citation" : {
+        "foregroundColor" : "#70a288"
+    },
+    "glossary" : {
+        "foregroundColor" : "#70a288"
+    },
+    "definition" : {
+        "foregroundColor" : "#70a288"
+    },
+    "variable" : {
+        "foregroundColor" : "#70a288"
+    },
+    "markup" : {
+        "foregroundColor" : "#d5896f"
+    },
+    "metadata" : {
+        "backgroundColor" : "#04395e",
+        "foregroundColor" : "#dab785"
+    },
+    "definitionAbbreviation" : {
+        "foregroundColor" : "#d5896f"
+    },
+    "definitionCitation" : {
+        "foregroundColor" : "#d5896f"
+    },
+    "definitionFootnote" : {
+        "foregroundColor" : "#d5896f"
+    },
+    "definitionGlossary" : {
+        "foregroundColor" : "#d5896f"
+    },
+    "definitionLink" : {
+        "foregroundColor" : "#d5896f"
+    }
+}

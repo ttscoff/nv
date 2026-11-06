@@ -1,0 +1,310 @@
+/*
+	Ocean - Night
+	Preview for the Ocean - Night theme.
+*/
+
+body {
+	margin: 0;
+	background: #04395e;
+	color: #dab785;
+}
+
+#wrapper {
+	box-sizing: border-box;
+	max-width: 42em;
+	margin: 0 auto;
+	padding: 2.6em 2.4em 4.5em;
+	background: #031d44;
+	color: #dab785;
+	font-family: "Iowan Old Style", Palatino, Georgia, serif;
+	font-size: 18px;
+	line-height: 1.55;
+}
+
+#wrapper ::selection {
+	background: #70a28848;
+	color: #dab785;
+}
+
+#wrapper h1,
+#wrapper h2,
+#wrapper h3,
+#wrapper h4,
+#wrapper h5,
+#wrapper h6 {
+	font-family: "Avenir Next", Avenir, "Helvetica Neue", sans-serif;
+	font-weight: 600;
+	line-height: 1.2;
+	margin: 1.5em 0 0.4em;
+}
+
+#wrapper h1 { color: #d5896f; font-size: 1.9em; }
+#wrapper h2 { color: #70a288; font-size: 1.45em; }
+#wrapper h3 { color: #dab785; font-size: 1.2em; }
+#wrapper h4 { color: #dab785; font-size: 1.05em; }
+#wrapper h5 { color: #70a288; font-size: 0.95em; }
+#wrapper h6 { color: #70a288; font-size: 0.85em; letter-spacing: 0.04em; }
+
+#wrapper h1:first-child,
+#wrapper h2:first-child,
+#wrapper h3:first-child {
+	margin-top: 0;
+}
+
+#wrapper p,
+#wrapper ul,
+#wrapper ol,
+#wrapper dl,
+#wrapper blockquote,
+#wrapper pre,
+#wrapper table,
+#wrapper figure {
+	margin: 0 0 1em;
+}
+
+#wrapper a {
+	color: #70a288;
+	text-decoration-color: #70a288;
+	text-underline-offset: 0.15em;
+}
+
+#wrapper a:hover {
+	color: #d5896f;
+}
+
+#wrapper strong,
+#wrapper b {
+	font-weight: 700;
+	color: #dab785;
+}
+
+#wrapper em,
+#wrapper i,
+#wrapper dfn,
+#wrapper cite {
+	font-style: italic;
+}
+
+#wrapper small {
+	font-size: 0.85em;
+	color: #70a288;
+}
+
+#wrapper mark {
+	background: #70a28833;
+	color: #dab785;
+}
+
+#wrapper del {
+	color: #d5896f;
+	text-decoration: line-through;
+}
+
+#wrapper ins {
+	color: #70a288;
+	text-decoration: none;
+}
+
+#wrapper span.critic.comment {
+	color: #70a288;
+}
+
+#wrapper span.critic.comment::before {
+	content: "{>> ";
+}
+
+#wrapper span.critic.comment::after {
+	content: " <<}";
+}
+
+#wrapper span.critic.substitution {
+	color: #d5896f;
+}
+
+#wrapper sup,
+#wrapper sub {
+	font-size: 0.75em;
+	line-height: 0;
+	position: relative;
+}
+
+#wrapper sup { top: -0.4em; }
+#wrapper sub { bottom: -0.2em; }
+
+#wrapper abbr {
+	color: #70a288;
+	text-decoration: underline dotted;
+	text-underline-offset: 0.15em;
+}
+
+#wrapper var {
+	color: #70a288;
+	font-style: normal;
+	font-family: Menlo, monospace;
+	font-size: 0.9em;
+}
+
+#wrapper blockquote {
+	margin-left: 0;
+	padding: 0.4em 1em;
+	background: #d5896f33;
+	border-left: 3px solid #d5896f;
+	color: #dab785;
+}
+
+#wrapper blockquote > :first-child { margin-top: 0; }
+#wrapper blockquote > :last-child { margin-bottom: 0; }
+
+#wrapper q {
+	color: #d5896f;
+}
+
+#wrapper code,
+#wrapper kbd,
+#wrapper samp,
+#wrapper tt {
+	font-family: Menlo, monospace;
+	font-size: 0.86em;
+	background: #04395e;
+	color: #dab785;
+	padding: 0.1em 0.35em;
+	border-radius: 3px;
+}
+
+#wrapper kbd {
+	border: 1px solid #70a288;
+	border-bottom-width: 2px;
+}
+
+#wrapper pre {
+	background: #04395e;
+	color: #dab785;
+	padding: 0.9em 1em;
+	overflow: auto;
+	border-radius: 4px;
+	font-family: Menlo, monospace;
+	font-size: 0.86em;
+	line-height: 1.45;
+}
+
+#wrapper pre code {
+	background: transparent;
+	padding: 0;
+	font-size: 1em;
+}
+
+#wrapper .math,
+#wrapper span.math {
+	color: #d5896f;
+	background: #70a28833;
+	padding: 0.05em 0.3em;
+	border-radius: 3px;
+}
+
+#wrapper ul,
+#wrapper ol {
+	padding-left: 1.4em;
+}
+
+#wrapper ul ul,
+#wrapper ul ol,
+#wrapper ol ul,
+#wrapper ol ol {
+	margin: 0.3em 0;
+}
+
+#wrapper li::marker {
+	color: #d5896f;
+}
+
+#wrapper li + li {
+	margin-top: 0.25em;
+}
+
+#wrapper dt {
+	font-family: "Avenir Next", Avenir, "Helvetica Neue", sans-serif;
+	font-weight: 600;
+	color: #d5896f;
+	margin-top: 0.8em;
+}
+
+#wrapper dd {
+	margin: 0.2em 0 0.6em 1.2em;
+	color: #dab785;
+}
+
+#wrapper table {
+	border-collapse: collapse;
+	width: 100%;
+	background: #04395e55;
+	color: #70a288;
+	font-size: 0.92em;
+}
+
+#wrapper caption {
+	caption-side: bottom;
+	padding-top: 0.5em;
+	font-size: 0.85em;
+	color: #70a288;
+	text-align: left;
+}
+
+#wrapper th,
+#wrapper td {
+	border: 1px solid #04395e;
+	padding: 0.4em 0.7em;
+	text-align: left;
+	vertical-align: top;
+}
+
+#wrapper th {
+	font-family: "Avenir Next", Avenir, "Helvetica Neue", sans-serif;
+	font-weight: 600;
+	color: #d5896f;
+	background: #04395e;
+}
+
+#wrapper hr {
+	border: 0;
+	border-top: 1px solid #04395e;
+	margin: 2em 0;
+}
+
+#wrapper img {
+	max-width: 100%;
+	height: auto;
+}
+
+#wrapper figure {
+	margin-left: 0;
+	margin-right: 0;
+}
+
+#wrapper figcaption {
+	font-family: "Avenir Next", Avenir, "Helvetica Neue", sans-serif;
+	font-size: 0.85em;
+	color: #70a288;
+	margin-top: 0.4em;
+}
+
+#wrapper .metadata {
+	background: #04395e;
+	color: #dab785;
+	padding: 0.6em 0.8em;
+	border-radius: 4px;
+	font-family: "Avenir Next", Avenir, "Helvetica Neue", sans-serif;
+	font-size: 0.85em;
+}
+
+#wrapper .footnotes {
+	margin-top: 2em;
+	border-top: 1px solid #04395e;
+	padding-top: 0.8em;
+	font-size: 0.9em;
+	color: #70a288;
+}
+
+#wrapper a.footnote,
+#wrapper .footnotes a {
+	color: #70a288;
+}

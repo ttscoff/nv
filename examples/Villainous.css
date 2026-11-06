@@ -1,0 +1,311 @@
+/*
+	Villainous
+	Preview for the Villainous theme.
+*/
+
+body {
+	margin: 0;
+	background: #061316;
+	color: #e9d8a6;
+}
+
+#wrapper {
+	box-sizing: border-box;
+	max-width: 42em;
+	margin: 0 auto;
+	padding: 2.6em 2.4em 4.5em;
+	background: #0c1e22;
+	color: #e9d8a6;
+	font-family: "Iowan Old Style", Palatino, Georgia, serif;
+	font-size: 18px;
+	line-height: 1.55;
+}
+
+#wrapper ::selection {
+	background: #bb3e0366;
+	color: #e9d8a6;
+}
+
+#wrapper h1,
+#wrapper h2,
+#wrapper h3,
+#wrapper h4,
+#wrapper h5,
+#wrapper h6 {
+	font-family: "Avenir Next", Avenir, "Helvetica Neue", sans-serif;
+	font-weight: 600;
+	line-height: 1.2;
+	margin: 1.5em 0 0.4em;
+}
+
+#wrapper h1 { color: #ee9b00; font-size: 1.9em; }
+#wrapper h2 { color: #ca6702; font-size: 1.45em; }
+#wrapper h3 { color: #94d2bd; font-size: 1.2em; }
+#wrapper h4 { color: #e9d8a6; font-size: 1.05em; }
+#wrapper h5 { color: #94d2bd; font-size: 0.95em; }
+#wrapper h6 { color: #0a9396; font-size: 0.85em; letter-spacing: 0.04em; }
+
+#wrapper h1:first-child,
+#wrapper h2:first-child,
+#wrapper h3:first-child {
+	margin-top: 0;
+}
+
+#wrapper p,
+#wrapper ul,
+#wrapper ol,
+#wrapper dl,
+#wrapper blockquote,
+#wrapper pre,
+#wrapper table,
+#wrapper figure {
+	margin: 0 0 1em;
+}
+
+#wrapper a {
+	color: #94d2bd;
+	text-decoration-color: #0a9396;
+	text-underline-offset: 0.15em;
+}
+
+#wrapper a:hover {
+	color: #ee9b00;
+}
+
+#wrapper strong,
+#wrapper b {
+	font-weight: 700;
+	color: #f6f0dc;
+}
+
+#wrapper em,
+#wrapper i,
+#wrapper dfn,
+#wrapper cite {
+	font-style: italic;
+}
+
+#wrapper small {
+	font-size: 0.85em;
+	color: #94d2bd;
+}
+
+#wrapper mark {
+	background: #ee9b0033;
+	color: #ee9b00;
+}
+
+#wrapper del {
+	background: #9b2226;
+	color: #e9d8a6;
+	text-decoration: line-through;
+}
+
+#wrapper ins {
+	color: #94d2bd;
+	text-decoration: none;
+}
+
+#wrapper span.critic.comment {
+	color: #0a9396;
+}
+
+#wrapper span.critic.comment::before {
+	content: "{>> ";
+}
+
+#wrapper span.critic.comment::after {
+	content: " <<}";
+}
+
+#wrapper span.critic.substitution {
+	color: #ca6702;
+}
+
+#wrapper sup,
+#wrapper sub {
+	font-size: 0.75em;
+	line-height: 0;
+	position: relative;
+}
+
+#wrapper sup { top: -0.4em; }
+#wrapper sub { bottom: -0.2em; }
+
+#wrapper abbr {
+	color: #94d2bd;
+	text-decoration: underline dotted;
+	text-underline-offset: 0.15em;
+}
+
+#wrapper var {
+	color: #94d2bd;
+	font-style: normal;
+	font-family: Menlo, monospace;
+	font-size: 0.9em;
+}
+
+#wrapper blockquote {
+	margin-left: 0;
+	padding: 0.4em 1em;
+	background: #005f7333;
+	border-left: 3px solid #0a9396;
+	color: #e9d8a6;
+}
+
+#wrapper blockquote > :first-child { margin-top: 0; }
+#wrapper blockquote > :last-child { margin-bottom: 0; }
+
+#wrapper q {
+	color: #ee9b00;
+}
+
+#wrapper code,
+#wrapper kbd,
+#wrapper samp,
+#wrapper tt {
+	font-family: Menlo, monospace;
+	font-size: 0.86em;
+	background: #061316;
+	color: #94d2bd;
+	padding: 0.1em 0.35em;
+	border-radius: 3px;
+}
+
+#wrapper kbd {
+	border: 1px solid #005f73;
+	border-bottom-width: 2px;
+}
+
+#wrapper pre {
+	background: #061316;
+	color: #94d2bd;
+	padding: 0.9em 1em;
+	overflow: auto;
+	border-radius: 4px;
+	font-family: Menlo, monospace;
+	font-size: 0.86em;
+	line-height: 1.45;
+}
+
+#wrapper pre code {
+	background: transparent;
+	padding: 0;
+	font-size: 1em;
+}
+
+#wrapper .math,
+#wrapper span.math {
+	color: #ee9b00;
+	background: #bb3e0333;
+	padding: 0.05em 0.3em;
+	border-radius: 3px;
+}
+
+#wrapper ul,
+#wrapper ol {
+	padding-left: 1.4em;
+}
+
+#wrapper ul ul,
+#wrapper ul ol,
+#wrapper ol ul,
+#wrapper ol ol {
+	margin: 0.3em 0;
+}
+
+#wrapper li::marker {
+	color: #ee9b00;
+}
+
+#wrapper li + li {
+	margin-top: 0.25em;
+}
+
+#wrapper dt {
+	font-family: "Avenir Next", Avenir, "Helvetica Neue", sans-serif;
+	font-weight: 600;
+	color: #ee9b00;
+	margin-top: 0.8em;
+}
+
+#wrapper dd {
+	margin: 0.2em 0 0.6em 1.2em;
+	color: #e9d8a6;
+}
+
+#wrapper table {
+	border-collapse: collapse;
+	width: 100%;
+	background: #005f7344;
+	color: #94d2bd;
+	font-size: 0.92em;
+}
+
+#wrapper caption {
+	caption-side: bottom;
+	padding-top: 0.5em;
+	font-size: 0.85em;
+	color: #94d2bd;
+	text-align: left;
+}
+
+#wrapper th,
+#wrapper td {
+	border: 1px solid #005f73;
+	padding: 0.4em 0.7em;
+	text-align: left;
+	vertical-align: top;
+}
+
+#wrapper th {
+	font-family: "Avenir Next", Avenir, "Helvetica Neue", sans-serif;
+	font-weight: 600;
+	color: #ee9b00;
+	background: #005f7355;
+}
+
+#wrapper hr {
+	border: 0;
+	border-top: 1px solid #005f73;
+	margin: 2em 0;
+}
+
+#wrapper img {
+	max-width: 100%;
+	height: auto;
+}
+
+#wrapper figure {
+	margin-left: 0;
+	margin-right: 0;
+}
+
+#wrapper figcaption {
+	font-family: "Avenir Next", Avenir, "Helvetica Neue", sans-serif;
+	font-size: 0.85em;
+	color: #94d2bd;
+	margin-top: 0.4em;
+}
+
+#wrapper .metadata {
+	background: #005f73;
+	color: #e9d8a6;
+	padding: 0.6em 0.8em;
+	border-radius: 4px;
+	font-family: "Avenir Next", Avenir, "Helvetica Neue", sans-serif;
+	font-size: 0.85em;
+}
+
+#wrapper .footnotes {
+	margin-top: 2em;
+	border-top: 1px solid #005f73;
+	padding-top: 0.8em;
+	font-size: 0.9em;
+	color: #94d2bd;
+}
+
+#wrapper a.footnote,
+#wrapper .footnotes a {
+	color: #94d2bd;
+}

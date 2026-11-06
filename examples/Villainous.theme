@@ -1,0 +1,173 @@
+{
+    "comment" : "Villainous.",
+
+    "darkWindow" : true,
+    "lightWindow" : false,
+    "transparentTitlebar" : true,
+
+    "windowBackgroundColor" : "#061316",
+    "backgroundColor" : "#061316",
+    "foregroundColor" : "#e9d8a6",
+    "caretColor" : "#ee9b00",
+    "selectionBackgroundColor" : "#bb3e0366",
+
+    "searchField" : {
+        "foregroundColor" : "#e9d8a6",
+        "backgroundColor" : "#061316"
+    },
+
+    "tableView" : {
+        "fontName" : "Avenir",
+        "fontSize" : 14,
+        "rowHeight" : 34,
+        "drawBorder" : false,
+        "drawFocusRing": false
+    },
+
+    "tableViewHighlighted" : {
+        "backgroundColor" : "#9b2226",
+        "foregroundColor" : "#e9d8a6"
+    },
+
+    "tableViewInactive" : {
+        "backgroundColor" : "#ae2012",
+        "foregroundColor" : "#e9d8a6"
+    },
+
+    "textView" : {
+        "backgroundColor" : "#0c1e22",
+        "foregroundColor" : "#e9d8a6",
+        "caretColor" : "#ee9b00"
+    },
+
+    "strong" : {
+        "bold" : 1,
+        "foregroundColor" : "#f6f0dc"
+    },
+    "emphasis" : {
+        "italic" : 1
+    },
+    "superscript" : {
+        "superscript" : 1
+    },
+    "subscript" : {
+        "superscript" : -1
+    },
+    "criticAddition" : {
+        "foregroundColor" : "#94d2bd"
+    },
+    "criticDeletion" : {
+        "foregroundColor" : "#e9d8a6",
+        "backgroundColor" : "#9b2226"
+    },
+    "criticSubstitution" : {
+        "foregroundColor" : "#ca6702"
+    },
+    "criticHighlight" : {
+        "foregroundColor" : "#ee9b00"
+    },
+    "criticComment" : {
+        "foregroundColor" : "#0a9396"
+    },
+    "blockquote" : {
+        "backgroundColor" : "#005f7333",
+        "foregroundColor" : "#e9d8a6"
+    },
+    "codeBlock" : {
+        "backgroundColor" : "#061316",
+        "foregroundColor" : "#94d2bd",
+        "fontName" : "Menlo",
+        "fontScale" : 0.92,
+        "textAlignment" : 1
+    },
+    "codeSpan" : {
+        "fontName" : "Menlo",
+        "fontScale" : 0.92,
+        "backgroundColor" : "#061316",
+        "foregroundColor" : "#94d2bd",
+        "mono" : 1
+    },
+    "heading" : {
+        "bold" : 1,
+        "foregroundColor" : "#ee9b00"
+    },
+    "heading1" : {
+        "foregroundColor" : "#ee9b00",
+        "fontScale" : 1.4
+    },
+    "heading2" : {
+        "foregroundColor" : "#ca6702",
+        "fontScale" : 1.2
+    },
+    "heading3" : {
+        "foregroundColor" : "#94d2bd",
+        "fontScale" : 1.1
+    },
+    "math" : {
+        "foregroundColor" : "#ee9b00",
+        "backgroundColor" : "#bb3e0333"
+    },
+    "table" : {
+        "backgroundColor" : "#005f7344",
+        "foregroundColor" : "#94d2bd"
+    },
+    "pairs" : {
+        "foregroundColor" : "#0a9396"
+    },
+    "parens" : {
+        "foregroundColor" : "#e9d8a6"
+    },
+    "braces" : {
+        "foregroundColor" : "#e9d8a6"
+    },
+    "linkParens" : {
+        "foregroundColor" : "#0a9396",
+        "markupForegroundColor": "#ee9b00"
+    },
+    "quoteDouble" : {
+        "foregroundColor" : "#ee9b00"
+    },
+    "quoteSingle" : {
+        "foregroundColor" : "#ee9b00"
+    },
+    "footnote" : {
+        "foregroundColor" : "#94d2bd"
+    },
+    "abbreviation" : {
+        "foregroundColor" : "#94d2bd"
+    },
+    "citation" : {
+        "foregroundColor" : "#94d2bd"
+    },
+    "glossary" : {
+        "foregroundColor" : "#94d2bd"
+    },
+    "definition" : {
+        "foregroundColor" : "#94d2bd"
+    },
+    "variable" : {
+        "foregroundColor" : "#94d2bd"
+    },
+    "markup" : {
+        "foregroundColor" : "#ca6702"
+    },
+    "metadata" : {
+        "backgroundColor" : "#005f73",
+        "foregroundColor" : "#e9d8a6"
+    },
+    "definitionAbbreviation" : {
+        "foregroundColor" : "#ee9b00"
+    },
+    "definitionCitation" : {
+        "foregroundColor" : "#ee9b00"
+    },
+    "definitionFootnote" : {
+        "foregroundColor" : "#ee9b00"
+    },
+    "definitionGlossary" : {
+        "foregroundColor" : "#ee9b00"
+    },
+    "definitionLink" : {
+        "foregroundColor" : "#ee9b00"
+    }
+}
