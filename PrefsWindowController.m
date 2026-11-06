@@ -466,6 +466,47 @@
 	[listPopup release];
 }
 
+- (void)addEnterInListControl {
+	if (!editingView || [editingView viewWithTag:7330])
+		return;
+	CGFloat extra = 28.0;
+	NSArray *subviews = [[editingView subviews] copy];
+	NSMutableArray *savedMasks = [[NSMutableArray alloc] initWithCapacity:[subviews count]];
+	for (NSView *subview in subviews) {
+		[savedMasks addObject:[NSNumber numberWithUnsignedInteger:[subview autoresizingMask]]];
+		[subview setAutoresizingMask:NSViewNotSizable];
+	}
+	for (NSView *subview in subviews) {
+		NSRect frame = [subview frame];
+		frame.origin.y += extra;
+		[subview setFrame:frame];
+	}
+	NSRect viewFrame = [editingView frame];
+	viewFrame.size.height += extra;
+	[editingView setFrame:viewFrame];
+	NSUInteger maskIndex = 0;
+	for (NSView *subview in subviews)
+		[subview setAutoresizingMask:[[savedMasks objectAtIndex:maskIndex++] unsignedIntegerValue]];
+	[savedMasks release];
+	[subviews release];
+
+	NSButton *button = [[NSButton alloc] initWithFrame:NSMakeRect(18, 6, 330, 18)];
+	[button setButtonType:NSButtonTypeSwitch];
+	[button setTitle:NSLocalizedString(@"Enter in list renames note", @"Editing settings checkbox")];
+	[button setFont:[NSFont systemFontOfSize:[NSFont systemFontSize]]];
+	[button setTag:7330];
+	[button setTarget:self];
+	[button setAction:@selector(changedEnterInListRenamesNote:)];
+	[button setState:[prefsController enterInListRenamesNote]];
+	[button setAutoresizingMask:NSViewMaxYMargin | NSViewMaxXMargin];
+	[editingView addSubview:button];
+	[button release];
+}
+
+- (IBAction)changedEnterInListRenamesNote:(id)sender {
+	[prefsController setEnterInListRenamesNote:[sender state] sender:self];
+}
+
 - (IBAction)changedMarkdownMarker:(id)sender {
 	NSString *value = [[sender selectedItem] representedObject];
 	NSInteger tag = [sender tag];
@@ -783,6 +824,7 @@
     [self addListFontControls];
     [self addThemeControls];
     [self addMarkdownMarkerControls];
+    [self addEnterInListControl];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(themesDidChange:) name:NVThemesDidChangeNotification object:nil];
     [self previewNoteBodyFont];
 	[appShortcutField setStringValue:[[prefsController appActivationKeyCombo] description]];

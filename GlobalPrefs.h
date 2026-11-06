@@ -110,6 +110,9 @@ BOOL ColorsEqualWith8BitChannels(NSColor *c1, NSColor *c2);
 - (void)setTabIndenting:(BOOL)value sender:(id)sender;
 - (BOOL)tabKeyIndents;
 
+- (void)setEnterInListRenamesNote:(BOOL)value sender:(id)sender;
+- (BOOL)enterInListRenamesNote;
+
 //- (void)setUseTextReplacement:(BOOL)value sender:(id)sender;
 //- (BOOL)useTextReplacement;
 

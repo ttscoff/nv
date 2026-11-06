@@ -217,6 +217,8 @@ static BOOL nvApplyingWindowChrome;
                   andMaxDimension:600.0];
     [notesSubview setCanCollapse:YES];
     [notesSubview setAutoresizesSubviews:YES];
+    if ([notesSubview respondsToSelector:@selector(setClipsToBounds:)])
+        [notesSubview setClipsToBounds:YES];
     [notesSubview addSubview:notesScrollView];
     splitSubview = [[splitView subviewAtPosition:1] retain];
     [notesScrollView setFrame:[notesSubview frame]];
@@ -224,6 +226,8 @@ static BOOL nvApplyingWindowChrome;
     [splitSubview setMinDimension:1 andMaxDimension:0];
     [splitSubview setCanCollapse:NO];
     [splitSubview setAutoresizesSubviews:YES];
+    if ([splitSubview respondsToSelector:@selector(setClipsToBounds:)])
+        [splitSubview setClipsToBounds:YES];
     [splitSubview addSubview:textScrollView];
     
     id docView = [[textScrollView documentView] retain];
@@ -816,6 +820,7 @@ terminateApp:
     if (horiz) {
         [splitSubview setMinDimension:100.0 andMaxDimension:0.0];
     }
+    [notesScrollView setHidden:[notesSubview isCollapsed]];
 }
 
 - (IBAction)switchViewLayout:(id)sender {
@@ -2727,6 +2732,8 @@ static NSURL *NVHTTPURLFromImportString(NSString *entered) {
 
 - (void)splitView:(RBSplitView*)sender didCollapse:(RBSplitSubview*)subview{
     if(!splitViewIsChangingLayout){
+        if (subview == notesSubview)
+            [notesScrollView setHidden:YES];
         [splitView setDividerThickness: kSplitViewCollapsedDividerThickness];
         [window makeFirstResponder:textView];
         [splitView adjustSubviews];
@@ -2746,6 +2753,8 @@ static NSURL *NVHTTPURLFromImportString(NSString *entered) {
 
 - (void)splitView:(RBSplitView*)sender didExpand:(RBSplitSubview*)subview{
     if(!splitViewIsChangingLayout){
+        if (subview == notesSubview)
+            [notesScrollView setHidden:NO];
         [splitView setDividerThickness:kSplitViewExpandedDividerThickness];
         [splitView adjustSubviews];
         [mainView setNeedsDisplay:YES];

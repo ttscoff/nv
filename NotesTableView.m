@@ -21,6 +21,7 @@
 #import "NoteAttributeColumn.h"
 #import "ExternalEditorListController.h"
 #import "GlobalPrefs.h"
+#import "ListEnter.h"
 #import "NotationPrefs.h"
 #import "NoteObject.h"
 #import "NSCollection_utils.h"
@@ -893,7 +894,7 @@ static void _CopyItemWithSelectorFromMenu(NSMenu *destMenu, NSMenu *sourceMenu, 
 		NSInteger sel = [self selectedRow];
 		if (sel < (unsigned)[self numberOfRows] && [self numberOfSelectedRows] == 1) {
 			NSInteger colIndex = [self columnWithIdentifier:NoteTitleColumnString];
-			if (colIndex > -1) {
+			if (NVListEnterStartsRename([globalPrefs enterInListRenamesNote], colIndex > -1)) {
 				[self editColumn:colIndex row:sel withEvent:theEvent select:YES];
 			} else {
 				[[self window] selectNextKeyView:self];

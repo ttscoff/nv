@@ -53,6 +53,7 @@ static NSString *CheckSpellingInNoteBodyKey = @"CheckSpellingInNoteBody";
 static NSString *TextReplacementInNoteBodyKey = @"TextReplacementInNoteBody";
 static NSString *QuitWhenClosingMainWindowKey = @"QuitWhenClosingMainWindow";
 static NSString *TabKeyIndentsKey = @"TabKeyIndents";
+static NSString *EnterInListRenamesNoteKey = @"EnterInListRenamesNote";
 static NSString *PastePreservesStyleKey = @"PastePreservesStyle";
 static NSString *AutoFormatsDoneTagKey = @"AutoFormatsDoneTag";
 static NSString *AutoFormatsListBulletsKey = @"AutoFormatsListBullets";
@@ -140,6 +141,7 @@ static void sendCallbacksForGlobalPrefs(GlobalPrefs* self, SEL selector, id orig
 			[NSNumber numberWithInteger:4], NumberOfSpacesInTabKey,
 			[NSNumber numberWithBool:YES], PastePreservesStyleKey,
 			[NSNumber numberWithBool:YES], TabKeyIndentsKey,
+			[NSNumber numberWithBool:YES], EnterInListRenamesNoteKey,
 			[NSNumber numberWithBool:YES], ConfirmNoteDeletionKey,
 			[NSNumber numberWithBool:YES], CheckSpellingInNoteBodyKey, 
             [NSNumber numberWithBool:NO], TextReplacementInNoteBodyKey,
@@ -654,6 +656,14 @@ static NSString *NVAllowedMarker(NSString *stored, NSString *allowed, NSString *
         return NO;
     }
 	return [defaults boolForKey:UseFinderTagsKey];
+}
+
+- (void)setEnterInListRenamesNote:(BOOL)value sender:(id)sender {
+	[defaults setBool:value forKey:EnterInListRenamesNoteKey];
+}
+
+- (BOOL)enterInListRenamesNote {
+	return [defaults boolForKey:EnterInListRenamesNoteKey];
 }
 
 - (void)setSoftTabs:(BOOL)value sender:(id)sender {

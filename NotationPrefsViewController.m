@@ -29,6 +29,7 @@
 #import "PassphraseChanger.h"
 #import "NSFileManager_NV.h"
 #import "AppController.h"
+#import "MarkdownButtonLayout.h"
 
 @implementation FileKindListView 
 
@@ -258,22 +259,50 @@ enum {VERIFY_NOT_ATTEMPTED, VERIFY_FAILED, VERIFY_IN_PROGRESS, VERIFY_SUCCESS};
 }
 
 - (void)addMarkdownConversionButton {
-	NSView *storageView = [storageFormatPopupButton superview];
+	NSButton *anchor = confirmFileDeletionButton;
+	NSView *storageView = [anchor superview];
 	if (!storageView || [storageView viewWithTag:7301])
 		return;
 	NSButton *button = [[NSButton alloc] initWithFrame:NSZeroRect];
 	[button setBezelStyle:NSBezelStyleRounded];
 	[button setButtonType:NSButtonTypeMomentaryPushIn];
 	[button setTitle:NSLocalizedString(@"Convert to Markdown", @"Notes storage button")];
+	[[button cell] setWraps:NO];
+	[[button cell] setLineBreakMode:NSLineBreakByTruncatingTail];
 	[button setTag:7301];
 	[button setTarget:self];
 	[button setAction:@selector(convertNotesToMarkdown:)];
 	[button sizeToFit];
-	NSRect frame = [button frame];
-	frame.origin = NSMakePoint(42, 14);
-	frame.size.width = MAX(frame.size.width + 16, 180);
-	[button setFrame:frame];
+
+	NSRect checkbox = [anchor frame];
+	CGFloat upperSlack = NSHeight([storageView bounds]);
+	for (NSView *subview in [storageView subviews]) {
+		if (NSMinY([subview frame]) + 0.5 < NSMinY(checkbox))
+			continue;
+		CGFloat room = NSHeight([storageView bounds]) - NSMaxY([subview frame]);
+		if (room < upperSlack)
+			upperSlack = room;
+	}
+	NSRect fitted = [button frame];
+	CGFloat maxWidth = NSWidth([storageView bounds]) - NSMinX(checkbox) - 8.0;
+	CGFloat width = MAX(ceil(fitted.size.width + 16.0), 180.0);
+	if (maxWidth >= 120.0 && width > maxWidth)
+		width = maxWidth;
+	CGFloat shift = 0.0;
+	NSRect frame = NVMarkdownConversionButtonFrame(checkbox, width, fitted.size.height, upperSlack, &shift);
+	if (shift > 0.0) {
+		for (NSView *subview in [storageView subviews]) {
+			NSRect subFrame = [subview frame];
+			if (NSMinY(subFrame) + 0.5 < NSMinY(checkbox))
+				continue;
+			subFrame.origin.y += shift;
+			[subview setFrame:subFrame];
+		}
+	}
+	[button setFrame:NSIntegralRect(frame)];
 	[button setAutoresizingMask:NSViewMaxXMargin | NSViewMaxYMargin];
+	if (@available(macOS 14.0, *))
+		[button setClipsToBounds:YES];
 	[storageView addSubview:button];
 	[button release];
 }
