@@ -843,9 +843,8 @@ terminateApp:
 	[notesTableView makeFirstPreviouslyVisibleRowVisibleIfNecessary];
 	
 	[self updateNoteMenus];
-    
-	[notesTableView setBackgroundColor:backgrndColor];
-	[notesTableView setNeedsDisplay];
+	[self applyNotesListChrome];
+	[self alignSearchFieldWithEditor];
 }
 
 - (void)createFromSelection:(NSPasteboard *)pboard userData:(NSString *)userData error:(NSString **)error {
@@ -2498,14 +2497,6 @@ static NSURL *NVHTTPURLFromImportString(NSString *entered) {
 
 #pragma mark SplitView Delegate methods
 
-- (void)nv_pinViewLeftEdge:(NSView *)view {
-	// Fixed left margin, flexible width: window resize grows the right edge only.
-	NSUInteger mask = [view autoresizingMask];
-	mask &= ~(NSViewMinXMargin | NSViewMaxXMargin);
-	mask |= NSViewWidthSizable;
-	[view setAutoresizingMask:mask];
-}
-
 - (void)alignSearchFieldWithEditor {
 	static BOOL aligning = NO;
 	if (aligning || !field || !splitView || !notesSubview || !window)
@@ -2523,31 +2514,52 @@ static NSURL *NVHTTPURLFromImportString(NSString *entered) {
 	NSRect titlebarInWindow = [titlebar convertRect:[titlebar bounds] toView:nil];
 	CGFloat right = NSMaxX(titlebarInWindow) - 6.0;
 	CGFloat left = NSMinX(titlebarInWindow);
-	if ([splitView isVertical] && ![notesSubview isCollapsed]) {
-		NSRect listInWindow = [notesSubview convertRect:[notesSubview bounds] toView:nil];
-		left = NSMaxX(listInWindow);
-	}
 	NSButton *zoomButton = [window standardWindowButton:NSWindowZoomButton];
 	if (zoomButton && [zoomButton superview]) {
 		NSRect zoomInWindow = [[zoomButton superview] convertRect:[zoomButton frame] toView:nil];
-		CGFloat minLeft = ceil(NSMaxX(zoomInWindow) + 4.0);
-		if (minLeft > NSMinX(titlebarInWindow) && minLeft < NSMaxX(titlebarInWindow) * 0.5 && left < minLeft)
+		CGFloat minLeft = ceil(NSMaxX(zoomInWindow) + 8.0);
+		if (minLeft > left && minLeft < right)
 			left = minLeft;
+	}
+	BOOL notesBesideEditor = [splitView isVertical] && ![notesSubview isCollapsed];
+	if (notesBesideEditor) {
+		NSRect listInWindow = [notesSubview convertRect:[notesSubview bounds] toView:nil];
+		if (NSMaxX(listInWindow) > left)
+			left = NSMaxX(listInWindow);
+	} else if ([[window title] length]) {
+		/* Inline title, just after the traffic lights. The measured string is
+		   narrower than the drawn title, so the extra gap keeps the field off the last letter. */
+		NSFont *titleFont = [NSFont titleBarFontOfSize:0.0];
+		NSSize titleSize = [[window title] sizeWithAttributes:[NSDictionary dictionaryWithObject:titleFont forKey:NSFontAttributeName]];
+		left += ceil(titleSize.width) + 36.0;
 	}
 	left = round(left);
 	if (right - left < 50.0)
 		return;
 
+	/* Match the traffic-light row so later titlebar layout leaves the field where it is. */
+	CGFloat fieldHeight = NSHeight([container bounds]);
+	CGFloat y = NSMinY(titlebarInWindow);
+	NSButton *closeButton = [window standardWindowButton:NSWindowCloseButton];
+	if (closeButton && [closeButton superview]) {
+		NSRect closeInWindow = [[closeButton superview] convertRect:[closeButton frame] toView:nil];
+		y = NSMidY(closeInWindow) - (fieldHeight / 2.0);
+	}
+	y = round(y);
+
 	NSRect containerInWindow = [container convertRect:[container bounds] toView:nil];
 	BOOL alreadyPinned = [container superview] == titlebar
 		&& fabs(NSMinX(containerInWindow) - left) <= 0.5
 		&& fabs(NSMaxX(containerInWindow) - right) <= 0.5
+		&& fabs(NSMinY(containerInWindow) - y) <= 0.5
 		&& fabs(NSMinX([field frame])) <= 0.5
 		&& fabs(NSWidth([field frame]) - NSWidth([container bounds])) <= 0.5;
 	if (alreadyPinned)
 		return;
 
 	aligning = YES;
+	if ([window respondsToSelector:@selector(setTitleVisibility:)])
+		[window setTitleVisibility:NSWindowTitleVisible];
 	// The toolbar item slot cannot start left of the title. Host the field in the
 	// titlebar itself so its left edge can sit on the notes list.
 	if ([container superview] != titlebar) {
@@ -2562,14 +2574,16 @@ static NSURL *NVHTTPURLFromImportString(NSString *entered) {
 		[titlebar addSubview:container];
 		[container release];
 	}
+	/* The titlebar's own constraints were resizing this view between passes. */
+	[container setTranslatesAutoresizingMaskIntoConstraints:NO];
+	[container setAutoresizingMask:NSViewNotSizable];
 
-	NSRect desired = NSMakeRect(left, NSMinY(containerInWindow), right - left, NSHeight(containerInWindow));
+	NSRect desired = NSMakeRect(left, y, right - left, fieldHeight);
 	NSRect frame = [titlebar convertRect:desired fromView:nil];
 	frame.origin.x = round(frame.origin.x);
 	frame.origin.y = round(frame.origin.y);
 	frame.size.width = round(NSWidth(frame));
 	[container setFrame:frame];
-	[self nv_pinViewLeftEdge:container];
 
 	NSRect fieldFrame = [field frame];
 	fieldFrame.origin.x = 0.0;
@@ -2744,14 +2758,18 @@ static NSURL *NVHTTPURLFromImportString(NSString *entered) {
 - (void)tableView:(NSTableView *)aTableView willDisplayCell:(id)aCell forTableColumn:(NSTableColumn *)aTableColumn row:(NSInteger)rowIndex {
     if (aTableView==notesTableView) {
         NVEditorTheme *listTheme = [[NVThemeManager sharedManager] currentEditorTheme];
+        /* Stacked layout draws its own selection and does not mark the cell highlighted. */
+        BOOL rowIsSelected = [aCell isHighlighted] || [notesTableView isRowSelected:rowIndex];
+        if (rowIsSelected && ![aCell isHighlighted])
+            [aCell setHighlighted:YES];
         BOOL rowIsFocused = ([window firstResponder]==notesTableView)||(isEditing&&([notesTableView editedRow]==rowIndex))||([notesTableView nv_tagEditingRow]==rowIndex);
         NSColor *rowColor = foregrndColor;
         if (listTheme) {
-            if ([aCell isHighlighted])
+            if (rowIsSelected)
                 rowColor = rowIsFocused ? [listTheme listSelectionForegroundColor] : [listTheme listInactiveSelectionForegroundColor];
             else
                 rowColor = [listTheme listForegroundColor] ?: foregrndColor;
-        } else if ([aCell isHighlighted]) {
+        } else if (rowIsSelected) {
             if (rowIsFocused) {//([notesTableView rowHeight]>30.0)||
                 [aCell setTextColor:[NSColor whiteColor]];
                 return;
@@ -2770,7 +2788,7 @@ static NSURL *NVHTTPURLFromImportString(NSString *entered) {
         if (listTheme && rowColor && [shown length]) {
             NSMutableAttributedString *colored = [shown mutableCopy];
             NSRange titleRange = [[colored string] rangeOfString:@"\n"];
-            if ([aCell isHighlighted] || titleRange.location == NSNotFound) {
+            if (rowIsSelected || titleRange.location == NSNotFound) {
                 [colored addAttribute:NSForegroundColorAttributeName value:rowColor range:NSMakeRange(0, [colored length])];
             } else {
                 [colored addAttribute:NSForegroundColorAttributeName value:rowColor range:NSMakeRange(0, titleRange.location)];
@@ -2924,6 +2942,8 @@ static NSURL *NVHTTPURLFromImportString(NSString *entered) {
     //        [[NSUserDefaults standardUserDefaults] setBool:!isVis forKey:@"ToolbarHidden"];
     if (isVis) {
         [window setTitle:@"nvALT"];
+        if ([window respondsToSelector:@selector(setTitleVisibility:)])
+            [window setTitleVisibility:NSWindowTitleVisible];
         if (currentNote&&(![[field stringValue]isEqualToString:titleOfNote(currentNote)]))
             [field setStringValue:titleOfNote(currentNote)];
         
@@ -2933,6 +2953,8 @@ static NSURL *NVHTTPURLFromImportString(NSString *entered) {
     }else{
         if (currentNote)
             [window setTitle:titleOfNote(currentNote)];
+        if ([window respondsToSelector:@selector(setTitleVisibility:)])
+            [window setTitleVisibility:NSWindowTitleVisible];
         
         
         [window setInitialFirstResponder:textView];
@@ -3187,28 +3209,36 @@ static NSURL *NVHTTPURLFromImportString(NSString *entered) {
         [self updateColorScheme];
     }
     
+- (void)applyNotesListChrome {
+    if ([notesTableView respondsToSelector:@selector(setStyle:)])
+        [notesTableView setStyle:[prefsController horizontalLayout] ? NSTableViewStyleAutomatic : NSTableViewStylePlain];
+    NVEditorTheme *listTheme = [[NVThemeManager sharedManager] currentEditorTheme];
+    NSColor *listBackground = listTheme ? [listTheme listBackgroundColor] : nil;
+    NSColor *listForeground = listTheme ? [listTheme listForegroundColor] : nil;
+    if (!listBackground)
+        listBackground = backgrndColor;
+    [notesTableView setBackgroundColor:listBackground];
+    NSScrollView *listScroll = [notesTableView enclosingScrollView];
+    if (listBackground && listScroll) {
+        [listScroll setBackgroundColor:listBackground];
+        [[listScroll contentView] setBackgroundColor:listBackground];
+    }
+    if (listForeground)
+        [NotesTableHeaderCell setTxtColor:listForeground];
+    else if (foregrndColor)
+        [NotesTableHeaderCell setTxtColor:foregrndColor];
+    [notesTableView setNeedsDisplay:YES];
+    [notesScrollView nv_updateScrollerChrome];
+}
+
 - (void)updateColorScheme{
     if (!IsLionOrLater) {        
         [window setBackgroundColor:backgrndColor];
         [dualFieldView setBackgroundColor:backgrndColor];
     }
     [mainView setBackgroundColor:backgrndColor];
-    [NotesTableHeaderCell setTxtColor:foregrndColor];
-    
     [notesTableView setGridColor:foregrndColor];
-    [notesTableView setBackgroundColor:backgrndColor];
-    NVEditorTheme *listTheme = [[NVThemeManager sharedManager] currentEditorTheme];
-    if (listTheme) {
-        NSColor *listBackground = [listTheme listBackgroundColor];
-        NSColor *listForeground = [listTheme listForegroundColor];
-        if (listBackground) {
-            [notesTableView setBackgroundColor:listBackground];
-            [[notesTableView enclosingScrollView] setBackgroundColor:listBackground];
-        }
-        if (listForeground)
-            [NotesTableHeaderCell setTxtColor:listForeground];
-    }
-    [notesTableView setNeedsDisplay:YES];
+    [self applyNotesListChrome];
     [notationController setForegroundTextColor:foregrndColor];
     
     [textView setBackgroundColor:backgrndColor];

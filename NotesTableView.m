@@ -309,7 +309,12 @@ static BOOL NVAppearanceIsDark(NSAppearance *appearance) {
 
 - (void)_configureAttributesForCurrentLayout {
 	BOOL horiz = [globalPrefs horizontalLayout];
-    
+
+	/* Plain style is only for the stacked list. On the side-by-side list it
+	   replaces the theme selection with the system accent. */
+	if ([self respondsToSelector:@selector(setStyle:)])
+		[self setStyle:horiz ? NSTableViewStyleAutomatic : NSTableViewStylePlain];
+
     [self setUsesAlternatingRowBackgroundColors:[globalPrefs alternatingRows]];
     [self updateGrid];
 	
@@ -324,8 +329,9 @@ static BOOL NVAppearanceIsDark(NSAppearance *appearance) {
 	}	
 	BOOL isOneRow = !horiz || (![globalPrefs tableColumnsShowPreview] && !ColumnIsSet(NoteLabelsColumn, [globalPrefs tableColumnsBitmap]));
     if (IsLeopardOrLater){
-//        [self setSelectionHighlightStyle:NSTableViewSelectionHighlightStyleRegular];
-        [self setSelectionHighlightStyle:isOneRow ? NSTableViewSelectionHighlightStyleRegular : NSTableViewSelectionHighlightStyleSourceList];
+		/* Regular draws the system accent over the theme on this layout.
+		   None lets us paint the same selection color the side-by-side list uses. */
+        [self setSelectionHighlightStyle:isOneRow ? NSTableViewSelectionHighlightStyleNone : NSTableViewSelectionHighlightStyleSourceList];
     }
 	NSLayoutManager *lm = [[NSLayoutManager alloc] init];
 	tableFontHeight = [lm defaultLineHeightForFont:font];
@@ -1668,13 +1674,36 @@ enum { kNext_Tag = 'j', kPrev_Tag = 'k' };
     }
 }
 
+- (NSColor *)nv_themedSelectionColor {
+	NVEditorTheme *listTheme = [[NVThemeManager sharedManager] currentEditorTheme];
+	if (!listTheme)
+		return nil;
+	BOOL focused = [[self window] firstResponder] == self || [self currentEditor] != nil || nvTokenField != nil;
+	return focused ? [listTheme listSelectionColor] : [listTheme listInactiveSelectionColor];
+}
+
+- (void)drawRow:(NSInteger)row clipRect:(NSRect)clipRect {
+	if ([self selectionHighlightStyle] == NSTableViewSelectionHighlightStyleNone && [self isRowSelected:row]) {
+		NSColor *fill = [self nv_themedSelectionColor];
+		if (fill) {
+			NSRect rowRect = [self rectOfRow:row];
+			rowRect.origin.x = 0.0;
+			rowRect.size.width = NSWidth([self bounds]);
+			NSRect drawRect = NSIntersectionRect(rowRect, clipRect);
+			if (!NSIsEmptyRect(drawRect)) {
+				[fill setFill];
+				NSRectFillUsingOperation(drawRect, NSCompositingOperationSourceOver);
+			}
+		}
+	}
+	[super drawRow:row clipRect:clipRect];
+}
+
 - (void)highlightSelectionInClipRect:(NSRect)clipRect{
     if (![self dataSource]) {
 		return;
 	}
-	NVEditorTheme *listTheme = [[NVThemeManager sharedManager] currentEditorTheme];
-	BOOL focused = [[self window] firstResponder] == self || [self currentEditor] != nil || nvTokenField != nil;
-	NSColor *themedFill = listTheme ? (focused ? [listTheme listSelectionColor] : [listTheme listInactiveSelectionColor]) : nil;
+	NSColor *themedFill = [self nv_themedSelectionColor];
 	if (themedFill) {
 		[themedFill setFill];
 		NSIndexSet *themedRows = [self selectedRowIndexes];
@@ -1691,6 +1720,7 @@ enum { kNext_Tag = 'j', kPrev_Tag = 'k' };
 		return;
 	}
 	/* Dark Mode's inactive selection is a dark bar. On a light list that leaves dark text on it. */
+	BOOL focused = [[self window] firstResponder] == self || [self currentEditor] != nil || nvTokenField != nil;
 	if (focused || ![self usesLightRowBackground]) {
 		[super highlightSelectionInClipRect:clipRect];
 		return;
