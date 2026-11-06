@@ -82,6 +82,7 @@ typedef struct _ViewLocationContext {
 
 - (void)restoreColumns;
 - (void)_configureAttributesForCurrentLayout;
+- (void)applySelectionHighlightStyle;
 - (void)updateHeaderViewForColumns;
 - (BOOL)eventIsTagEdit:(NSEvent*)event forColumn:(NSInteger)columnIndex row:(NSInteger)rowIndex;
 - (BOOL)lastEventActivatedTagEdit;

@@ -22,6 +22,7 @@
 #import "ExternalEditorListController.h"
 #import "GlobalPrefs.h"
 #import "ListEnter.h"
+#import "ListSelection.h"
 #import "NotationPrefs.h"
 #import "NoteObject.h"
 #import "NSCollection_utils.h"
@@ -308,6 +309,25 @@ static BOOL NVAppearanceIsDark(NSAppearance *appearance) {
 	}
 }
 
+- (void)applySelectionHighlightStyle {
+	if (!IsLeopardOrLater)
+		return;
+	BOOL horiz = [globalPrefs horizontalLayout];
+	BOOL isOneRow = !horiz || (![globalPrefs tableColumnsShowPreview] && !ColumnIsSet(NoteLabelsColumn, [globalPrefs tableColumnsBitmap]));
+	NVEditorTheme *theme = [[NVThemeManager sharedManager] currentEditorTheme];
+	BOOL hasThemeSelection = [theme listSelectionColor] != nil;
+	/* Regular draws the system accent over a theme highlight. None is only
+	   for a theme color we paint ourselves. The default theme has no color,
+	   and None then leaves white selected text on the list background. */
+	NVListSelectionStyle choice = NVListSelectionStyleForRow(isOneRow, hasThemeSelection);
+	NSTableViewSelectionHighlightStyle style = NSTableViewSelectionHighlightStyleRegular;
+	if (choice == NVListSelectionSourceList)
+		style = NSTableViewSelectionHighlightStyleSourceList;
+	else if (choice == NVListSelectionTheme)
+		style = NSTableViewSelectionHighlightStyleNone;
+	[self setSelectionHighlightStyle:style];
+}
+
 - (void)_configureAttributesForCurrentLayout {
 	BOOL horiz = [globalPrefs horizontalLayout];
 
@@ -328,12 +348,7 @@ static BOOL NVAppearanceIsDark(NSAppearance *appearance) {
 	for (i=0; i<[allColumns count]; i++) {
 		[[[allColumns objectAtIndex:i] dataCell] setFont:font];
 	}	
-	BOOL isOneRow = !horiz || (![globalPrefs tableColumnsShowPreview] && !ColumnIsSet(NoteLabelsColumn, [globalPrefs tableColumnsBitmap]));
-    if (IsLeopardOrLater){
-		/* Regular draws the system accent over the theme on this layout.
-		   None lets us paint the same selection color the side-by-side list uses. */
-        [self setSelectionHighlightStyle:isOneRow ? NSTableViewSelectionHighlightStyleNone : NSTableViewSelectionHighlightStyleSourceList];
-    }
+	[self applySelectionHighlightStyle];
 	NSLayoutManager *lm = [[NSLayoutManager alloc] init];
 	tableFontHeight = [lm defaultLineHeightForFont:font];
 	float h[4] = {(tableFontHeight * 3.0 + 5.0f), (tableFontHeight * 2.0 + 6.0f), (tableFontHeight + 2.0f), tableFontHeight + 2.0f};

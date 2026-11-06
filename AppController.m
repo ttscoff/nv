@@ -3222,6 +3222,7 @@ static NSURL *NVHTTPURLFromImportString(NSString *entered) {
 - (void)applyNotesListChrome {
     if ([notesTableView respondsToSelector:@selector(setStyle:)])
         [notesTableView setStyle:[prefsController horizontalLayout] ? NSTableViewStyleAutomatic : NSTableViewStylePlain];
+    [notesTableView applySelectionHighlightStyle];
     NVEditorTheme *listTheme = [[NVThemeManager sharedManager] currentEditorTheme];
     NSColor *listBackground = listTheme ? [listTheme listBackgroundColor] : nil;
     NSColor *listForeground = listTheme ? [listTheme listForegroundColor] : nil;
