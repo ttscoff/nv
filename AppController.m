@@ -2758,10 +2758,11 @@ static NSURL *NVHTTPURLFromImportString(NSString *entered) {
 - (void)tableView:(NSTableView *)aTableView willDisplayCell:(id)aCell forTableColumn:(NSTableColumn *)aTableColumn row:(NSInteger)rowIndex {
     if (aTableView==notesTableView) {
         NVEditorTheme *listTheme = [[NVThemeManager sharedManager] currentEditorTheme];
-        /* Stacked layout draws its own selection and does not mark the cell highlighted. */
+        /* Stacked layout paints its own selection. Leaving the cell highlighted
+           makes it draw the system accent over that fill. */
         BOOL rowIsSelected = [aCell isHighlighted] || [notesTableView isRowSelected:rowIndex];
-        if (rowIsSelected && ![aCell isHighlighted])
-            [aCell setHighlighted:YES];
+        if (rowIsSelected && [notesTableView selectionHighlightStyle] == NSTableViewSelectionHighlightStyleNone)
+            [aCell setHighlighted:NO];
         BOOL rowIsFocused = ([window firstResponder]==notesTableView)||(isEditing&&([notesTableView editedRow]==rowIndex))||([notesTableView nv_tagEditingRow]==rowIndex);
         NSColor *rowColor = foregrndColor;
         if (listTheme) {
