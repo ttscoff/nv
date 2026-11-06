@@ -1,3 +1,13 @@
+nvALT 3.0.27 (144)
+-------------------------
+
+#### FIXED
+
+- **Vertical Layout** notes list uses the theme background, selection, and text color
+- **Search field** in Vertical Layout stays in place and leaves the window title visible
+- **Vertical Layout** selected rows use the theme highlight instead of the system blue bar
+- Selected **tags** in Vertical Layout still use the selected style
+
 nvALT 3.0.26 (144)
 -------------------------
 
