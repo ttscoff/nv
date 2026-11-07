@@ -59,6 +59,9 @@
 		[self setObject:obliquenessStyle forKey:NSObliquenessAttributeName];
 	if (hiddenDoneTagStyle)
 		[self setObject:hiddenDoneTagStyle forKey:NVHiddenDoneTagAttributeName];
+	id hiddenTaskStyle = [dict objectForKey:NVHiddenTaskDoneAttributeName];
+	if (hiddenTaskStyle)
+		[self setObject:hiddenTaskStyle forKey:NVHiddenTaskDoneAttributeName];
 }
 
 - (void)applyStyleInverted:(BOOL)opposite trait:(NSFontTraitMask)trait forFont:(NSFont*)font 

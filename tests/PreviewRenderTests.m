@@ -147,6 +147,12 @@ int main(int argc, const char *argv[]) {
 	NSString *assembled = [NVPreviewHTMLPreparingContent(both, NULL, NULL, NULL) stringByAppendingString:NVPreviewRendererScripts(dir, YES, YES, NO)];
 	expectTrue([NVPreviewHTMLForDisplay(both, dir) isEqualToString:assembled], "display output is prepared content plus scripts");
 
+	NSString *tasks = @"<ul>\n<li><input type=\"checkbox\" checked=\"\" disabled=\"\" /> done</li>\n<li><input type=\"checkbox\" disabled=\"\" /> open</li>\n</ul>";
+	NSString *taskOut = NVPreviewHTMLPreparingContent(tasks, NULL, NULL, NULL);
+	expectContains(taskOut, @"<li class=\"nv-task-done\"><input type=\"checkbox\" checked=\"\" disabled=\"\" />", "prepare: a completed task is marked done");
+	expectContains(taskOut, @"<li><input type=\"checkbox\" disabled=\"\" />", "prepare: an open task stays an open checkbox");
+	expectContains(taskOut, @"text-decoration:line-through", "prepare: completed tasks are struck in the preview");
+
 	NSURL *page = [NSURL URLWithString:@"applewebdata://ABC-123"];
 	expectTrue(NVPreviewURLIsFragmentOfDocument([NSURL URLWithString:@"applewebdata://ABC-123#section-2"], page), "fragment: anchor in the same page");
 	expectTrue(NVPreviewURLIsFragmentOfDocument([NSURL URLWithString:@"applewebdata://ABC-123#a"], [NSURL URLWithString:@"applewebdata://ABC-123#b"]), "fragment: page already at another anchor");

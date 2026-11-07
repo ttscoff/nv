@@ -45,6 +45,28 @@ static BOOL NVHTMLContains(NSString *html, NSString *needle) {
 	return [html rangeOfString:needle options:NSCaseInsensitiveSearch].location != NSNotFound;
 }
 
+static NSString * const NVPreviewTaskListCSS = @"li input[type=\"checkbox\"]{margin-right:0.4em;vertical-align:text-bottom;}li.nv-task-done{text-decoration:line-through;}li.nv-task-done input{text-decoration:none;}";
+
+static void NVMarkCompletedPreviewTasks(NSMutableString *html) {
+	if (!NVHTMLContains(html, @"type=\"checkbox\""))
+		return;
+	NSRegularExpression *expression = [NSRegularExpression regularExpressionWithPattern:@"<li\\b([^>]*)>(\\s*)<input\\b(?=[^>]*\\btype=\"checkbox\")(?=[^>]*\\bchecked=)[^>]*>" options:NSRegularExpressionCaseInsensitive error:NULL];
+	if (!expression)
+		return;
+	NSArray *matches = [expression matchesInString:html options:0 range:NSMakeRange(0, [html length])];
+	NSEnumerator *reverse = [matches reverseObjectEnumerator];
+	NSTextCheckingResult *match;
+	while ((match = [reverse nextObject])) {
+		NSString *attributes = [html substringWithRange:[match rangeAtIndex:1]];
+		NSString *space = [html substringWithRange:[match rangeAtIndex:2]];
+		NSRange inputRange = NSMakeRange(NSMaxRange([match rangeAtIndex:2]), NSMaxRange([match range]) - NSMaxRange([match rangeAtIndex:2]));
+		NSString *input = [html substringWithRange:inputRange];
+		NSString *replacement = [NSString stringWithFormat:@"<li class=\"nv-task-done\"%@>%@%@", attributes, space, input];
+		[html replaceCharactersInRange:[match range] withString:replacement];
+	}
+	[html insertString:[NSString stringWithFormat:@"<style>%@</style>", NVPreviewTaskListCSS] atIndex:0];
+}
+
 NSString *NVPreviewHTMLPreparingContent(NSString *html, BOOL *needsMath, BOOL *needsMermaid, BOOL *needsWiki) {
 	if (needsMath)
 		*needsMath = NO;
@@ -65,6 +87,7 @@ NSString *NVPreviewHTMLPreparingContent(NSString *html, BOOL *needsMath, BOOL *n
 		*needsMermaid = NVHTMLContains(result, @"class=\"mermaid\"");
 	if (needsWiki)
 		*needsWiki = [result rangeOfString:@"[[" options:NSLiteralSearch].location != NSNotFound;
+	NVMarkCompletedPreviewTasks(result);
 	return result;
 }
 

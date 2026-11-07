@@ -25,6 +25,7 @@
 #import "TagSearch.h"
 #import "LinkReferenceCompletion.h"
 #import "ClickBelowText.h"
+#import "TaskList.h"
 #import "ETScrollView.h"
 #import "ETClipView.h"
 //#import "NSTextFinder.h"
@@ -1290,6 +1291,10 @@ static NSColor *NVBlendColors(NSColor *first, NSColor *second, CGFloat fraction,
 			[self cycleListMarkerOnCurrentLine];
 			return YES;
 		}
+		if (commandOption && (keyChar == 't' || keyChar == 'T')) {
+			[self toggleTaskMarker:nil];
+			return YES;
+		}
 		if (commandOnly && (keyChar == 'b' || keyChar == 'B')) {
 			[self bold:nil];
 			return YES;
@@ -1661,6 +1666,8 @@ static NSColor *NVBlendColors(NSColor *first, NSColor *second, CGFloat fraction,
 }
 
 - (void)mouseDown:(NSEvent *)event {
+	if ([self nv_toggleTaskCheckboxForEvent:event])
+		return;
 	NSUInteger flags = [event modifierFlags] & NSDeviceIndependentModifierFlagsMask;
 	NSPoint viewPoint = [self convertPoint:[event locationInWindow] fromView:nil];
 	/* Control-click still brings up the menu. A double-click keeps the usual
@@ -2324,7 +2331,7 @@ static long (*GetGetScriptManagerVariablePointer())(short) {
 	// A continued item always has whitespace after the marker. A bare "1." or "---" is left alone.
 	if (markerEnd == NSNotFound || markerEnd >= contentLength)
 		return NO;
-	if ([line rangeOfCharacterFromSet:[whitespace invertedSet] options:0 range:NSMakeRange(markerEnd, contentLength - markerEnd)].location != NSNotFound)
+	if ([line rangeOfCharacterFromSet:[whitespace invertedSet] options:0 range:NSMakeRange(markerEnd, contentLength - markerEnd)].location != NSNotFound && !NVTaskLineIsEmptyItem(line))
 		return NO;
 
 	if (![self shouldChangeTextInRange:lineRange replacementString:@"\n"])
@@ -2399,6 +2406,9 @@ static long (*GetGetScriptManagerVariablePointer())(short) {
                     previousLineWhitespaceString = [previousLineWhitespaceString stringByAppendingFormat:@"%@", [NSString stringWithCharacters:&bulletChar length:1]];
                 }
                 previousLineWhitespaceString=[previousLineWhitespaceString stringByAppendingFormat:@"%@",[NSString stringWithCharacters:&wsChar length:1]];
+                NSString *taskSuffix = NVTaskContinuationSuffix([[self string] substringWithRange:previousLineRange]);
+                if ([taskSuffix length])
+                    previousLineWhitespaceString = [previousLineWhitespaceString stringByAppendingString:taskSuffix];
             } else if (NSMaxRange(realBulletRange) < [[self string] length] && [self _rangeIsAutoIdentedBullet:realBulletRange]) {
                 //should not carry a bullet; also check if one is here that we should delete
                 shouldDeleteLastBullet = YES;
@@ -2486,6 +2496,11 @@ static long (*GetGetScriptManagerVariablePointer())(short) {
 	[formatMenu addItem:theMenuItem];
 	
 	theMenuItem = [[[NSMenuItem alloc] initWithTitle:NSLocalizedString(@"Strikethrough",nil) action:@selector(strikethroughNV:) keyEquivalent:@""] autorelease];
+	[theMenuItem setTarget:self];
+	[formatMenu addItem:theMenuItem];
+
+	theMenuItem = [[[NSMenuItem alloc] initWithTitle:NSLocalizedString(@"Task",nil) action:@selector(toggleTaskMarker:) keyEquivalent:@"t"] autorelease];
+	[theMenuItem setKeyEquivalentModifierMask:NSCommandKeyMask | NSAlternateKeyMask];
 	[theMenuItem setTarget:self];
 	[formatMenu addItem:theMenuItem];
 	
@@ -3302,6 +3317,128 @@ static BOOL NVBulletMarker(NSString *line, NSUInteger contentLength, NSUInteger 
 	}
 	[[self undoManager] endUndoGrouping];
 	return YES;
+}
+
+- (BOOL)nv_toggleTaskCheckboxForEvent:(NSEvent *)event {
+	if ([event clickCount] != 1)
+		return NO;
+	NSUInteger flags = [event modifierFlags] & NSDeviceIndependentModifierFlagsMask;
+	if (flags & (NSControlKeyMask | NSShiftKeyMask | NSCommandKeyMask | NSAlternateKeyMask))
+		return NO;
+	NSPoint viewPoint = [self convertPoint:[event locationInWindow] fromView:nil];
+	if ([self nv_viewPointIsBelowText:viewPoint])
+		return NO;
+	NSTextContainer *container = [self textContainer];
+	NSLayoutManager *layout = [self layoutManager];
+	if (!container || !layout || ![layout numberOfGlyphs])
+		return NO;
+	NSPoint containerPoint = viewPoint;
+	NSPoint origin = [self textContainerOrigin];
+	containerPoint.x -= origin.x;
+	containerPoint.y -= origin.y;
+	NSUInteger glyph = [layout glyphIndexForPoint:containerPoint inTextContainer:container fractionOfDistanceThroughGlyph:NULL];
+	if (glyph >= [layout numberOfGlyphs])
+		return NO;
+	NSRect glyphRect = [layout boundingRectForGlyphRange:NSMakeRange(glyph, 1) inTextContainer:container];
+	if (!NSMouseInRect(containerPoint, glyphRect, YES))
+		return NO;
+	NSUInteger charIndex = [layout characterIndexForGlyphAtIndex:glyph];
+	NSString *text = [self string];
+	if (charIndex >= [text length] || NVTaskIndexIsInsideFence(text, charIndex))
+		return NO;
+	NSRange lineRange = [text lineRangeForRange:NSMakeRange(charIndex, 0)];
+	NSString *line = [text substringWithRange:lineRange];
+	NVTaskEdit edit = NVTaskToggleEdit(line, charIndex - lineRange.location);
+	if (edit.range.location == NSNotFound)
+		return NO;
+	NSRange documentRange = NSMakeRange(lineRange.location + edit.range.location, edit.range.length);
+	if (![self shouldChangeTextInRange:documentRange replacementString:edit.replacement])
+		return NO;
+	[[self undoManager] beginUndoGrouping];
+	[self replaceCharactersInRange:documentRange withString:edit.replacement];
+	[self setSelectedRange:NSMakeRange(documentRange.location + [edit.replacement length], 0)];
+	[self didChangeText];
+	[[self undoManager] setActionName:NSLocalizedString(@"Toggle Task", nil)];
+	[[self undoManager] endUndoGrouping];
+	return YES;
+}
+
+- (BOOL)toggleTaskMarkerOnSelectedLines {
+	NSString *text = [self string];
+	NSRange selection = [self selectedRange];
+	if (selection.location > [text length])
+		return NO;
+	NSArray *lines = nil;
+	BOOL multi = NO;
+	if ([text length] && selection.length) {
+		lines = [self nv_lineRangesForSelection:selection inText:text];
+		multi = [lines count] > 1;
+	}
+	if (!multi) {
+		NSRange lineRange = [text lineRangeForRange:NSMakeRange(MIN(selection.location, [text length]), 0)];
+		lines = [NSArray arrayWithObject:[NSValue valueWithRange:lineRange]];
+	}
+	NSUInteger firstLocation = [[lines objectAtIndex:0] rangeValue].location;
+	BOOL grouping = NO;
+	BOOL changed = NO;
+	BOOL removed = NO;
+	BOOL added = NO;
+	NSInteger lineIndex;
+	for (lineIndex = (NSInteger)[lines count] - 1; lineIndex >= 0; lineIndex--) {
+		text = [self string];
+		NSRange lineRange = [[lines objectAtIndex:(NSUInteger)lineIndex] rangeValue];
+		if (lineRange.location > [text length])
+			continue;
+		if (NSMaxRange(lineRange) > [text length])
+			lineRange.length = [text length] - lineRange.location;
+		if (NVTaskIndexIsInsideFence(text, lineRange.location))
+			continue;
+		NSString *line = [text substringWithRange:lineRange];
+		NVTaskEdit edit = NVTaskShortcutEdit(line);
+		if (edit.range.location == NSNotFound)
+			continue;
+		NSRange documentRange = NSMakeRange(lineRange.location + edit.range.location, edit.range.length);
+		if (NSMaxRange(documentRange) > [text length])
+			continue;
+		if (![self shouldChangeTextInRange:documentRange replacementString:edit.replacement])
+			continue;
+		if (!grouping) {
+			[[self undoManager] beginUndoGrouping];
+			grouping = YES;
+		}
+		if ([edit.replacement isEqualToString:@" "])
+			removed = YES;
+		else
+			added = YES;
+		[self replaceCharactersInRange:documentRange withString:edit.replacement];
+		if (!multi) {
+			NSInteger delta = (NSInteger)[edit.replacement length] - (NSInteger)documentRange.length;
+			if (selection.location >= NSMaxRange(documentRange))
+				selection.location += delta;
+			else if (selection.location > documentRange.location)
+				selection.location = documentRange.location + [edit.replacement length];
+			if (selection.location > [[self string] length])
+				selection.location = [[self string] length];
+			selection.length = 0;
+		}
+		changed = YES;
+	}
+	if (changed) {
+		if (multi)
+			changedRange = [self nv_rangeCoveringLineCount:[lines count] fromLocation:firstLocation];
+		[self setSelectedRange:multi ? changedRange : selection];
+		[self didChangeText];
+		NSString *actionName = (removed && !added) ? NSLocalizedString(@"Remove Task", nil) : NSLocalizedString(@"Add Task", nil);
+		[[self undoManager] setActionName:actionName];
+	}
+	if (grouping)
+		[[self undoManager] endUndoGrouping];
+	return YES;
+}
+
+- (IBAction)toggleTaskMarker:(id)sender {
+	(void)sender;
+	[self toggleTaskMarkerOnSelectedLines];
 }
 
 - (BOOL)cycleListMarkerOnCurrentLine {
