@@ -1,3 +1,12 @@
+nvALT 3.0.32 (144)
+-------------------------
+
+#### FIXED
+
+- **Search highlights** clear when the field shows the note title, and clearing the search removes them
+- **Search highlights** use dark or light text so the marked words stay readable
+- **Tab** and **Backtab** on a task checkbox indent the item instead of inserting link brackets
+
 nvALT 3.0.31 (144)
 -------------------------
 
