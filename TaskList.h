@@ -217,3 +217,24 @@ static inline BOOL NVTaskIndexIsInsideFence(NSString *text, NSUInteger index) {
 	}
 	return NO;
 }
+
+/* The checkbox's ] sits where Markdown link completion looks for a link.
+   Tab and Backtab should indent the task instead of inserting [] or (http://). */
+static inline BOOL NVTaskCursorBelongsToCheckbox(NSString *line, NSUInteger cursorInLine) {
+	NVTaskParts parts = NVTaskParseLine(line);
+	if (!parts.hasCheckbox || parts.markIndex == NSNotFound)
+		return NO;
+	NSUInteger closer = parts.markIndex + 1;
+	if (cursorInLine < parts.markIndex || cursorInLine > parts.contentLength)
+		return NO;
+	if (cursorInLine <= closer)
+		return YES;
+	NSUInteger index = closer + 1;
+	while (index < cursorInLine) {
+		unichar character = [line characterAtIndex:index];
+		if (character != ' ' && character != '\t')
+			return NO;
+		index++;
+	}
+	return YES;
+}

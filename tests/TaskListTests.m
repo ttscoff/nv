@@ -85,6 +85,12 @@ int main(void) {
 	expectTrue(!NVTaskLineIsEmptyItem(@"- [ ] milk"), "a task with text is not empty");
 	expectTrue(!NVTaskLineIsEmptyItem(@"- "), "a plain bullet is not an empty task");
 
+	expectTrue(NVTaskCursorBelongsToCheckbox(@"- [ ] ", 6), "the cursor after an empty checkbox belongs to it");
+	expectTrue(NVTaskCursorBelongsToCheckbox(@"- [ ]", 4), "the cursor on the checkbox closer belongs to it");
+	expectTrue(NVTaskCursorBelongsToCheckbox(@"- [x] ", 4), "the cursor inside a completed checkbox belongs to it");
+	expectTrue(!NVTaskCursorBelongsToCheckbox(@"- [ ] milk", 8), "the cursor in the task text is not the checkbox");
+	expectTrue(!NVTaskCursorBelongsToCheckbox(@"[link]", 6), "a link bracket is not a task checkbox");
+
 	if (!gFailures)
 		printf("test-ok\n");
 	[pool drain];

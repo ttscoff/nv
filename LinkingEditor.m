@@ -168,17 +168,14 @@ if ([selectorString isEqualToString:SEL_STR(setNoteBodyFont:sender:)]) {
 	} else if ([selectorString isEqualToString:SEL_STR(setSearchTermHighlightColor:sender:)] || 
 			   [selectorString isEqualToString:SEL_STR(setShouldHighlightSearchTerms:sender:)]) {
 		
-		if (![prefsController highlightSearchTerms]) {
+		if (![prefsController highlightSearchTerms])
 			[self removeHighlightedTerms];
-		} else {
-			NSString *typedString = [(AppController *)[NSApp delegate] searchStringForHighlighting];
-			if (typedString)
-				[self highlightTermsTemporarilyReturningFirstRange:typedString avoidHighlight:NO];
-		}
+		[self scheduleMarkdownHighlight];
 	}
 }
 
 - (BOOL)becomeFirstResponder {
+	[self discardSearchHighlights];
 	[notesTableView setShouldUseSecondaryHighlightColor:YES];
 
 	if ([[[self window] currentEvent] type] == NSKeyDown && [[[self window] currentEvent] firstCharacter] == '\t') {
@@ -708,6 +705,63 @@ copyRTFType:
 	[[self layoutManager] removeTemporaryAttribute:NSBackgroundColorAttributeName forCharacterRange:NSMakeRange(0, [[self string] length])];
 }
 
+static BOOL NVHighlightComponentsMatch(CGFloat a, CGFloat b) {
+	CGFloat delta = a - b;
+	if (delta < 0)
+		delta = -delta;
+	return delta < 0.02f;
+}
+
+static BOOL NVSearchHighlightColorMatches(NSColor *applied, NSColor *searchColor) {
+	if (applied == searchColor)
+		return YES;
+	if (!applied || !searchColor)
+		return NO;
+	NSColor *appliedRGB = [applied colorUsingColorSpace:[NSColorSpace sRGBColorSpace]];
+	NSColor *searchRGB = [searchColor colorUsingColorSpace:[NSColorSpace sRGBColorSpace]];
+	if (!appliedRGB || !searchRGB)
+		return [applied isEqual:searchColor];
+	return NVHighlightComponentsMatch([appliedRGB redComponent], [searchRGB redComponent]) &&
+		NVHighlightComponentsMatch([appliedRGB greenComponent], [searchRGB greenComponent]) &&
+		NVHighlightComponentsMatch([appliedRGB blueComponent], [searchRGB blueComponent]) &&
+		NVHighlightComponentsMatch([appliedRGB alphaComponent], [searchRGB alphaComponent]);
+}
+
+- (void)removeSearchTermHighlights {
+	NSColor *searchColor = [[prefsController searchTermHighlightAttributes] objectForKey:NSBackgroundColorAttributeName];
+	NSLayoutManager *layout = [self layoutManager];
+	NSUInteger length = [[self string] length];
+	if (!searchColor || !layout || !length)
+		return;
+	NSUInteger index = 0;
+	while (index < length) {
+		NSRange effective = NSMakeRange(0, 0);
+		NSDictionary *attrs = [layout temporaryAttributesAtCharacterIndex:index effectiveRange:&effective];
+		if (!effective.length)
+			break;
+		NSColor *background = [attrs objectForKey:NSBackgroundColorAttributeName];
+		if (NVSearchHighlightColorMatches(background, searchColor)) {
+			[layout removeTemporaryAttribute:NSBackgroundColorAttributeName forCharacterRange:effective];
+			[layout removeTemporaryAttribute:NSForegroundColorAttributeName forCharacterRange:effective];
+		}
+		NSUInteger next = NSMaxRange(effective);
+		if (next <= index)
+			break;
+		index = next;
+	}
+}
+
+- (void)discardSearchHighlights {
+	NSLayoutManager *layout = [self layoutManager];
+	NSUInteger length = [[self string] length];
+	if (layout && length) {
+		NSRange all = NSMakeRange(0, length);
+		[layout removeTemporaryAttribute:NSBackgroundColorAttributeName forCharacterRange:all];
+		[layout removeTemporaryAttribute:NSForegroundColorAttributeName forCharacterRange:all];
+	}
+	[self scheduleMarkdownHighlight];
+}
+
 
 //use with rangesOfWordsInString:(NSString*)findString earliestRange:(NSRange*)aRange inRange:
 - (void)highlightRangesTemporarily:(CFArrayRef)ranges {
@@ -992,6 +1046,7 @@ static NSColor *NVBlendColors(NSColor *first, NSColor *second, CGFloat fraction,
 	if (![prefsController highlightSearchTerms])
 		return;
 	NSString *typed = [(AppController *)[NSApp delegate] searchStringForHighlighting];
+	[self removeSearchTermHighlights];
 	if ([typed length])
 		[self highlightTermsTemporarilyReturningFirstRange:typed avoidHighlight:NO];
 }
@@ -1394,9 +1449,20 @@ static NSColor *NVBlendColors(NSColor *first, NSColor *second, CGFloat fraction,
 		[super moveToBeginningOfLine:sender];
 }
 
+- (BOOL)nv_cursorBelongsToTaskCheckbox {
+	NSString *text = [self string];
+	NSUInteger length = [text length];
+	if (!length)
+		return NO;
+	NSUInteger location = MIN([self selectedRange].location, length);
+	NSUInteger probe = location < length ? location : length - 1;
+	NSRange lineRange = [text lineRangeForRange:NSMakeRange(probe, 0)];
+	return NVTaskCursorBelongsToCheckbox([text substringWithRange:lineRange], location - lineRange.location);
+}
+
 - (void)insertTab:(id)sender {
 	//check prefs for tab behavior
-    if ([[NSUserDefaults standardUserDefaults]boolForKey:@"UsesMarkdownCompletions"]) {
+    if ([[NSUserDefaults standardUserDefaults]boolForKey:@"UsesMarkdownCompletions"] && ![self nv_cursorBelongsToTaskCheckbox]) {
         NSRange selectedRange=[self selectedRange];
         NSUInteger closer=[self cursorIsInsidePair:@"]"];   
         if ((closer!=NSNotFound)||([self cursorIsImmediatelyPastPair:@"]"])){ 
@@ -1460,7 +1526,7 @@ static NSColor *NVBlendColors(NSColor *first, NSColor *second, CGFloat fraction,
 
 - (void)insertBacktab:(id)sender {
 	//check temporary NVHiddenBulletIndentAttributeName here first
-    if ([[NSUserDefaults standardUserDefaults]boolForKey:@"UsesMarkdownCompletions"]) {
+    if ([[NSUserDefaults standardUserDefaults]boolForKey:@"UsesMarkdownCompletions"] && ![self nv_cursorBelongsToTaskCheckbox]) {
         NSRange selectedRange=[self selectedRange];
         NSUInteger closer=[self cursorIsInsidePair:@"]"];        
         if ((closer!=NSNotFound)||([self cursorIsImmediatelyPastPair:@"]"])){             

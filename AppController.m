@@ -24,6 +24,7 @@
 #import "NotationFileManager.h"
 #import "NSString_NV.h"
 #import "TagSearch.h"
+#import "SearchHighlight.h"
 #import "LinkReferenceCompletion.h"
 #import "NSString_CustomTruncation.h"
 #import "NSFileManager_NV.h"
@@ -1424,9 +1425,13 @@ static NSURL *NVHTTPURLFromImportString(NSString *entered) {
             return;
         }
 		[field setStringValue:@""];
+		NSText *searchEditor = [field currentEditor];
+		if ([searchEditor isKindOfClass:[NSText class]])
+			[searchEditor setString:@""];
 		typedStringIsCached = NO;
 		[typedString release];
 		typedString = nil;
+		[self refreshVisibleSearchHighlights];
 		
 		[notesTableView deselectAll:sender];//thiss
 		[notationController filterNotesFromString:@""];
@@ -1606,18 +1611,32 @@ static NSURL *NVHTTPURLFromImportString(NSString *entered) {
 }
 
 - (NSString*)searchStringForHighlighting {
-	if (![typedString length])
-		return nil;
-	// While a note is selected the field shows its title, so the typed query is hidden.
-	// Only highlight a search the user can still see and clear.
-	NSString *highlight = nil;
-	if (isFilteringFromTyping)
-		highlight = typedString;
-	else if ([[field stringValue] isEqualToString:typedString])
-		highlight = typedString;
-	if (!highlight)
+	NSText *editor = [field currentEditor];
+	NSString *fieldString = editor ? [editor string] : [field stringValue];
+	NSRange selection = editor ? [editor selectedRange] : NSMakeRange(0, [fieldString length]);
+	BOOL bodyFocused = textView && [window firstResponder] == textView;
+	NSString *highlight = NVSearchHighlightQuery(bodyFocused, isFilteringFromTyping, typedStringIsCached,
+												 editor != nil, selection, typedString, fieldString,
+												 currentNote ? titleOfNote(currentNote) : nil);
+	if (![highlight length])
 		return nil;
 	return NVHighlightStringByRemovingTagWords(highlight);
+}
+
+- (void)refreshVisibleSearchHighlights {
+	if (!textView)
+		return;
+	if (![prefsController highlightSearchTerms]) {
+		[textView discardSearchHighlights];
+		return;
+	}
+	NSString *query = [self searchStringForHighlighting];
+	if (![query length]) {
+		[textView discardSearchHighlights];
+		return;
+	}
+	[textView removeSearchTermHighlights];
+	[textView highlightTermsTemporarilyReturningFirstRange:query avoidHighlight:NO];
 }
 
 - (void)cacheTypedStringIfNecessary:(NSString*)aString {
@@ -1692,7 +1711,7 @@ static NSURL *NVHTTPURLFromImportString(NSString *entered) {
 		}
 		
 		isFilteringFromTyping = NO;
-        
+		[self refreshVisibleSearchHighlights];
 	}
 }
 
@@ -1792,6 +1811,7 @@ static NSURL *NVHTTPURLFromImportString(NSString *entered) {
 					} else {
 						[window setTitle:titleOfNote(currentNote)];
 					}
+					[self refreshVisibleSearchHighlights];
 				}
 			}
 			return;
@@ -1912,11 +1932,16 @@ static NSURL *NVHTTPURLFromImportString(NSString *entered) {
 		[self updateWordCount:(![prefsController showWordCount])];
 		//[textView setAutomaticallySelectedRange:NSMakeRange(0,0)];
 		
-		//highlight terms--delay this, too
-		NSString *highlightString = [self searchStringForHighlighting];
+		// Marks are only for the search being typed. Opening a note shows its title
+		// in the field, and the words that found it are not highlighted again.
+		[textView removeSearchTermHighlights];
+		NSString *highlightString = isFilteringFromTyping ? [self searchStringForHighlighting] : nil;
+		NSRange foundTermRange = NSMakeRange(NSNotFound, 0);
+		if (highlightString)
+			foundTermRange = [textView highlightTermsTemporarilyReturningFirstRange:highlightString avoidHighlight:
+							  ![prefsController highlightSearchTerms]];
 		if (highlightString && (unsigned)noteIndex != [notationController preferredSelectedNoteIndex])
-			firstFoundTermRange = [textView highlightTermsTemporarilyReturningFirstRange:highlightString avoidHighlight:
-								   ![prefsController highlightSearchTerms]];
+			firstFoundTermRange = foundTermRange;
 		
 		//if there was nothing selected, select the first found range
 		if (!noteSelectionRange.length && firstFoundTermRange.location != NSNotFound)
@@ -1956,7 +1981,7 @@ static NSURL *NVHTTPURLFromImportString(NSString *entered) {
 
 - (void)textDidBeginEditing:(NSNotification *)aNotification {
 	if ([aNotification object] == textView) {
-		[textView removeHighlightedTerms];
+		[textView discardSearchHighlights];
 	    [self createNoteIfNecessary];
 	}/*else if ([aNotification object] == notesTableView) {
       NSLog(@"ntv tdbe2");

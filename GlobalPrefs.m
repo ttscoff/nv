@@ -635,7 +635,18 @@ static NSString *NVAllowedMarker(NSString *stored, NSString *allowed, NSString *
 	NSColor *highlightColor = nil;
 	
 	if (!searchTermHighlightAttributes && (highlightColor = [self searchTermHighlightColorRaw:NO])) {
-		searchTermHighlightAttributes = [[NSDictionary dictionaryWithObjectsAndKeys:highlightColor, NSBackgroundColorAttributeName, nil] retain];
+		NSColor *rgb = [highlightColor colorUsingColorSpace:[NSColorSpace sRGBColorSpace]];
+		CGFloat red = 0, green = 0, blue = 0, alpha = 0;
+		NSColor *ink = [NSColor blackColor];
+		if (rgb) {
+			[rgb getRed:&red green:&green blue:&blue alpha:&alpha];
+			CGFloat luminance = (0.2126 * red) + (0.7152 * green) + (0.0722 * blue);
+			if (luminance <= 0.55)
+				ink = [NSColor whiteColor];
+		}
+		searchTermHighlightAttributes = [[NSDictionary dictionaryWithObjectsAndKeys:
+										  highlightColor, NSBackgroundColorAttributeName,
+										  ink, NSForegroundColorAttributeName, nil] retain];
 	}
 	return searchTermHighlightAttributes;
 	
