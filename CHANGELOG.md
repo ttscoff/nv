@@ -1,3 +1,13 @@
+nvALT 3.0.31 (144)
+-------------------------
+
+#### NEW
+
+- **Option-Command-T** turns the current line into a task. A list item gains a checkbox, and a line that already has one loses it
+- Click the space inside a task's brackets to mark it **done** or open again
+- A completed task is **crossed out** in the editor, and the preview shows it as a checked item
+- **Return** on a task continues the list with a new open task, and Return on an empty checkbox clears that line
+
 nvALT 3.0.30 (144)
 -------------------------
 
