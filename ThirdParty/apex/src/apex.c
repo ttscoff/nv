@@ -3127,6 +3127,7 @@ apex_options apex_options_default(void) {
     opts.paginate_symbols = false;
     opts.terminal_inline_images = true;
     opts.terminal_image_width = 50;
+    opts.source_positions = false;
 
     return opts;
 }
@@ -3481,6 +3482,10 @@ static int apex_to_cmark_options(const apex_options *options) {
 
     if (options->enable_smart_typography) {
         cmark_opts |= CMARK_OPT_SMART;
+    }
+
+    if (options->source_positions) {
+        cmark_opts |= CMARK_OPT_SOURCEPOS;
     }
 
     /* Table style preference (use CSS classes instead of inline styles) */

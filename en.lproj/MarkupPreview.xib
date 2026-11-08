@@ -10,7 +10,6 @@
             <connections>
                 <outlet property="preview" destination="229" id="248"/>
                 <outlet property="printPreviewButton" destination="267" id="280"/>
-                <outlet property="saveButton" destination="263" id="282"/>
                 <outlet property="shareButton" destination="265" id="281"/>
                 <outlet property="shareConfirmation" destination="157" id="169"/>
                 <outlet property="shareNotification" destination="133" id="138"/>
@@ -152,17 +151,6 @@ Gw
                         </buttonCell>
                         <connections>
                             <action selector="makePreviewSticky:" target="-2" id="269"/>
-                        </connections>
-                    </button>
-                    <button toolTip="Open in Marked" hidden="YES" wantsLayer="YES" verticalHuggingPriority="750" id="263">
-                        <rect key="frame" x="208" y="7" width="120" height="19"/>
-                        <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxY="YES"/>
-                        <buttonCell key="cell" type="roundRect" title="Open in Marked" bezelStyle="roundedRect" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="264">
-                            <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
-                            <font key="font" metaFont="titleBar" size="12"/>
-                        </buttonCell>
-                        <connections>
-                            <action selector="openInMarked:" target="-2" id="274"/>
                         </connections>
                     </button>
                     <button toolTip="Share on Marked Share" wantsLayer="YES" verticalHuggingPriority="750" alphaValue="0.80000000000000004" id="265">

@@ -333,6 +333,9 @@ typedef struct apex_options {
      */
     void (*cmark_done)(struct cmark_parser *parser, const struct apex_options *options, int cmark_opts, void *user_data);
     void *cmark_user_data; /* User data passed to cmark init/done callback */
+
+    /* Emit data-sourcepos="line:col-line:col" on block elements. Off by default. */
+    bool source_positions;
 } apex_options;
 
 /* AST serializers */

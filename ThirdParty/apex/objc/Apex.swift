@@ -77,6 +77,9 @@ public struct ApexOptions {
     /// Autolink bare URLs and emails. `nil` leaves the mode default unchanged.
     public var enableAutolink: Bool? = nil
 
+    /// Add data-sourcepos attributes to block elements.
+    public var sourcePositions: Bool = false
+
     /// Output format: "html" (default) or "rtf"
     public var outputFormat: String? = nil
 
@@ -125,6 +128,9 @@ public struct ApexOptions {
         }
         if let enableAutolink {
             dict["enableAutolink"] = enableAutolink
+        }
+        if sourcePositions {
+            dict["sourcePositions"] = true
         }
         if let outputFormat = outputFormat {
             dict["outputFormat"] = outputFormat

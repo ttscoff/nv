@@ -14,6 +14,13 @@
     return [[textView textStorage] string];
 }
 
+-(NSUInteger)noteCaretIndex
+{
+    if (!textView)
+        return NSNotFound;
+    return [textView selectedRange].location;
+}
+
 -(NSInteger)currentPreviewMode
 {	
     return currentPreviewMode;
