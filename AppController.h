@@ -51,7 +51,7 @@
 
 @interface AppController : NSObject 
 #if MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_6
-<NSToolbarDelegate, NSTableViewDelegate, NSWindowDelegate, NSTextFieldDelegate, NSTextViewDelegate>
+<NSToolbarDelegate, NSTableViewDelegate, NSWindowDelegate, NSTextFieldDelegate, NSTextViewDelegate, NSSharingServicePickerDelegate>
 #endif
 {
 	IBOutlet NSMenuItem *fsMenuItem;
@@ -73,6 +73,8 @@
     NSDictionary *fieldAttributes;
 	NSTimer *modifierTimer;
 	IBOutlet WordCountToken *wordCounter;
+	NSButton *editorShareButton;
+	NSSharingServicePicker *editorSharePicker;
     IBOutlet DualField *field;
 	RBSplitSubview *splitSubview;
 	RBSplitSubview *notesSubview;

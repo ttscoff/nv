@@ -12,7 +12,7 @@
 @class AppController;
 @class NoteObject;
 
-@interface PreviewController : NSWindowController 
+@interface PreviewController : NSWindowController <NSSharingServicePickerDelegate, NSSharingServiceDelegate>
 {
   IBOutlet WebView *preview;
 	IBOutlet NSTextView *sourceView;
@@ -35,6 +35,9 @@
 	NSButton *shareCancel;
 	NSButton *shareConfirm;
 	NSString *shareURL;
+	NSButton *previewShareButton;
+	NSString *shareHTML;
+	NSSharingServicePicker *previewSharePicker;
 	NSString *cssString;
 	NSString *htmlString;
 
