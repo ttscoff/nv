@@ -2527,23 +2527,47 @@ static NSURL *NVHTTPURLFromImportString(NSString *entered) {
 
 #pragma mark SplitView Delegate methods
 
+static BOOL nvSearchFieldAligning = NO;
+
+static void NVRemoveSuperviewConstraintsOnView(NSView *view) {
+	NSView *superview = [view superview];
+	if (!superview)
+		return;
+	NSArray *existing = [[superview constraints] copy];
+	NSUInteger i;
+	for (i = 0; i < [existing count]; i++) {
+		NSLayoutConstraint *constraint = [existing objectAtIndex:i];
+		if ([constraint firstItem] == view || [constraint secondItem] == view)
+			[superview removeConstraint:constraint];
+	}
+	[existing release];
+}
+
 - (void)alignSearchFieldWithEditor {
-	static BOOL aligning = NO;
-	if (aligning || !field || !splitView || !notesSubview || !window)
+	if (nvSearchFieldAligning || !field || !splitView || !notesSubview || !window)
 		return;
 	NSView *container = [field superview];
 	NSView *titlebar = [[window standardWindowButton:NSWindowCloseButton] superview];
 	if (!container || !titlebar || [container window] != window || [notesSubview window] != window)
 		return;
-	if (NSWidth([container bounds]) < 1.0 || NSHeight([container bounds]) < 1.0)
+	if (NSHeight([container bounds]) < 1.0)
 		return;
 	// Old fullscreen mode hosts the field in the content view, not the titlebar.
 	if (dualFieldView && [container superview] == dualFieldView)
 		return;
 
 	NSRect titlebarInWindow = [titlebar convertRect:[titlebar bounds] toView:nil];
-	CGFloat right = NSMaxX(titlebarInWindow) - 6.0;
-	CGFloat left = NSMinX(titlebarInWindow);
+	CGFloat right = NSMaxX(titlebarInWindow);
+	CGFloat leftLimit = NSMinX(titlebarInWindow);
+	NSView *content = [window contentView];
+	if (content) {
+		/* A tiled window can inset the content without insetting the titlebar, or the other way around. */
+		NSRect contentInWindow = [content convertRect:[content bounds] toView:nil];
+		right = MIN(right, NSMaxX(contentInWindow));
+		leftLimit = MAX(leftLimit, NSMinX(contentInWindow));
+	}
+	right -= 6.0;
+	CGFloat left = leftLimit;
 	NSButton *zoomButton = [window standardWindowButton:NSWindowZoomButton];
 	if (zoomButton && [zoomButton superview]) {
 		NSRect zoomInWindow = [[zoomButton superview] convertRect:[zoomButton frame] toView:nil];
@@ -2551,20 +2575,20 @@ static NSURL *NVHTTPURLFromImportString(NSString *entered) {
 		if (minLeft > left && minLeft < right)
 			left = minLeft;
 	}
-	BOOL notesBesideEditor = [splitView isVertical] && ![notesSubview isCollapsed];
-	if (notesBesideEditor) {
-		NSRect listInWindow = [notesSubview convertRect:[notesSubview bounds] toView:nil];
-		if (NSMaxX(listInWindow) > left)
-			left = NSMaxX(listInWindow);
-	} else if ([[window title] length]) {
-		/* Inline title, just after the traffic lights. The measured string is
-		   narrower than the drawn title, so the extra gap keeps the field off the last letter. */
+	/* Both layouts start just after the title. The notes column is not part of this
+	   measurement, so a tiled or narrow window cannot pull the field over the list.
+	   The measured string is narrower than the drawn title, so the extra gap keeps
+	   the field off the last letter. */
+	if ([[window title] length]) {
 		NSFont *titleFont = [NSFont titleBarFontOfSize:0.0];
 		NSSize titleSize = [[window title] sizeWithAttributes:[NSDictionary dictionaryWithObject:titleFont forKey:NSFontAttributeName]];
 		left += ceil(titleSize.width) + 36.0;
 	}
 	left = round(left);
+	/* Keep the right edge on the window even when the title leaves little room. */
 	if (right - left < 50.0)
+		left = MAX(leftLimit, right - 50.0);
+	if (right - left < 1.0)
 		return;
 
 	/* Match the traffic-light row so later titlebar layout leaves the field where it is. */
@@ -2587,11 +2611,11 @@ static NSURL *NVHTTPURLFromImportString(NSString *entered) {
 	if (alreadyPinned)
 		return;
 
-	aligning = YES;
+	nvSearchFieldAligning = YES;
 	if ([window respondsToSelector:@selector(setTitleVisibility:)])
 		[window setTitleVisibility:NSWindowTitleVisible];
 	// The toolbar item slot cannot start left of the title. Host the field in the
-	// titlebar itself so its left edge can sit on the notes list.
+	// titlebar so it can start just after the title in either layout.
 	if ([container superview] != titlebar) {
 		[container retain];
 		if (dualFieldItem && [dualFieldItem view] == container) {
@@ -2604,8 +2628,9 @@ static NSURL *NVHTTPURLFromImportString(NSString *entered) {
 		[titlebar addSubview:container];
 		[container release];
 	}
-	/* The titlebar's own constraints were resizing this view between passes. */
-	[container setTranslatesAutoresizingMaskIntoConstraints:NO];
+	/* The titlebar adds its own constraints and will put a fixed frame back on the next pass. */
+	NVRemoveSuperviewConstraintsOnView(container);
+	[container setTranslatesAutoresizingMaskIntoConstraints:YES];
 	[container setAutoresizingMask:NSViewNotSizable];
 
 	NSRect desired = NSMakeRect(left, y, right - left, fieldHeight);
@@ -2625,16 +2650,27 @@ static NSURL *NVHTTPURLFromImportString(NSString *entered) {
 	/* Nib load can lay this out before DualField swaps in DualFieldCell. */
 	if ([editor isKindOfClass:[NSTextView class]] && [searchCell respondsToSelector:@selector(textAreaForBounds:)])
 		[editor setFrame:[(id)searchCell textAreaForBounds:[field bounds]]];
-	aligning = NO;
+	nvSearchFieldAligning = NO;
+}
+
+- (void)alignSearchFieldWithEditorAfterLayout {
+	if (nvSearchFieldAligning)
+		return;
+	[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(alignSearchFieldWithEditor) object:nil];
+	[self performSelector:@selector(alignSearchFieldWithEditor) withObject:nil afterDelay:0 inModes:[NSArray arrayWithObject:NSRunLoopCommonModes]];
 }
 
 - (void)windowDidLayout:(NSNotification *)notification {
 	[self alignSearchFieldWithEditor];
+	/* Titlebar layout can run after this and put the field back. Align once more after it. */
+	[self alignSearchFieldWithEditorAfterLayout];
 }
 
 - (void)didAdjustSubviews:(RBSplitView*)sender {
-	if (sender == splitView)
+	if (sender == splitView) {
 		[self alignSearchFieldWithEditor];
+		[self alignSearchFieldWithEditorAfterLayout];
+	}
 }
 
 - (void)splitView:(RBSplitView*)sender wasResizedFrom:(CGFloat)oldDimension to:(CGFloat)newDimension {
