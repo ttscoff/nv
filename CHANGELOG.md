@@ -1,3 +1,14 @@
+nvALT 3.0.33 (144)
+-------------------------
+
+#### CHANGED
+
+- **Search field** starts just after the window title in side-by-side layout, the same way it does in vertical layout
+
+#### FIXED
+
+- **Search field** stays inside the window when the window is tiled or made very narrow
+
 nvALT 3.0.32 (144)
 -------------------------
 
