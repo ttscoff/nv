@@ -25,6 +25,7 @@
 #import "NSString_NV.h"
 #import "TagSearch.h"
 #import "SearchHighlight.h"
+#import "NoteShare.h"
 #import "LinkReferenceCompletion.h"
 #import "NSString_CustomTruncation.h"
 #import "NSFileManager_NV.h"
@@ -1838,6 +1839,7 @@ static NSURL *NVHTTPURLFromImportString(NSString *entered) {
 			}
 			[textView setString:@""];
 			[textView redisplayAfterNoteChange];
+			[self refreshEditorShareButton];
 		}
 		//[self _expandToolbar];
         [self setDualFieldIsVisible:YES];
@@ -1956,6 +1958,7 @@ static NSURL *NVHTTPURLFromImportString(NSString *entered) {
 		//[textView setFutureSelectionRange:noteSelectionRange highlightingWords:words];
 		
         [self updateRTL];
+		[self refreshEditorShareButton];
         
 		return YES;
 	}
@@ -1971,12 +1974,18 @@ static NSURL *NVHTTPURLFromImportString(NSString *entered) {
 		[currentNote setContentString:[textView textStorage]];
 		[self postTextUpdate];
 		[self updateWordCount:(![prefsController showWordCount])];
+		[self refreshEditorShareButton];
         if (IsLionOrLater) {
             [[NSNotificationCenter defaultCenter] postNotificationName:@"TextFindContextShouldUpdate" object:self];
         }
 	}
     
     
+}
+
+- (void)textViewDidChangeSelection:(NSNotification *)notification {
+	if ([notification object] == textView)
+		[self refreshEditorShareButton];
 }
 
 - (void)textDidBeginEditing:(NSNotification *)aNotification {
@@ -2446,6 +2455,9 @@ static NSURL *NVHTTPURLFromImportString(NSString *entered) {
     [mainView release];
     [dualFieldView release];
     [wordCounter release];
+	[editorShareButton removeFromSuperview];
+	[editorShareButton release];
+	[editorSharePicker release];
     [splitView release];
     [splitSubview release];
     [notesSubview release];
@@ -2528,6 +2540,9 @@ static NSURL *NVHTTPURLFromImportString(NSString *entered) {
 #pragma mark SplitView Delegate methods
 
 static BOOL nvSearchFieldAligning = NO;
+static const CGFloat NVEditorShareButtonWidth = 28.0;
+static const CGFloat NVEditorShareButtonGap = 6.0;
+static const CGFloat NVEditorShareButtonEdge = 6.0;
 
 static void NVRemoveSuperviewConstraintsOnView(NSView *view) {
 	NSView *superview = [view superview];
@@ -2543,6 +2558,69 @@ static void NVRemoveSuperviewConstraintsOnView(NSView *view) {
 	[existing release];
 }
 
+- (void)refreshEditorShareButton {
+	if (!editorShareButton)
+		return;
+	NSString *body = textView ? [textView string] : @"";
+	NSRange selection = textView ? [textView selectedRange] : NSMakeRange(0, 0);
+	BOOL hasSelection = selection.length > 0 && selection.location != NSNotFound && NSMaxRange(selection) <= [body length];
+	[editorShareButton setEnabled:NVEditorShareText(body, selection) != nil];
+	[editorShareButton setToolTip:hasSelection ? @"Share Selection" : @"Share Note"];
+}
+
+- (NSButton *)makeEditorShareButton {
+	if (editorShareButton)
+		return editorShareButton;
+	editorShareButton = [[NSButton alloc] initWithFrame:NSMakeRect(0, 0, NVEditorShareButtonWidth, 22)];
+	[editorShareButton setBordered:NO];
+	[editorShareButton setButtonType:NSButtonTypeMomentaryPushIn];
+	[editorShareButton setImagePosition:NSImageOnly];
+	[editorShareButton setImage:[NSImage imageNamed:NSImageNameShareTemplate]];
+	[[editorShareButton cell] setImageScaling:NSImageScaleProportionallyDown];
+	[editorShareButton setTarget:self];
+	[editorShareButton setAction:@selector(shareEditorNote:)];
+	[editorShareButton setAutoresizingMask:NSViewNotSizable];
+	[self refreshEditorShareButton];
+	return editorShareButton;
+}
+
+- (void)placeEditorShareButtonInView:(NSView *)host frameInWindow:(NSRect)desired {
+	NSButton *button = [self makeEditorShareButton];
+	if ([button superview] != host) {
+		[button retain];
+		[button removeFromSuperview];
+		[host addSubview:button];
+		[button release];
+	}
+	NVRemoveSuperviewConstraintsOnView(button);
+	[button setTranslatesAutoresizingMaskIntoConstraints:YES];
+	[button setAutoresizingMask:NSViewNotSizable];
+	NSRect frame = [host convertRect:desired fromView:nil];
+	frame.origin.x = round(frame.origin.x);
+	frame.origin.y = round(frame.origin.y);
+	frame.size.width = round(NSWidth(frame));
+	frame.size.height = round(NSHeight(frame));
+	[button setFrame:frame];
+}
+
+- (IBAction)shareEditorNote:(id)sender {
+	NSString *item = NVEditorShareText(textView ? [textView string] : @"",
+									   textView ? [textView selectedRange] : NSMakeRange(0, 0));
+	if (![item length] || !editorShareButton)
+		return;
+	[editorSharePicker release];
+	editorSharePicker = [[NSSharingServicePicker alloc] initWithItems:[NSArray arrayWithObject:item]];
+	[editorSharePicker setDelegate:self];
+	[editorSharePicker showRelativeToRect:[editorShareButton bounds] ofView:editorShareButton preferredEdge:NSMinYEdge];
+}
+
+- (void)sharingServicePicker:(NSSharingServicePicker *)sharingServicePicker didChooseSharingService:(NSSharingService *)service {
+	if (sharingServicePicker == editorSharePicker) {
+		[editorSharePicker release];
+		editorSharePicker = nil;
+	}
+}
+
 - (void)alignSearchFieldWithEditor {
 	if (nvSearchFieldAligning || !field || !splitView || !notesSubview || !window)
 		return;
@@ -2553,8 +2631,31 @@ static void NVRemoveSuperviewConstraintsOnView(NSView *view) {
 	if (NSHeight([container bounds]) < 1.0)
 		return;
 	// Old fullscreen mode hosts the field in the content view, not the titlebar.
-	if (dualFieldView && [container superview] == dualFieldView)
+	if (dualFieldView && [container superview] == dualFieldView) {
+		NSRect hostInWindow = [dualFieldView convertRect:[dualFieldView bounds] toView:nil];
+		NSRect containerInWindow = [container convertRect:[container bounds] toView:nil];
+		if (NSHeight(containerInWindow) < 1.0)
+			return;
+		nvSearchFieldAligning = YES;
+		CGFloat buttonLeft = NSMaxX(hostInWindow) - NVEditorShareButtonEdge - NVEditorShareButtonWidth;
+		NSRect fieldDesired = containerInWindow;
+		fieldDesired.size.width = buttonLeft - NVEditorShareButtonGap - NSMinX(fieldDesired);
+		if (NSWidth(fieldDesired) < 1.0)
+			fieldDesired.size.width = 1.0;
+		NSRect containerFrame = [dualFieldView convertRect:fieldDesired fromView:nil];
+		containerFrame.origin.x = round(containerFrame.origin.x);
+		containerFrame.origin.y = round(containerFrame.origin.y);
+		containerFrame.size.width = round(NSWidth(containerFrame));
+		containerFrame.size.height = round(NSHeight(containerFrame));
+		[container setFrame:containerFrame];
+		NSRect fieldFrame = [field frame];
+		fieldFrame.origin.x = 0.0;
+		fieldFrame.size.width = NSWidth([container bounds]);
+		[field setFrame:fieldFrame];
+		[self placeEditorShareButtonInView:dualFieldView frameInWindow:NSMakeRect(buttonLeft, NSMinY(containerInWindow), NVEditorShareButtonWidth, NSHeight(containerInWindow))];
+		nvSearchFieldAligning = NO;
 		return;
+	}
 
 	NSRect titlebarInWindow = [titlebar convertRect:[titlebar bounds] toView:nil];
 	CGFloat right = NSMaxX(titlebarInWindow);
@@ -2566,7 +2667,9 @@ static void NVRemoveSuperviewConstraintsOnView(NSView *view) {
 		right = MIN(right, NSMaxX(contentInWindow));
 		leftLimit = MAX(leftLimit, NSMinX(contentInWindow));
 	}
-	right -= 6.0;
+	right -= NVEditorShareButtonEdge;
+	CGFloat shareButtonRight = right;
+	right -= NVEditorShareButtonWidth + NVEditorShareButtonGap;
 	CGFloat left = leftLimit;
 	NSButton *zoomButton = [window standardWindowButton:NSWindowZoomButton];
 	if (zoomButton && [zoomButton superview]) {
@@ -2601,13 +2704,20 @@ static void NVRemoveSuperviewConstraintsOnView(NSView *view) {
 	}
 	y = round(y);
 
+	NSRect shareDesired = NSMakeRect(shareButtonRight - NVEditorShareButtonWidth, y, NVEditorShareButtonWidth, fieldHeight);
 	NSRect containerInWindow = [container convertRect:[container bounds] toView:nil];
+	NSRect shareInWindow = editorShareButton ? [editorShareButton convertRect:[editorShareButton bounds] toView:nil] : NSZeroRect;
+	BOOL sharePinned = editorShareButton && [editorShareButton superview] == titlebar
+		&& fabs(NSMinX(shareInWindow) - NSMinX(shareDesired)) <= 0.5
+		&& fabs(NSMaxX(shareInWindow) - NSMaxX(shareDesired)) <= 0.5
+		&& fabs(NSMinY(shareInWindow) - y) <= 0.5;
 	BOOL alreadyPinned = [container superview] == titlebar
 		&& fabs(NSMinX(containerInWindow) - left) <= 0.5
 		&& fabs(NSMaxX(containerInWindow) - right) <= 0.5
 		&& fabs(NSMinY(containerInWindow) - y) <= 0.5
 		&& fabs(NSMinX([field frame])) <= 0.5
-		&& fabs(NSWidth([field frame]) - NSWidth([container bounds])) <= 0.5;
+		&& fabs(NSWidth([field frame]) - NSWidth([container bounds])) <= 0.5
+		&& sharePinned;
 	if (alreadyPinned)
 		return;
 
@@ -2650,6 +2760,7 @@ static void NVRemoveSuperviewConstraintsOnView(NSView *view) {
 	/* Nib load can lay this out before DualField swaps in DualFieldCell. */
 	if ([editor isKindOfClass:[NSTextView class]] && [searchCell respondsToSelector:@selector(textAreaForBounds:)])
 		[editor setFrame:[(id)searchCell textAreaForBounds:[field bounds]]];
+	[self placeEditorShareButtonInView:titlebar frameInWindow:shareDesired];
 	nvSearchFieldAligning = NO;
 }
 

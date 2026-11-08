@@ -6,6 +6,7 @@
 //  Copyright 2010
 
 #import "PreviewController.h"
+#import "NoteShare.h"
 #import "AppController.h" // TODO for the defines only, can you get around that?
 #import "AppController_Preview.h"
 #import "NSString_MultiMarkdown.h"
@@ -565,6 +566,7 @@ static const NSUInteger NVMarkedShareMaxBodyBytes = 500000;
     if (sameNote && !previewNeedsFullReload && ![preview isLoading]
         && (!needsMath || previewHasMathJax) && (!needsMermaid || previewHasMermaid) && (!needsWiki || previewHasWiki)
         && [self updatePreviewInPlaceWithContent:content title:noteTitle]) {
+        [self storeShareHTML:NVPreviewHTMLByReplacingShareContent(shareHTML, content, noteTitle)];
         [[self window] setTitle:noteTitle];
         [sourceView replaceCharactersInRange:NSMakeRange(0, [[sourceView string] length]) withString:processedString];
         self.isPreviewOutdated = NO;
@@ -613,6 +615,7 @@ static const NSUInteger NVMarkedShareMaxBodyBytes = 500000;
 
     NSString *themedDocument = [[self class] themedHTMLDocumentForTitle:noteTitle contentHTML:previewString];
     if (themedDocument) {
+        [self storeShareHTML:themedDocument];
         [[preview mainFrame] loadHTMLString:themedDocument baseURL:nil];
         [[self window] setTitle:noteTitle];
         [sourceView replaceCharactersInRange:NSMakeRange(0, [[sourceView string] length]) withString:processedString];
@@ -632,6 +635,7 @@ static const NSUInteger NVMarkedShareMaxBodyBytes = 500000;
     [outputString replaceOccurrencesOfString:@"{%content%}" withString:bodyString options:0 range:NSMakeRange(0, [outputString length])];
     [outputString replaceOccurrencesOfString:@"{%style%}" withString:cssString options:0 range:NSMakeRange(0, [outputString length])];
 
+    [self storeShareHTML:outputString];
     [[preview mainFrame] loadHTMLString:outputString baseURL:nil];
     [[self window] setTitle:noteTitle];
 
@@ -1165,7 +1169,88 @@ static const NSUInteger NVMarkedShareMaxBodyBytes = 500000;
     [shareURL release];
 }
 
+- (void)storeShareHTML:(NSString *)html {
+    if (shareHTML != html && ![shareHTML isEqualToString:html]) {
+        [shareHTML release];
+        shareHTML = [html copy];
+    }
+    [self refreshPreviewShareButton];
+}
+
+- (void)refreshPreviewShareButton {
+    [previewShareButton setEnabled:[shareHTML length] > 0];
+}
+
+- (void)discardPreviewShareFiles {
+    if (previewShareDirectory) {
+        [[NSFileManager defaultManager] removeItemAtPath:previewShareDirectory error:NULL];
+        [previewShareDirectory release];
+        previewShareDirectory = nil;
+    }
+    [previewSharePicker release];
+    previewSharePicker = nil;
+}
+
+- (void)windowDidLoad {
+    [super windowDidLoad];
+    if (previewShareButton || !shareButton)
+        return;
+    NSRect shareFrame = [shareButton frame];
+    NSRect frame = NSMakeRect(NSMinX(shareFrame) - 6.0 - 28.0, NSMinY(shareFrame), 28.0, NSHeight(shareFrame));
+    previewShareButton = [[NSButton alloc] initWithFrame:frame];
+    [previewShareButton setBordered:NO];
+    [previewShareButton setButtonType:NSButtonTypeMomentaryPushIn];
+    [previewShareButton setImagePosition:NSImageOnly];
+    [previewShareButton setImage:[NSImage imageNamed:NSImageNameShareTemplate]];
+    [[previewShareButton cell] setImageScaling:NSImageScaleProportionallyDown];
+    [previewShareButton setToolTip:@"Share Preview"];
+    [previewShareButton setTarget:self];
+    [previewShareButton setAction:@selector(shareRenderedPreview:)];
+    [previewShareButton setAutoresizingMask:NSViewMinXMargin];
+    [previewShareButton setEnabled:NO];
+    [[shareButton superview] addSubview:previewShareButton];
+}
+
+- (IBAction)shareRenderedPreview:(id)sender {
+    if (![shareHTML length] || !previewShareButton)
+        return;
+    [self discardPreviewShareFiles];
+    NSString *directory = [NSTemporaryDirectory() stringByAppendingPathComponent:[[NSProcessInfo processInfo] globallyUniqueString]];
+    NSArray *items = NVPreviewShareItems(shareHTML, [[self window] title], directory);
+    if (![items count]) {
+        [[NSFileManager defaultManager] removeItemAtPath:directory error:NULL];
+        return;
+    }
+    previewShareDirectory = [directory retain];
+    previewSharePicker = [[NSSharingServicePicker alloc] initWithItems:items];
+    [previewSharePicker setDelegate:self];
+    [previewSharePicker showRelativeToRect:[previewShareButton bounds] ofView:previewShareButton preferredEdge:NSMaxYEdge];
+}
+
+- (void)sharingServicePicker:(NSSharingServicePicker *)sharingServicePicker didChooseSharingService:(NSSharingService *)service {
+    if (sharingServicePicker != previewSharePicker)
+        return;
+    if (!service)
+        [self discardPreviewShareFiles];
+}
+
+- (id <NSSharingServiceDelegate>)sharingServicePicker:(NSSharingServicePicker *)sharingServicePicker delegateForSharingService:(NSSharingService *)service {
+    return self;
+}
+
+- (void)sharingService:(NSSharingService *)sharingService didShareItems:(NSArray *)items {
+    [self discardPreviewShareFiles];
+}
+
+- (void)sharingService:(NSSharingService *)sharingService didFailToShareItems:(NSArray *)items error:(NSError *)error {
+    [self discardPreviewShareFiles];
+}
+
 - (void)dealloc {
+    [self discardPreviewShareFiles];
+    [shareHTML release];
+    [previewShareButton removeFromSuperview];
+    [previewShareButton release];
     [htmlString release];
     [cssString release];
     [lastNote release];
