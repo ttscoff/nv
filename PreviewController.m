@@ -19,9 +19,11 @@
 #import "NSFileManager+DirectoryLocations.h"
 #import "NVThemeManager.h"
 #import "PreviewRender.h"
+#import "PreviewSync.h"
 #import <Security/Security.h>
 
 #define kDefaultMarkupPreviewVisible @"markupPreviewVisible"
+static NSString * const NVPreviewScrollsToEditKey = @"PreviewScrollsToEdit";
 
 static NSString * const NVMarkedShareKeychainService = @"net.elasticthreads.nv.marked-share";
 static NSString * const NVMarkedShareTokenAccount = @"api_token";
@@ -64,9 +66,28 @@ static NSString * const NVMarkedShareConnectURL = @"https://share.markedapp.com/
 // into the new document (see -preview: and -webView:didFinishLoadForFrame:).
 static NSString * const NVPreviewScrollStateScript = @"JSON.stringify(" NV_JS_CAPTURE_SCROLL ")";
 
+// Scroll the tightest block whose data-sourcepos range contains the 1-based
+// source line. scrollIntoViewIfNeeded is what actually moves a legacy WebView:
+// assigning scrollTop on the document leaves the frame's own scroller put,
+// which is why typing past the bottom of the preview did nothing.
+// A caret on a blank line uses the nearest block. Already-visible blocks stay put.
+#define NV_JS_SCROLL_TO_LINE \
+"function(line){var nodes=document.querySelectorAll('[data-sourcepos]'),best=null,span=1e15,near=null,nearDist=1e15,i,m,a,b,dist;" \
+"for(i=0;i<nodes.length;i++){m=/^(\\d+):\\d+-(\\d+):\\d+$/.exec(nodes[i].getAttribute('data-sourcepos')||'');" \
+"if(!m)continue;a=+m[1];b=+m[2];" \
+"if(line>=a&&line<=b&&(b-a)<=span){span=b-a;best=nodes[i];}" \
+"if(line<a||line>b){dist=line<a?a-line:line-b;if(dist<nearDist){nearDist=dist;near=nodes[i];}}}" \
+"if(!best)best=near;if(!best)return;" \
+"var root=document.documentElement,body=document.body,box=document.getElementById('wrapper')||document.getElementById('contentdiv');" \
+"if(root)root.style.overflowAnchor='none';if(body)body.style.overflowAnchor='none';if(box)box.style.overflowAnchor='none';" \
+"if(best.scrollIntoViewIfNeeded)best.scrollIntoViewIfNeeded(false);else if(best.scrollIntoView)best.scrollIntoView(true);}"
+
 // Replaces the rendered note between the nv-content marker comments without
 // reloading the document, so nothing flashes and the scroll position is kept.
-// Takes a JSON array [html, title]. Returns "1", or "0" when the markers are not
+// Takes a JSON array [html, title, line]. A line of 0 restores the reader's
+// scroll. A line above 0 scrolls the block containing that source line, and
+// the same scroll runs again after MathJax or Mermaid change the page height.
+// Returns "1", or "0" when the markers are not
 // there (nothing loaded yet, or a stray closing tag in the note pushed the end
 // marker out of the container) and the caller must load a full document. MathJax
 // and Mermaid, when the page has them, are asked to render the new content.
@@ -81,7 +102,8 @@ static NSString * const NVPreviewUpdateInPlaceScript =
     // A fresh end marker is placed as a sibling so the next edit finds it directly.
     "var p=s.parentNode,last=e;while(last&&last.parentNode!==p)last=last.parentNode;"
     "if(!last)return '0';"
-    "var saved=" NV_JS_CAPTURE_SCROLL ",applied={};var restore=function(){(" NV_JS_RESTORE_SCROLL ")(saved,applied);};"
+    "var editLine=a[2]|0;var scrollTo=(" NV_JS_SCROLL_TO_LINE ");"
+    "var saved=" NV_JS_CAPTURE_SCROLL ",applied={};var restore=function(){if(editLine){scrollTo(editLine);return;}(" NV_JS_RESTORE_SCROLL ")(saved,applied);};"
     "while(s.nextSibling&&s.nextSibling!==last)p.removeChild(s.nextSibling);p.removeChild(last);"
     "var t=document.createElement('template');t.innerHTML=a[0];t.content.appendChild(document.createComment('nv-content-end'));"
     "p.insertBefore(t.content,s.nextSibling);"
@@ -121,8 +143,10 @@ static const NSUInteger NVMarkedShareMaxBodyBytes = 500000;
 
 +(void)initialize
 {
-    NSDictionary *appDefaults = [NSDictionary dictionaryWithObject:[NSNumber numberWithBool:NO]
-                                                            forKey:kDefaultMarkupPreviewVisible];
+    NSDictionary *appDefaults = [NSDictionary dictionaryWithObjectsAndKeys:
+                                 [NSNumber numberWithBool:NO], kDefaultMarkupPreviewVisible,
+                                 [NSNumber numberWithBool:NO], NVPreviewScrollsToEditKey,
+                                 nil];
 
     [[NSUserDefaults standardUserDefaults] registerDefaults:appDefaults];
     /* Initialize webInspector. */
@@ -327,6 +351,12 @@ static const NSUInteger NVMarkedShareMaxBodyBytes = 500000;
 {
     if (frame != [sender mainFrame])
         return;
+    if ([self previewScrollsToEdit] && !self.isPreviewSticky) {
+        [pendingScrollState release];
+        pendingScrollState = nil;
+        [self scrollPreviewToSourceLine:[self previewEditLine]];
+        return;
+    }
     if (pendingScrollState) {
         [sender stringByEvaluatingJavaScriptFromString:[self javaScriptReapplyingPreviewScrollState:pendingScrollState]];
         [pendingScrollState release];
@@ -407,7 +437,8 @@ static const NSUInteger NVMarkedShareMaxBodyBytes = 500000;
             [self performSelector:@selector(preview:) withObject:[[NSApplication sharedApplication] delegate] afterDelay:0.0];
         }
         [tabView selectTabViewItem:[tabView tabViewItemAtIndex:0]];
-        [tabSwitcher setTitle:@"View Source"];
+        [tabSwitcher setToolTip:@"View Source"];
+        [tabSwitcher setState:NSControlStateValueOff];
 
         [wnd orderFront:self];
     }
@@ -525,9 +556,41 @@ static const NSUInteger NVMarkedShareMaxBodyBytes = 500000;
 // Swaps the rendered note into the page that is already showing. Returns NO when
 // the page has no markers (nothing loaded yet), in which case the caller loads a
 // full document instead.
-- (BOOL)updatePreviewInPlaceWithContent:(NSString *)content title:(NSString *)title
+- (BOOL)previewScrollsToEdit
 {
-    NSData *args = [NSJSONSerialization dataWithJSONObject:@[content ?: @"", title ?: @""] options:0 error:NULL];
+    if (editScrollButton)
+        return [editScrollButton state] == NSControlStateValueOn;
+    return [[NSUserDefaults standardUserDefaults] boolForKey:NVPreviewScrollsToEditKey];
+}
+
+- (NSUInteger)previewEditLine
+{
+    AppController *app = (AppController *)[NSApp delegate];
+    NSUInteger index = [app noteCaretIndex];
+    if (index == NSNotFound)
+        return NSNotFound;
+    return NVSourceLineForIndex([app noteContent], index);
+}
+
+- (void)scrollPreviewToSourceLine:(NSUInteger)line
+{
+    NSString *script;
+    if (!preview || line == 0 || line == NSNotFound)
+        return;
+    script = [NSString stringWithFormat:@"(" NV_JS_SCROLL_TO_LINE ")(%lu);", (unsigned long)line];
+    [preview stringByEvaluatingJavaScriptFromString:script];
+}
+
+- (void)scrollPreviewToEditIfSynced
+{
+    if (![self previewScrollsToEdit] || self.isPreviewSticky || ![[self window] isVisible])
+        return;
+    [self scrollPreviewToSourceLine:[self previewEditLine]];
+}
+
+- (BOOL)updatePreviewInPlaceWithContent:(NSString *)content title:(NSString *)title editLine:(NSUInteger)editLine
+{
+    NSData *args = [NSJSONSerialization dataWithJSONObject:@[content ?: @"", title ?: @"", [NSNumber numberWithUnsignedInteger:editLine]] options:0 error:NULL];
     if (!args)
         return NO;
     NSString *argsString = [[[NSString alloc] initWithData:args encoding:NSUTF8StringEncoding] autorelease];
@@ -549,7 +612,11 @@ static const NSUInteger NVMarkedShareMaxBodyBytes = 500000;
     NSString *rawString = [app noteContent];
 
     SEL mode = [self markupProcessorSelector:[app currentPreviewMode]];
-    NSString *processedString = [NSString performSelector:mode withObject:rawString];
+    BOOL followEdit = [self previewScrollsToEdit];
+    NSUInteger editLine = followEdit ? [self previewEditLine] : 0;
+    NSString *processedString = (followEdit && mode == @selector(stringWithProcessedMultiMarkdown:))
+        ? [NSString stringWithProcessedMultiMarkdown:rawString includingSourcePositions:YES]
+        : [NSString performSelector:mode withObject:rawString];
     NSString *noteTitle =  ([app selectedNoteObject]) ? [NSString stringWithFormat:@"%@",titleOfNote([app selectedNoteObject])] : @"";
     NSString *previewAssets = [[[NSBundle mainBundle] resourcePath] stringByAppendingPathComponent:@"preview-js"];
 
@@ -565,23 +632,29 @@ static const NSUInteger NVMarkedShareMaxBodyBytes = 500000;
 
     if (sameNote && !previewNeedsFullReload && ![preview isLoading]
         && (!needsMath || previewHasMathJax) && (!needsMermaid || previewHasMermaid) && (!needsWiki || previewHasWiki)
-        && [self updatePreviewInPlaceWithContent:content title:noteTitle]) {
+        && [self updatePreviewInPlaceWithContent:content title:noteTitle editLine:(editLine == NSNotFound ? 0 : editLine)]) {
         [self storeShareHTML:NVPreviewHTMLByReplacingShareContent(shareHTML, content, noteTitle)];
         [[self window] setTitle:noteTitle];
         [sourceView replaceCharactersInRange:NSMakeRange(0, [[sourceView string] length]) withString:processedString];
         self.isPreviewOutdated = NO;
         [self updateOpenInMarkedButton];
+        if (followEdit) {
+            // The swap can anchor the old viewport after this script returns.
+            [NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(scrollPreviewToEditIfSynced) object:nil];
+            [self performSelector:@selector(scrollPreviewToEditIfSynced) withObject:nil afterDelay:0];
+        }
         return;
     }
 
     NSString *scrollState = nil;
-    if (sameNote) {
+    if (sameNote && !followEdit) {
         // Keep the reader's place across the reload. If the previous reload is
         // still in flight the new document may not be scrolled yet, so reuse
         // what we saved. The retain/autorelease keeps that object alive for the
         // rest of this method even though pendingScrollState is replaced below.
+        // Scroll-to-edit wins over that restore, or the two fight after each update.
         scrollState = ([preview isLoading] && pendingScrollState) ? [[pendingScrollState retain] autorelease] : [self currentPreviewScrollState];
-    } else {
+    } else if (!sameNote) {
         [cssString release];
         [htmlString release];
         cssString = [[[self class] css] retain];
@@ -970,11 +1043,8 @@ static const NSUInteger NVMarkedShareMaxBodyBytes = 500000;
 
 - (void)updateOpenInMarkedButton
 {
-    NoteObject *note = [self noteShownInPreview];
-    BOOL show = NO;
-    if (note && storageFormatOfNote(note) == PlainTextFormat)
-        show = [[note noteFilePath] length] > 0;
-    [saveButton setHidden:!show];
+    /* Marked is available from the system share menu. */
+    [saveButton setHidden:YES];
 }
 
 -(IBAction)openInMarked:(id)sender
@@ -1061,11 +1131,13 @@ static const NSUInteger NVMarkedShareMaxBodyBytes = 500000;
 {
 
     if ([tabView indexOfTabViewItem:[tabView selectedTabViewItem]] == 0) {
-        [tabSwitcher setTitle:@"View Preview"];
         [tabView selectTabViewItem:[tabView tabViewItemAtIndex:1]];
+        [tabSwitcher setToolTip:@"View Preview"];
+        [tabSwitcher setState:NSControlStateValueOn];
     } else {
-        [tabSwitcher setTitle:@"View Source"];
         [tabView selectTabViewItem:[tabView tabViewItemAtIndex:0]];
+        [tabSwitcher setToolTip:@"View Source"];
+        [tabSwitcher setState:NSControlStateValueOff];
     }
 }
 
@@ -1170,6 +1242,7 @@ static const NSUInteger NVMarkedShareMaxBodyBytes = 500000;
 }
 
 - (void)storeShareHTML:(NSString *)html {
+    html = NVHTMLWithoutSourcePositions(html);
     if (shareHTML != html && ![shareHTML isEqualToString:html]) {
         [shareHTML release];
         shareHTML = [html copy];
@@ -1186,14 +1259,46 @@ static const NSUInteger NVMarkedShareMaxBodyBytes = 500000;
     previewSharePicker = nil;
 }
 
+- (NSImage *)previewToolbarImageNamed:(NSString *)symbolName
+{
+    NSImage *image = [NSImage imageWithSystemSymbolName:symbolName accessibilityDescription:nil];
+    NSImageSymbolConfiguration *config;
+    if (!image)
+        return nil;
+    config = [NSImageSymbolConfiguration configurationWithPointSize:12 weight:NSFontWeightRegular];
+    image = [image imageWithSymbolConfiguration:config] ?: image;
+    image = [[image copy] autorelease];
+    [image setTemplate:YES];
+    return image;
+}
+
+- (void)stylePreviewSourceButton
+{
+    NSImage *image = [self previewToolbarImageNamed:@"chevron.left.forwardslash.chevron.right"];
+    [tabSwitcher setButtonType:NSButtonTypePushOnPushOff];
+    [tabSwitcher setBezelStyle:NSBezelStyleRecessed];
+    [tabSwitcher setImagePosition:image ? NSImageOnly : NSNoImage];
+    [tabSwitcher setImageScaling:NSImageScaleProportionallyDown];
+    [tabSwitcher setImage:image];
+    [tabSwitcher setTitle:image ? @"" : @"</>"];
+    [tabSwitcher setAlphaValue:0.8];
+    [tabSwitcher setToolTip:@"View Source"];
+    [tabSwitcher setState:NSControlStateValueOff];
+    [tabSwitcher setAutoresizingMask:NSViewMaxXMargin | NSViewMaxYMargin];
+}
+
 - (void)windowDidLoad {
     [super windowDidLoad];
-    if (previewShareButton || !shareButton)
+    [self updateOpenInMarkedButton];
+    if (previewShareButton || !shareButton || !tabSwitcher)
         return;
-    /* Pin, Print, and Marked Share sit 6 points apart. Slide that row left and take the slot at the right. */
+    /* Sync, then the source icon, sit at the left. Pin, Print, and Marked Share
+       slide one slot left so the system share button can take the right end. */
     CGFloat slot = NSWidth([shareButton frame]);
     CGFloat gap = 6.0;
-    NSButton *row[] = { saveButton, stickyPreviewButton, printPreviewButton, shareButton };
+    NSRect sourceFrame = [tabSwitcher frame];
+    CGFloat left = NSMinX(sourceFrame);
+    NSButton *row[] = { stickyPreviewButton, printPreviewButton, shareButton };
     NSUInteger index;
     for (index = 0; index < sizeof(row) / sizeof(row[0]); index++) {
         NSButton *button = row[index];
@@ -1203,6 +1308,29 @@ static const NSUInteger NVMarkedShareMaxBodyBytes = 500000;
         buttonFrame.origin.x -= slot + gap;
         [button setFrame:buttonFrame];
     }
+    [self stylePreviewSourceButton];
+    sourceFrame = NSMakeRect(left + slot + gap, NSMinY(sourceFrame), slot, NSHeight([shareButton frame]));
+    [tabSwitcher setFrame:sourceFrame];
+    editScrollButton = [[NSButton alloc] initWithFrame:NSMakeRect(left, NSMinY(sourceFrame), slot, NSHeight(sourceFrame))];
+    [editScrollButton setButtonType:NSButtonTypePushOnPushOff];
+    [editScrollButton setBezelStyle:NSBezelStyleRecessed];
+    [editScrollButton setImagePosition:NSImageOnly];
+    [editScrollButton setImageScaling:NSImageScaleProportionallyDown];
+    NSImage *syncImage = [self previewToolbarImageNamed:@"arrow.up.and.down"];
+    if (syncImage) {
+        [editScrollButton setImage:syncImage];
+    } else {
+        syncImage = [[NSImage imageNamed:NSImageNameRefreshTemplate] copy];
+        [editScrollButton setImage:syncImage];
+        [syncImage release];
+    }
+    [editScrollButton setAlphaValue:0.8];
+    [editScrollButton setToolTip:@"Scroll preview with the edit"];
+    [editScrollButton setTarget:self];
+    [editScrollButton setAction:@selector(togglePreviewScrollsToEdit:)];
+    [editScrollButton setAutoresizingMask:NSViewMaxXMargin | NSViewMaxYMargin];
+    [editScrollButton setState:[self previewScrollsToEdit] ? NSControlStateValueOn : NSControlStateValueOff];
+    [[tabSwitcher superview] addSubview:editScrollButton];
     NSRect shareFrame = [shareButton frame];
     NSRect frame = NSMakeRect(NSMinX(shareFrame) + slot + gap, NSMinY(shareFrame), slot, NSHeight(shareFrame));
     previewShareButton = [[NSButton alloc] initWithFrame:frame];
@@ -1221,6 +1349,13 @@ static const NSUInteger NVMarkedShareMaxBodyBytes = 500000;
     [previewShareButton setAutoresizingMask:NSViewMinXMargin | NSViewMaxYMargin];
     [previewShareButton setEnabled:NO];
     [[shareButton superview] addSubview:previewShareButton];
+}
+
+- (IBAction)togglePreviewScrollsToEdit:(id)sender {
+    BOOL on = [sender state] == NSControlStateValueOn;
+    [[NSUserDefaults standardUserDefaults] setBool:on forKey:NVPreviewScrollsToEditKey];
+    if (on)
+        [self preview:[NSApp delegate]];
 }
 
 - (IBAction)shareRenderedPreview:(id)sender {
@@ -1255,10 +1390,13 @@ static const NSUInteger NVMarkedShareMaxBodyBytes = 500000;
 }
 
 - (void)dealloc {
+    [NSObject cancelPreviousPerformRequestsWithTarget:self];
     [self discardPreviewSharePicker];
     [shareHTML release];
     [previewShareButton removeFromSuperview];
     [previewShareButton release];
+    [editScrollButton removeFromSuperview];
+    [editScrollButton release];
     [htmlString release];
     [cssString release];
     [lastNote release];

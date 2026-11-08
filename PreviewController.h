@@ -36,6 +36,7 @@
 	NSButton *shareConfirm;
 	NSString *shareURL;
 	NSButton *previewShareButton;
+	NSButton *editScrollButton;
 	NSString *shareHTML;
 	NSSharingServicePicker *previewSharePicker;
 	NSString *cssString;
@@ -68,6 +69,8 @@
 -(IBAction)makePreviewSticky:(id)sender;
 -(IBAction)makePreviewNotSticky:(id)sender;
 -(IBAction)printPreview:(id)sender;
+-(IBAction)togglePreviewScrollsToEdit:(id)sender;
+-(void)scrollPreviewToEditIfSynced;
 -(BOOL)previewIsVisible;
 -(void)togglePreview:(id)sender;
 -(void)requestPreviewUpdate:(NSNotification *)notification;

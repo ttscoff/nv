@@ -67,7 +67,7 @@
 }
 
 
-+(NSString*)processMultiMarkdown:(NSString*)inputString
++(NSString*)processMultiMarkdown:(NSString*)inputString includingSourcePositions:(BOOL)sourcePositions
 {
 	if (!inputString)
 		return @"";
@@ -75,7 +75,14 @@
 	NSRange tagFoundRange = [inputString rangeOfString:@"@taskpaper"];
 	if (archiveFoundRange.location != NSNotFound || tagFoundRange.location != NSNotFound)
 		inputString = [self processTaskPaper:inputString];
+	if (sourcePositions)
+		return [NVApexMarkdown htmlFromMarkdownIncludingSourcePositions:inputString];
 	return [NVApexMarkdown htmlFromMarkdown:inputString];
+}
+
++(NSString*)processMultiMarkdown:(NSString*)inputString
+{
+	return [self processMultiMarkdown:inputString includingSourcePositions:NO];
 }
 
 +(NSString*)documentWithProcessedMultiMarkdown:(NSString*)inputString
@@ -107,5 +114,10 @@
 {
 	return [self processMultiMarkdown:inputString];
 } // stringWithProcessedMultiMarkdown:
+
++(NSString*)stringWithProcessedMultiMarkdown:(NSString*)inputString includingSourcePositions:(BOOL)sourcePositions
+{
+	return [self processMultiMarkdown:inputString includingSourcePositions:sourcePositions];
+}
 
 @end // NSString (MultiMarkdown)

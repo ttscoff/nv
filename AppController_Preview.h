@@ -12,5 +12,6 @@
 @interface AppController (Preview)
 
 -(NSString *)noteContent;
+-(NSUInteger)noteCaretIndex;
 -(NSInteger)currentPreviewMode;
 @end

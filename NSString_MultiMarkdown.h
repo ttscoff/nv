@@ -14,6 +14,7 @@
 @interface NSString (MultiMarkdown)
 
 + (NSString*)stringWithProcessedMultiMarkdown:(NSString*)inputString;
++ (NSString*)stringWithProcessedMultiMarkdown:(NSString*)inputString includingSourcePositions:(BOOL)sourcePositions;
 + (NSString*)documentWithProcessedMultiMarkdown:(NSString*)inputString;
 + (NSString*)xhtmlWithProcessedMultiMarkdown:(NSString*)inputString;
 + (NSString*)processMultiMarkdown:(NSString*)inputString;

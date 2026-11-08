@@ -1984,8 +1984,10 @@ static NSURL *NVHTTPURLFromImportString(NSString *entered) {
 }
 
 - (void)textViewDidChangeSelection:(NSNotification *)notification {
-	if ([notification object] == textView)
-		[self refreshEditorShareButton];
+	if ([notification object] != textView)
+		return;
+	[self refreshEditorShareButton];
+	[previewController scrollPreviewToEditIfSynced];
 }
 
 - (void)textDidBeginEditing:(NSNotification *)aNotification {

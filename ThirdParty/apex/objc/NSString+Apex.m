@@ -289,6 +289,12 @@ NSString *const ApexModeQuarto = @"quarto";
       options.enable_autolink = [enableAutolinkValue boolValue];
     }
 
+    /* data-sourcepos on block elements */
+    id sourcePositionsValue = optionsDict[@"sourcePositions"];
+    if (sourcePositionsValue && [sourcePositionsValue isKindOfClass:[NSNumber class]]) {
+      options.source_positions = [sourcePositionsValue boolValue];
+    }
+
     /* Output format: html (default) or rtf */
     id outputFormatValue = optionsDict[@"outputFormat"];
     if (outputFormatValue && [outputFormatValue isKindOfClass:[NSString class]]) {
