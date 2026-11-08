@@ -1,3 +1,21 @@
+nvALT 3.0.34 (144)
+-------------------------
+
+#### CHANGED
+
+- **View Source** is now a `</>` icon, and the sync toggle sits to its left
+- Removed **Open in Marked** from the preview toolbar. Share to Marked from the share menu instead
+
+#### NEW
+
+- **Share** button in the title bar sends the selected text, or the whole note when nothing is selected
+- **Share Preview** sends the rendered note as rich text so other notes apps can paste it into the note
+- **Preview sync** keeps the preview on the block you are editing, and only scrolls when that block leaves the screen
+
+#### FIXED
+
+- **Search field** right edge follows the window when a tiled window is resized
+
 nvALT 3.0.33 (144)
 -------------------------
 
