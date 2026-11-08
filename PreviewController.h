@@ -37,7 +37,6 @@
 	NSString *shareURL;
 	NSButton *previewShareButton;
 	NSString *shareHTML;
-	NSString *previewShareDirectory;
 	NSSharingServicePicker *previewSharePicker;
 	NSString *cssString;
 	NSString *htmlString;

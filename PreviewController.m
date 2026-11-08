@@ -1181,12 +1181,7 @@ static const NSUInteger NVMarkedShareMaxBodyBytes = 500000;
     [previewShareButton setEnabled:[shareHTML length] > 0];
 }
 
-- (void)discardPreviewShareFiles {
-    if (previewShareDirectory) {
-        [[NSFileManager defaultManager] removeItemAtPath:previewShareDirectory error:NULL];
-        [previewShareDirectory release];
-        previewShareDirectory = nil;
-    }
+- (void)discardPreviewSharePicker {
     [previewSharePicker release];
     previewSharePicker = nil;
 }
@@ -1195,34 +1190,47 @@ static const NSUInteger NVMarkedShareMaxBodyBytes = 500000;
     [super windowDidLoad];
     if (previewShareButton || !shareButton)
         return;
+    /* Pin, Print, and Marked Share sit 6 points apart. Slide that row left and take the slot at the right. */
+    CGFloat slot = NSWidth([shareButton frame]);
+    CGFloat gap = 6.0;
+    NSButton *row[] = { saveButton, stickyPreviewButton, printPreviewButton, shareButton };
+    NSUInteger index;
+    for (index = 0; index < sizeof(row) / sizeof(row[0]); index++) {
+        NSButton *button = row[index];
+        if (!button)
+            continue;
+        NSRect buttonFrame = [button frame];
+        buttonFrame.origin.x -= slot + gap;
+        [button setFrame:buttonFrame];
+    }
     NSRect shareFrame = [shareButton frame];
-    NSRect frame = NSMakeRect(NSMinX(shareFrame) - 6.0 - 28.0, NSMinY(shareFrame), 28.0, NSHeight(shareFrame));
+    NSRect frame = NSMakeRect(NSMinX(shareFrame) + slot + gap, NSMinY(shareFrame), slot, NSHeight(shareFrame));
     previewShareButton = [[NSButton alloc] initWithFrame:frame];
-    [previewShareButton setBordered:NO];
     [previewShareButton setButtonType:NSButtonTypeMomentaryPushIn];
+    [previewShareButton setBezelStyle:NSBezelStyleRecessed];
     [previewShareButton setImagePosition:NSImageOnly];
-    [previewShareButton setImage:[NSImage imageNamed:NSImageNameShareTemplate]];
-    [[previewShareButton cell] setImageScaling:NSImageScaleProportionallyDown];
+    [previewShareButton setImageScaling:NSImageScaleProportionallyDown];
+    NSImage *image = [[NSImage imageNamed:NSImageNameShareTemplate] copy];
+    [image setTemplate:YES];
+    [previewShareButton setImage:image];
+    [image release];
+    [previewShareButton setAlphaValue:0.8];
     [previewShareButton setToolTip:@"Share Preview"];
     [previewShareButton setTarget:self];
     [previewShareButton setAction:@selector(shareRenderedPreview:)];
-    [previewShareButton setAutoresizingMask:NSViewMinXMargin];
+    [previewShareButton setAutoresizingMask:NSViewMinXMargin | NSViewMaxYMargin];
     [previewShareButton setEnabled:NO];
     [[shareButton superview] addSubview:previewShareButton];
 }
 
 - (IBAction)shareRenderedPreview:(id)sender {
-    if (![shareHTML length] || !previewShareButton)
+    if (!previewShareButton)
         return;
-    [self discardPreviewShareFiles];
-    NSString *directory = [NSTemporaryDirectory() stringByAppendingPathComponent:[[NSProcessInfo processInfo] globallyUniqueString]];
-    NSArray *items = NVPreviewShareItems(shareHTML, [[self window] title], directory);
-    if (![items count]) {
-        [[NSFileManager defaultManager] removeItemAtPath:directory error:NULL];
+    NSAttributedString *rich = NVPreviewShareRichText(shareHTML);
+    if (!rich)
         return;
-    }
-    previewShareDirectory = [directory retain];
-    previewSharePicker = [[NSSharingServicePicker alloc] initWithItems:items];
+    [self discardPreviewSharePicker];
+    previewSharePicker = [[NSSharingServicePicker alloc] initWithItems:[NSArray arrayWithObject:rich]];
     [previewSharePicker setDelegate:self];
     [previewSharePicker showRelativeToRect:[previewShareButton bounds] ofView:previewShareButton preferredEdge:NSMaxYEdge];
 }
@@ -1231,7 +1239,7 @@ static const NSUInteger NVMarkedShareMaxBodyBytes = 500000;
     if (sharingServicePicker != previewSharePicker)
         return;
     if (!service)
-        [self discardPreviewShareFiles];
+        [self discardPreviewSharePicker];
 }
 
 - (id <NSSharingServiceDelegate>)sharingServicePicker:(NSSharingServicePicker *)sharingServicePicker delegateForSharingService:(NSSharingService *)service {
@@ -1239,15 +1247,15 @@ static const NSUInteger NVMarkedShareMaxBodyBytes = 500000;
 }
 
 - (void)sharingService:(NSSharingService *)sharingService didShareItems:(NSArray *)items {
-    [self discardPreviewShareFiles];
+    [self discardPreviewSharePicker];
 }
 
 - (void)sharingService:(NSSharingService *)sharingService didFailToShareItems:(NSArray *)items error:(NSError *)error {
-    [self discardPreviewShareFiles];
+    [self discardPreviewSharePicker];
 }
 
 - (void)dealloc {
-    [self discardPreviewShareFiles];
+    [self discardPreviewSharePicker];
     [shareHTML release];
     [previewShareButton removeFromSuperview];
     [previewShareButton release];
