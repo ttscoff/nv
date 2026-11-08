@@ -26,6 +26,7 @@
 #import "TagSearch.h"
 #import "SearchHighlight.h"
 #import "NoteShare.h"
+#import "SearchFieldLayout.h"
 #import "LinkReferenceCompletion.h"
 #import "NSString_CustomTruncation.h"
 #import "NSFileManager_NV.h"
@@ -2664,9 +2665,10 @@ static void NVRemoveSuperviewConstraintsOnView(NSView *view) {
 	CGFloat leftLimit = NSMinX(titlebarInWindow);
 	NSView *content = [window contentView];
 	if (content) {
-		/* A tiled window can inset the content without insetting the titlebar, or the other way around. */
+		/* The titlebar view lags a tiled resize and stays at the width from
+		   when the window was tiled. The content view has the new width. */
 		NSRect contentInWindow = [content convertRect:[content bounds] toView:nil];
-		right = MIN(right, NSMaxX(contentInWindow));
+		right = NVSearchFieldRightEdge(right, NSMaxX(contentInWindow));
 		leftLimit = MAX(leftLimit, NSMinX(contentInWindow));
 	}
 	right -= NVEditorShareButtonEdge;
@@ -2776,6 +2778,18 @@ static void NVRemoveSuperviewConstraintsOnView(NSView *view) {
 - (void)windowDidLayout:(NSNotification *)notification {
 	[self alignSearchFieldWithEditor];
 	/* Titlebar layout can run after this and put the field back. Align once more after it. */
+	[self alignSearchFieldWithEditorAfterLayout];
+}
+
+- (void)windowDidResize:(NSNotification *)notification {
+	/* A tiled resize updates the content view before the titlebar view, and
+	   does not always send windowDidLayout. Align from the resize itself. */
+	[self alignSearchFieldWithEditor];
+	[self alignSearchFieldWithEditorAfterLayout];
+}
+
+- (void)windowDidEndLiveResize:(NSNotification *)notification {
+	[self alignSearchFieldWithEditor];
 	[self alignSearchFieldWithEditorAfterLayout];
 }
 
