@@ -1,3 +1,22 @@
+nvALT 3.0.35 (144)
+-------------------------
+
+#### CHANGED
+
+- The notes list, the editor, and the preview use the system **scroll bars**
+- **Use nvALT Scrollbars** is gone from Settings
+- **Search highlights** stay while switching notes and clear when the editor takes focus
+
+#### FIXED
+
+- **Scroll bars** keep a single knob instead of leaving copies behind while scrolling
+- **Search field** follows the window when the title bar is still the width from when the window was created
+- **Share button** stays on the right edge as the window grows
+- Moving the **selection** no longer leaves a hairline on a fractional line
+- **Search highlights** on a dark note keep their color instead of turning into a gray bar
+- Matched text sits on the **highlight color** instead of black letters on the note background
+- Letters return to the **theme color** when they stop matching the search
+
 nvALT 3.0.34 (144)
 -------------------------
 
