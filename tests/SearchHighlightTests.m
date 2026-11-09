@@ -33,13 +33,39 @@ int main(int argc, const char *argv[]) {
 				nil, "the note body does not keep the search highlight");
 
 	expectEqual(NVSearchHighlightQuery(NO, NO, YES, NO, allOfTitle, @"nvalt task", title, title),
-				nil, "opening the note does not highlight the words that found it");
+				@"nvalt task", "opening a found note keeps the search highlighted");
 
 	expectEqual(NVSearchHighlightQuery(NO, NO, YES, YES, allOfTitle, @"nvalt task", title, title),
-				nil, "the field showing only the title is not a search");
+				@"nvalt task", "the title in the field does not erase the search highlight");
+
+	expectEqual(NVSearchHighlightQuery(NO, NO, NO, YES, allOfTitle, nil, title, title),
+				nil, "a title with no search behind it is not highlighted");
 
 	expectEqual(NVSearchHighlightQuery(NO, YES, YES, YES, none, @"nvalt task", @"", title),
 				nil, "clearing the field leaves nothing to highlight");
+
+	CGFloat red, green, blue;
+	BOOL whiteInk = YES;
+	NVSearchHighlightPaint(0.945, 0.702, 0.702, 1.0, 0.231, 0.259, 0.325, &red, &green, &blue, &whiteInk);
+	if (red < 0.94 || green < 0.69 || blue < 0.69 || whiteInk)
+		fprintf(stderr, "FAIL opaque highlight keeps its color\n"), gFailures++;
+
+	whiteInk = YES;
+	NVSearchHighlightPaint(0.945, 0.702, 0.702, 0.40, 0.231, 0.259, 0.325, &red, &green, &blue, &whiteInk);
+	if (red < 0.90 || green > 0.80 || blue > 0.80 || whiteInk)
+		fprintf(stderr, "FAIL translucent highlight stays colored on a dark note (%.3f %.3f %.3f)\n", red, green, blue), gFailures++;
+
+	NVSearchHighlightPaint(0.871, 0.930, 0.110, 0.45, 0.231, 0.259, 0.325, &red, &green, &blue, &whiteInk);
+	if (NVSearchHighlightSaturation(red, green, blue) < 0.40 || green < red || green < blue)
+		fprintf(stderr, "FAIL yellow highlight stays yellow on a dark note (%.3f %.3f %.3f)\n", red, green, blue), gFailures++;
+
+	NVSearchHighlightPaint(0.945, 0.702, 0.702, 0.40, 0.965, 0.948, 0.949, &red, &green, &blue, &whiteInk);
+	if (red < 0.94 || green < 0.80)
+		fprintf(stderr, "FAIL a light note still gets a tint of the highlight (%.3f %.3f %.3f)\n", red, green, blue), gFailures++;
+
+	NVSearchHighlightPaint(0.15, 0.12, 0.25, 1.0, 1, 1, 1, &red, &green, &blue, &whiteInk);
+	if (!whiteInk)
+		fprintf(stderr, "FAIL a dark highlight uses light text\n"), gFailures++;
 
 	[pool drain];
 	if (gFailures) {

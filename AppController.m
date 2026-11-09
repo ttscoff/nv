@@ -1935,10 +1935,10 @@ static NSURL *NVHTTPURLFromImportString(NSString *entered) {
 		[self updateWordCount:(![prefsController showWordCount])];
 		//[textView setAutomaticallySelectedRange:NSMakeRange(0,0)];
 		
-		// Marks are only for the search being typed. Opening a note shows its title
-		// in the field, and the words that found it are not highlighted again.
+		// The search that found this note stays marked across notes.
+		// Focusing the note body clears it.
 		[textView removeSearchTermHighlights];
-		NSString *highlightString = isFilteringFromTyping ? [self searchStringForHighlighting] : nil;
+		NSString *highlightString = [self searchStringForHighlighting];
 		NSRange foundTermRange = NSMakeRange(NSNotFound, 0);
 		if (highlightString)
 			foundTermRange = [textView highlightTermsTemporarilyReturningFirstRange:highlightString avoidHighlight:

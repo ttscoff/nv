@@ -12,6 +12,7 @@
 
 #import "LinkingEditor.h"
 #import "GlobalPrefs.h"
+#import "SearchHighlight.h"
 #import "AppController.h"
 #import "AppController_Importing.h"
 #import "NotesTableView.h"
@@ -71,6 +72,40 @@ static long (*GetGetScriptManagerVariablePointer())(short);
 - (void)nv_restoreSelectedTextAttributes;
 - (void)nv_recolorCompletionBrackets;
 - (void)nv_reapplyCompletionColors;
+@end
+
+static NSString * const NVSearchHighlightAttributeName = @"NVSearchHighlight";
+
+@interface LinkingEditor (NVSearchHighlightOverlay)
+- (void)nv_drawSearchHighlightsInOverlay:(NSView *)overlay dirtyRect:(NSRect)dirtyRect;
+@end
+
+/* The note draws search ink in a surface that sits above -drawRect:, so a chip
+   painted there never appears behind the letters. This view is flipped like the
+   text view and stays above that surface. */
+@interface NVSearchHighlightOverlay : NSView
+@end
+
+@implementation NVSearchHighlightOverlay
+
+- (BOOL)isFlipped {
+	return YES;
+}
+
+- (BOOL)isOpaque {
+	return NO;
+}
+
+- (NSView *)hitTest:(NSPoint)point {
+	return nil;
+}
+
+- (void)drawRect:(NSRect)dirtyRect {
+	NSView *parent = [self superview];
+	if ([parent respondsToSelector:@selector(nv_drawSearchHighlightsInOverlay:dirtyRect:)])
+		[(LinkingEditor *)parent nv_drawSearchHighlightsInOverlay:self dirtyRect:dirtyRect];
+}
+
 @end
 
 @implementation LinkingEditor
@@ -465,17 +500,45 @@ CGFloat _perceptualColorDifference(NSColor*a, NSColor*b) {
 	didRenderFully = YES;
 }
 
+static NSColor *NVSearchHighlightInkColor(NSColor *highlight) {
+	static NSColor *blackInk = nil;
+	static NSColor *whiteInk = nil;
+	CGFloat red = 0, green = 0, blue = 0, alpha = 0;
+	NSColor *rgb = [highlight colorUsingColorSpace:[NSColorSpace sRGBColorSpace]];
+	if (!rgb)
+		return nil;
+	[rgb getRed:&red green:&green blue:&blue alpha:&alpha];
+	if (!blackInk) {
+		blackInk = [[NSColor colorWithSRGBRed:0 green:0 blue:0 alpha:1] retain];
+		whiteInk = [[NSColor colorWithSRGBRed:1 green:1 blue:1 alpha:1] retain];
+	}
+	return NVSearchHighlightLuminance(red, green, blue) <= 0.55 ? whiteInk : blackInk;
+}
+
 - (NSDictionary *)layoutManager:(NSLayoutManager *)layoutManager shouldUseTemporaryAttributes:(NSDictionary *)attrs forDrawingToScreen:(BOOL)toScreen atCharacterIndex:(NSUInteger)charIndex effectiveRange:(NSRangePointer)effectiveCharRange {
-	if (!toScreen || !completionSelectionColored || !completionColoredRange.length || !NSLocationInRange(charIndex, completionColoredRange))
+	if (!toScreen)
 		return attrs;
-	NSColor *color = [self nv_themeForegroundColor];
-	if (!color)
-		return attrs;
-	NSMutableDictionary *modified = attrs ? [[attrs mutableCopy] autorelease] : [NSMutableDictionary dictionary];
-	[modified setObject:color forKey:NSForegroundColorAttributeName];
-	if (effectiveCharRange)
-		*effectiveCharRange = NSMakeRange(charIndex, 1);
-	return modified;
+	if (completionSelectionColored && completionColoredRange.length && NSLocationInRange(charIndex, completionColoredRange)) {
+		NSColor *color = [self nv_themeForegroundColor];
+		if (!color)
+			return attrs;
+		NSMutableDictionary *modified = attrs ? [[attrs mutableCopy] autorelease] : [NSMutableDictionary dictionary];
+		[modified setObject:color forKey:NSForegroundColorAttributeName];
+		if (effectiveCharRange)
+			*effectiveCharRange = NSMakeRange(charIndex, 1);
+		return modified;
+	}
+	/* Ink is chosen only while drawing. Storing it would replace the theme color,
+	   and taking it away when the letters stop matching leaves the default black. */
+	if ([attrs objectForKey:NVSearchHighlightAttributeName]) {
+		NSColor *ink = NVSearchHighlightInkColor([attrs objectForKey:NSBackgroundColorAttributeName]);
+		if (!ink)
+			return attrs;
+		NSMutableDictionary *modified = [[attrs mutableCopy] autorelease];
+		[modified setObject:ink forKey:NSForegroundColorAttributeName];
+		return modified;
+	}
+	return attrs;
 }
 - (void)layoutManagerDidInvalidateLayout:(NSLayoutManager *)aLayoutManager {
 	didRenderFully = NO;	
@@ -728,6 +791,133 @@ static BOOL NVSearchHighlightColorMatches(NSColor *applied, NSColor *searchColor
 		NVHighlightComponentsMatch([appliedRGB alphaComponent], [searchRGB alphaComponent]);
 }
 
+- (NSDictionary *)nv_searchHighlightAttributes {
+	NSDictionary *base = [prefsController searchTermHighlightAttributes];
+	if (!base)
+		return nil;
+	NSMutableDictionary *attributes = [[base mutableCopy] autorelease];
+	[attributes removeObjectForKey:NSForegroundColorAttributeName];
+	[attributes setObject:[NSNumber numberWithBool:YES] forKey:NVSearchHighlightAttributeName];
+	return attributes;
+}
+
+- (NVSearchHighlightOverlay *)nv_searchHighlightOverlayCreating:(BOOL)create {
+	NVSearchHighlightOverlay *overlay = nil;
+	NSArray *subviews = [self subviews];
+	NSUInteger i;
+	for (i = 0; i < [subviews count]; i++) {
+		NSView *view = [subviews objectAtIndex:i];
+		if ([view isKindOfClass:[NVSearchHighlightOverlay class]])
+			overlay = (NVSearchHighlightOverlay *)view;
+	}
+	if (!overlay && create) {
+		overlay = [[NVSearchHighlightOverlay alloc] initWithFrame:[self bounds]];
+		[overlay setAutoresizingMask:NSViewWidthSizable | NSViewHeightSizable];
+		[self addSubview:overlay];
+		[overlay release];
+	}
+	if (overlay && !NSEqualRects([overlay frame], [self bounds]))
+		[overlay setFrame:[self bounds]];
+	return overlay;
+}
+
+- (void)nv_displaySearchHighlights {
+	NVSearchHighlightOverlay *overlay = [self nv_searchHighlightOverlayCreating:YES];
+	[overlay setNeedsDisplay:YES];
+}
+
+- (void)didAddSubview:(NSView *)subview {
+	[super didAddSubview:subview];
+	if ([subview isKindOfClass:[NVSearchHighlightOverlay class]])
+		return;
+	NVSearchHighlightOverlay *overlay = [self nv_searchHighlightOverlayCreating:NO];
+	if (overlay)
+		[self addSubview:overlay];
+}
+
+- (void)setBoundsOrigin:(NSPoint)newOrigin {
+	[super setBoundsOrigin:newOrigin];
+	NVSearchHighlightOverlay *overlay = [self nv_searchHighlightOverlayCreating:NO];
+	if (overlay)
+		[overlay setFrame:[self bounds]];
+}
+
+- (void)setFrameSize:(NSSize)newSize {
+	[super setFrameSize:newSize];
+	NVSearchHighlightOverlay *overlay = [self nv_searchHighlightOverlayCreating:NO];
+	if (overlay)
+		[overlay setFrame:[self bounds]];
+}
+
+- (void)nv_fillSearchHighlightRange:(NSRange)slice color:(NSColor *)color inOverlay:(NSView *)overlay {
+	NSLayoutManager *layout = [self layoutManager];
+	NSTextContainer *container = [self textContainer];
+	if (!layout || !container || !overlay || !slice.length || !color)
+		return;
+	NSRange glyphs = [layout glyphRangeForCharacterRange:slice actualCharacterRange:NULL];
+	if (!glyphs.length)
+		return;
+	NSPoint containerOrigin = [self textContainerOrigin];
+	NSPoint frameOrigin = [overlay frame].origin;
+	NSPoint origin = NSMakePoint(containerOrigin.x - frameOrigin.x, containerOrigin.y - frameOrigin.y);
+	NSRect rect = [layout boundingRectForGlyphRange:glyphs inTextContainer:container];
+	rect.origin.x += origin.x;
+	rect.origin.y += origin.y;
+	[color setFill];
+	NSRectFillUsingOperation(rect, NSCompositingOperationSourceOver);
+	[layout drawGlyphsForGlyphRange:glyphs atPoint:origin];
+}
+
+- (void)nv_paintSearchHighlightSlice:(NSRange)slice avoidingRange:(NSRange)selected color:(NSColor *)color inOverlay:(NSView *)overlay {
+	if (!slice.length)
+		return;
+	if (selected.length && selected.location != NSNotFound) {
+		NSRange overlap = NSIntersectionRange(slice, selected);
+		if (overlap.length) {
+			if (overlap.location > slice.location)
+				[self nv_fillSearchHighlightRange:NSMakeRange(slice.location, overlap.location - slice.location) color:color inOverlay:overlay];
+			if (NSMaxRange(overlap) < NSMaxRange(slice))
+				[self nv_fillSearchHighlightRange:NSMakeRange(NSMaxRange(overlap), NSMaxRange(slice) - NSMaxRange(overlap)) color:color inOverlay:overlay];
+			return;
+		}
+	}
+	[self nv_fillSearchHighlightRange:slice color:color inOverlay:overlay];
+}
+
+- (void)nv_drawSearchHighlightsInOverlay:(NSView *)overlay dirtyRect:(NSRect)dirtyRect {
+	if (!prefsController || ![prefsController highlightSearchTerms])
+		return;
+	NSLayoutManager *layout = [self layoutManager];
+	NSTextContainer *container = [self textContainer];
+	if (!layout || !container)
+		return;
+	NSPoint frameOrigin = [overlay frame].origin;
+	NSPoint containerOrigin = [self textContainerOrigin];
+	NSRect containerRect = dirtyRect;
+	containerRect.origin.x += frameOrigin.x - containerOrigin.x;
+	containerRect.origin.y += frameOrigin.y - containerOrigin.y;
+	containerRect = NSInsetRect(containerRect, -4.0, -4.0);
+	NSRange glyphs = [layout glyphRangeForBoundingRect:containerRect inTextContainer:container];
+	if (!glyphs.length)
+		return;
+	NSRange chars = [layout characterRangeForGlyphRange:glyphs actualGlyphRange:NULL];
+	NSRange selected = [self selectedRange];
+	NSUInteger index = chars.location;
+	NSUInteger end = NSMaxRange(chars);
+	while (index < end) {
+		NSRange effective = NSMakeRange(0, 0);
+		NSDictionary *attributes = [layout temporaryAttributesAtCharacterIndex:index effectiveRange:&effective];
+		NSRange slice = NSIntersectionRange(effective, chars);
+		NSColor *color = [attributes objectForKey:NSBackgroundColorAttributeName];
+		if (slice.length && [attributes objectForKey:NVSearchHighlightAttributeName] && color)
+			[self nv_paintSearchHighlightSlice:slice avoidingRange:selected color:color inOverlay:overlay];
+		NSUInteger next = NSMaxRange(effective);
+		if (next <= index)
+			break;
+		index = next;
+	}
+}
+
 - (void)removeSearchTermHighlights {
 	NSColor *searchColor = [[prefsController searchTermHighlightAttributes] objectForKey:NSBackgroundColorAttributeName];
 	NSLayoutManager *layout = [self layoutManager];
@@ -741,15 +931,16 @@ static BOOL NVSearchHighlightColorMatches(NSColor *applied, NSColor *searchColor
 		if (!effective.length)
 			break;
 		NSColor *background = [attrs objectForKey:NSBackgroundColorAttributeName];
-		if (NVSearchHighlightColorMatches(background, searchColor)) {
+		if ([attrs objectForKey:NVSearchHighlightAttributeName] || NVSearchHighlightColorMatches(background, searchColor)) {
 			[layout removeTemporaryAttribute:NSBackgroundColorAttributeName forCharacterRange:effective];
-			[layout removeTemporaryAttribute:NSForegroundColorAttributeName forCharacterRange:effective];
+			[layout removeTemporaryAttribute:NVSearchHighlightAttributeName forCharacterRange:effective];
 		}
 		NSUInteger next = NSMaxRange(effective);
 		if (next <= index)
 			break;
 		index = next;
 	}
+	[self nv_displaySearchHighlights];
 }
 
 - (void)discardSearchHighlights {
@@ -758,8 +949,9 @@ static BOOL NVSearchHighlightColorMatches(NSColor *applied, NSColor *searchColor
 	if (layout && length) {
 		NSRange all = NSMakeRange(0, length);
 		[layout removeTemporaryAttribute:NSBackgroundColorAttributeName forCharacterRange:all];
-		[layout removeTemporaryAttribute:NSForegroundColorAttributeName forCharacterRange:all];
+		[layout removeTemporaryAttribute:NVSearchHighlightAttributeName forCharacterRange:all];
 	}
+	[self nv_displaySearchHighlights];
 	[self scheduleMarkdownHighlight];
 }
 
@@ -768,7 +960,7 @@ static BOOL NVSearchHighlightColorMatches(NSColor *applied, NSColor *searchColor
 - (void)highlightRangesTemporarily:(CFArrayRef)ranges {
 	CFIndex rangeIndex;
 	long bodyLength = (long)[[self string] length];
-	NSDictionary *highlightDict = [prefsController searchTermHighlightAttributes];
+	NSDictionary *highlightDict = [self nv_searchHighlightAttributes];
 	
 	for (rangeIndex = 0; rangeIndex < CFArrayGetCount(ranges); rangeIndex++) {
 		CFRange *range = (CFRange *)CFArrayGetValueAtIndex(ranges, rangeIndex);
@@ -779,6 +971,7 @@ static BOOL NVSearchHighlightColorMatches(NSColor *applied, NSColor *searchColor
 			NSLog(@"highlightRangesTemporarily: Invalid range (%@)", range ? NSStringFromRange(*(NSRange*)range) : @"null");
 		}
 	}
+	[self nv_displaySearchHighlights];
 }
 
 - (NSRange)highlightTermsTemporarilyReturningFirstRange:(NSString*)typedString avoidHighlight:(BOOL)noHighlight {
@@ -793,7 +986,7 @@ static BOOL NVSearchHighlightColorMatches(NSColor *applied, NSColor *searchColor
 	if (terms) {
 		CFIndex termIndex, rangeIndex;
 		CFStringRef bodyString = (CFStringRef)[self string];
-		NSDictionary *highlightDict = [prefsController searchTermHighlightAttributes];
+		NSDictionary *highlightDict = [self nv_searchHighlightAttributes];
 		
 		for (termIndex = 0; termIndex < CFArrayGetCount(terms); termIndex++) {
 			CFStringRef term = CFArrayGetValueAtIndex(terms, termIndex);
@@ -826,6 +1019,7 @@ static BOOL NVSearchHighlightColorMatches(NSColor *applied, NSColor *searchColor
 	returnEarly:
 		CFRelease(terms);
 	}
+	[self nv_displaySearchHighlights];
 	return (firstRange);
 }
 

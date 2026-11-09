@@ -33,6 +33,8 @@
 #import "PTHotKeyCenter.h"
 #import "NSString_NV.h"
 #import "AppController.h"
+#import "SearchHighlight.h"
+#import "NVThemeManager.h"
 
 #define SEND_CALLBACKS() sendCallbacksForGlobalPrefs(self, _cmd, sender)
 
@@ -603,6 +605,23 @@ static NSString *NVAllowedMarker(NSString *stored, NSString *allowed, NSString *
 	}
 }
 
+static BOOL NVColorComponents(NSColor *color, CGFloat *red, CGFloat *green, CGFloat *blue, CGFloat *alpha) {
+	NSColor *rgb = [color colorUsingColorSpace:[NSColorSpace sRGBColorSpace]];
+	if (!rgb)
+		rgb = [color colorUsingColorSpace:[NSColorSpace genericRGBColorSpace]];
+	if (!rgb)
+		return NO;
+	[rgb getRed:red green:green blue:blue alpha:alpha];
+	return YES;
+}
+
+- (NSColor *)nv_searchHighlightBackdrop {
+	NSColor *background = [[[NVThemeManager sharedManager] currentEditorTheme] editorBackgroundColor];
+	if (!background)
+		background = [self backgroundTextColor];
+	return background;
+}
+
 - (NSColor*)searchTermHighlightColorRaw:(BOOL)isRaw {
 	
 	NSData *theData = [defaults dataForKey:SearchTermHighlightColorKey];
@@ -610,9 +629,19 @@ static NSString *NVAllowedMarker(NSString *stored, NSString *allowed, NSString *
 		NSColor *color = (NSColor *)[NSUnarchiver unarchiveObjectWithData:theData];
 		if (isRaw) return color;
 		if (color) {
-			//nslayoutmanager temporary attributes don't seem to like alpha components, so synthesize translucency using the bg color
-			NSColor *fauxAlphaSTHC = [[color colorUsingColorSpaceName:NSCalibratedRGBColorSpace] colorWithAlphaComponent:1.0];
-			return [fauxAlphaSTHC blendedColorWithFraction:(1.0 - [color alphaComponent]) ofColor:[self backgroundTextColor]];
+			CGFloat highlightRed, highlightGreen, highlightBlue, highlightAlpha;
+			if (!NVColorComponents(color, &highlightRed, &highlightGreen, &highlightBlue, &highlightAlpha))
+				return color;
+			CGFloat backgroundRed = highlightRed, backgroundGreen = highlightGreen, backgroundBlue = highlightBlue;
+			CGFloat unusedAlpha = 1;
+			NSColor *backdrop = [self nv_searchHighlightBackdrop];
+			if (backdrop)
+				NVColorComponents(backdrop, &backgroundRed, &backgroundGreen, &backgroundBlue, &unusedAlpha);
+			CGFloat paintedRed, paintedGreen, paintedBlue;
+			NVSearchHighlightPaint(highlightRed, highlightGreen, highlightBlue, highlightAlpha,
+								   backgroundRed, backgroundGreen, backgroundBlue,
+								   &paintedRed, &paintedGreen, &paintedBlue, NULL);
+			return [NSColor colorWithSRGBRed:paintedRed green:paintedGreen blue:paintedBlue alpha:1.0];
 		}
 	}
 
@@ -620,24 +649,23 @@ static NSString *NVAllowedMarker(NSString *stored, NSString *allowed, NSString *
 }
 
 - (NSDictionary*)searchTermHighlightAttributes {
-	NSColor *highlightColor = nil;
-	
-	if (!searchTermHighlightAttributes && (highlightColor = [self searchTermHighlightColorRaw:NO])) {
+	NSColor *highlightColor = [self searchTermHighlightColorRaw:NO];
+	[searchTermHighlightAttributes release];
+	searchTermHighlightAttributes = nil;
+	if (highlightColor) {
 		NSColor *rgb = [highlightColor colorUsingColorSpace:[NSColorSpace sRGBColorSpace]];
 		CGFloat red = 0, green = 0, blue = 0, alpha = 0;
-		NSColor *ink = [NSColor blackColor];
+		NSColor *ink = [NSColor colorWithSRGBRed:0 green:0 blue:0 alpha:1];
 		if (rgb) {
 			[rgb getRed:&red green:&green blue:&blue alpha:&alpha];
-			CGFloat luminance = (0.2126 * red) + (0.7152 * green) + (0.0722 * blue);
-			if (luminance <= 0.55)
-				ink = [NSColor whiteColor];
+			if (NVSearchHighlightLuminance(red, green, blue) <= 0.55)
+				ink = [NSColor colorWithSRGBRed:1 green:1 blue:1 alpha:1];
 		}
 		searchTermHighlightAttributes = [[NSDictionary dictionaryWithObjectsAndKeys:
 										  highlightColor, NSBackgroundColorAttributeName,
 										  ink, NSForegroundColorAttributeName, nil] retain];
 	}
 	return searchTermHighlightAttributes;
-	
 }
 
 - (void)setUseFinderTags:(id)sender {
