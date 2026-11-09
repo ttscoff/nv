@@ -91,7 +91,6 @@ static NSString *UseAutoPairing = @"UseAutoPairing";
 static NSString *MarkdownBoldMarkerKey = @"MarkdownBoldMarker";
 static NSString *MarkdownItalicMarkerKey = @"MarkdownItalicMarker";
 static NSString *MarkdownListMarkerKey = @"MarkdownListMarker";
-static NSString *UseETScrollbarsOnLion = @"UseETScrollbarsOnLion";
 static NSString *UsesMarkdownCompletions = @"UsesMarkdownCompletions";
 static NSString *UseFinderTagsKey = @"UseFinderTags";
 static NSString *UseSmartInsertDeleteKey = @"UseSmartInsertDelete";
@@ -171,7 +170,6 @@ static void sendCallbacksForGlobalPrefs(GlobalPrefs* self, SEL selector, id orig
             @"*", MarkdownBoldMarkerKey,
             @"*", MarkdownItalicMarkerKey,
             @"*", MarkdownListMarkerKey,
-            [NSNumber numberWithBool:NO], UseETScrollbarsOnLion,
             [NSNumber numberWithBool:YES], UsesMarkdownCompletions,
 
 			[NSArchiver archivedDataWithRootObject:
@@ -504,16 +502,6 @@ static void sendCallbacksForGlobalPrefs(GlobalPrefs* self, SEL selector, id orig
 - (void)setShowWordCount:(BOOL)value{
 	[defaults setBool:value forKey:ShowWordCount];
 }
-
-- (void)setUseETScrollbarsOnLion:(BOOL)value sender:(id)sender{
-	[defaults setBool:value forKey:UseETScrollbarsOnLion];
-	SEND_CALLBACKS();
-}
-
-- (BOOL)useETScrollbarsOnLion{
-	return [defaults boolForKey:UseETScrollbarsOnLion];
-}
-
 
 - (void)setUseMarkdownImport:(BOOL)value sender:(id)sender {
 	[defaults setBool:value forKey:UseMarkdownImportKey];

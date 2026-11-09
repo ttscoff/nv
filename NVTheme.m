@@ -430,15 +430,3 @@ NSColor *NVWindowChromeColor(void) {
 		return color;
 	return NVColorResolvedInAppearance([NSColor windowBackgroundColor], [NSApp effectiveAppearance]);
 }
-
-NSColor *NVWindowChromeKnobColor(void) {
-	NSColor *track = NVWindowChromeColor();
-	NSColor *foreground = [[[NVThemeManager sharedManager] currentEditorTheme] windowForegroundColor];
-	if (foreground && track && (NVThemeColorIsLight(foreground) != NVThemeColorIsLight(track))) {
-		if ([foreground alphaComponent] < 0.85)
-			foreground = [foreground colorWithAlphaComponent:0.85];
-		return foreground;
-	}
-	BOOL light = !track || NVThemeColorIsLight(track);
-	return [NSColor colorWithCalibratedWhite:(light ? 0.22 : 0.92) alpha:1.0];
-}

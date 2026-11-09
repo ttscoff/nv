@@ -41,7 +41,7 @@
 	BOOL isAutocompleting, wasDeleting, completionSelectionColored;
 	NSRange completionColoredRange;
 	
-	BOOL backgroundIsDark, mouseInside;
+	BOOL backgroundIsDark, mouseInside, expandingDisplayRect;
 	
 	//ludicrous ivars used to hack NSTextFinder. just write your own, damnit!
 	NSRange selectedRangeDuringFind;

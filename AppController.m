@@ -541,7 +541,7 @@ void outletObjectAwoke(id sender) {
 	 @selector(setTableColumnsShowPreview:sender:),  //when to tell notationcontroller to generate or disable note-body previews
 	 @selector(setConfirmNoteDeletion:sender:),  //whether "delete note" should have an ellipsis
      @selector(setUseFinderTags:),  //whether nvalt should use findertags
-	 @selector(setAutoCompleteSearches:sender:),@selector(setUseETScrollbarsOnLion:sender:), nil];   //when to tell notationcontroller to build its title-prefix connections
+	 @selector(setAutoCompleteSearches:sender:), nil];   //when to tell notationcontroller to build its title-prefix connections
 	
 	[self performSelector:@selector(runDelayedUIActionsAfterLaunch) withObject:nil afterDelay:0.0];
 	[self performSelector:@selector(offerMarkdownConversionIfNeeded) withObject:nil afterDelay:0.6];
@@ -2561,6 +2561,49 @@ static void NVRemoveSuperviewConstraintsOnView(NSView *view) {
 	[existing release];
 }
 
+/* A required width constraint captured when the window was created keeps that
+   width across later resizes. Point any such constraint at the width we want. */
+static void NVRetargetWidthConstraints(NSView *view, CGFloat desiredWidth) {
+	NSView *owner = view;
+	while (owner) {
+		NSArray *existing = [[owner constraints] copy];
+		NSUInteger i;
+		for (i = 0; i < [existing count]; i++) {
+			NSLayoutConstraint *constraint = [existing objectAtIndex:i];
+			if ([constraint firstItem] == view && [constraint secondItem] == nil &&
+				[constraint firstAttribute] == NSLayoutAttributeWidth &&
+				fabs([constraint constant] - desiredWidth) > 0.5)
+				[constraint setConstant:desiredWidth];
+		}
+		[existing release];
+		owner = [owner superview];
+	}
+}
+
+/* The titlebar and the views behind it can stay at the width from when the
+   window was created and clip the search field. Stretch the ones that start
+   at the left edge, outermost first so a child is not clipped by its parent. */
+static void NVStretchFullBleedAncestors(NSView *view, CGFloat targetWidth) {
+	NSMutableArray *chain = [NSMutableArray array];
+	NSView *ancestor = view;
+	while (ancestor) {
+		[chain addObject:ancestor];
+		ancestor = [ancestor superview];
+	}
+	NSInteger i;
+	for (i = (NSInteger)[chain count] - 1; i >= 0; i--) {
+		NSView *item = [chain objectAtIndex:(NSUInteger)i];
+		NSRect frame = [item frame];
+		CGFloat width = NVFullBleedWidth(NSMinX(frame), NSWidth(frame), targetWidth);
+		if (fabs(width - NSWidth(frame)) <= 0.5)
+			continue;
+		frame.size.width = width;
+		NVRetargetWidthConstraints(item, width);
+		[item setFrame:frame];
+		NVRetargetWidthConstraints(item, width);
+	}
+}
+
 - (void)refreshEditorShareButton {
 	if (!editorShareButton)
 		return;
@@ -2597,13 +2640,17 @@ static void NVRemoveSuperviewConstraintsOnView(NSView *view) {
 	}
 	NVRemoveSuperviewConstraintsOnView(button);
 	[button setTranslatesAutoresizingMaskIntoConstraints:YES];
-	[button setAutoresizingMask:NSViewNotSizable];
 	NSRect frame = [host convertRect:desired fromView:nil];
 	frame.origin.x = round(frame.origin.x);
 	frame.origin.y = round(frame.origin.y);
 	frame.size.width = round(NSWidth(frame));
 	frame.size.height = round(NSHeight(frame));
+	NVRetargetWidthConstraints(button, NSWidth(frame));
 	[button setFrame:frame];
+	/* Stick to the right edge. A fixed origin is what left the button behind
+	   when the titlebar grew. */
+	[button setAutoresizingMask:NSViewMinXMargin | NSViewMinYMargin];
+	NVRetargetWidthConstraints(button, NSWidth(frame));
 }
 
 - (IBAction)shareEditorNote:(id)sender {
@@ -2664,13 +2711,21 @@ static void NVRemoveSuperviewConstraintsOnView(NSView *view) {
 	CGFloat right = NSMaxX(titlebarInWindow);
 	CGFloat leftLimit = NSMinX(titlebarInWindow);
 	NSView *content = [window contentView];
+	CGFloat contentMaxX = right;
 	if (content) {
-		/* The titlebar view lags a tiled resize and stays at the width from
-		   when the window was tiled. The content view has the new width. */
 		NSRect contentInWindow = [content convertRect:[content bounds] toView:nil];
-		right = NVSearchFieldRightEdge(right, NSMaxX(contentInWindow));
+		contentMaxX = NSMaxX(contentInWindow);
 		leftLimit = MAX(leftLimit, NSMinX(contentInWindow));
 	}
+	/* The titlebar and the content view can both keep the width from when the
+	   window was created. The window frame is already the new width. */
+	NSRect frameOnScreen = [window frame];
+	NSRect contentOnScreen = [window contentRectForFrameRect:frameOnScreen];
+	NSRect windowContentInWindow = [window convertRectFromScreen:contentOnScreen];
+	CGFloat windowMaxX = NSMaxX(windowContentInWindow);
+	right = NVSearchFieldRightEdge(right, contentMaxX, windowMaxX);
+	if (windowMaxX >= 1.0)
+		NVStretchFullBleedAncestors(titlebar, windowMaxX);
 	right -= NVEditorShareButtonEdge;
 	CGFloat shareButtonRight = right;
 	right -= NVEditorShareButtonWidth + NVEditorShareButtonGap;
@@ -2742,21 +2797,25 @@ static void NVRemoveSuperviewConstraintsOnView(NSView *view) {
 		[titlebar addSubview:container];
 		[container release];
 	}
-	/* The titlebar adds its own constraints and will put a fixed frame back on the next pass. */
+	/* The titlebar's width constraint keeps the creation width. Retarget it,
+	   then let the field grow with the titlebar instead of pinning that width. */
 	NVRemoveSuperviewConstraintsOnView(container);
 	[container setTranslatesAutoresizingMaskIntoConstraints:YES];
-	[container setAutoresizingMask:NSViewNotSizable];
 
 	NSRect desired = NSMakeRect(left, y, right - left, fieldHeight);
 	NSRect frame = [titlebar convertRect:desired fromView:nil];
 	frame.origin.x = round(frame.origin.x);
 	frame.origin.y = round(frame.origin.y);
 	frame.size.width = round(NSWidth(frame));
+	NVRetargetWidthConstraints(container, NSWidth(frame));
 	[container setFrame:frame];
+	[container setAutoresizingMask:NSViewWidthSizable | NSViewMinYMargin];
+	NVRetargetWidthConstraints(container, NSWidth(frame));
 
 	NSRect fieldFrame = [field frame];
 	fieldFrame.origin.x = 0.0;
 	fieldFrame.size.width = NSWidth([container bounds]);
+	[field setAutoresizingMask:NSViewWidthSizable | NSViewMinYMargin];
 	[field setFrame:fieldFrame];
 	[container setNeedsDisplay:YES];
 	NSTextView *editor = (NSTextView *)[field currentEditor];

@@ -534,10 +534,6 @@
 	[[NVThemeManager sharedManager] openThemesFolder];
 }
 
-- (IBAction)changedUseETScrollbarsOnLion:(id)sender{
-    [prefsController setUseETScrollbarsOnLion:[useETScrollbarsOnLionButton state] sender:self];
-}
-
 - (IBAction)changedBackgroundTextColorWell:(id)sender {
 	[prefsController setBackgroundTextColor:[backgroundColorWell color] sender:self];
 }
@@ -859,8 +855,6 @@
     [showGridButton setState:[prefsController showGrid]];
     [autoPairButton setState:[prefsController useAutoPairing]];
     items = [[NSMutableDictionary alloc] init];
-    [useETScrollbarsOnLionButton setState:[prefsController useETScrollbarsOnLion]];
-    [useETScrollbarsOnLionButton setHidden:!IsLionOrLater];
     [self installSettingsSplitView];
 }
 

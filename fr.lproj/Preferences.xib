@@ -38,7 +38,6 @@
                 <outlet property="tableTextSizeField" destination="178" id="246"/>
                 <outlet property="togDockButton" destination="389" id="398"/>
                 <outlet property="togDockLabel" destination="390" id="399"/>
-                <outlet property="useETScrollbarsOnLionButton" destination="488" id="491"/>
                 <outlet property="useMarkdownImportButton" destination="446" id="461"/>
                 <outlet property="useReadabilityButton" destination="447" id="462"/>
                 <outlet property="window" destination="5" id="238"/>
@@ -692,17 +691,6 @@
                     </buttonCell>
                     <connections>
                         <action selector="changedAltRows:" target="-2" id="469"/>
-                    </connections>
-                </button>
-                <button id="488">
-                    <rect key="frame" x="57" y="80" width="242" height="18"/>
-                    <autoresizingMask key="autoresizingMask" flexibleMinY="YES"/>
-                    <buttonCell key="cell" type="check" title="Use nvALT Scrollbars:  " bezelStyle="regularSquare" imagePosition="right" alignment="right" inset="2" id="489">
-                        <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                        <font key="font" metaFont="system"/>
-                    </buttonCell>
-                    <connections>
-                        <action selector="changedUseETScrollbarsOnLion:" target="-2" id="490"/>
                     </connections>
                 </button>
             </subviews>

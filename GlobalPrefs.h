@@ -200,8 +200,6 @@ BOOL ColorsEqualWith8BitChannels(NSColor *c1, NSColor *c2);
 - (BOOL)rtl;
 - (BOOL)showWordCount;
 - (void)setShowWordCount:(BOOL)value;
-- (void)setUseETScrollbarsOnLion:(BOOL)value sender:(id)sender;
-- (BOOL)useETScrollbarsOnLion;
 - (void)setUseMarkdownImport:(BOOL)value sender:(id)sender;
 - (BOOL)useMarkdownImport;
 - (void)setUseReadability:(BOOL)value sender:(id)sender;

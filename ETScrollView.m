@@ -6,9 +6,6 @@
 //
 
 #import "ETScrollView.h"
-#import "ETOverlayScroller.h"
-#import "ETTransparentScroller.h"
-#import "GlobalPrefs.h"
 #import "NVThemeManager.h"
 
 @interface NVChromeMarginView : NSView
@@ -49,57 +46,11 @@
 
 @implementation ETScrollView
 
-
-+ (BOOL)isCompatibleWithResponsiveScrolling{
-    return NO;
-}
-
-
-- (void)awakeFromNib{
-    needsOverlayTiling=NO;
-    if ([self.documentView isKindOfClass:[NSTableView class]]) {
-        scrollerClass=NSClassFromString(@"ETOverlayScroller");
-        [self setAutohidesScrollers:YES];
-        if (!IsLionOrLater) {
-            needsOverlayTiling=YES;
-        }
-    }else{
-        scrollerClass=NSClassFromString(@"ETTransparentScroller");
-    }
-#if MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_7
+- (void)awakeFromNib {
     if (IsLionOrLater) {
-        [[GlobalPrefs defaultPrefs] registerForSettingChange:@selector(setUseETScrollbarsOnLion:sender:) withTarget:self];
         [self setHorizontalScrollElasticity:NSScrollElasticityNone];
         [self setVerticalScrollElasticity:NSScrollElasticityAllowed];
     }
-#endif
-    [self changeUseETScrollbarsOnLion];
-}
-
-
-#if MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_7
-- (void)settingChangedForSelectorString:(NSString*)selectorString{
-    if (IsLionOrLater&&([selectorString isEqualToString:SEL_STR(setUseETScrollbarsOnLion:sender:)])){
-        [self changeUseETScrollbarsOnLion];
-    }
-}
-
-- (void)changeUseETScrollbarsOnLion{
-    id theScroller = [[scrollerClass alloc] init];
-    if ([theScroller respondsToSelector:@selector(setFillBackground:)])
-        [theScroller setFillBackground:!IsLionOrLater && (scrollerClass == [ETTransparentScroller class])];
-    NSScrollerStyle style = 0;
-    if (IsLionOrLater)
-        style = [[theScroller class] preferredScrollerStyle];
-    [self setVerticalScroller:theScroller];
-
-    if (IsLionOrLater) {
-        [theScroller setScrollerStyle:style];
-        [self setScrollerStyle:style];
-    }
-    [theScroller release];
-    [self tile];
-    [self reflectScrolledClipView:[self contentView]];
     [self nv_updateScrollerChrome];
 }
 
@@ -111,17 +62,12 @@
     if ([[self documentView] respondsToSelector:@selector(backgroundColor)])
         pane = [(id)[self documentView] backgroundColor];
     NSColor *chrome = NVWindowChromeColor();
-    NSColor *knob = NVWindowChromeKnobColor();
     BOOL lightChrome = !chrome || NVThemeColorIsLight(chrome);
-    NSAppearance *appearance = [NSAppearance appearanceNamed:(lightChrome ? NSAppearanceNameAqua : NSAppearanceNameDarkAqua)];
-    NSScroller *scroller = [self verticalScroller];
-    BOOL legacy = IsLionOrLater && [scroller scrollerStyle] == NSScrollerStyleLegacy;
-    [scroller setKnobStyle:lightChrome ? NSScrollerKnobStyleDark : NSScrollerKnobStyleLight];
-    if ([scroller appearance] != appearance && (!appearance || ![[scroller appearance] isEqual:appearance]))
-        [scroller setAppearance:appearance];
-    NSColor *track = legacy ? chrome : nil;
-    if ([scroller respondsToSelector:@selector(nv_setExplicitKnobColor:trackColor:)])
-        [(ETTransparentScroller *)scroller nv_setExplicitKnobColor:knob trackColor:track];
+    // Style the scroll view, not the scroller. Setting the scroller's knob style or
+    // appearance makes AppKit leave the previous knob painted in the track.
+    NSScrollerKnobStyle knobStyle = lightChrome ? NSScrollerKnobStyleDark : NSScrollerKnobStyleLight;
+    if ([self scrollerKnobStyle] != knobStyle)
+        [self setScrollerKnobStyle:knobStyle];
     // The area around a width-limited note is the scroll view background. Keep that on the window color.
     if (chrome) {
         [self setBackgroundColor:chrome];
@@ -131,7 +77,6 @@
         [[self contentView] setBackgroundColor:(pane ?: chrome)];
         [[self contentView] setDrawsBackground:YES];
     }
-    [scroller setNeedsDisplay:YES];
     [self nv_showWindowChromeMargins];
     updatingScrollerChrome = NO;
 }
@@ -140,7 +85,6 @@
     [super viewDidChangeEffectiveAppearance];
     [self nv_updateScrollerChrome];
 }
-#endif
 
 - (void)nv_showWindowChromeMargins {
     if (installingChromeMargin)
@@ -166,18 +110,6 @@
 - (void)tile {
     [super tile];
     [self nv_showWindowChromeMargins];
-    if (needsOverlayTiling) {
-        if (![[self verticalScroller] isHidden]) {
-            //            NSRect vsRect=[[self verticalScroller] frame];
-            NSRect conRect = [[self contentView] frame];
-            //            NSView *wdContent = [[self contentView] retain];
-            conRect.size.width = conRect.size.width + [[self verticalScroller] frame].size.width;
-            [[self contentView] setFrameSize:conRect.size];
-            //            [wdContent setFrame:conRect];
-            //            [wdContent release];
-            //            [[self verticalScroller] setFrame:vsRect];
-        }
-    }
 }
 
 

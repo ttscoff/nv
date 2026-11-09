@@ -25,6 +25,7 @@
 #import "TagSearch.h"
 #import "LinkReferenceCompletion.h"
 #import "ClickBelowText.h"
+#import "SelectionRedraw.h"
 #import "TaskList.h"
 #import "ETScrollView.h"
 #import "ETClipView.h"
@@ -2688,6 +2689,28 @@ static long (*GetGetScriptManagerVariablePointer())(short) {
 
 
 #pragma mark - nvALT additions
+
+- (void)setNeedsDisplayInRect:(NSRect)invalidRect {
+	if (!expandingDisplayRect) {
+		expandingDisplayRect = YES;
+		invalidRect = NVTextRedrawRect(invalidRect);
+		[super setNeedsDisplayInRect:invalidRect];
+		expandingDisplayRect = NO;
+		return;
+	}
+	[super setNeedsDisplayInRect:invalidRect];
+}
+
+- (void)setNeedsDisplayInRect:(NSRect)rect avoidAdditionalLayout:(BOOL)flag {
+	if (!expandingDisplayRect) {
+		expandingDisplayRect = YES;
+		rect = NVTextRedrawRect(rect);
+		[super setNeedsDisplayInRect:rect avoidAdditionalLayout:flag];
+		expandingDisplayRect = NO;
+		return;
+	}
+	[super setNeedsDisplayInRect:rect avoidAdditionalLayout:flag];
+}
 
 - (BOOL)isOpaque{
     return YES;
