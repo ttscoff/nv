@@ -33,6 +33,9 @@ enum {
 
 + (NVThemeStyle *)styleWithDictionary:(NSDictionary *)dict;
 + (NVThemeStyle *)styleWithForegroundColor:(NSColor *)color;
++ (NVThemeStyle *)styleWithForegroundColor:(NSColor *)foreground backgroundColor:(NSColor *)background;
++ (NVThemeStyle *)highlightStyleFromThemeStyle:(NVThemeStyle *)themeStyle;
++ (NVThemeStyle *)criticStyleForKind:(NSString *)kind fromThemeStyle:(NVThemeStyle *)themeStyle;
 - (NVThemeStyle *)styleByOverlayingStyle:(NVThemeStyle *)overlay;
 - (NSColor *)foregroundColor;
 - (NSColor *)backgroundColor;

@@ -69,5 +69,9 @@
     "metadata" : {
         "backgroundColor" : "#f3eee4",
         "foregroundColor" : "#6e675f"
+    },
+    "highlight" : {
+        "backgroundColor" : "#ffff00",
+        "foregroundColor" : "#000000"
     }
 }

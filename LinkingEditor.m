@@ -23,6 +23,8 @@
 #import "NVAutoPair.h"
 #import "NVPasswordGenerator.h"
 #import "NVThemeManager.h"
+#import "MarkdownHighlight.h"
+#import "CriticMarkup.h"
 #import "TagSearch.h"
 #import "LinkReferenceCompletion.h"
 #import "ClickBelowText.h"
@@ -1251,6 +1253,10 @@ static NSColor *NVBlendColors(NSColor *first, NSColor *second, CGFloat fraction,
 }
 
 - (void)paintThemeRange:(NSRange)range style:(NVThemeStyle *)style baseFont:(NSFont *)baseFont useBaseFont:(BOOL)useBaseFont forceStrikethrough:(BOOL)forceStrikethrough {
+	[self paintThemeRange:range style:style baseFont:baseFont useBaseFont:useBaseFont forceStrikethrough:forceStrikethrough forceUnderline:NO];
+}
+
+- (void)paintThemeRange:(NSRange)range style:(NVThemeStyle *)style baseFont:(NSFont *)baseFont useBaseFont:(BOOL)useBaseFont forceStrikethrough:(BOOL)forceStrikethrough forceUnderline:(BOOL)forceUnderline {
 	NSString *string = [self string];
 	if (range.length == 0 || range.location == NSNotFound || NSMaxRange(range) > [string length])
 		return;
@@ -1268,6 +1274,8 @@ static NSColor *NVBlendColors(NSColor *first, NSColor *second, CGFloat fraction,
 		[attrs setObject:font forKey:NSFontAttributeName];
 	if (forceStrikethrough || [style isStrikethrough])
 		[attrs setObject:[NSNumber numberWithInteger:NSUnderlineStyleSingle] forKey:NSStrikethroughStyleAttributeName];
+	if (forceUnderline)
+		[attrs setObject:[NSNumber numberWithInteger:NSUnderlineStyleSingle] forKey:NSUnderlineStyleAttributeName];
 	if (![attrs count])
 		return;
 	NSTextStorage *storage = [self textStorage];
@@ -1366,6 +1374,59 @@ static NSColor *NVBlendColors(NSColor *first, NSColor *second, CGFloat fraction,
 		[self paintMarkdownRange:[[ranges objectAtIndex:i] rangeValue] color:color strikethrough:NO];
 }
 
+- (void)highlightMarkedSpansInString:(NSString *)string style:(NVThemeStyle *)style marker:(NVThemeStyle *)marker baseFont:(NSFont *)baseFont {
+	NSArray *spans = NVMarkdownHighlightSpans(string);
+	NSUInteger index;
+	for (index = 0; index < [spans count]; index++) {
+		NSDictionary *span = [spans objectAtIndex:index];
+		[self paintThemeRange:[[span objectForKey:@"content"] rangeValue] style:style baseFont:baseFont useBaseFont:NO forceStrikethrough:NO];
+		[self paintThemeRange:[[span objectForKey:@"opener"] rangeValue] style:marker baseFont:baseFont useBaseFont:YES forceStrikethrough:NO];
+		[self paintThemeRange:[[span objectForKey:@"closer"] rangeValue] style:marker baseFont:baseFont useBaseFont:YES forceStrikethrough:NO];
+	}
+}
+
+- (void)highlightCriticMarkupInString:(NSString *)string addition:(NVThemeStyle *)addition deletion:(NVThemeStyle *)deletion highlight:(NVThemeStyle *)highlight comment:(NVThemeStyle *)comment substitutionMarker:(NVThemeStyle *)substitutionMarker marker:(NVThemeStyle *)marker baseFont:(NSFont *)baseFont {
+	NSArray *spans = NVCriticMarkupSpans(string);
+	NSLayoutManager *layout = [self layoutManager];
+	NSUInteger index;
+	for (index = 0; index < [spans count]; index++) {
+		NSDictionary *span = [spans objectAtIndex:index];
+		NSString *type = [span objectForKey:@"type"];
+		NSRange opener = [[span objectForKey:@"opener"] rangeValue];
+		NSRange closer = [[span objectForKey:@"closer"] rangeValue];
+		NSRange content = [[span objectForKey:@"content"] rangeValue];
+		NSRange whole = NSMakeRange(opener.location, NSMaxRange(closer) - opener.location);
+		if (layout && whole.length) {
+			[layout removeTemporaryAttribute:NSStrikethroughStyleAttributeName forCharacterRange:whole];
+			[layout removeTemporaryAttribute:NSUnderlineStyleAttributeName forCharacterRange:whole];
+		}
+		NSValue *oldValue = [span objectForKey:@"old"];
+		NSValue *separatorValue = [span objectForKey:@"separator"];
+		if ([type isEqualToString:@"substitution"] && oldValue) {
+			[self paintThemeRange:[oldValue rangeValue] style:deletion baseFont:baseFont useBaseFont:NO forceStrikethrough:YES forceUnderline:NO];
+			[self paintThemeRange:content style:addition baseFont:baseFont useBaseFont:NO forceStrikethrough:NO forceUnderline:YES];
+			if (separatorValue)
+				[self paintThemeRange:[separatorValue rangeValue] style:(substitutionMarker ?: marker) baseFont:baseFont useBaseFont:YES forceStrikethrough:NO forceUnderline:NO];
+		} else {
+			NVThemeStyle *style = addition;
+			BOOL strike = NVCriticKindStrikethrough(type);
+			BOOL underline = NVCriticKindUnderline(type);
+			if ([type isEqualToString:@"deletion"])
+				style = deletion;
+			else if ([type isEqualToString:@"highlight"])
+				style = highlight;
+			else if ([type isEqualToString:@"comment"])
+				style = comment;
+			else if ([type isEqualToString:@"substitution"])
+				underline = YES;
+			[self paintThemeRange:content style:style baseFont:baseFont useBaseFont:NO forceStrikethrough:strike forceUnderline:underline];
+		}
+		NVThemeStyle *markStyle = ([type isEqualToString:@"substitution"] && substitutionMarker) ? substitutionMarker : marker;
+		[self paintThemeRange:opener style:markStyle baseFont:baseFont useBaseFont:YES forceStrikethrough:NO forceUnderline:NO];
+		[self paintThemeRange:closer style:markStyle baseFont:baseFont useBaseFont:YES forceStrikethrough:NO forceUnderline:NO];
+	}
+}
+
 - (void)highlightMarkdownSyntaxWithTheme:(NVEditorTheme *)theme {
 	NSLayoutManager *layout = [self layoutManager];
 	NSString *string = [self string];
@@ -1393,6 +1454,7 @@ static NSColor *NVBlendColors(NSColor *first, NSColor *second, CGFloat fraction,
 	NVThemeStyle *strong = [theme styleForKey:@"strong"] ?: baseStyle;
 	NVThemeStyle *emphasis = [theme styleForKey:@"emphasis"] ?: baseStyle;
 	NVThemeStyle *strike = [theme styleForKey:@"criticDeletion"] ?: baseStyle;
+	NVThemeStyle *highlight = [NVThemeStyle highlightStyleFromThemeStyle:[theme styleForKey:@"highlight"]];
 
 	[self paintThemeRange:fullRange style:baseStyle baseFont:baseFont useBaseFont:NO forceStrikethrough:NO];
 
@@ -1445,6 +1507,15 @@ static NSColor *NVBlendColors(NSColor *first, NSColor *second, CGFloat fraction,
 	[self highlightCompleteReferenceLinksInString:string style:link baseFont:baseFont];
 	[self paintThemeMatches:listRegex string:string content:markup marker:markup baseFont:baseFont contentGroup:0 delimiterGroup:0 hasCloser:NO forceStrikethrough:NO];
 	[self paintThemeMatches:ruleRegex string:string content:markup marker:markup baseFont:baseFont contentGroup:0 delimiterGroup:0 hasCloser:NO forceStrikethrough:NO];
+	[self highlightMarkedSpansInString:string style:highlight marker:markup baseFont:baseFont];
+	[self highlightCriticMarkupInString:string
+		addition:[NVThemeStyle criticStyleForKind:@"addition" fromThemeStyle:[theme styleForKey:@"criticAddition"]]
+		deletion:[NVThemeStyle criticStyleForKind:@"deletion" fromThemeStyle:[theme styleForKey:@"criticDeletion"]]
+		highlight:[NVThemeStyle criticStyleForKind:@"highlight" fromThemeStyle:[theme styleForKey:@"criticHighlight"]]
+		comment:[NVThemeStyle criticStyleForKind:@"comment" fromThemeStyle:[theme styleForKey:@"criticComment"]]
+		substitutionMarker:[theme styleForKey:@"criticSubstitution"]
+		marker:markup
+		baseFont:baseFont];
 	[self paintThemeMatches:codeRegex string:string content:code marker:markup baseFont:baseFont contentGroup:2 delimiterGroup:1 hasCloser:YES forceStrikethrough:NO];
 	[self highlightThemedFencedCodeInString:string code:codeBlock marker:markup baseFont:baseFont];
 	[self highlightWritingGremlins];
@@ -1513,6 +1584,16 @@ static NSColor *NVBlendColors(NSColor *first, NSColor *second, CGFloat fraction,
 	[self highlightCompleteReferenceLinksInString:string color:link];
 	[self paintMarkdownMatches:listRegex string:string content:marker marker:marker contentGroup:0 delimiterGroup:0 hasCloser:NO strikethrough:NO];
 	[self paintMarkdownMatches:ruleRegex string:string content:marker marker:marker contentGroup:0 delimiterGroup:0 hasCloser:NO strikethrough:NO];
+	NSFont *criticFont = [prefsController noteBodyFont] ?: [NSFont userFontOfSize:14.0];
+	[self highlightMarkedSpansInString:string style:[NVThemeStyle highlightStyleFromThemeStyle:nil] marker:[NVThemeStyle styleWithForegroundColor:marker] baseFont:criticFont];
+	[self highlightCriticMarkupInString:string
+		addition:[NVThemeStyle criticStyleForKind:@"addition" fromThemeStyle:nil]
+		deletion:[NVThemeStyle criticStyleForKind:@"deletion" fromThemeStyle:nil]
+		highlight:[NVThemeStyle criticStyleForKind:@"highlight" fromThemeStyle:nil]
+		comment:[NVThemeStyle criticStyleForKind:@"comment" fromThemeStyle:nil]
+		substitutionMarker:nil
+		marker:[NVThemeStyle styleWithForegroundColor:marker]
+		baseFont:criticFont];
 	[self paintMarkdownMatches:codeRegex string:string content:code marker:marker contentGroup:2 delimiterGroup:1 hasCloser:YES strikethrough:NO];
 	[self highlightFencedCodeInString:string code:code marker:marker];
 	[self highlightWritingGremlins];
@@ -2973,13 +3054,20 @@ static long (*GetGetScriptManagerVariablePointer())(short) {
             }
             if (action == NVAutoPairWrapOrInsert) {
                 if (selRange.length>0) {
+                    NSString *prefix = appendString;
+                    NSString *suffix = oppositeAppend;
+                    NSString *affix = NVAutoPairSelectionAffix(appendString);
+                    if (affix) {
+                        prefix = affix;
+                        suffix = affix;
+                    }
                     [[[self undoManager] prepareWithInvocationTarget:self] setSelectedRange:selRange];
                     NSRange insRange=selRange;
                     insRange.length=0;
-                    [super insertText:appendString replacementRange:insRange];
-                    insRange.location+=(selRange.length+1); //add appendstr.length
-                    [super insertText:oppositeAppend replacementRange:insRange];
-                    insRange.location+=1;  //add oppappendstr.length
+                    [super insertText:prefix replacementRange:insRange];
+                    insRange.location += selRange.length + [prefix length];
+                    [super insertText:suffix replacementRange:insRange];
+                    insRange.location += [suffix length];
                     [self setSelectedRange:insRange];
                     return;
                 }else {

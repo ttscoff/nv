@@ -107,6 +107,40 @@ static BOOL NVThemeValueIsPresent(id value) {
 	return [style autorelease];
 }
 
++ (NVThemeStyle *)styleWithForegroundColor:(NSColor *)foreground backgroundColor:(NSColor *)background {
+	NVThemeStyle *style = [[NVThemeStyle alloc] init];
+	if (foreground) {
+		style->foregroundColor = [foreground retain];
+		style->presentMask |= NVThemeStyleForeground;
+	}
+	if (background) {
+		style->backgroundColor = [background retain];
+		style->presentMask |= NVThemeStyleBackground;
+	}
+	return [style autorelease];
+}
+
++ (NVThemeStyle *)highlightStyleFromThemeStyle:(NVThemeStyle *)themeStyle {
+	NSColor *black = [NSColor colorWithSRGBRed:0 green:0 blue:0 alpha:1];
+	NSColor *yellow = [NSColor colorWithSRGBRed:1 green:1 blue:0 alpha:1];
+	NVThemeStyle *fallback = [self styleWithForegroundColor:black backgroundColor:yellow];
+	return [fallback styleByOverlayingStyle:themeStyle];
+}
+
++ (NVThemeStyle *)criticStyleForKind:(NSString *)kind fromThemeStyle:(NVThemeStyle *)themeStyle {
+	if (themeStyle)
+		return themeStyle;
+	if ([kind isEqualToString:@"addition"])
+		return [self styleWithDictionary:[NSDictionary dictionaryWithObject:@"#2f9e44" forKey:@"foregroundColor"]];
+	if ([kind isEqualToString:@"deletion"])
+		return [self styleWithDictionary:[NSDictionary dictionaryWithObject:@"#cc3333" forKey:@"foregroundColor"]];
+	if ([kind isEqualToString:@"highlight"])
+		return [self styleWithDictionary:[NSDictionary dictionaryWithObjectsAndKeys:@"#000000", @"foregroundColor", @"#ffff00", @"backgroundColor", nil]];
+	if ([kind isEqualToString:@"comment"])
+		return [self styleWithDictionary:[NSDictionary dictionaryWithObject:@"#00a3b5" forKey:@"foregroundColor"]];
+	return nil;
+}
+
 - (void)dealloc {
 	[foregroundColor release];
 	[backgroundColor release];

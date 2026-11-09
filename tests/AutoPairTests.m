@@ -38,9 +38,16 @@ static void typeInto(NSMutableString *text, NSUInteger *cursor, NSUInteger *sele
 	}
 	if (action == NVAutoPairWrapOrInsert) {
 		if (len > 0) {
-			[text insertString:insert atIndex:loc];
-			[text insertString:opposite atIndex:loc + len + [insert length]];
-			*cursor = loc + len + [insert length] + [opposite length];
+			NSString *prefix = insert;
+			NSString *suffix = opposite;
+			NSString *affix = NVAutoPairSelectionAffix(insert);
+			if (affix) {
+				prefix = affix;
+				suffix = affix;
+			}
+			[text insertString:prefix atIndex:loc];
+			[text insertString:suffix atIndex:loc + len + [prefix length]];
+			*cursor = loc + len + [prefix length] + [suffix length];
 			*selection = 0;
 			return;
 		}
@@ -148,6 +155,45 @@ int main(int argc, const char *argv[]) {
 	expectTrue(NVAutoPairActionForInsert(@")", @"(", 0, @"(", @")", 0) == NVAutoPairTypeOver, "close paren types over");
 	expectTrue(NVAutoPairActionForInsert(@"(", @")", 2, @"", @")", 0) == NVAutoPairAsTyped, "paren does not pair into an unmatched closer");
 	expectTrue(NVAutoPairActionForInsert(@"(", @")", 2, @"", @"hello", 0) == NVAutoPairAsTyped, "paren skips a following word");
+
+	expectTrue(NVPairedCharacterCode('=', &match) == 3, "equals wraps a selection only");
+	expectEqual(match, @"=", "equals matches itself");
+	expectTrue(NVPairedCharacterCode('~', &match) == 3, "tilde wraps a selection only");
+	expectEqual(match, @"~", "tilde matches itself");
+	expectTrue(NVCharactersFormEmptyPair('=', '=') == NO, "equals is not an empty pair");
+	expectTrue(NVCharactersFormEmptyPair('~', '~') == NO, "tilde is not an empty pair");
+	expectTrue(NVAutoPairActionForInsert(@"=", @"=", 3, @"", @"", 5) == NVAutoPairWrapOrInsert, "equals wraps a selection");
+	expectTrue(NVAutoPairActionForInsert(@"=", @"=", 3, @"", @"", 0) == NVAutoPairAsTyped, "equals does not pair without a selection");
+	expectTrue(NVAutoPairActionForInsert(@"=", @"=", 3, @"", @"=", 0) == NVAutoPairAsTyped, "equals does not type over");
+	expectTrue(NVAutoPairActionForInsert(@"~", @"~", 3, @"hello", @"", 0) == NVAutoPairAsTyped, "tilde does not pair without a selection");
+	expectEqual(NVAutoPairSelectionAffix(@"="), @"==", "equals wraps with a highlight mark");
+	expectEqual(NVAutoPairSelectionAffix(@"~"), @"~~", "tilde wraps with a strike mark");
+	expectEqual(NVAutoPairSelectionAffix(@"`"), nil, "a backtick stays a single wrap");
+
+	NSMutableString *highlighted = [NSMutableString stringWithString:@"hello"];
+	cursor = 0;
+	selection = 5;
+	typeInto(highlighted, &cursor, &selection, @"=");
+	expectEqual(highlighted, @"==hello==", "a selection is wrapped in highlight marks");
+	expectTrue(cursor == [highlighted length] && selection == 0, "caret follows the highlight");
+
+	NSMutableString *oneEquals = [NSMutableString stringWithString:@"hello"];
+	cursor = 0;
+	selection = 0;
+	typeInto(oneEquals, &cursor, &selection, @"=");
+	expectEqual(oneEquals, @"=hello", "equals before a word stays single");
+
+	NSMutableString *struck = [NSMutableString stringWithString:@"say hello there"];
+	cursor = 4;
+	selection = 5;
+	typeInto(struck, &cursor, &selection, @"~");
+	expectEqual(struck, @"say ~~hello~~ there", "a selection is wrapped in strike marks");
+
+	NSMutableString *oneTilde = [NSMutableString stringWithString:@"hello"];
+	cursor = 2;
+	selection = 0;
+	typeInto(oneTilde, &cursor, &selection, @"~");
+	expectEqual(oneTilde, @"he~llo", "a tilde inside a word stays single");
 
 	if (gFailures) {
 		fprintf(stderr, "%d auto-pair tests failed\n", gFailures);

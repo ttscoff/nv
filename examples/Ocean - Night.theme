@@ -170,5 +170,9 @@
     },
     "definitionLink" : {
         "foregroundColor" : "#d5896f"
+    },
+    "highlight" : {
+        "backgroundColor" : "#ffff00",
+        "foregroundColor" : "#000000"
     }
 }

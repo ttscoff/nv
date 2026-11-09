@@ -26,9 +26,23 @@ NSInteger NVPairedCharacterCode(unichar character, NSString **matchString) {
 		case '}':
 			*matchString = @"{";
 			return 0;
+		case '=':
+			*matchString = @"=";
+			return 3;
+		case '~':
+			*matchString = @"~";
+			return 3;
 		default:
 			return -1;
 	}
+}
+
+NSString *NVAutoPairSelectionAffix(NSString *insertString) {
+	if ([insertString isEqualToString:@"="])
+		return @"==";
+	if ([insertString isEqualToString:@"~"])
+		return @"~~";
+	return nil;
 }
 
 BOOL NVCharactersFormEmptyPair(unichar left, unichar right) {
@@ -45,6 +59,8 @@ BOOL NVCharactersFormEmptyPair(unichar left, unichar right) {
 NVAutoPairAction NVAutoPairActionForInsert(NSString *insertString, NSString *opposite, NSInteger pairCode, NSString *before, NSString *after, NSUInteger selectionLength) {
 	if (!insertString || !opposite || pairCode < 0)
 		return NVAutoPairAsTyped;
+	if (pairCode == 3)
+		return selectionLength > 0 ? NVAutoPairWrapOrInsert : NVAutoPairAsTyped;
 	if (!before)
 		before = @"";
 	if (!after)

@@ -1,7 +1,9 @@
 #import <Foundation/Foundation.h>
 
 // Symmetric characters (quotes, backticks) return 1 and set match to themselves.
-// Openers return 2 and closers return 0. Anything else returns -1.
+// Openers return 2 and closers return 0.
+// Selection marks (= and ~) return 3: they wrap a selection and otherwise insert as typed.
+// Anything else returns -1.
 NSInteger NVPairedCharacterCode(unichar character, NSString **matchString);
 
 typedef enum {
@@ -14,5 +16,8 @@ typedef enum {
 // A backtick inserts a pair, and the next backtick types over that closer. A backtick typed
 // immediately after another backtick is left as a single character, so ``` stays a fence.
 NVAutoPairAction NVAutoPairActionForInsert(NSString *insertString, NSString *opposite, NSInteger pairCode, NSString *before, NSString *after, NSUInteger selectionLength);
+
+// == and ~~ when a selection is wrapped. Nil for an ordinary one-character pair.
+NSString *NVAutoPairSelectionAffix(NSString *insertString);
 
 BOOL NVCharactersFormEmptyPair(unichar left, unichar right);
