@@ -1,3 +1,13 @@
+nvALT 3.0.36 (144)
+-------------------------
+
+#### NEW
+
+- **Highlight syntax** (==text==) is colored in the editor from the theme, or as black text on yellow
+- = wraps a **selection** as ==selection== and ~ wraps it as ~~selection~~, and neither key pairs when nothing is selected
+- **CriticMarkup** is colored from the theme, or in red, green, yellow, and cyan when a theme leaves it unset
+- **Deletions** are crossed out, **insertions** are underlined, and a substitution shows the old text crossed out and the new text underlined
+
 nvALT 3.0.35 (144)
 -------------------------
 
