@@ -17,13 +17,13 @@
 
 
 #import <Cocoa/Cocoa.h>
+#import "PreviewTruncation.h"
 
 @interface NSString (CustomTruncation)
 
 void ResetFontRelatedTableAttributes();
 NSDictionary *LineTruncAttributesForTitle();
 
-- (NSString*)truncatedPreviewStringOfLength:(NSUInteger)bodyCharCount;
 - (NSAttributedString*)attributedSingleLinePreviewFromBodyText:(NSAttributedString*)bodyText upToWidth:(float)width;
 - (NSAttributedString*)attributedSingleLineTitle;
 - (NSAttributedString*)attributedMultiLinePreviewFromBodyText:(NSAttributedString*)bodyText upToWidth:(float)upToWidth intrusionWidth:(float)intWidth;

@@ -59,6 +59,12 @@ static const unsigned char gsToLowerMap[256] = {
 static u_int32_t u8_nextchar(const char *s, size_t *i, size_t len);
 
 char *replaceString(char *oldString, const char *newString) {
+    //the caller may hand back the very buffer it is replacing, as refilterNotes
+    //does with the search string in force; realloc can move that buffer and free
+    //the old one, so copying from it afterwards would read freed memory
+    if (oldString == newString)
+        return oldString;
+
     size_t newLen = strlen(newString) + 1;
 
     //realloc is smart enough to do better memory management than we can do right here

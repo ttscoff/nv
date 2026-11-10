@@ -29,58 +29,6 @@ static size_t EstimatedCharCountForWidth(float upToWidth);
 
 
 
-- (NSString*)truncatedPreviewStringOfLength:(NSUInteger)bodyCharCount {
-	
-	//try to get the underlying C-string buffer and copy only part of it
-	//this won't be exact because chars != bytes, but that's alright because it is expected to be further truncated by an NSTextFieldCell
-	CFStringEncoding bodyPreviewEncoding = CFStringGetFastestEncoding((CFStringRef)self);
-	const char * cStrPtr = CFStringGetCStringPtr((CFStringRef)self, bodyPreviewEncoding);
-	char *bodyPreviewBuffer = calloc(bodyCharCount + 1, sizeof(char));
-	CFIndex usedBufLen = bodyCharCount;
-	
-	if (bodyCharCount > 1) {
-		if (cStrPtr && kCFStringEncodingUTF8 != bodyPreviewEncoding && kCFStringEncodingUnicode != bodyPreviewEncoding) {
-			//only attempt to copy the buffer directly if the fastest encoding is not a unicode variant
-			memcpy(bodyPreviewBuffer, cStrPtr, bodyCharCount);
-		} else {
-			bodyPreviewEncoding = kCFStringEncodingUTF8;
-			if ([self length] == bodyCharCount) {
-				//if this is supposed to be the entire string, don't waffle around
-				const char *fullUTF8String = [self UTF8String];
-				if (fullUTF8String) {
-					usedBufLen = bodyCharCount = strlen(fullUTF8String);
-					bodyPreviewBuffer = realloc(bodyPreviewBuffer, bodyCharCount + 1);
-					memcpy(bodyPreviewBuffer, fullUTF8String, bodyCharCount + 1);
-					goto replace;
-				}
-			}
-			if (!CFStringGetBytes((CFStringRef)self, CFRangeMake(0, bodyCharCount), bodyPreviewEncoding, ' ', FALSE, 
-								  (UInt8 *)bodyPreviewBuffer, bodyCharCount + 1, &usedBufLen)) {
-				NVLogError(@"can't get utf8 string from '%@' (charcount: %lu)", self, (unsigned long)bodyCharCount);
-				free(bodyPreviewBuffer);
-				return nil;
-			}
-		}
-	}
-replace:
-    // If bodyPreviewBuffer is a UTF-8 encoded string, examine one UTF-8 sequence at a time.
-    // Use the actual number of bytes produced (usedBufLen) to avoid scanning past valid data.
-    if (bodyPreviewEncoding == kCFStringEncodingUTF8) {
-        replace_breaks_utf8(bodyPreviewBuffer, (size_t)usedBufLen);
-    } else {
-        replace_breaks(bodyPreviewBuffer, (size_t)usedBufLen);
-    }
-	
-	NSString* truncatedBodyString = [[NSString alloc] initWithBytesNoCopy:bodyPreviewBuffer length:usedBufLen 
-																 encoding:CFStringConvertEncodingToNSStringEncoding(bodyPreviewEncoding) freeWhenDone:YES];
-	if (!truncatedBodyString) {
-		free(bodyPreviewBuffer);
-		NVLogError(@"can't create cfstring from '%@' (cstr lens: %lu/%ld) with encoding %u (fastest = %u)", self, (unsigned long)bodyCharCount, usedBufLen, bodyPreviewEncoding, CFStringGetFastestEncoding((CFStringRef)self));
-		return nil;
-	}
-	return [truncatedBodyString autorelease];
-}
-
 static NSMutableDictionary *titleTruncAttrs = nil;
 
 void ResetFontRelatedTableAttributes() {
