@@ -121,6 +121,10 @@ BOOL ColorsEqualWith8BitChannels(NSColor *c1, NSColor *c2);
 
 - (void)setConfirmNoteDeletion:(BOOL)value sender:(id)sender;
 - (BOOL)confirmNoteDeletion;
+- (void)setLogsErrorsAndWarnings:(BOOL)value sender:(id)sender;
+- (BOOL)logsErrorsAndWarnings;
+- (void)setLogsAllDiagnosticMessages:(BOOL)value sender:(id)sender;
+- (BOOL)logsAllDiagnosticMessages;
 
 - (void)setQuitWhenClosingWindow:(BOOL)value sender:(id)sender;
 - (BOOL)quitWhenClosingWindow;
