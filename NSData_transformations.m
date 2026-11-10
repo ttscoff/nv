@@ -75,11 +75,11 @@ NSData *ExecuteTransformWithInput(NSData *input, SecTransformRef transform) {
             NSSwapHostIntToBig( [self length] );
 			[newData setLength:bufferLength + sizeof(unsigned)];
 		} else {
-			NSLog(@"error compressing: %s", zError(zlibError));
+			NVLogError(@"error compressing: %s", zError(zlibError));
 			newData = nil;
 		}
 	} else
-		NSLog(@"error compressing: couldn't allocate memory");
+		NVLogError(@"error compressing: couldn't allocate memory");
 	
 	return newData;
 }
@@ -104,7 +104,7 @@ NSData *ExecuteTransformWithInput(NSData *input, SecTransformRef transform) {
 			newData = [ NSMutableData dataWithLength:originalSize ];
 		NS_HANDLER
 			if ([[localException name] isEqualToString:NSInvalidArgumentException] ) {
-				NSLog(@"error decompressing--bad size: %@", [localException reason]);
+				NVLogError(@"error decompressing--bad size: %@", [localException reason]);
 				NS_VALUERETURN( nil, NSMutableData * );
 			} else
 				[localException raise];   // This should NEVER happen...
@@ -114,14 +114,14 @@ NSData *ExecuteTransformWithInput(NSData *input, SecTransformRef transform) {
 			outSize = originalSize;
 			zlibError = uncompress([newData mutableBytes], &outSize, [self bytes], [self length] - sizeof(unsigned));
 			if( zlibError != Z_OK ) {
-				NSLog(@"decompression failed: %s", zError(zlibError));
+				NVLogError(@"decompression failed: %s", zError(zlibError));
 				newData = nil;
 			} else if (originalSize != outSize)
-				NSLog(@"error decompressing: extracted size %lu does not match original of %u", outSize, originalSize);
+				NVLogError(@"error decompressing: extracted size %lu does not match original of %u", outSize, originalSize);
 		} else
-			NSLog(@"error allocating memory while decompressing");
+			NVLogError(@"error allocating memory while decompressing");
 	} else
-		NSLog(@"error decompressing: data does not seem to be compressed with zlib");
+		NVLogError(@"error decompressing: data does not seem to be compressed with zlib");
 	
 	return newData;
 }
@@ -163,7 +163,7 @@ NSData *ExecuteTransformWithInput(NSData *input, SecTransformRef transform) {
 							len - amtRead );
 			if (oneRead <= 0 && ( errno != EINTR && errno != EAGAIN ) ) {
 				
-				NSLog(@"random data read error: %s", strerror(errno));
+				NVLogError(@"random data read error: %s", strerror(errno));
 				randomData = nil;
 				break;
 			}
@@ -171,7 +171,7 @@ NSData *ExecuteTransformWithInput(NSData *input, SecTransformRef transform) {
 		}
 		[devRandom closeFile];
 	} else
-		NSLog(@"error opening /dev/random");
+		NVLogError(@"error opening /dev/random");
 	
 	return randomData;
 }
@@ -275,7 +275,7 @@ NSData *ExecuteTransformWithInput(NSData *input, SecTransformRef transform) {
     OSErr err = FSFindFolder(kUserDomain, kCurrentUserFolderType, kCreateFolder, &userHomeFoundRef);
     if (err != noErr) {
 		relativeRef = NULL;
-		NSLog(@"FSFindFolder error: %d", err);
+		NVLogError(@"FSFindFolder error: %d", err);
     }
     
     AliasHandle aliasHandle;
@@ -404,12 +404,12 @@ NSData *ExecuteTransformWithInput(NSData *input, SecTransformRef transform) {
 static BOOL NVCryptAES256CBC(NSMutableData *data, CCOperation operation, NSData *key, NSData *iv) {
 	BOOL encrypting = operation == kCCEncrypt;
 	if ([key length] != kCCKeySizeAES256) {
-		NSLog(@"%s key length was wrong size: %lu", encrypting ? "encryption" : "decryption",
+		NVLogError(@"%s key length was wrong size: %lu", encrypting ? "encryption" : "decryption",
 			(unsigned long)[key length]);
 		return NO;
 	}
 	if ([iv length] != kCCBlockSizeAES128) {
-		NSLog(@"initialization vector length was wrong size: %lu", (unsigned long)[iv length]);
+		NVLogError(@"initialization vector length was wrong size: %lu", (unsigned long)[iv length]);
 		return NO;
 	}
 
@@ -425,7 +425,7 @@ static BOOL NVCryptAES256CBC(NSMutableData *data, CCOperation operation, NSData 
 		[key bytes], kCCKeySizeAES256, [iv bytes], [data bytes], [data length],
 		[buffer mutableBytes], bufferLength, &bytesMoved);
 	if (status != kCCSuccess) {
-		NSLog(@"Couldn't %s data (status=%d)", encrypting ? "encrypt" : "decrypt", (int)status);
+		NVLogError(@"Couldn't %s data (status=%d)", encrypting ? "encrypt" : "decrypt", (int)status);
 		return NO;
 	}
 

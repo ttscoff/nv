@@ -588,7 +588,7 @@ BOOL IsHardLineBreakUnichar(unichar uchar, NSString *str, unsigned charIndex) {
 			nextRange = NSMakeRange(rangeLoc, [self length] - rangeLoc);
 		}
 	} @catch (NSException *e) {
-		NSLog(@"%@ got an exception: %@", NSStringFromSelector(_cmd), [e reason]);
+		NVLogError(@"%@ got an exception: %@", NSStringFromSelector(_cmd), [e reason]);
 	}
 }
 

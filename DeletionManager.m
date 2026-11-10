@@ -185,13 +185,13 @@ void updateForVerifiedExistingNote(DeletionManager *self, NoteObject *goodNote) 
 - (void)showPanelForDeletedNotes {
 	
 	if (![deletedNotes count]) {
-		NSLog(@"showPanelForDeletedNotes was asked to display without deleted notes");
+		NVLogWarning(@"showPanelForDeletedNotes was asked to display without deleted notes");
 		return;
 	}
 	
 	if (!window) {
 		if (![NSBundle loadNibNamed:@"DeletionManager" owner:self])  {
-			NSLog(@"Failed to load DeletionManager.nib");
+			NVLogError(@"Failed to load DeletionManager.nib");
 			NSBeep();
 			return;
 		}
@@ -222,7 +222,7 @@ void updateForVerifiedExistingNote(DeletionManager *self, NoteObject *goodNote) 
 		[notationController removeNote:[deletedNotes lastObject]];
 		
 	} else {
-		NSLog(@"No deleted notes?!");
+		NVLogWarning(@"No deleted notes?!");
 	}
 }
 

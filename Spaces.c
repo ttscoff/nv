@@ -23,21 +23,21 @@ Boolean CurrentContextForWindowNumber(NSInteger windowNum, SpaceSwitchingContext
 	CGSWorkspace windowSpace;
 	CGError err = CGSGetWindowWorkspace(_CGSDefaultConnection(), (CGSWindow)windowNum, &windowSpace);
 	if (err) {
-		printf("CGSGetWindowWorkspace error: %d\n", err);
+		NVLogErrorC("CGSGetWindowWorkspace error: %d\n", err);
 		return false;
 	}
 	
 	CGSWorkspace currentSpace;
 	err = CGSGetWorkspace(_CGSDefaultConnection(), &currentSpace);
 	if (err) {
-		printf("CGSGetWorkspace error: %d\n", err);
+		NVLogErrorC("CGSGetWorkspace error: %d\n", err);
 		return false;
 	}
 	
 	ProcessSerialNumber frontPSN;
 	OSErr osErr = GetFrontProcess(&frontPSN);
 	if (osErr) {
-		printf("GetFrontProcess error: %d\n", err);
+		NVLogErrorC("GetFrontProcess error: %d\n", err);
 		return false;
 	}
 	
@@ -50,13 +50,13 @@ Boolean CurrentContextForWindowNumber(NSInteger windowNum, SpaceSwitchingContext
 
 Boolean CompareContextsAndSwitch(SpaceSwitchingContext *ctxBefore, SpaceSwitchingContext *ctxAfter) {
 	if (!ctxBefore || !ctxAfter) {
-		printf("null context\n");
+		NVLogErrorC("null context\n");
 		return false;
 	}
 	
 	//contexts are equal; can't do anything
 	if (!memcmp(ctxBefore, ctxAfter, sizeof(SpaceSwitchingContext))) {
-		printf("equal contexts\n");
+		NVLogInfoC("equal contexts\n");
 		return false;
 	}
 	
@@ -74,7 +74,7 @@ Boolean CompareContextsAndSwitch(SpaceSwitchingContext *ctxBefore, SpaceSwitchin
 		
 		OSErr err = SetFrontProcess(&ctxBefore->frontPSN);
 		if (err) {
-			printf("SetFrontProcess error: %d\n", err);
+			NVLogErrorC("SetFrontProcess error: %d\n", err);
 			return false;
 		}
 		

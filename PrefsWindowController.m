@@ -56,7 +56,7 @@
 - (void)showWindow:(id)sender {
 	if (!window) {
 		if (![NSBundle loadNibNamed:@"Preferences" owner:self])  {
-			NSLog(@"Failed to load Preferences.nib");
+			NVLogError(@"Failed to load Preferences.nib");
 			return;
 		}
 	}
@@ -87,7 +87,7 @@
 }
 
 - (void)menuNeedsUpdate:(NSMenu *)menu {
-	NSLog(@"I need an update: %@", [menu description]);
+	NVLogInfo(@"I need an update: %@", [menu description]);
 }
 
 - (IBAction)setAppShortcut:(id)sender {
@@ -102,7 +102,7 @@
 		
 	if (![prefsController registerAppActivationKeystrokeWithTarget:[NSApp delegate] selector:@selector(toggleNVActivation:)]) {
 		[prefsController setAppActivationKeyCombo:oldKeyCombo sender:self];
-		NSLog(@"reverting to old (hopefully working key combo");
+		NVLogWarning(@"reverting to old (hopefully working key combo");
 	}
 	
 	[oldKeyCombo release];
@@ -645,7 +645,7 @@
 }
 
 - (IBAction)changedNotesFolderLocation:(id)sender {
-    NSLog(@"Changed notes folder menu");
+    NVLogInfo(@"Changed notes folder menu");
 }
 
 - (IBAction)changedQuitBehavior:(id)sender {
@@ -771,7 +771,7 @@
 				[[prefsController notationPrefs] checkForKnownRedundantSyncConduitsAtPath:directoryPath];
 			}
 		} else {
-			NSLog(@"This folder is already chosen!");
+			NVLogWarning(@"This folder is already chosen!");
 		}
 		
 	}
@@ -791,7 +791,7 @@
     NSString *startingDirectory = nil;
 	
     if (!notesDirectoryRef) {
-		NSLog(@"notesDirectoryRef is NULL!");
+		NVLogError(@"notesDirectoryRef is NULL!");
 		return NO;
     }
     
@@ -818,7 +818,7 @@
 		@try {
 			[openPanel setDirectoryURL:[NSURL fileURLWithPath:startingDirectory isDirectory:YES]];
 		} @catch (NSException *exception) {
-			NSLog(@"Opening the notes folder picker without a starting directory (%@)", [exception reason]);
+			NVLogInfo(@"Opening the notes folder picker without a starting directory (%@)", [exception reason]);
 		}
     }
     [openPanel setAllowedFileTypes:nil];

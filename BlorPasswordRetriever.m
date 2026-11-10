@@ -109,7 +109,7 @@
 	
 	if (!window) {
 		if (![NSBundle loadNibNamed:@"BlorPasswordRetriever" owner:self])  {
-			NSLog(@"Failed to load BlorPasswordRetriever.nib");
+			NVLogError(@"Failed to load BlorPasswordRetriever.nib");
 			NSBeep();
 			return NULL;
 		}
@@ -179,7 +179,7 @@
 			return nil;
 			
 		if ([blorData length] < 28) {
-			NSLog(@"read data is too small (%lu) to hold any notes!", (unsigned long)[blorData length]);
+			NVLogError(@"read data is too small (%lu) to hold any notes!", (unsigned long)[blorData length]);
 			return nil;
 		}
 		
@@ -225,7 +225,7 @@
 
 #define ASSERT_CAN_READ_BYTE_COUNT(n) do { \
 	if (!((n) + currentByteOffset <= [blorData length])) { \
-		NSLog(@"Attempted to read %d bytes past the length of the blor!", ((n) + currentByteOffset) - [blorData length]);\
+		NVLogError(@"Attempted to read %d bytes past the length of the blor!", ((n) + currentByteOffset) - [blorData length]);\
 		return nil;\
 	} \
 } while (0)

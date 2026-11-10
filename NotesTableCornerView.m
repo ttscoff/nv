@@ -44,7 +44,7 @@ NSGradient *cGradient;
 		
 	}
 	@catch (NSException * e) {
-		NSLog(@"drawrect except is : %@",[e description]);
+		NVLogError(@"drawrect except is : %@",[e description]);
 	}
 }
 

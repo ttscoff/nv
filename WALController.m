@@ -72,7 +72,7 @@
     //but really we shouldn't just fstat the fd because the file shouldn't be renamed or moved, either
     //on the other hand, what if another app deleted and re-created it? then any changes would be lost upon closing the fd
     if (fstat(logFD, &sb) < 0) {
-	NSLog(@"logFileStillExists: fstat error: %s", strerror(errno));
+	NVLogError(@"logFileStillExists: fstat error: %s", strerror(errno));
 	
 	return NO;
     }
@@ -87,15 +87,15 @@
 	
 	//get current path of file descriptor in case the directory was moved
 	if (fcntl(logFD, F_GETPATH, pathIntPtr) < 0) {
-		NSLog(@"destroyLogFile: fcntl F_GETPATH error: %s", strerror(errno));
+		NVLogError(@"destroyLogFile: fcntl F_GETPATH error: %s", strerror(errno));
 	}
 	
 	if (close(logFD) < 0) {
-		NSLog(@"destroyLogFile: close error: %s:", strerror(errno));
+		NVLogError(@"destroyLogFile: close error: %s:", strerror(errno));
 	}
 	
 	if (unlink(journalFile) < 0) {
-		NSLog(@"destroyLogFile: unlink error: %s", strerror(errno));
+		NVLogError(@"destroyLogFile: unlink error: %s", strerror(errno));
 		return NO;
 	}
     return YES;
@@ -136,12 +136,12 @@
             //if this fails, the file probably still exists, or we don't have write permission
             //either way, we shouldn't continue
             
-            NSLog(@"WALStorageController: open error for file %s: %s", journalFile, strerror(errno));
+            NVLogError(@"WALStorageController: open error for file %s: %s", journalFile, strerror(errno));
             
             return nil;
         }
         if (fcntl(logFD, F_NOCACHE, 1) < 0) {
-            NSLog(@"Unable to disable disk caching for writing: %s", strerror(errno));
+            NVLogError(@"Unable to disable disk caching for writing: %s", strerror(errno));
         }
 		
         //this will grow as necessary
@@ -155,7 +155,7 @@
 		compressionStream.opaque = Z_NULL;
         
 		if (deflateInit2(&compressionStream, 5, Z_DEFLATED, MAX_WBITS, MAX_MEM_LEVEL, Z_DEFAULT_STRATEGY) != Z_OK) {
-			NSLog(@"deflateInit2 returned error: %s", compressionStream.msg);
+			NVLogError(@"deflateInit2 returned error: %s", compressionStream.msg);
 			return nil;
 		}
 		
@@ -215,7 +215,7 @@
 				memmove(bytes, bytes + bytesWritten, newLength);
 			[unwrittenData setLength:newLength];
 		} else {
-			NSLog(@"Unable to empty out unwritten data to journal %s: %s", journalFile, strerror(errno));
+			NVLogError(@"Unable to empty out unwritten data to journal %s: %s", journalFile, strerror(errno));
 		}
     }
     
@@ -244,11 +244,11 @@
 	uLong zlibAfterBufLen = compressionStream.total_out - previousOut;
 
 	if (deflateResult != Z_OK) {
-		NSLog(@"zlib deflation error: %s\n", compressionStream.msg);
+		NVLogError(@"zlib deflation error: %s\n", compressionStream.msg);
 		return NO;
 	}
 	if (zlibAfterBufLen > compressedDataBufferSize) {
-		NSLog(@"zlibAfterBufLen is larger than the allocated compressed buffer!");
+		NVLogError(@"zlibAfterBufLen is larger than the allocated compressed buffer!");
 		return NO;
 	}
 	
@@ -261,7 +261,7 @@
 	NSData *recordKey = [logSessionKey derivedKeyOfLength:[logSessionKey length] salt:recordSalt iterations:1];
 	
 	if (![data encryptAESDataWithKey:recordKey iv:[recordSalt subdataWithRange:NSMakeRange(0, 16)]]) {
-		NSLog(@"Couldn't encrypt WAL record data!");
+		NVLogError(@"Couldn't encrypt WAL record data!");
 		return NO;
 	}
 	
@@ -290,7 +290,7 @@
     }
     
     if (bytesWritten < 0) {
-		NSLog(@"Unable to write new data to journal %s: %s", journalFile, strerror(errno));
+		NVLogError(@"Unable to write new data to journal %s: %s", journalFile, strerror(errno));
 		bytesWritten = 0;
     }
 	
@@ -310,7 +310,7 @@
     
     //F_FULLFSYNC is probably overkill
     if (fsync(logFD)) {
-	NSLog(@"synchronize WAL: fsync error: %s", strerror(errno));
+	NVLogError(@"synchronize WAL: fsync error: %s", strerror(errno));
 	return NO;
     }
     
@@ -349,18 +349,18 @@
         
         //attempt to open file read-only
         if ((logFD = open(journalFile, O_EXCL | O_RDONLY)) < 0) {
-            NSLog(@"WALRecoveryController: open error for file %s: %s", journalFile, strerror(errno));
+            NVLogError(@"WALRecoveryController: open error for file %s: %s", journalFile, strerror(errno));
             return nil;
         }
         
         struct stat sb;
         if (fstat(logFD, &sb) < 0) {
-            NSLog(@"WALRecoveryController: fstat error for file %s: %s", journalFile, strerror(errno));
+            NVLogError(@"WALRecoveryController: fstat error for file %s: %s", journalFile, strerror(errno));
             return nil;
         }
         
         if (S_ISDIR(sb.st_mode)) {
-            NSLog(@"WALRecoveryController: log file is actually a directory! Don't play games with me!");
+            NVLogError(@"WALRecoveryController: log file is actually a directory! Don't play games with me!");
             return nil;
         }
         
@@ -374,7 +374,7 @@
         compressionStream.opaque = Z_NULL;
         
         if (inflateInit2(&compressionStream, MAX_WBITS) != Z_OK) {
-            NSLog(@"inflateInit2 error: %s", compressionStream.msg);
+            NVLogError(@"inflateInit2 error: %s", compressionStream.msg);
             return nil;
         }
         return self;
@@ -401,7 +401,7 @@
     totalBytesRead += MAX(0, readBytes);
 	
     if (readBytes < (int)sizeof(WALRecordHeader)) {
-		NSLog(@"recoverNextObject can't even read (entire) log record header: %s", strerror(errno));
+		NVLogError(@"recoverNextObject can't even read (entire) log record header: %s", strerror(errno));
 		return nil;
     }
 	
@@ -410,7 +410,7 @@
 	record.checksum = CFSwapInt32BigToHost(record.checksum);
     
     if (record.dataLength > fileLength - totalBytesRead) {
-		NSLog(@"recoverNextObject can't continue because the size of this record is larger than the rest of the file!");
+		NVLogError(@"recoverNextObject can't continue because the size of this record is larger than the rest of the file!");
 		return nil;
     }
     
@@ -420,7 +420,7 @@
     totalBytesRead += MAX(0, readBytes);
     
     if (readBytes < (int)record.dataLength) {
-		NSLog(@"recoverNextObject can't read all serialized bytes: %s", strerror(errno));
+		NVLogError(@"recoverNextObject can't read all serialized bytes: %s", strerror(errno));
 		free(presumablySerializedBytes);
 		return nil;
     }
@@ -428,7 +428,7 @@
     NSMutableData *presumablySerializedData = [[NSMutableData alloc] initWithBytesNoCopy:presumablySerializedBytes 
 																				  length:record.dataLength freeWhenDone:YES];
     if ([presumablySerializedData CRC32] != record.checksum) {
-		NSLog(@"recoverNextObject: checksum of read data does not match that of record header");
+		NVLogError(@"recoverNextObject: checksum of read data does not match that of record header");
 		[presumablySerializedData release];
 		return nil;
     }
@@ -438,7 +438,7 @@
 	NSData *recordKey = [logSessionKey derivedKeyOfLength:[logSessionKey length] salt:recordSalt iterations:1];
 	
 	if (!([presumablySerializedData decryptAESDataWithKey:recordKey iv:[recordSalt subdataWithRange:NSMakeRange(0, 16)]])) {
-		NSLog(@"Record decryption failed!");
+		NVLogError(@"Record decryption failed!");
 		return nil;
 	}
 	
@@ -453,17 +453,17 @@
 	
 	int inflateResult = inflate(&compressionStream, Z_SYNC_FLUSH);
 	if (inflateResult == Z_STREAM_ERROR) {
-		NSLog(@"zlib inflate error: %s", compressionStream.msg);
+		NVLogError(@"zlib inflate error: %s", compressionStream.msg);
 		return nil;
 	}
 	if (inflateResult == Z_NEED_DICT || inflateResult == Z_DATA_ERROR || 
 		inflateResult == Z_MEM_ERROR) {
-		NSLog(@"err: inflateResult = %d", inflateResult);
+		NVLogError(@"err: inflateResult = %d", inflateResult);
 		return nil;
 	}
 	
 	if (compressionStream.avail_out != 0) {
-		NSLog(@"recoverNextObject: compressionStream.avail_out(%d) != 0", compressionStream.avail_out);
+		NVLogWarning(@"recoverNextObject: compressionStream.avail_out(%d) != 0", compressionStream.avail_out);
 		return nil;
 	}
 	
@@ -478,7 +478,7 @@
 		object = [unarchiver decodeObjectForKey:@"aNote"];
 		[unarchiver release];	
     } @catch (NSException *e) {
-		NSLog(@"recoverNextObject got an exception while unarchiving object: %@; returning NSNull to skip", [e reason]);
+		NVLogError(@"recoverNextObject got an exception while unarchiving object: %@; returning NSNull to skip", [e reason]);
 		object = (id<SynchronizedNote>)[NSNull null];
     }
     
@@ -561,7 +561,7 @@ static Boolean SynchronizedNoteIsEqual(const void *o, const void *p) {
 				}
 				CFDictionarySetValue(recoveredNotes, (const void *)objUUIDBytes, (const void *)obj);
 			} else {
-				NSLog(@"object of class %@ recovered that doesn't conform to SynchronizedNote protocol", [(NSObject*)obj className]);
+				NVLogWarning(@"object of class %@ recovered that doesn't conform to SynchronizedNote protocol", [(NSObject*)obj className]);
 			}
 		}
     } while (obj); //|| this note failed because of a deserialization problem, but everything else was fine

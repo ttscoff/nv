@@ -72,7 +72,7 @@
       return image;
     }
     
-    NSLog(@"smallIconForFSRef error: %d", err);
+    NVLogError(@"smallIconForFSRef error: %d", err);
     
     return nil;
 }

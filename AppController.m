@@ -132,7 +132,7 @@ static BOOL nvApplyingWindowChrome;
                 ProcessSerialNumber psn = { 0, kCurrentProcess };
                 OSStatus returnCode = TransformProcessType(&psn, kProcessTransformToUIElementApplication);
                 if( returnCode != 0) {
-                    NSLog(@"Could not bring the application to front. Error %d", returnCode);
+                    NVLogWarning(@"Could not bring the application to front. Error %d", returnCode);
                 }                
             }
             if (![[NSUserDefaults standardUserDefaults] boolForKey:@"StatusBarItem"]) {
@@ -392,9 +392,9 @@ void outletObjectAwoke(id sender) {
     [siSparkle setAction:@selector(checkForUpdates:)];
     NSError *startError = nil;
     if (![controller.updater startUpdater:&startError])
-        NSLog(@"Sparkle failed to start: %@", startError);
+        NVLogError(@"Sparkle failed to start: %@", startError);
     else
-        NSLog(@"Sparkle started");
+        NVLogInfo(@"Sparkle started");
     // add elasticthreads' menuitems
     if(IsLeopardOrLater){
         [fsMenuItem setEnabled:YES];
@@ -509,7 +509,7 @@ void outletObjectAwoke(id sender) {
 	
 	[self setNotationController:newNotation];
 	
-	NSLog(@"load time: %g, ",[[NSDate date] timeIntervalSinceDate:before]);
+	NVLogInfo(@"load time: %g, ",[[NSDate date] timeIntervalSinceDate:before]);
 	//	NSLog(@"version: %s", PRODUCT_NAME);
 	
 	//import old database(s) here if necessary
@@ -1001,7 +1001,7 @@ terminateApp:
     NSURL *streamURL = [NSURL URLWithString:@"x-marked://stream/"];
     if (![[NSWorkspace sharedWorkspace] openURL:streamURL]) {
         NSBeep();
-        NSLog(@"Could not open Marked streaming preview");
+        NVLogWarning(@"Could not open Marked streaming preview");
     }
 }
 
@@ -1009,7 +1009,7 @@ terminateApp:
     if (![[[NSWorkspace sharedWorkspace]URLForApplicationWithBundleIdentifier:@"com.brettterpstra.marked2"] isFileURL] && ![[[NSWorkspace sharedWorkspace]URLForApplicationWithBundleIdentifier:@"com.brettterpstra.marky"] isFileURL] && ![[[NSWorkspace sharedWorkspace]URLForApplicationWithBundleIdentifier:@"com.brettterpstra.marked-setapp"] isFileURL] && ![[[NSWorkspace sharedWorkspace]URLForApplicationWithBundleIdentifier:@"com.brettterpstra.marked2.beta"] isFileURL])
     {
         NSBeep();
-        NSLog(@"Marked not found");
+        NVLogWarning(@"Marked not found");
     } else {
         NSIndexSet *indexes = [notesTableView selectedRowIndexes];
         //force-write any queued changes to disk in case notes are being stored as separate files which might be opened directly by the method below
@@ -1569,7 +1569,7 @@ static NSURL *NVHTTPURLFromImportString(NSString *entered) {
 		}
 	} else{
         
-		NSLog(@"%@/%@ got %@", [control description], [aTextView description], NSStringFromSelector(command));
+		NVLogInfo(@"%@/%@ got %@", [control description], [aTextView description], NSStringFromSelector(command));
         self.isEditing=NO;
     }
 	
@@ -1996,7 +1996,7 @@ static NSURL *NVHTTPURLFromImportString(NSString *entered) {
 		[textView discardSearchHighlights];
 	    [self createNoteIfNecessary];
 	}/*else if ([aNotification object] == notesTableView) {
-      NSLog(@"ntv tdbe2");
+      NVLogInfo(@"ntv tdbe2");
       }*/
 }
 
@@ -2007,7 +2007,7 @@ static NSURL *NVHTTPURLFromImportString(NSString *entered) {
             
         }else{
             
-            NSLog(@"not textview should begin with to:%@",[aTextObject description]);
+            NVLogInfo(@"not textview should begin with to:%@",[aTextObject description]);
         }
     }
     return YES;
@@ -2016,7 +2016,7 @@ static NSURL *NVHTTPURLFromImportString(NSString *entered) {
 
 /*
  - (void)controlTextDidBeginEditing:(NSNotification *)aNotification{
- NSLog(@"controltextdidbegin");
+ NVLogInfo(@"controltextdidbegin");
  }
 */
 - (void)textDidEndEditing:(NSNotification *)aNotification {
@@ -2069,7 +2069,7 @@ static NSURL *NVHTTPURLFromImportString(NSString *entered) {
 	
 	if ([sender firstResponder] == textView) {
 		if ((floor(NSAppKitVersionNumber) > NSAppKitVersionNumber10_3) && currentNote) {
-			NSLog(@"windowWillReturnUndoManager should not be called when textView is first responder on Tiger or higher");
+			NVLogWarning(@"windowWillReturnUndoManager should not be called when textView is first responder on Tiger or higher");
 		}
 		
 		NSUndoManager *undoMan = [self undoManagerForTextView:textView];
@@ -2131,7 +2131,7 @@ static NSURL *NVHTTPURLFromImportString(NSString *entered) {
 		NSUInteger selectedNoteIndex = [notationController indexInFilteredListForNoteIdenticalTo:note];
 		
 		if (selectedNoteIndex == NSNotFound) {
-			NSLog(@"Note was not visible--showing all notes and trying again");
+			NVLogInfo(@"Note was not visible--showing all notes and trying again");
 			[self cancelOperation:nil];
 			
 			selectedNoteIndex = [notationController indexInFilteredListForNoteIdenticalTo:note];
@@ -2200,7 +2200,7 @@ static NSURL *NVHTTPURLFromImportString(NSString *entered) {
 			[fieldEditor replaceCharactersInRange:fullRange withString:string];
 			[fieldEditor didChangeText];
 		} else {
-			NSLog(@"I shouldn't change text?");
+			NVLogWarning(@"I shouldn't change text?");
 		}
 	}
 }
@@ -2447,7 +2447,7 @@ static NSURL *NVHTTPURLFromImportString(NSString *entered) {
     if ([notationController flushAllNoteChanges])
 		[notationController closeJournal];
 	else
-		NSLog(@"Could not flush database, so not removing journal");
+		NVLogError(@"Could not flush database, so not removing journal");
 	
     [prefsController synchronize];
 }
@@ -3904,7 +3904,7 @@ static void NVStretchFullBleedAncestors(NSView *view, CGFloat targetWidth) {
             ProcessSerialNumber psn = { 0, kCurrentProcess };
             OSStatus returnCode = TransformProcessType(&psn, kProcessTransformToForegroundApplication);
             if( returnCode != 0) {
-                NSLog(@"Could not bring the application to front. Error %d", returnCode);
+                NVLogWarning(@"Could not bring the application to front. Error %d", returnCode);
             }
 
         }else{
@@ -3923,7 +3923,7 @@ static void NVStretchFullBleedAncestors(NSView *view, CGFloat targetWidth) {
             ProcessSerialNumber psn = { 0, kCurrentProcess };
             OSStatus returnCode = TransformProcessType(&psn, kProcessTransformToUIElementApplication);
             if( returnCode != 0) {
-                NSLog(@"Could not bring the application to front. Error %d", returnCode);
+                NVLogWarning(@"Could not bring the application to front. Error %d", returnCode);
             }
             if (!statusItem) {
                 [self setUpStatusBarItem];

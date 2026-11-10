@@ -662,12 +662,12 @@ static NSColor *NVSearchHighlightInkColor(NSColor *highlight) {
 					goto copyRTFType;
 			}
 #if COPY_PASTE_DEBUG
-			NSLog(@"false alarm: no real styles");
+			NVLogInfo(@"false alarm: no real styles");
 #endif
 			
 		} else {
 #if COPY_PASTE_DEBUG
-			NSLog(@"homogeneous style");
+			NVLogInfo(@"homogeneous style");
 #endif
 		}
 		
@@ -675,7 +675,7 @@ static NSColor *NVSearchHighlightInkColor(NSColor *highlight) {
 copyRTFType:
 			//we have more than a single styling segment within the selection--grudgingly allow regular RTF copying
 #if COPY_PASTE_DEBUG
-			NSLog(@"copying RTF due to multiple attributes");
+			NVLogInfo(@"copying RTF due to multiple attributes");
 			[[self layoutManager] addTemporaryAttributes:[prefsController searchTermHighlightAttributes] forCharacterRange:effectiveRange];
 #endif
 			[types insertObject:NSRTFPboardType atIndex:1];
@@ -970,7 +970,7 @@ static BOOL NVSearchHighlightColorMatches(NSColor *applied, NSColor *searchColor
 		if (range && range->length > 0 && range->location + range->length <= bodyLength) {
 			[[self layoutManager] addTemporaryAttributes:highlightDict forCharacterRange:*(NSRange*)range];
 		} else {
-			NSLog(@"highlightRangesTemporarily: Invalid range (%@)", range ? NSStringFromRange(*(NSRange*)range) : @"null");
+			NVLogWarning(@"highlightRangesTemporarily: Invalid range (%@)", range ? NSStringFromRange(*(NSRange*)range) : @"null");
 		}
 	}
 	[self nv_displaySearchHighlights];
@@ -1012,7 +1012,7 @@ static BOOL NVSearchHighlightColorMatches(NSColor *applied, NSColor *searchColor
 						}
 						[[self layoutManager] addTemporaryAttributes:highlightDict forCharacterRange:*(NSRange*)range];
 					} else {
-						NSLog(@"highlightTermsTemporarily: Invalid range (%@)", range ? NSStringFromRange(*(NSRange*)range) : @"?");
+						NVLogWarning(@"highlightTermsTemporarily: Invalid range (%@)", range ? NSStringFromRange(*(NSRange*)range) : @"?");
 					}
 				}
 				CFRelease(ranges);
@@ -1117,7 +1117,7 @@ static NSRegularExpression *NVMarkdownRegex(NSString *pattern) {
 	NSError *error = nil;
 	NSRegularExpression *regex = [NSRegularExpression regularExpressionWithPattern:pattern options:NSRegularExpressionAnchorsMatchLines error:&error];
 	if (!regex)
-		NSLog(@"nvALT markdown highlight: %@", error);
+		NVLogInfo(@"nvALT markdown highlight: %@", error);
 	return regex;
 }
 
@@ -2534,7 +2534,7 @@ static BOOL NVIsLinkBracket(unichar character) {
 static long (*GetGetScriptManagerVariablePointer())(short) {
 	static long (*_GetScriptManagerVariablePointer)(short) = NULL;
 	if (!_GetScriptManagerVariablePointer) {
-		NSLog(@"looking up");
+		NVLogInfo(@"looking up");
 		CFBundleRef csBundle = CFBundleCreate(NULL, CFURLCreateWithFileSystemPath(NULL, CFSTR("/System/Library/Frameworks/CoreServices.framework"), kCFURLPOSIXPathStyle, TRUE));
 		if (csBundle) _GetScriptManagerVariablePointer = (long (*)(short))CFBundleGetDataPointerForName(csBundle, CFSTR("GetScriptManagerVariable"));
 	}
@@ -2937,7 +2937,7 @@ static long (*GetGetScriptManagerVariablePointer())(short) {
 
 - (void)dealloc {
     [NSObject cancelPreviousPerformRequestsWithTarget:self];
-    NSLog(@"dealloc linkinged");
+    NVLogInfo(@"dealloc linkinged");
     [self unbind:@"automaticQuoteSubstitutionEnabled"];
     [self unbind:@"automaticDashSubstitutionEnabled"];
     [self unbind:@"automaticTextReplacementEnabled"];
@@ -3197,7 +3197,7 @@ static long (*GetGetScriptManagerVariablePointer())(short) {
                 [self setSelectedRange:selRange];
                 return YES;
             }else{
-                NSLog(@"trying to add markdown syntax, but selection string contains an even# of the syntax. haven't dealt with this condition yet");
+                NVLogWarning(@"trying to add markdown syntax, but selection string contains an even# of the syntax. haven't dealt with this condition yet");
             }
         }
         
@@ -4278,7 +4278,7 @@ static BOOL NVBulletMarker(NSString *line, NSUInteger contentLength, NSUInteger 
             
 //            [textFinder setFindIndicatorNeedsUpdate:YES];
         }else{
-            NSLog(@"find action was invalid");
+            NVLogError(@"find action was invalid");
         }
         [newSender release];
         return;

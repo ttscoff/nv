@@ -323,7 +323,7 @@ static const NSUInteger NVMarkedShareMaxBodyBytes = 500000;
 //this is a simple log command
 - (void)logJavaScriptString:(NSString*) logText
 {
-    NSLog(@"JavaScript: %@",logText);
+    NVLogInfo(@"JavaScript: %@",logText);
 }
 
 //this is called as soon as the script environment is ready in the webview
@@ -373,7 +373,7 @@ static const NSUInteger NVMarkedShareMaxBodyBytes = 500000;
 }
 
 - (void)webView:(WebView *)sender decidePolicyForNewWindowAction:(NSDictionary *)actionInformation request:(NSURLRequest *)request newFrameName:(NSString *)frameName decisionListener:(id<WebPolicyDecisionListener>)listener {
-    NSLog(@"NEW WIN ACTION SENDER: %@",sender);
+    NVLogInfo(@"NEW WIN ACTION SENDER: %@",sender);
     [[NSWorkspace sharedWorkspace] openURL:[actionInformation objectForKey:WebActionOriginalURLKey]];
     [listener ignore];
 }
@@ -997,10 +997,10 @@ static const NSUInteger NVMarkedShareMaxBodyBytes = 500000;
 
 - (void)connectionDidFinishLoading:(NSURLConnection *)connection
 {
-    NSLog(@"Succeeded! Received %lu bytes of data",(unsigned long)[receivedData length]);
+    NVLogInfo(@"Succeeded! Received %lu bytes of data",(unsigned long)[receivedData length]);
 
     NSString * responseString = [[[NSString alloc] initWithData:receivedData encoding:NSASCIIStringEncoding] autorelease];
-    NSLog(@"RESPONSE STRING: %@", responseString);
+    NVLogInfo(@"RESPONSE STRING: %@", responseString);
     [receivedData release];
 }
 
@@ -1057,7 +1057,7 @@ static const NSUInteger NVMarkedShareMaxBodyBytes = 500000;
     NSURL *url = encodedPath ? [NSURL URLWithString:[NSString stringWithFormat:@"x-marked-3://open?file=%@", encodedPath]] : nil;
     if (!url || ![[NSWorkspace sharedWorkspace] openURL:url]) {
         NSBeep();
-        NSLog(@"Could not open note in Marked");
+        NVLogWarning(@"Could not open note in Marked");
     }
 }
 
@@ -1065,7 +1065,7 @@ static const NSUInteger NVMarkedShareMaxBodyBytes = 500000;
 {
     if (!accessoryView) {
         if (![NSBundle loadNibNamed:@"SaveHTMLPreview" owner:self]) {
-            NSLog(@"Failed to load SaveHTMLPreview.nib");
+            NVLogError(@"Failed to load SaveHTMLPreview.nib");
             NSBeep();
             return;
         }

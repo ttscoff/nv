@@ -69,7 +69,7 @@
 - (void)startProgressIndication:(id)sender {
 	if (!window) {
 		if (![NSBundle loadNibNamed:@"URLGetter" owner:self])  {
-			NSLog(@"Failed to load URLGetter.nib");
+			NVLogError(@"Failed to load URLGetter.nib");
 			NSBeep();
 			return;
 		}
@@ -125,7 +125,7 @@
 	tempDirectory = [[NSTemporaryDirectory() stringByAppendingPathComponent:[[NSProcessInfo processInfo] globallyUniqueString]] retain];
    //if (![[NSFileManager defaultManager] createDirectoryAtPath:tempDirectory attributes:nil]) {
 	if (![[NSFileManager defaultManager]createFolderAtPath:tempDirectory]) {
-		NSLog(@"URLGetter: Couldn't create temporary directory!");
+		NVLogError(@"URLGetter: Couldn't create temporary directory!");
 		[download cancel];
 		NSBeep();
 	}
@@ -177,7 +177,7 @@
 			[fileMan deleteFileAtPath:tempDirectory];
 //            [fileMan removeFileAtPath:tempDirectory handler:NULL];
 		else
-			NSLog(@"note removing %@ because it still contains files!", tempDirectory);
+			NVLogWarning(@"note removing %@ because it still contains files!", tempDirectory);
 		[tempDirectory release];
 		tempDirectory = nil;
 	}

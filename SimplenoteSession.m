@@ -134,7 +134,7 @@ static void SNReachabilityCallback(SCNetworkReachabilityRef	target, SCNetworkCon
 		SCNetworkReachabilityContext context = {0, aTarget, NULL, NULL, NULL};
 		if (SCNetworkReachabilitySetCallback(reachableRef, callout, &context)) {
 			if (!SCNetworkReachabilityScheduleWithRunLoop(reachableRef, CFRunLoopGetCurrent(), kCFRunLoopDefaultMode)) {
-				NSLog(@"SCNetworkReachabilityScheduleWithRunLoop error: %d", SCError());
+				NVLogError(@"SCNetworkReachabilityScheduleWithRunLoop error: %d", SCError());
 				CFRelease(reachableRef);
 				return NULL;
 			}
@@ -209,7 +209,7 @@ static void SNReachabilityCallback(SCNetworkReachabilityRef	target, SCNetworkCon
 	//no comparison posible is the same as no comparison necessary for this method; 
 	//the locally-added or remotely-added cases should not need to look at modification dates
 	//TODO: Should we default to NSOrderedDescending (to force server-side sync) when in doubt??
-	NSLog(@"%@ or %@ are lacking syncnum property and date-modified property!", localEntry, remoteEntry);
+	NVLogWarning(@"%@ or %@ are lacking syncnum property and date-modified property!", localEntry, remoteEntry);
 	return NSOrderedSame;
 }
 
@@ -218,7 +218,7 @@ static void SNReachabilityCallback(SCNetworkReachabilityRef	target, SCNetworkCon
 	NSSet *localTagset = [NSSet setWithArray:[(NoteObject *)aNote orderedLabelTitles]];
 	NSSet *remoteTagset = [NSSet setWithArray:[remoteEntry objectForKey:@"tags"]];
 	if (![localTagset isEqualToSet:remoteTagset]) {
-		NSLog(@"Tagsets differ. Updating.");
+		NVLogInfo(@"Tagsets differ. Updating.");
 		NSString *newLabelString = nil;
 		if ([self tagsShouldBeMergedForEntry:localEntry]) {
 			NSMutableSet *mergedTags = [NSMutableSet setWithSet:localTagset];
@@ -272,7 +272,7 @@ static void SNReachabilityCallback(SCNetworkReachabilityRef	target, SCNetworkCon
 
 - (id)initWithNotationPrefs:(NotationPrefs*)prefs {
 	if (![prefs syncServiceIsEnabled:SimplenoteServiceName]) {
-		NSLog(@"notationPrefs says this service is disabled--stop it!");
+		NVLogInfo(@"notationPrefs says this service is disabled--stop it!");
 		return nil;
 	}
 	
@@ -294,7 +294,7 @@ static void SNReachabilityCallback(SCNetworkReachabilityRef	target, SCNetworkCon
 		reachabilityFailed = NO;
 
 		if (![(emailAddress = [aUserString retain]) length]) {
-			NSLog(@"%@: empty email address", NSStringFromSelector(_cmd));
+			NVLogError(@"%@: empty email address", NSStringFromSelector(_cmd));
 			return nil;
 		}
 		if (![(password = [aPassString retain]) length]) {
@@ -499,7 +499,7 @@ static void SNReachabilityCallback(SCNetworkReachabilityRef	target, SCNetworkCon
 	if ([unsyncedServiceNotes count] > 0) {
 		
 		if ([listFetcher isRunning] || [changesFetcher isRunning]) {
-			NSLog(@"%@: not pushing because a full sync index is in progress", NSStringFromSelector(_cmd));
+			NVLogInfo(@"%@: not pushing because a full sync index is in progress", NSStringFromSelector(_cmd));
 			return NO;
 		}
 		
@@ -542,7 +542,7 @@ static void SNReachabilityCallback(SCNetworkReachabilityRef	target, SCNetworkCon
 						//alternatively, its originalNote might have been given metadata by now, in which case we should also add it
 						[notesToDelete addObject:aNote];
 					} else {
-						NSLog(@"not creating an already-deleted, not-being-modified-or-been-modified note %@", aNote);
+						NVLogWarning(@"not creating an already-deleted, not-being-modified-or-been-modified note %@", aNote);
 						[unsyncedServiceNotes removeObject:aNote];
 					}
 				}
@@ -604,9 +604,9 @@ static void SNReachabilityCallback(SCNetworkReachabilityRef	target, SCNetworkCon
 		
 	} else {
 		if ([collectorsInProgress count]) {
-			NSLog(@"not requesting list because collections (%@) are still in progress", collectorsInProgress);
+			NVLogInfo(@"not requesting list because collections (%@) are still in progress", collectorsInProgress);
 		} else {
-			NSLog(@"not requesting list because it is already being fetched or notes are still being modified");
+			NVLogWarning(@"not requesting list because it is already being fetched or notes are still being modified");
 		}
 	}
 	
@@ -777,7 +777,7 @@ static void SNReachabilityCallback(SCNetworkReachabilityRef	target, SCNetworkCon
 	//because there could be many notes missing
 	//although notes that encountered errors normally (entriesInError w/o stopping) will potentially be duplicated anyway.
 	if ([collector collectionStoppedPrematurely]) {
-		NSLog(@"%@: not merging notes because collection was cancelled", NSStringFromSelector(_cmd));
+		NVLogInfo(@"%@: not merging notes because collection was cancelled", NSStringFromSelector(_cmd));
 		return;
 	}
 	NSMutableArray *entries = [NSMutableArray arrayWithCapacity:[[collector entriesCollected] count]];
@@ -848,15 +848,15 @@ static void SNReachabilityCallback(SCNetworkReachabilityRef	target, SCNetworkCon
 	}
 		
 	if ([downloadedNotesToKeep count]) {
-		NSLog(@"%@: found %lu genuinely new notes on the server",NSStringFromSelector(_cmd), (unsigned long)[downloadedNotesToKeep count]);
+		NVLogInfo(@"%@: found %lu genuinely new notes on the server",NSStringFromSelector(_cmd), (unsigned long)[downloadedNotesToKeep count]);
 		[delegate syncSession:self receivedAddedNotes:downloadedNotesToKeep];
 	}
 	if ([notesToReportModified count]) {
-		NSLog(@"%@: found %lu duplicate notes on the server",NSStringFromSelector(_cmd), (unsigned long)[notesToReportModified count]);
+		NVLogInfo(@"%@: found %lu duplicate notes on the server",NSStringFromSelector(_cmd), (unsigned long)[notesToReportModified count]);
 		[delegate syncSession:self didModifyNotes:notesToReportModified];
 	}
 	if ([localNotesToUpload count] && ![collector collectionStoppedPrematurely]) {
-		NSLog(@"%@: found %lu locally unique notes",NSStringFromSelector(_cmd), (unsigned long)[localNotesToUpload count]);
+		NVLogInfo(@"%@: found %lu locally unique notes",NSStringFromSelector(_cmd), (unsigned long)[localNotesToUpload count]);
 		//automatically upload the rest of the unique notes using -startCreatingNotes:
 		[self startCreatingNotes:[localNotesToUpload allObjects]];
 	}
@@ -1096,7 +1096,7 @@ static void SNReachabilityCallback(SCNetworkReachabilityRef	target, SCNetworkCon
 			[self performSelector:@selector(startFetchingListForFullSync) withObject:nil afterDelay:0.0];
 		}
 		if (!reachabilityFailed)
-			NSLog(@"%@ returned %@", fetcher, errString);
+			NVLogInfo(@"%@ returned %@", fetcher, errString);
 		
 		//report error to delegate
 		[self _stoppedWithErrorString:[fetcher didCancel] ? nil : errString];
@@ -1112,7 +1112,7 @@ static void SNReachabilityCallback(SCNetworkReachabilityRef	target, SCNetworkCon
 		@try {
 			responseDictionary = [NSDictionary dictionaryWithJSONString:bodyString];
 		} @catch (NSException *e) {
-			NSLog(@"Exception while parsing Simplenote user: %@", [e reason]);
+			NVLogError(@"Exception while parsing Simplenote user: %@", [e reason]);
 		}
 		if ([responseDictionary objectForKey:@"access_token"]) {
 			[simperiumToken autorelease];
@@ -1128,14 +1128,14 @@ static void SNReachabilityCallback(SCNetworkReachabilityRef	target, SCNetworkCon
 				rawEntries = [responseDictionary objectForKey:@"changes"];
 			}
 		} @catch (NSException *e) {
-			NSLog(@"Exception while parsing Simplenote JSON index: %@", [e reason]);
+			NVLogError(@"Exception while parsing Simplenote JSON index: %@", [e reason]);
 		} @finally {
 			if (!rawEntries) {
 				[self _stoppedWithErrorString:NSLocalizedString(@"The index of notes could not be parsed.", @"Simplenote-specific error")];
 			}
 		}
 		if ([fetcher statusCode] == 400 || [fetcher statusCode] == 401 || [fetcher statusCode] == 404) {
-			NSLog(@"changes fetcher error code: %ld", (long)[fetcher statusCode]);
+			NVLogError(@"changes fetcher error code: %ld", (long)[fetcher statusCode]);
 			[lastCV release];
 			lastCV = nil;
 			[changesFetcher autorelease];
@@ -1156,7 +1156,7 @@ static void SNReachabilityCallback(SCNetworkReachabilityRef	target, SCNetworkCon
 			[entriesDict setObject:[rawEntries objectAtIndex:i] forKey:[rawEntry objectForKey:@"id"]];
 			lastCV = [[rawEntry objectForKey:@"cv"] copy];
 		}
-		NSLog(@"remote: %lu updates", (unsigned long)[rawEntries count]);
+		NVLogInfo(@"remote: %lu updates", (unsigned long)[rawEntries count]);
 		for (NSString *noteKey in entriesDict) {
 			NSDictionary *rawEntry = [entriesDict objectForKey:noteKey];
 			NSNumber *version = [rawEntry objectForKey:@"ev"];
@@ -1185,7 +1185,7 @@ static void SNReachabilityCallback(SCNetworkReachabilityRef	target, SCNetworkCon
 				rawEntries = [responseDictionary objectForKey:@"index"];
 			}
 		} @catch (NSException *e) {
-			NSLog(@"Exception while parsing Simplenote JSON index: %@", [e reason]);
+			NVLogError(@"Exception while parsing Simplenote JSON index: %@", [e reason]);
 		} @finally {
 			if (!rawEntries) {
 				[self _stoppedWithErrorString:NSLocalizedString(@"The index of notes could not be parsed.", @"Simplenote-specific error")];
@@ -1269,7 +1269,7 @@ static void SNReachabilityCallback(SCNetworkReachabilityRef	target, SCNetworkCon
 			indexEntryBuffer = nil;
 		}
 	} else {
-		NSLog(@"unknown fetcher returned: %@, body: %@", fetcher, bodyString);
+		NVLogError(@"unknown fetcher returned: %@, body: %@", fetcher, bodyString);
 	}
 }
 

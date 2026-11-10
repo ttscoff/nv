@@ -403,7 +403,7 @@
 }
 
 - (void)parser:(NSXMLParser *)parser parseErrorOccurred:(NSError *)parseError {
-  NSLog(@"HTMLToMarkdownConverter parse error: %@", parseError);
+  NVLogError(@"HTMLToMarkdownConverter parse error: %@", parseError);
 }
 
 #pragma mark - NSXMLParserDelegate

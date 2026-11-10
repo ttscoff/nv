@@ -17,7 +17,7 @@
         return ([success boolValue] ? LAST_FIND_YES : LAST_FIND_NO);
     } @catch (NSException *e) {}
     
-	NSLog(@"lastFindWasSuccessful ivar not found!");
+	NVLogError(@"lastFindWasSuccessful ivar not found!");
 	return LAST_FIND_UNKNOWN;
 }
 

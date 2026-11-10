@@ -147,7 +147,7 @@ NSString * const DirectoryLocationDomain = @"DirectoryLocationDomain";
 			error:&error];
 	if (!result)
 	{
-		NSLog(@"Unable to find or create application support directory:\n%@", error);
+		NVLogError(@"Unable to find or create application support directory:\n%@", error);
 	}
 	return result;
 }

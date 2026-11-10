@@ -1,10 +1,11 @@
 #import "LinkReferenceCompletion.h"
+#import "NVLog.h"
 
 static NSRegularExpression *NVLinkRegex(NSString *pattern) {
 	NSError *error = nil;
 	NSRegularExpression *regex = [NSRegularExpression regularExpressionWithPattern:pattern options:0 error:&error];
 	if (!regex)
-		NSLog(@"link reference completion: %@", error);
+		NVLogInfo(@"link reference completion: %@", error);
 	return regex;
 }
 

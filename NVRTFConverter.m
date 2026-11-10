@@ -156,7 +156,7 @@
                 html = [[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding];
             }
         } @catch (NSException *exception) {
-            NSLog(@"textutil RTF conversion failed: %@", exception);
+            NVLogError(@"textutil RTF conversion failed: %@", exception);
         }
     }
 

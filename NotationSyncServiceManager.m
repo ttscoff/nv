@@ -34,7 +34,7 @@
 		if (keyForService) {
 			[dict setObject:entry forKey:keyForService];
 		} else {
-			NSLog(@"service key for %@ does not exist", entry);
+			NVLogError(@"service key for %@ does not exist", entry);
 		}
 	}
 	return dict;
@@ -177,7 +177,7 @@
 		[syncSession startCollectingChangedNotesWithEntries:changedNotes];
 	}
 	if ([notesToDelete count]) {
-		NSLog(@"removing %lu notes", (unsigned long)[notesToDelete count]);
+		NVLogInfo(@"removing %lu notes", (unsigned long)[notesToDelete count]);
 		[syncSession suppressPushingForNotes:notesToDelete];
 		[self removeNotes:notesToDelete];
 		[syncSession stopSuppressingPushingForNotes:notesToDelete];
@@ -302,7 +302,7 @@
 				}
 			}
 		} else {
-			NSLog(@"Hmm! remote entry %@ has no key", remoteEntry);
+			NVLogWarning(@"Hmm! remote entry %@ has no key", remoteEntry);
 		}
 	}
 	
@@ -335,7 +335,7 @@
 				[notationPrefs setSyncShouldMerge:YES inCurrentAccountForService:serviceName];
 			}
 		}
-		if (wasToldToMerge) NSLog(@"continuing previous merge");
+		if (wasToldToMerge) NVLogInfo(@"continuing previous merge");
 		mergeNotes = locallyAddedNotes;
 	} else if (![locallyAddedNotes count]) {
 		//once all the locally-added notes have been taken care of, future syncs should not continue to merge
@@ -344,9 +344,9 @@
 	
 	if ([locallyAddedNotes count] || [locallyChangedNotes count] || [locallyDeletedNotes count] || [mergeNotes count] || 
 		[remotelyAddedEntries count] || [remotelyChangedNotes count] || [remotelyDeletedNotes count] || [remotelyMissingNotes count]) {
-		NSLog(@"local: %lu added, %lu changed, %lu deleted, %lu to merge",
+		NVLogInfo(@"local: %lu added, %lu changed, %lu deleted, %lu to merge",
 			  (unsigned long)[locallyAddedNotes count], (unsigned long)[locallyChangedNotes count], (unsigned long)[locallyDeletedNotes count], (unsigned long)[mergeNotes count]);
-		NSLog(@"remote: %lu added, %lu changed, %lu deleted, %lu missing", 
+		NVLogInfo(@"remote: %lu added, %lu changed, %lu deleted, %lu missing", 
 			  (unsigned long)[remotelyAddedEntries count], (unsigned long)[remotelyChangedNotes count], (unsigned long)[remotelyDeletedNotes count], (unsigned long)[remotelyMissingNotes count]);
 	}
 
@@ -355,7 +355,7 @@
 	if (!([mergeNotes count] && [remotelyAddedEntries count])) 
 		[syncSession startCreatingNotes:locallyAddedNotes];
 	else
-		NSLog(@"not creating notes because %lu mergenotes exist", (unsigned long)[mergeNotes count]);
+		NVLogInfo(@"not creating notes because %lu mergenotes exist", (unsigned long)[mergeNotes count]);
 	
 	[syncSession startModifyingNotes:locallyChangedNotes];
 	
@@ -467,12 +467,12 @@ ended:
 			
 			[notationPrefs setSyncShouldMerge:NO inCurrentAccountForService:serviceName];
 			//continue along down your potentially dangerous path
-			NSLog(@"User agreed to replace all notes with those from the server");
+			NVLogInfo(@"User agreed to replace all notes with those from the server");
 			
 			return NO;			
 	}
 	
-	NSLog(@"%@: unhandled case (res: %ld)!", NSStringFromSelector(_cmd), (long)res);
+	NVLogWarning(@"%@: unhandled case (res: %ld)!", NSStringFromSelector(_cmd), (long)res);
 	return YES;
 }
 

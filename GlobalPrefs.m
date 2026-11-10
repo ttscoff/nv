@@ -286,7 +286,7 @@ static void sendCallbacksForGlobalPrefs(GlobalPrefs* self, SEL selector, id orig
 		va_end(argList);
 		
 	} else {
-		NSLog(@"%@: target %@ does not respond to callback selector!", NSStringFromSelector(_cmd), [sender description]);
+		NVLogError(@"%@: target %@ does not respond to callback selector!", NSStringFromSelector(_cmd), [sender description]);
 	}
 }
 
@@ -304,7 +304,7 @@ static void sendCallbacksForGlobalPrefs(GlobalPrefs* self, SEL selector, id orig
 		if (![senders count])
 			[selectorObservers removeObjectForKey:selectorKey];
 	} else {
-		NSLog(@"Selector %@ has no observers?", NSStringFromSelector(selector));
+		NVLogWarning(@"Selector %@ has no observers?", NSStringFromSelector(selector));
 	}
 }
 
@@ -774,7 +774,7 @@ BOOL ColorsEqualWith8BitChannels(NSColor *c1, NSColor *c2) {
 		if (![[prefsFont fontName] isEqualToString:[noteFont fontName]] || 
 			[prefsFont pointSize] != [noteFont pointSize]) {
 			
-			NSLog(@"archived notationPrefs base font does not match current global default font!");
+			NVLogWarning(@"archived notationPrefs base font does not match current global default font!");
 			[self _setNoteBodyFont:prefsFont];
 			
 			SEND_CALLBACKS();
@@ -823,7 +823,7 @@ BOOL ColorsEqualWith8BitChannels(NSColor *c1, NSColor *c2) {
 		@try {
 			noteBodyFont = [[NSUnarchiver unarchiveObjectWithData:[defaults objectForKey:NoteBodyFontKey]] retain];
 		} @catch (NSException *e) {
-			NSLog(@"Error trying to unarchive default note body font (%@, %@)", [e name], [e reason]);
+			NVLogError(@"Error trying to unarchive default note body font (%@, %@)", [e name], [e reason]);
 		}
 		
 		if ((!noteBodyFont || ![noteBodyFont isKindOfClass:[NSFont class]]) && !triedOnce) {
@@ -978,7 +978,7 @@ BOOL ColorsEqualWith8BitChannels(NSColor *c1, NSColor *c2) {
 		@try {
 			noteListFont = [[NSUnarchiver unarchiveObjectWithData:stored] retain];
 		} @catch (NSException *exception) {
-			NSLog(@"Error trying to unarchive note list font (%@, %@)", [exception name], [exception reason]);
+			NVLogError(@"Error trying to unarchive note list font (%@, %@)", [exception name], [exception reason]);
 		}
 	}
 	BOOL replaceAvenirDefault = [GlobalPrefs fontIsUnreleasedAvenirListDefault:noteListFont];

@@ -39,7 +39,7 @@
 }
 
 void(^exportHandler)(NSInteger) =^(NSInteger returnCode) {
-    NSLog(@"panel  handlin:%ld",returnCode);
+    NVLogInfo(@"panel  handlin:%ld",returnCode);
 //    NSArray *notes = (NSArray *)contextInfo;
 //    NSLog(@"notes:%@",notes);
 //    [notes release];
@@ -126,7 +126,7 @@ void(^exportHandler)(NSInteger) =^(NSInteger returnCode) {
 	
 	if (!accessoryView) {
 		if (![NSBundle loadNibNamed:@"ExporterManager" owner:self]) {
-			NSLog(@"Failed to load ExporterManager.nib");
+			NVLogError(@"Failed to load ExporterManager.nib");
 			NSBeep();
 			return;
 		}
