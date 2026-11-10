@@ -1,3 +1,16 @@
+nvALT 3.0.37 (144)
+-------------------------
+
+#### NEW
+
+- A **Debug** pane writes errors and warnings to Console, and can include every diagnostic message or go quiet
+
+#### FIXED
+
+- Deleting a note no longer leaves the **notes list** empty or showing a random handful of notes
+- A one-character note shows its **preview** in the notes list
+- **Note previews** keep Japanese text, emoji, and accented characters whole
+
 nvALT 3.0.36 (144)
 -------------------------
 
