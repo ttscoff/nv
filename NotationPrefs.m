@@ -107,11 +107,11 @@ NSMutableDictionary *ServiceAccountDictInit(NotationPrefs *prefs, NSString* serv
 		@try {
 			baseBodyFont = [[decoder decodeObjectForKey:VAR_STR(baseBodyFont)] retain];
 		} @catch (NSException *e) {
-			NSLog(@"Error trying to unarchive default base body font (%@, %@)", [e name], [e reason]);
+			NVLogError(@"Error trying to unarchive default base body font (%@, %@)", [e name], [e reason]);
 		}
 		if (!baseBodyFont || ![baseBodyFont isKindOfClass:[NSFont class]]) {
 			baseBodyFont = [[[GlobalPrefs defaultPrefs] noteBodyFont] retain];
-			NSLog(@"setting base body to current default: %@", baseBodyFont);
+			NVLogInfo(@"setting base body to current default: %@", baseBodyFont);
 			preferencesChanged = YES;
 		} else if ([[NSUserDefaults standardUserDefaults] integerForKey:@"NVFontSizeEpoch"] < 2 &&
 				   [GlobalPrefs fontIsLegacyBodyDefault:baseBodyFont]) {
@@ -128,7 +128,7 @@ NSMutableDictionary *ServiceAccountDictInit(NotationPrefs *prefs, NSString* serv
 		@try {
 			foregroundColor = [[decoder decodeObjectForKey:VAR_STR(foregroundColor)] retain];
 		} @catch (NSException *e) {
-			NSLog(@"Error trying to unarchive foreground text color (%@, %@)", [e name], [e reason]);
+			NVLogError(@"Error trying to unarchive foreground text color (%@, %@)", [e name], [e reason]);
 		}
 		if (!foregroundColor || ![foregroundColor isKindOfClass:[NSColor class]]) {
 			//foregroundColor = [[[GlobalPrefs defaultPrefs] foregroundTextColor] retain];
@@ -243,7 +243,7 @@ NSMutableDictionary *ServiceAccountDictInit(NotationPrefs *prefs, NSString* serv
 	case WordDocFormat:
 		return [NSMutableArray arrayWithObjects:[(id)UTCreateStringForOSType(WORD_DOC_TYPE_ID) autorelease], nil];
 	default:
-	    NSLog(@"Unknown format ID: %d", formatID);
+	    NVLogError(@"Unknown format ID: %d", formatID);
     }
     
     return [NSMutableArray arrayWithCapacity:0];
@@ -264,7 +264,7 @@ NSMutableDictionary *ServiceAccountDictInit(NotationPrefs *prefs, NSString* serv
 	case WordXMLFormat:
 		return [NSMutableArray arrayWithObjects:@"docx", nil];
 	default:
-	    NSLog(@"Unknown format ID: %d", formatID);
+	    NVLogError(@"Unknown format ID: %d", formatID);
     }
     
     return [NSMutableArray arrayWithCapacity:0];
@@ -351,7 +351,7 @@ NSMutableDictionary *ServiceAccountDictInit(NotationPrefs *prefs, NSString* serv
 	OSStatus err = SecKeychainFindGenericPassword(NULL, strlen(KEYCHAIN_SERVICENAME), KEYCHAIN_SERVICENAME,
 												  strlen(kcSyncAccountName), kcSyncAccountName, &passwordLength, &passwordData, &returnedItem);
 	if (err != noErr) {
-		NSLog(@"Error finding keychain password for service account %@: %d\n", serviceName, err);
+		NVLogError(@"Error finding keychain password for service account %@: %d\n", serviceName, err);
 		return nil;
 	}
 	password = [[[NSString alloc] initWithBytes:passwordData length:passwordLength encoding:NSUTF8StringEncoding] autorelease];
@@ -476,7 +476,7 @@ NSMutableDictionary *ServiceAccountDictInit(NotationPrefs *prefs, NSString* serv
 	if (itemRef) {
 		OSStatus err = SecKeychainItemDelete(itemRef);
 		if (err != noErr)
-			NSLog(@"Error deleting keychain item: %d", err);
+			NVLogError(@"Error deleting keychain item: %d", err);
 		CFRelease(itemRef);
 	}
 }
@@ -493,7 +493,7 @@ NSMutableDictionary *ServiceAccountDictInit(NotationPrefs *prefs, NSString* serv
 												  &passwordLength, &passwordData,
 												  &returnedItem);
 	if (err != noErr) {
-		NSLog(@"Error finding keychain password for account %s: %d\n", accountName, err);
+		NVLogError(@"Error finding keychain password for account %s: %d\n", accountName, err);
 		return nil;
 	}
 	NSData *data = [NSData dataWithBytes:passwordData length:passwordLength];
@@ -524,7 +524,7 @@ NSMutableDictionary *ServiceAccountDictInit(NotationPrefs *prefs, NSString* serv
 		const SecKeychainAttributeList attributes = { sizeof(attrs) / sizeof(attrs[0]), attrs };
 		
 		if (noErr != (status = SecKeychainItemModifyAttributesAndData(itemRef, &attributes, [data length], [data bytes]))) {
-			NSLog(@"Error modifying keychain data with new passphrase-data: %d", status);
+			NVLogError(@"Error modifying keychain data with new passphrase-data: %d", status);
 		}
 		
 		CFRelease(itemRef);
@@ -535,7 +535,7 @@ NSMutableDictionary *ServiceAccountDictInit(NotationPrefs *prefs, NSString* serv
 		//add new data; item does not exist
 		if (noErr != (status = SecKeychainAddGenericPassword(NULL, strlen(KEYCHAIN_SERVICENAME), KEYCHAIN_SERVICENAME,
 															 strlen(accountName), accountName, [data length], [data bytes], NULL))) {
-			NSLog(@"Error adding new passphrase item to keychain: %d", status);
+			NVLogError(@"Error adding new passphrase item to keychain: %d", status);
 		}
 	}
 }
@@ -764,7 +764,7 @@ NSMutableDictionary *ServiceAccountDictInit(NotationPrefs *prefs, NSString* serv
 	if ([self syncNotesShouldMergeForServiceName:serviceName] != shouldMerge) {
 		NSString *username = [accountDict objectForKey:@"username"];
 		if (username) {
-			NSLog(@"%@: %d, %@",  NSStringFromSelector(_cmd), shouldMerge, username);
+			NVLogInfo(@"%@: %d, %@",  NSStringFromSelector(_cmd), shouldMerge, username);
 			if (shouldMerge) {
 				[accountDict setObject:username forKey:@"shouldmerge"];
 			} else {
@@ -772,7 +772,7 @@ NSMutableDictionary *ServiceAccountDictInit(NotationPrefs *prefs, NSString* serv
 			}
 			preferencesChanged = YES;
 		} else {
-			NSLog(@" no username found in %@", serviceName);
+			NVLogWarning(@" no username found in %@", serviceName);
 		}
 	}
 }
@@ -821,7 +821,7 @@ NSMutableDictionary *ServiceAccountDictInit(NotationPrefs *prefs, NSString* serv
 				
 				OSStatus status = noErr;
 				if (noErr != (status = SecKeychainItemModifyAttributesAndData(itemRef, &attributes, [passwordData length], [passwordData bytes]))) {
-					NSLog(@"Error modifying keychain data with different service password: %d", status);
+					NVLogError(@"Error modifying keychain data with different service password: %d", status);
 				}
 				CFRelease(itemRef);
 			} else {
@@ -829,11 +829,11 @@ NSMutableDictionary *ServiceAccountDictInit(NotationPrefs *prefs, NSString* serv
 				OSStatus status = noErr;
 				if (noErr != (status = SecKeychainAddGenericPassword(NULL, strlen(KEYCHAIN_SERVICENAME), KEYCHAIN_SERVICENAME,
 																	 strlen(kcSyncAccountName), kcSyncAccountName, [passwordData length], [passwordData bytes], NULL))) {
-					NSLog(@"Error adding new service password to keychain: %d", status);
+					NVLogError(@"Error adding new service password to keychain: %d", status);
 				}
 			}
 		} else {
-			NSLog(@"not storing password in keychain for %@ because a sync account name couldn't be created", serviceName);
+			NVLogError(@"not storing password in keychain for %@ because a sync account name couldn't be created", serviceName);
 		}
 			
 		preferencesChanged = YES;
@@ -855,11 +855,11 @@ NSMutableDictionary *ServiceAccountDictInit(NotationPrefs *prefs, NSString* serv
 			}	
 			if (itemRef) {
 				OSStatus err = SecKeychainItemDelete(itemRef);
-				if (err != noErr) NSLog(@"Error deleting keychain item for service %@: %d", serviceName, (int)err);
+				if (err != noErr) NVLogError(@"Error deleting keychain item for service %@: %d", serviceName, (int)err);
 				CFRelease(itemRef);
 			}
 		} else {
-			NSLog(@"not removing password for %@ because a keychain sync account name couldn't be created", serviceName);
+			NVLogError(@"not removing password for %@ because a keychain sync account name couldn't be created", serviceName);
 		}
 		
 		[delegate syncSettingsChangedForService:serviceName];
@@ -877,7 +877,7 @@ NSMutableDictionary *ServiceAccountDictInit(NotationPrefs *prefs, NSString* serv
 		return idx;
 	}
 	
-	NSLog(@"saw new disk UUID: %@ (other disks are: %@)", diskEntry, seenDiskUUIDEntries);
+	NVLogInfo(@"saw new disk UUID: %@ (other disks are: %@)", diskEntry, seenDiskUUIDEntries);
 	[seenDiskUUIDEntries addObject:diskEntry];
 	
 	preferencesChanged = YES;
@@ -934,7 +934,7 @@ NSMutableDictionary *ServiceAccountDictInit(NotationPrefs *prefs, NSString* serv
 		
 		return @"docx";
 	default:
-	    NSLog(@"storage format ID is unknown: %ld", format);
+	    NVLogError(@"storage format ID is unknown: %ld", format);
     }
     
     return @"";

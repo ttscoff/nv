@@ -56,7 +56,7 @@ static BOOL MountPointExists(const char *expectedMountPath) {
 	
 	char absExpectedMountPath[PATH_MAX];	
 	if (!realpath(expectedMountPath, absExpectedMountPath)) {
-		NSLog(@"error getting realpath from path '%s': %d", expectedMountPath, errno);
+		NVLogError(@"error getting realpath from path '%s': %d", expectedMountPath, errno);
 		return NO;
 	}
 	
@@ -82,7 +82,7 @@ static NSString *TempDirectoryPathForEditing() {
 	NSAssert(prefs != nil, @"prefs are nil");
 	
 	if ([self isPreparing]) {
-		NSLog(@"prepEditingSpaceIfNecessary: already preparing");
+		NVLogWarning(@"prepEditingSpaceIfNecessary: already preparing");
 		return;
 	}
 	
@@ -204,7 +204,7 @@ static NSString *TempDirectoryPathForEditing() {
 	[fileMan createDirectoryAtPath:path attributes:
 	 [NSDictionary dictionaryWithObject:[NSNumber numberWithUnsignedLong:0700] forKey:NSFilePosixPermissions]];
 #endif
-	if (!didCreate) NSLog(@"couldn't create directory '%@': %@", path, (err ? [err localizedDescription] : @"(unknown error)"));
+	if (!didCreate) NVLogError(@"couldn't create directory '%@': %@", path, (err ? [err localizedDescription] : @"(unknown error)"));
 	return didCreate;
 }
 
@@ -237,7 +237,7 @@ static NSString *TempDirectoryPathForEditing() {
 				if (!deviceName) deviceName = [outString retain];
 			}
 			if (![deviceName length]) {
-				NSLog(@"couldn't get device name from hdiutil attach");
+				NVLogError(@"couldn't get device name from hdiutil attach");
 				[self _stopPreparation];
 			} else {
 //				NSLog(@"device name is '%@'", deviceName);
@@ -262,7 +262,7 @@ static NSString *TempDirectoryPathForEditing() {
 			if (MountPointExists([path fileSystemRepresentation])) {
 				[self _finishPreparationWithPath:path];
 			} else {
-				NSLog(@"the RAM disk somehow does not exist!");
+				NVLogError(@"the RAM disk somehow does not exist!");
 				[self _stopPreparation];
 			}
 		}

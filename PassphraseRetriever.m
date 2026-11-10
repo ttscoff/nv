@@ -48,7 +48,7 @@
 	
 	if (!window) {
 		if (![NSBundle loadNibNamed:@"PassphraseRetriever" owner:self])  {
-			NSLog(@"Failed to load PassphraseRetriever.nib");
+			NVLogError(@"Failed to load PassphraseRetriever.nib");
 			NSBeep();
 			return 0;
 		}

@@ -422,7 +422,7 @@ CFStringRef CreateRandomizedFileName() {
     ProcessSerialNumber psn;
     OSStatus err = noErr;
     if ((err = GetCurrentProcess(&psn)) != noErr) {
-	printf("error getting process serial number: %d\n", (int)err);
+	NVLogErrorC("error getting process serial number: %d\n", (int)err);
 	
 	//just use the location of our memory
 	psn.lowLongOfPSN = (UInt32)&psn;
@@ -474,12 +474,12 @@ OSStatus FSRefReadData(FSRef *fsRef, size_t maximumReadSize, UInt64 *bufferSize,
     ByteCount readActualCount = 0, totalReadBytes = 0;
 	
 	if (!bufferSize || !newBuffer || !fsRef) {
-		printf("FSRefReadData: NULL buffers or fsRef\n");
+		NVLogErrorC("FSRefReadData: NULL buffers or fsRef\n");
 		return paramErr;
 	}
     
     if ((err = FSGetDataForkName(&dfName)) != noErr) {
-		printf("FSGetDataForkName: error %d\n", (int)err);
+		NVLogErrorC("FSGetDataForkName: error %d\n", (int)err);
 		return err;
     }
     
@@ -488,12 +488,12 @@ OSStatus FSRefReadData(FSRef *fsRef, size_t maximumReadSize, UInt64 *bufferSize,
     //get fork size
 	//read data
     if ((err = FSOpenFork(fsRef, dfName.length, dfName.unicode, fsRdPerm, &refNum)) != noErr) {
-		printf("FSRefReadData: FSOpenFork: error %d\n", (int)err);
+		NVLogErrorC("FSRefReadData: FSOpenFork: error %d\n", (int)err);
 		return err;
     }
     if ((forkSize = *bufferSize) < 1) {
 		if ((err = FSGetForkSize(refNum, &forkSize)) != noErr) {
-			printf("FSGetForkSize: error %d\n", (int)err);
+			NVLogErrorC("FSGetForkSize: error %d\n", (int)err);
 			return err;
 		}
     }
@@ -508,7 +508,7 @@ OSStatus FSRefReadData(FSRef *fsRef, size_t maximumReadSize, UInt64 *bufferSize,
     OSErr lastReadErr = err;
 	
 	if ((err = FSCloseFork(refNum)) != noErr)
-		printf("FSCloseFork: error %d\n", (int)err);
+		NVLogErrorC("FSCloseFork: error %d\n", (int)err);
     
     *newBuffer = fullSizeBuffer;
 	//in case we read less than the expected size or the size was not initially known
@@ -524,19 +524,19 @@ OSStatus FSRefWriteData(FSRef *fsRef, size_t maximumWriteSize, UInt64 bufferSize
     ByteCount writeActualCount = 0, totalWrittenBytes = 0;
 	
 	if (!buffer || !fsRef) {
-		printf("FSRefWriteData: NULL buffers or fsRef\n");
+		NVLogErrorC("FSRefWriteData: NULL buffers or fsRef\n");
 		return paramErr;
 	}
     
     if ((err = FSGetDataForkName(&dfName)) != noErr) {
-		printf("FSGetDataForkName: error %d\n", (int)err);
+		NVLogErrorC("FSGetDataForkName: error %d\n", (int)err);
 		return err;
     }
     
 	//FSOpenFork
     //get vrefnum or whatever
     if ((err = FSOpenFork(fsRef, dfName.length, dfName.unicode, fsWrPerm, &refNum)) != noErr) {
-		printf("FSRefWriteData: FSOpenFork: error %d\n", (int)err);
+		NVLogErrorC("FSRefWriteData: FSOpenFork: error %d\n", (int)err);
 		return err;
     }
     
@@ -552,12 +552,12 @@ OSStatus FSRefWriteData(FSRef *fsRef, size_t maximumWriteSize, UInt64 bufferSize
     OSErr writeError = err;
 	
 	if (truncateFile && (err = FSSetForkSize(refNum, fsFromStart, bufferSize))) {
-		printf("FSOpenFork: FSSetForkSize %d\n", (int)err);
+		NVLogErrorC("FSOpenFork: FSSetForkSize %d\n", (int)err);
 		return err;
 	}
     
 	if ((err = FSCloseFork(refNum)) != noErr)
-		printf("FSCloseFork: error %d\n", (int)err);
+		NVLogErrorC("FSCloseFork: error %d\n", (int)err);
 	
     return writeError;
 }

@@ -52,7 +52,7 @@
 	if (self=[super init]) {
 		if (!view) {
 			if (![NSBundle loadNibNamed:@"KeyDerivationManager" owner:self])  {
-				NSLog(@"Failed to load KeyDerivationManager.nib");
+				NVLogError(@"Failed to load KeyDerivationManager.nib");
 				NSBeep();
 				return nil;
 			}

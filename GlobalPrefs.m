@@ -51,6 +51,8 @@ static NSString *TableColumnsHaveBodyPreviewKey = @"TableColumnsHaveBodyPreview"
 static NSString *NoteBodyFontKey = @"NoteBodyFont";
 static NSString *NoteListFontKey = @"NoteListFont";
 static NSString *ConfirmNoteDeletionKey = @"ConfirmNoteDeletion";
+static NSString *LogErrorsAndWarningsKey = @"LogErrorsAndWarnings";
+static NSString *LogAllDiagnosticMessagesKey = @"LogAllDiagnosticMessages";
 static NSString *CheckSpellingInNoteBodyKey = @"CheckSpellingInNoteBody";
 static NSString *TextReplacementInNoteBodyKey = @"TextReplacementInNoteBody";
 static NSString *QuitWhenClosingMainWindowKey = @"QuitWhenClosingMainWindow";
@@ -144,6 +146,8 @@ static void sendCallbacksForGlobalPrefs(GlobalPrefs* self, SEL selector, id orig
 			[NSNumber numberWithBool:YES], TabKeyIndentsKey,
 			[NSNumber numberWithBool:YES], EnterInListRenamesNoteKey,
 			[NSNumber numberWithBool:YES], ConfirmNoteDeletionKey,
+			[NSNumber numberWithBool:YES], LogErrorsAndWarningsKey,
+			[NSNumber numberWithBool:NO], LogAllDiagnosticMessagesKey,
 			[NSNumber numberWithBool:YES], CheckSpellingInNoteBodyKey, 
             [NSNumber numberWithBool:NO], TextReplacementInNoteBodyKey,
             [NSNumber numberWithBool:NO], UseSmartInsertDeleteKey,
@@ -189,6 +193,8 @@ static void sendCallbacksForGlobalPrefs(GlobalPrefs* self, SEL selector, id orig
 			[NSNumber numberWithBool:YES], TableIsReverseSortedKey, nil]];
 		
 		autoCompleteSearches = [defaults boolForKey:AutoCompleteSearchesKey];
+		//the logging module starts out writing errors and warnings; the saved settings take over here
+		NVLogSetEnabled([defaults boolForKey:LogErrorsAndWarningsKey], [defaults boolForKey:LogAllDiagnosticMessagesKey]);
 		[self _upgradeLegacyFontSizesIfNeeded];
 	}
 	return self;
@@ -280,7 +286,7 @@ static void sendCallbacksForGlobalPrefs(GlobalPrefs* self, SEL selector, id orig
 		va_end(argList);
 		
 	} else {
-		NSLog(@"%@: target %@ does not respond to callback selector!", NSStringFromSelector(_cmd), [sender description]);
+		NVLogError(@"%@: target %@ does not respond to callback selector!", NSStringFromSelector(_cmd), [sender description]);
 	}
 }
 
@@ -298,7 +304,7 @@ static void sendCallbacksForGlobalPrefs(GlobalPrefs* self, SEL selector, id orig
 		if (![senders count])
 			[selectorObservers removeObjectForKey:selectorKey];
 	} else {
-		NSLog(@"Selector %@ has no observers?", NSStringFromSelector(selector));
+		NVLogWarning(@"Selector %@ has no observers?", NSStringFromSelector(selector));
 	}
 }
 
@@ -379,6 +385,32 @@ static void sendCallbacksForGlobalPrefs(GlobalPrefs* self, SEL selector, id orig
 }
 - (BOOL)confirmNoteDeletion {
     return [defaults boolForKey:ConfirmNoteDeletionKey];
+}
+
+- (void)setLogsErrorsAndWarnings:(BOOL)value sender:(id)sender {
+	[defaults setBool:value forKey:LogErrorsAndWarningsKey];
+	NVLogSetEnabled(value, [defaults boolForKey:LogAllDiagnosticMessagesKey]);
+
+	SEND_CALLBACKS();
+}
+
+- (BOOL)logsErrorsAndWarnings {
+	return [defaults boolForKey:LogErrorsAndWarningsKey];
+}
+
+//every diagnostic message includes the errors and warnings, so turning this on
+//also records that setting; turning it off again leaves errors and warnings on
+- (void)setLogsAllDiagnosticMessages:(BOOL)value sender:(id)sender {
+	[defaults setBool:value forKey:LogAllDiagnosticMessagesKey];
+	if (value)
+		[defaults setBool:YES forKey:LogErrorsAndWarningsKey];
+	NVLogSetEnabled([defaults boolForKey:LogErrorsAndWarningsKey], value);
+
+	SEND_CALLBACKS();
+}
+
+- (BOOL)logsAllDiagnosticMessages {
+	return [defaults boolForKey:LogAllDiagnosticMessagesKey];
 }
 
 - (void)setQuitWhenClosingWindow:(BOOL)value sender:(id)sender {
@@ -742,7 +774,7 @@ BOOL ColorsEqualWith8BitChannels(NSColor *c1, NSColor *c2) {
 		if (![[prefsFont fontName] isEqualToString:[noteFont fontName]] || 
 			[prefsFont pointSize] != [noteFont pointSize]) {
 			
-			NSLog(@"archived notationPrefs base font does not match current global default font!");
+			NVLogWarning(@"archived notationPrefs base font does not match current global default font!");
 			[self _setNoteBodyFont:prefsFont];
 			
 			SEND_CALLBACKS();
@@ -791,7 +823,7 @@ BOOL ColorsEqualWith8BitChannels(NSColor *c1, NSColor *c2) {
 		@try {
 			noteBodyFont = [[NSUnarchiver unarchiveObjectWithData:[defaults objectForKey:NoteBodyFontKey]] retain];
 		} @catch (NSException *e) {
-			NSLog(@"Error trying to unarchive default note body font (%@, %@)", [e name], [e reason]);
+			NVLogError(@"Error trying to unarchive default note body font (%@, %@)", [e name], [e reason]);
 		}
 		
 		if ((!noteBodyFont || ![noteBodyFont isKindOfClass:[NSFont class]]) && !triedOnce) {
@@ -946,7 +978,7 @@ BOOL ColorsEqualWith8BitChannels(NSColor *c1, NSColor *c2) {
 		@try {
 			noteListFont = [[NSUnarchiver unarchiveObjectWithData:stored] retain];
 		} @catch (NSException *exception) {
-			NSLog(@"Error trying to unarchive note list font (%@, %@)", [exception name], [exception reason]);
+			NVLogError(@"Error trying to unarchive note list font (%@, %@)", [exception name], [exception reason]);
 		}
 	}
 	BOOL replaceAvenirDefault = [GlobalPrefs fontIsUnreleasedAvenirListDefault:noteListFont];

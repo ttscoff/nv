@@ -65,7 +65,7 @@
 - (id)getFinderTagsAtFSPath:(const char*)path
 {
 	if (!path){
-        NSLog(@"nopath");
+        NVLogWarning(@"nopath");
         return nil;
     }
     
@@ -74,7 +74,7 @@
 	NSArray *existingTags=nil;
 	NSError *error=nil;
 	if (![url getResourceValue:&existingTags forKey:NSURLTagNamesKey error:&error])	{
-        NSLog(@"trouble getting finder tags:%@",error);
+        NVLogError(@"trouble getting finder tags:%@",error);
 		return nil;
 	}
 	if ([existingTags count] == 0)
@@ -110,7 +110,7 @@
     NSError *err=nil;
 	id outObject = [NSPropertyListSerialization propertyListWithData:nsData options:NSPropertyListImmutable format:&formatFound error:&err];
 	if (err) {
-		NSLog(@"%@: error deserializing labels: %@", NSStringFromSelector(_cmd), err);
+		NVLogError(@"%@: error deserializing labels: %@", NSStringFromSelector(_cmd), err);
 //		[err autorelease];
 		return nil;
 	}
@@ -135,7 +135,7 @@
 - (BOOL)setFinderTags:(id)plistObject atFSPath:(const char*)path
 {
 	if (!path){
-        NSLog(@"setting but no path");
+        NVLogWarning(@"setting but no path");
         return NO;
     }
 	NSURL *url = [NSURL fileURLWithPath:[NSString stringWithCString:path encoding:NSUTF8StringEncoding]];
@@ -143,8 +143,8 @@
 	NSError *error=nil;
 	if (![url setResourceValue:tagArray forKey:NSURLTagNamesKey error:&error])
 	{
-		NSLog(@"%@", error);
-		NSLog(@"Error setting Finder tags for %@", [url path]);
+		NVLogError(@"%@", error);
+		NVLogError(@"Error setting Finder tags for %@", [url path]);
 		return NO;
 	}
 	else
@@ -169,7 +169,7 @@
 		NSString *errorString = nil;
 		dataToSendNS = [NSPropertyListSerialization dataFromPropertyList:plistObject format:kCFPropertyListBinaryFormat_v1_0 errorDescription:&errorString];
 		if (errorString) {
-			NSLog(@"%@: error serializing labels: %@", NSStringFromSelector(_cmd), errorString);
+			NVLogError(@"%@: error serializing labels: %@", NSStringFromSelector(_cmd), errorString);
 			[errorString autorelease];
 			return NO;
 		}
@@ -185,7 +185,7 @@
 	}
 	
 	if (returnVal < 0) {
-		if (errno != ENOATTR) NSLog(@"%@: couldn't set/remove attribute: %d (value '%@')", NSStringFromSelector(_cmd), errno, dataToSendNS);
+		if (errno != ENOATTR) NVLogError(@"%@: couldn't set/remove attribute: %d (value '%@')", NSStringFromSelector(_cmd), errno, dataToSendNS);
 		return NO;
 	}
 
@@ -200,7 +200,7 @@
 	
 	CFStringEncoding cfStringEncoding = CFStringConvertNSStringEncodingToEncoding(encoding);
 	if (cfStringEncoding == kCFStringEncodingInvalidId) {
-		NSLog(@"%@: encoding %lu is invalid!", NSStringFromSelector(_cmd), encoding);
+		NVLogError(@"%@: encoding %lu is invalid!", NSStringFromSelector(_cmd), encoding);
 		return NO;
 	}
 	NSString *textEncStr = [(NSString *)CFStringConvertEncodingToIANACharSetName(cfStringEncoding) stringByAppendingFormat:@";%@", 
@@ -208,7 +208,7 @@
 	const char *textEncUTF8Str = [textEncStr UTF8String];
 	
 	if (setxattr(path, "com.apple.TextEncoding", textEncUTF8Str, strlen(textEncUTF8Str), 0, 0) < 0) {
-		NSLog(@"couldn't set text encoding attribute of %s to '%s': %d", path, textEncUTF8Str, errno);
+		NVLogError(@"couldn't set text encoding attribute of %s to '%s': %d", path, textEncUTF8Str, errno);
 		return NO;
 	}
 	return YES;
@@ -222,12 +222,12 @@
 	//It could be, but it probably won't. If it is, then we won't get the encoding. Too bad.
 	char xattrValueBytes[128] = { 0 };
 	if (getxattr(path, "com.apple.TextEncoding", xattrValueBytes, sizeof(xattrValueBytes), 0, 0) < 0) {
-		if (ENOATTR != errno) NSLog(@"couldn't get text encoding attribute of %s: %d", path, errno);
+		if (ENOATTR != errno) NVLogError(@"couldn't get text encoding attribute of %s: %d", path, errno);
 		goto errorReturn;
 	}
 	NSString *encodingStr = [NSString stringWithUTF8String:xattrValueBytes];
 	if (!encodingStr) {
-		NSLog(@"couldn't make attribute data from %s into a string", path);
+		NVLogError(@"couldn't make attribute data from %s into a string", path);
 		goto errorReturn;
 	}
 	NSArray *segs = [encodingStr componentsSeparatedByString:@";"];
@@ -237,7 +237,7 @@
 	} else if ([(NSString*)[segs objectAtIndex:0] length] > 1) {
 		CFStringEncoding theCFEncoding = CFStringConvertIANACharSetNameToEncoding((CFStringRef)[segs objectAtIndex:0]);
 		if (theCFEncoding == kCFStringEncodingInvalidId) {
-			NSLog(@"couldn't convert IANA charset");
+			NVLogError(@"couldn't convert IANA charset");
 			goto errorReturn;
 		}
 		return CFStringConvertEncodingToNSStringEncoding(theCFEncoding);
@@ -286,7 +286,7 @@ errorReturn:
 - (BOOL)createFolderAtPath:(NSString *)path withAttributes:(NSDictionary *)attributes{
     NSError *err=nil;
     if (![self createDirectoryAtPath:path withIntermediateDirectories:NO attributes:attributes error:&err]||(err!=nil)) {
-        NSLog(@"trouble creating directory at path:>%@<",[err description]);
+        NVLogError(@"trouble creating directory at path:>%@<",[err description]);
         return NO;
     }else{
         return YES;
@@ -303,7 +303,7 @@ errorReturn:
     if ((dict!=nil)&&(err==nil)) {
         return dict;
     }else if (err) {
-        NSLog(@"trouble getting attributes at path:>%@<\ndict:%@",[err description],dict);
+        NVLogError(@"trouble getting attributes at path:>%@<\ndict:%@",[err description],dict);
     }
     
     return [NSDictionary dictionary];
@@ -315,7 +315,7 @@ errorReturn:
     if ((arr!=nil)&&(err==nil)) {
         return arr;
     }else if (err) {
-        NSLog(@"trouble getting contents of path:>%@<",[err description]);
+        NVLogError(@"trouble getting contents of path:>%@<",[err description]);
     }
     return @[];
 }
@@ -325,7 +325,7 @@ errorReturn:
     if([self removeItemAtPath:path error:&err]&&(err==nil)){
         return YES;
     }else if(err){
-        NSLog(@"trouble removing file at path:>%@<",err.localizedDescription);
+        NVLogError(@"trouble removing file at path:>%@<",err.localizedDescription);
     }
     return NO;
 }

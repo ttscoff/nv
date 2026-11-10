@@ -102,7 +102,7 @@ void FSEventsCallback(ConstFSEventStreamRef stream, void* info, size_t num_event
 	//the directory was moved; re-initialize the event stream for the new path
 	//but do so after this callback ends to avoid confusing FSEvents
 	if (rootChanged) {
-		NSLog(@"FSEventsCallback detected directory dislocation; reconfiguring stream");
+		NVLogWarning(@"FSEventsCallback detected directory dislocation; reconfiguring stream");
 		[self performSelector:@selector(_configureDirEventStream) withObject:nil afterDelay:0];
 	}
 	
@@ -132,7 +132,7 @@ void FSEventsCallback(ConstFSEventStreamRef stream, void* info, size_t num_event
 	
 	FSEventStreamScheduleWithRunLoop(noteDirEventStreamRef, CFRunLoopGetCurrent(), kCFRunLoopDefaultMode);
 	if (!FSEventStreamStart(noteDirEventStreamRef)) {
-		NSLog(@"could not start the FSEvents stream!");
+		NVLogError(@"could not start the FSEvents stream!");
 	}
 	
 }
@@ -156,7 +156,7 @@ void FSEventsCallback(ConstFSEventStreamRef stream, void* info, size_t num_event
 		
 		OSStatus err = FNSubscribe(&noteDirectoryRef, subscriptionCallback, self, kFNNoImplicitAllSubscription | kFNNotifyInBackground, &noteDirSubscription);
 		if (err != noErr) {
-			NSLog(@"Could not subscribe to changes in notes directory!");
+			NVLogError(@"Could not subscribe to changes in notes directory!");
 			//just check modification time of directory?
 		}
 	}
@@ -175,7 +175,7 @@ void FSEventsCallback(ConstFSEventStreamRef stream, void* info, size_t num_event
     if (!IsZeros(&noteDirSubscription, sizeof(FNSubscriptionRef))) {
 		
 		if ((err = FNUnsubscribe(noteDirSubscription)) != noErr) {
-			NSLog(@"Could not unsubscribe from note changes callback: %d", err);
+			NVLogError(@"Could not unsubscribe from note changes callback: %d", err);
 		} else {
 			bzero(&noteDirSubscription, sizeof(FNSubscriptionRef));
 		}
@@ -202,7 +202,7 @@ void NotesDirFNSubscriptionProc(FNMessage message, OptionBits flags, void * refc
 		}
 		
     } else {
-		NSLog(@"we received an FNSubscr. callback and the directory didn't actually change?");
+		NVLogWarning(@"we received an FNSubscr. callback and the directory didn't actually change?");
     }
 }
 #endif
@@ -339,7 +339,7 @@ void NotesDirFNSubscriptionProc(FNMessage message, OptionBits flags, void * refc
 		return YES;
     }
     
-    NSLog(@"Error opening FSIterator: %d", status);
+    NVLogError(@"Error opening FSIterator: %d", status);
     
     return NO;
 }
@@ -365,7 +365,7 @@ void NotesDirFNSubscriptionProc(FNMessage message, OptionBits flags, void * refc
 		if (![unwrittenNotes containsObject:aNoteObject]) {
 			
 			if (![aNoteObject updateFromCatalogEntry:catEntry]) {
-				NSLog(@"file %@ was modified but could not be updated", catEntry->filename);
+				NVLogError(@"file %@ was modified but could not be updated", catEntry->filename);
 				//return NO;
 			}
 			//do not call makeNoteDirty because use of the WAL in this instance would cause redundant disk activity
@@ -381,12 +381,12 @@ void NotesDirFNSubscriptionProc(FNMessage message, OptionBits flags, void * refc
 			[self performSelector:@selector(scheduleUpdateListForAttribute:) withObject:NoteDateModifiedColumnString afterDelay:0.0];
 			
 			notesChanged = YES;
-			NSLog(@"FILE WAS MODIFIED: %@", catEntry->filename);
+			NVLogInfo(@"FILE WAS MODIFIED: %@", catEntry->filename);
 			
 			return YES;
 		} else {
 			//it's a conflict! we win.
-			NSLog(@"%@ was modified with unsaved changes in NV! Deciding the conflict in favor of NV.", catEntry->filename); 
+			NVLogInfo(@"%@ was modified with unsaved changes in NV! Deciding the conflict in favor of NV.", catEntry->filename); 
 		}
 		
 	}
@@ -515,7 +515,7 @@ void NotesDirFNSubscriptionProc(FNMessage message, OptionBits flags, void * refc
 				lastInserted = j;
 				exitedEarly = YES;
 				
-				NSLog(@"File deleted as per CNID: %@", filenameOfNote(currentNote));
+				NVLogInfo(@"File deleted as per CNID: %@", filenameOfNote(currentNote));
 				[hfsRemovedEntries addObject:currentNote];
 				
 				break;
@@ -525,7 +525,7 @@ void NotesDirFNSubscriptionProc(FNMessage message, OptionBits flags, void * refc
 				
 				
 				//note was renamed!
-				NSLog(@"File %@ renamed as per CNID to %@", filenameOfNote(currentNote), catEntry->filename);
+				NVLogInfo(@"File %@ renamed as per CNID to %@", filenameOfNote(currentNote), catEntry->filename);
 				if (![self modifyNoteIfNecessary:currentNote usingCatalogEntry:catEntry]) {
 					//at least update the file name, because we _know_ that changed
 					
@@ -541,7 +541,7 @@ void NotesDirFNSubscriptionProc(FNMessage message, OptionBits flags, void * refc
 			
 			//a new file was found on the disk! read it into memory!
 			
-			NSLog(@"File added as per CNID: %@", catEntry->filename);
+			NVLogInfo(@"File added as per CNID: %@", catEntry->filename);
 			[hfsAddedEntries addObject:[NSValue valueWithPointer:catEntry]];
 		}
 		
@@ -552,7 +552,7 @@ void NotesDirFNSubscriptionProc(FNMessage message, OptionBits flags, void * refc
 				lastInserted = bSize;
 				
 				//file deleted from disk; 
-				NSLog(@"File deleted as per CNID: %@", filenameOfNote(currentNote));
+				NVLogInfo(@"File deleted as per CNID: %@", filenameOfNote(currentNote));
 				[hfsRemovedEntries addObject:currentNote];
 			}
 		}
@@ -560,7 +560,7 @@ void NotesDirFNSubscriptionProc(FNMessage message, OptionBits flags, void * refc
     
     for (j=lastInserted; j<bSize; j++) {
 		NoteCatalogEntry *appendedCatEntry = (NoteCatalogEntry *)[[addedEntries objectAtIndex:j] pointerValue];
-		NSLog(@"File added as per CNID: %@", appendedCatEntry->filename);
+		NVLogInfo(@"File added as per CNID: %@", appendedCatEntry->filename);
 		[hfsAddedEntries addObject:[NSValue valueWithPointer:appendedCatEntry]];
     }
 	
@@ -570,7 +570,7 @@ void NotesDirFNSubscriptionProc(FNMessage message, OptionBits flags, void * refc
 		//NSLog(@"hfsAddedEntries: %@, hfsRemovedEntries: %@", hfsAddedEntries, hfsRemovedEntries);
 		if (![hfsRemovedEntries count]) {
 			for (i=0; i<[hfsAddedEntries count]; i++) {
-				NSLog(@"File _actually_ added: %@ (%@)", ((NoteCatalogEntry*)[[hfsAddedEntries objectAtIndex:i] pointerValue])->filename, NSStringFromSelector(_cmd));
+				NVLogInfo(@"File _actually_ added: %@ (%@)", ((NoteCatalogEntry*)[[hfsAddedEntries objectAtIndex:i] pointerValue])->filename, NSStringFromSelector(_cmd));
 				[self addNoteFromCatalogEntry:(NoteCatalogEntry*)[[hfsAddedEntries objectAtIndex:i] pointerValue]];
 			}
 		}
@@ -631,7 +631,7 @@ void NotesDirFNSubscriptionProc(FNMessage message, OptionBits flags, void * refc
 			if ([[[addedObjToCompare contentString] string] isEqualToString:[[removedObj contentString] string]]) {
 				//process this pair as a modification
 				
-				NSLog(@"File %@ renamed as per content to %@", filenameOfNote(removedObj), filenameOfNote(addedObjToCompare));
+				NVLogInfo(@"File %@ renamed as per content to %@", filenameOfNote(removedObj), filenameOfNote(addedObjToCompare));
 				if (![self modifyNoteIfNecessary:removedObj usingCatalogEntry:[val pointerValue]]) {
 					//at least update the file name, because we _know_ that changed
 					directoryChangesFound = YES;
@@ -652,14 +652,14 @@ void NotesDirFNSubscriptionProc(FNMessage message, OptionBits flags, void * refc
 		}
 		
 		if (!foundMatchingContent) {
-			NSLog(@"File %@ _actually_ removed (size: %u)", filenameOfNote(removedObj), fileSizeOfNote(removedObj));
+			NVLogInfo(@"File %@ _actually_ removed (size: %u)", filenameOfNote(removedObj), fileSizeOfNote(removedObj));
 			[deletionManager addDeletedNote:removedObj];
 		}
 	}
 	
 	for (i=0; i<[addedEntries count]; i++) {
 		NoteCatalogEntry *appendedCatEntry = (NoteCatalogEntry *)[[addedEntries objectAtIndex:i] pointerValue];
-		NSLog(@"File _actually_ added: %@ (%@)", appendedCatEntry->filename, NSStringFromSelector(_cmd));
+		NVLogInfo(@"File _actually_ added: %@ (%@)", appendedCatEntry->filename, NSStringFromSelector(_cmd));
 		[self addNoteFromCatalogEntry:appendedCatEntry];
     }	
 }

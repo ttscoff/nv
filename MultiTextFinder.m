@@ -70,7 +70,7 @@ static id sharedFindObject = nil;
 - (void)loadUI {
     if (!findStringField) {
         if (![NSBundle loadNibNamed:@"FindPanel" owner:self])  {
-            NSLog(@"Failed to load FindPanel.nib");
+            NVLogError(@"Failed to load FindPanel.nib");
             NSBeep();
         }
 		if (self == sharedFindObject) [window setFrameAutosaveName:@"Find In Filtered Notes"];

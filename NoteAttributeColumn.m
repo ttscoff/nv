@@ -45,7 +45,7 @@
 }
 
 - (void)sizeToFit{
-    NSLog(@"tablecolumn size to fit");
+    NVLogInfo(@"tablecolumn size to fit");
     [super sizeToFit];
 }
 

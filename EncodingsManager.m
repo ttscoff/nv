@@ -131,7 +131,7 @@ static const NSStringEncoding AllowedEncodings[] = {
 		
 		if (!window) {
 			if (![NSBundle loadNibNamed:@"EncodingsManager" owner:self])  {
-				NSLog(@"Failed to load EncodingsManager.nib");
+				NVLogError(@"Failed to load EncodingsManager.nib");
 				NSBeep();
 				return;
 			}
@@ -203,7 +203,7 @@ static const NSStringEncoding AllowedEncodings[] = {
 			[encodingsPopUpButton selectItemWithTag:(int)currentEncoding];
 		}		
 	} else {  
-		NSLog(@"Unknown class sent msg to change encoding: %@", [sender description]);
+		NVLogError(@"Unknown class sent msg to change encoding: %@", [sender description]);
 	}
 }
 
@@ -263,10 +263,10 @@ static const NSStringEncoding AllowedEncodings[] = {
 												 NSLocalizedString(@"Don't Update", @"don't update the note from its file on disk"), 
 												 NSLocalizedString(@"Overwrite Note", @"...from file on disk"), NULL);
 			if (result == NSAlertDefaultReturn) {
-				NSLog(@"not updating");
+				NVLogInfo(@"not updating");
 				return NO;
 			} else {
-				NSLog(@"user wants to update");
+				NVLogInfo(@"user wants to update");
 			}
 		}
     } else {

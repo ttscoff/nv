@@ -277,7 +277,7 @@
                 } else if (txtBody) {
                     [pboard setString:txtBody forType:NSStringPboardType];
                 } else {
-                    NSLog(@"no txt or html to add to pboard");
+                    NVLogWarning(@"no txt or html to add to pboard");
                     return NO;
                 }
                 return [self addNotesFromPasteboard:pboard];
@@ -325,7 +325,7 @@
 			if (url) {
         NSString *linkFormat = @"<%@>%s";
         NSString *pathString = [url absoluteString];
-        NSLog(@"%@",pathString);
+        NVLogInfo(@"%@",pathString);
         if ([pathString hasSuffix:@"jpg"]   || 
             [pathString hasSuffix:@"jpeg"]  ||
             [pathString hasSuffix:@"gif"]   ||

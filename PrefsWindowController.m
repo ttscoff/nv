@@ -29,6 +29,9 @@
 	NSTableView *sidebarTable;
 	NSView *detailView;
 	NSArray *settingsPanes;
+	NSView *debugView;
+	NSButton *logErrorsAndWarningsButton;
+	NSButton *logAllDiagnosticMessagesButton;
 }
 @end
 
@@ -43,7 +46,9 @@
 		[prefsController registerWithTarget:self forChangesInSettings:
 		 @selector(resolveNoteBodyFontFromNotationPrefsFromSender:), 
 //		 @selector(setCheckSpellingAsYouType:sender:), 
-		 @selector(setConfirmNoteDeletion:sender:), nil];
+		 @selector(setConfirmNoteDeletion:sender:),
+		 @selector(setLogsErrorsAndWarnings:sender:),
+		 @selector(setLogsAllDiagnosticMessages:sender:), nil];
     }
     return self;
 }
@@ -51,7 +56,7 @@
 - (void)showWindow:(id)sender {
 	if (!window) {
 		if (![NSBundle loadNibNamed:@"Preferences" owner:self])  {
-			NSLog(@"Failed to load Preferences.nib");
+			NVLogError(@"Failed to load Preferences.nib");
 			return;
 		}
 	}
@@ -82,7 +87,7 @@
 }
 
 - (void)menuNeedsUpdate:(NSMenu *)menu {
-	NSLog(@"I need an update: %@", [menu description]);
+	NVLogInfo(@"I need an update: %@", [menu description]);
 }
 
 - (IBAction)setAppShortcut:(id)sender {
@@ -97,7 +102,7 @@
 		
 	if (![prefsController registerAppActivationKeystrokeWithTarget:[NSApp delegate] selector:@selector(toggleNVActivation:)]) {
 		[prefsController setAppActivationKeyCombo:oldKeyCombo sender:self];
-		NSLog(@"reverting to old (hopefully working key combo");
+		NVLogWarning(@"reverting to old (hopefully working key combo");
 	}
 	
 	[oldKeyCombo release];
@@ -503,6 +508,84 @@
 	[button release];
 }
 
+/* The Debug pane: what the app writes to the system log, and a way to look at it.
+   Built here like the other added controls, so the six localized nibs stay as they are. */
+- (NSView *)debugView {
+	if (debugView)
+		return debugView;
+	debugView = [[NSView alloc] initWithFrame:NSMakeRect(0, 0, 480, 120)];
+
+	NSTextField *heading = [self themeLabelWithFrame:NSMakeRect(8, 89, 150, 17) title:NSLocalizedString(@"Write to system log:", @"Debug settings heading")];
+	[debugView addSubview:heading];
+	[heading release];
+
+	logAllDiagnosticMessagesButton = [[NSButton alloc] initWithFrame:NSMakeRect(166, 89, 300, 18)];
+	[logAllDiagnosticMessagesButton setButtonType:NSButtonTypeSwitch];
+	[logAllDiagnosticMessagesButton setTitle:NSLocalizedString(@"All Diagnostic Messages", @"Debug settings checkbox")];
+	[logAllDiagnosticMessagesButton setFont:[NSFont systemFontOfSize:[NSFont systemFontSize]]];
+	[logAllDiagnosticMessagesButton setTag:7341];
+	[logAllDiagnosticMessagesButton setTarget:self];
+	[logAllDiagnosticMessagesButton setAction:@selector(changedLogAllDiagnosticMessages:)];
+	[logAllDiagnosticMessagesButton setAutoresizingMask:NSViewMaxYMargin | NSViewMaxXMargin];
+	[debugView addSubview:logAllDiagnosticMessagesButton];
+
+	logErrorsAndWarningsButton = [[NSButton alloc] initWithFrame:NSMakeRect(166, 65, 300, 18)];
+	[logErrorsAndWarningsButton setButtonType:NSButtonTypeSwitch];
+	[logErrorsAndWarningsButton setTitle:NSLocalizedString(@"Errors and Warnings Only", @"Debug settings checkbox")];
+	[logErrorsAndWarningsButton setFont:[NSFont systemFontOfSize:[NSFont systemFontSize]]];
+	[logErrorsAndWarningsButton setTag:7340];
+	[logErrorsAndWarningsButton setTarget:self];
+	[logErrorsAndWarningsButton setAction:@selector(changedLogErrorsAndWarnings:)];
+	[logErrorsAndWarningsButton setAutoresizingMask:NSViewMaxYMargin | NSViewMaxXMargin];
+	[debugView addSubview:logErrorsAndWarningsButton];
+
+	NSButton *consoleButton = [[NSButton alloc] initWithFrame:NSMakeRect(160, 22, 160, 24)];
+	[consoleButton setBezelStyle:NSBezelStyleRounded];
+	[consoleButton setTitle:NSLocalizedString(@"Open in Console", @"Debug settings button")];
+	[consoleButton setFont:[NSFont systemFontOfSize:[NSFont systemFontSize]]];
+	[consoleButton setTag:7342];
+	[consoleButton setTarget:self];
+	[consoleButton setAction:@selector(openConsole:)];
+	[consoleButton setAutoresizingMask:NSViewMaxYMargin | NSViewMaxXMargin];
+	[debugView addSubview:consoleButton];
+	[consoleButton release];
+
+	[self updateDebugControls];
+	return debugView;
+}
+
+//every diagnostic message includes the errors and warnings, so that box is shown
+//checked and cannot be turned off while the other is on
+- (void)updateDebugControls {
+	if (!debugView)
+		return;
+	BOOL all = [prefsController logsAllDiagnosticMessages];
+	[logAllDiagnosticMessagesButton setState:all];
+	[logErrorsAndWarningsButton setState:all || [prefsController logsErrorsAndWarnings]];
+	[logErrorsAndWarningsButton setEnabled:!all];
+}
+
+- (IBAction)changedLogErrorsAndWarnings:(id)sender {
+	[prefsController setLogsErrorsAndWarnings:[sender state] sender:self];
+	[self updateDebugControls];
+}
+
+- (IBAction)changedLogAllDiagnosticMessages:(id)sender {
+	[prefsController setLogsAllDiagnosticMessages:[sender state] sender:self];
+	[self updateDebugControls];
+}
+
+- (IBAction)openConsole:(id)sender {
+	NSWorkspace *workspace = [NSWorkspace sharedWorkspace];
+	NSURL *console = [workspace URLForApplicationWithBundleIdentifier:@"com.apple.Console"];
+	if (!console) {
+		NVLogWarning(@"Console.app was not found, so it cannot be opened from the Debug settings");
+		NSBeep();
+		return;
+	}
+	[workspace openApplicationAtURL:console configuration:[NSWorkspaceOpenConfiguration configuration] completionHandler:nil];
+}
+
 - (IBAction)changedEnterInListRenamesNote:(id)sender {
 	[prefsController setEnterInListRenamesNote:[sender state] sender:self];
 }
@@ -562,7 +645,7 @@
 }
 
 - (IBAction)changedNotesFolderLocation:(id)sender {
-    NSLog(@"Changed notes folder menu");
+    NVLogInfo(@"Changed notes folder menu");
 }
 
 - (IBAction)changedQuitBehavior:(id)sender {
@@ -635,6 +718,9 @@
 //		[checkSpellingButton setState:[prefsController checkSpellingAsYouType]];
 	} else if ([selectorString isEqualToString:SEL_STR(setConfirmNoteDeletion:sender:)]) {
 		[confirmDeletionButton setState:[prefsController confirmNoteDeletion]];
+	} else if ([selectorString isEqualToString:SEL_STR(setLogsErrorsAndWarnings:sender:)] ||
+			   [selectorString isEqualToString:SEL_STR(setLogsAllDiagnosticMessages:sender:)]) {
+		[self updateDebugControls];
 	}
 }
 
@@ -685,7 +771,7 @@
 				[[prefsController notationPrefs] checkForKnownRedundantSyncConduitsAtPath:directoryPath];
 			}
 		} else {
-			NSLog(@"This folder is already chosen!");
+			NVLogWarning(@"This folder is already chosen!");
 		}
 		
 	}
@@ -705,7 +791,7 @@
     NSString *startingDirectory = nil;
 	
     if (!notesDirectoryRef) {
-		NSLog(@"notesDirectoryRef is NULL!");
+		NVLogError(@"notesDirectoryRef is NULL!");
 		return NO;
     }
     
@@ -732,7 +818,7 @@
 		@try {
 			[openPanel setDirectoryURL:[NSURL fileURLWithPath:startingDirectory isDirectory:YES]];
 		} @catch (NSException *exception) {
-			NSLog(@"Opening the notes folder picker without a starting directory (%@)", [exception reason]);
+			NVLogInfo(@"Opening the notes folder picker without a starting directory (%@)", [exception reason]);
 		}
     }
     [openPanel setAllowedFileTypes:nil];
@@ -868,7 +954,7 @@
 }
 
 - (NSArray *)toolbarDefaultItemIdentifiers:(NSToolbar*)theToolbar {
-    return [NSArray arrayWithObjects:@"General", @"Notes", @"Editing", @"Fonts & Colors", nil];
+    return [NSArray arrayWithObjects:@"General", @"Notes", @"Editing", @"Fonts & Colors", @"Debug", nil];
 }
 
 - (NSArray *)toolbarSelectableItemIdentifiers: (NSToolbar *)toolbar {
@@ -877,11 +963,11 @@
 }
 
 - (NSArray *)settingsPaneNames {
-	return [NSArray arrayWithObjects:@"General", @"Notes", @"Editing", @"Fonts & Colors", nil];
+	return [NSArray arrayWithObjects:@"General", @"Notes", @"Editing", @"Fonts & Colors", @"Debug", nil];
 }
 
 - (NSArray *)settingsPaneSymbols {
-	return [NSArray arrayWithObjects:@"gearshape", @"note.text", @"square.and.pencil", @"textformat", nil];
+	return [NSArray arrayWithObjects:@"gearshape", @"note.text", @"square.and.pencil", @"textformat", @"ladybug", nil];
 }
 
 - (NSString *)localizedSettingsTitleForPane:(NSString *)name {
@@ -897,6 +983,8 @@
 		return editingView;
 	if ([name isEqualToString:@"Fonts & Colors"])
 		return fontsColorsView;
+	if ([name isEqualToString:@"Debug"])
+		return [self debugView];
 	return nil;
 }
 
@@ -905,7 +993,7 @@
 	CGFloat paneWidth = 0;
 	CGFloat paneHeight = 0;
 	NSView *notesPane = [self databaseView];
-	NSArray *panes = [NSArray arrayWithObjects:generalView, notesPane, editingView, fontsColorsView, nil];
+	NSArray *panes = [NSArray arrayWithObjects:generalView, notesPane, editingView, fontsColorsView, [self debugView], nil];
 	for (NSView *pane in panes) {
 		paneWidth = MAX(paneWidth, NSWidth([pane frame]));
 		paneHeight = MAX(paneHeight, NSHeight([pane frame]));

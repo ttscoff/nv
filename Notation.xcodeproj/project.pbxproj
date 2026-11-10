@@ -24,6 +24,7 @@
 		212B84620978422300F3597F /* NSString_NV.m in Sources */ = {isa = PBXBuildFile; fileRef = 212B84610978422300F3597F /* NSString_NV.m */; };
 		B7E1AA031F0A000100000003 /* TagSearch.m in Sources */ = {isa = PBXBuildFile; fileRef = B7E1AA021F0A000100000002 /* TagSearch.m */; };
 		D5A1BB031F0C000100000003 /* NVAutoPair.m in Sources */ = {isa = PBXBuildFile; fileRef = D5A1BB021F0C000100000002 /* NVAutoPair.m */; };
+		F7A1C0DE1F0E000100000003 /* NVLog.m in Sources */ = {isa = PBXBuildFile; fileRef = F7A1C0DE1F0E000100000002 /* NVLog.m */; };
 		F8B2D1EF1F0F000100000003 /* PreviewTruncation.m in Sources */ = {isa = PBXBuildFile; fileRef = F8B2D1EF1F0F000100000002 /* PreviewTruncation.m */; };
 		E6B2CC031F0D000100000003 /* LinkReferenceCompletion.m in Sources */ = {isa = PBXBuildFile; fileRef = E6B2CC021F0D000100000002 /* LinkReferenceCompletion.m */; };
 		C4E1AA031F0B000100000003 /* PreviewRender.m in Sources */ = {isa = PBXBuildFile; fileRef = C4E1AA021F0B000100000002 /* PreviewRender.m */; };
@@ -342,6 +343,8 @@
 		B7E1AA021F0A000100000002 /* TagSearch.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TagSearch.m; sourceTree = "<group>"; };
 		D5A1BB011F0C000100000001 /* NVAutoPair.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = NVAutoPair.h; sourceTree = "<group>"; };
 		D5A1BB021F0C000100000002 /* NVAutoPair.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = NVAutoPair.m; sourceTree = "<group>"; };
+		F7A1C0DE1F0E000100000001 /* NVLog.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = NVLog.h; sourceTree = "<group>"; };
+		F7A1C0DE1F0E000100000002 /* NVLog.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = NVLog.m; sourceTree = "<group>"; };
 		F8B2D1EF1F0F000100000001 /* PreviewTruncation.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PreviewTruncation.h; sourceTree = "<group>"; };
 		F8B2D1EF1F0F000100000002 /* PreviewTruncation.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PreviewTruncation.m; sourceTree = "<group>"; };
 		E6B2CC011F0D000100000001 /* LinkReferenceCompletion.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LinkReferenceCompletion.h; sourceTree = "<group>"; };
@@ -931,6 +934,8 @@
 				B7E1AA021F0A000100000002 /* TagSearch.m */,
 				D5A1BB011F0C000100000001 /* NVAutoPair.h */,
 				D5A1BB021F0C000100000002 /* NVAutoPair.m */,
+				F7A1C0DE1F0E000100000001 /* NVLog.h */,
+				F7A1C0DE1F0E000100000002 /* NVLog.m */,
 				F8B2D1EF1F0F000100000001 /* PreviewTruncation.h */,
 				F8B2D1EF1F0F000100000002 /* PreviewTruncation.m */,
 				E6B2CC011F0D000100000001 /* LinkReferenceCompletion.h */,
@@ -1734,6 +1739,7 @@
 				212B84620978422300F3597F /* NSString_NV.m in Sources */,
 				B7E1AA031F0A000100000003 /* TagSearch.m in Sources */,
 				D5A1BB031F0C000100000003 /* NVAutoPair.m in Sources */,
+				F7A1C0DE1F0E000100000003 /* NVLog.m in Sources */,
 				F8B2D1EF1F0F000100000003 /* PreviewTruncation.m in Sources */,
 				E6B2CC031F0D000100000003 /* LinkReferenceCompletion.m in Sources */,
 				C4E1AA031F0B000100000003 /* PreviewRender.m in Sources */,

@@ -620,7 +620,7 @@ static void NVAddTagTitle(NSString *title, NoteObject *note) {
 - (id)initWithDelegate:(id)del notes:(NSArray *)notes labelsSource:(id)labelsSource atPoint:(NSPoint)centerpoint {
 	if ((self = [super init])) {
 		if (![NSBundle loadNibNamed:@"TagEditingManager" owner:self]) {
-			NSLog(@"Failed to load TagEditer.nib");
+			NVLogError(@"Failed to load TagEditer.nib");
 		} else {
 			isHappening = YES;
 			targetNotes = [notes copy];

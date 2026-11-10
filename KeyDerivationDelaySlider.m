@@ -70,7 +70,7 @@
 		[self setCell:myCell];
 		
 		if ([self cell] != myCell)
-			NSLog(@"cellular disintegration!");
+			NVLogInfo(@"cellular disintegration!");
         
         return self;
 	}

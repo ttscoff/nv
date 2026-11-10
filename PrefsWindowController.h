@@ -102,6 +102,9 @@
 - (NSView*)databaseView;
 - (void)addToolbarItemWithName:(NSString*)name;
 - (void)switchViews:(NSToolbarItem *)item;
+- (IBAction)changedLogErrorsAndWarnings:(id)sender;
+- (IBAction)changedLogAllDiagnosticMessages:(id)sender;
+- (IBAction)openConsole:(id)sender;
 - (IBAction)toggleHideDockIcon:(id)sender;
 - (IBAction)toggleKeepsTextWidthInWindow:(id)sender;
 - (IBAction)setMaxWidth:(id)sender;

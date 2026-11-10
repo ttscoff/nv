@@ -16,6 +16,10 @@
 #import <Cocoa/Cocoa.h>
 #endif
 
+/* The app's logging module, so every source can call NVLogError, NVLogWarning
+   and NVLogInfo (or the C forms) without importing it. */
+#include "NVLog.h"
+
 #ifndef NSFoundationVersionNumber10_10
 #define NSFoundationVersionNumber10_10 1151.00
 #endif

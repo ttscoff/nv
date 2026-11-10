@@ -89,7 +89,7 @@ static SecureTextEntryManager *sharedInstance = nil;
 		_calledSecureEventInput = NO;
 		
 		if (IsSecureEventInputEnabled())
-			NSLog(@"%@: WARNING: secure input is still enabled, possibly by another app", NSStringFromSelector(_cmd));
+			NVLogWarning(@"%@: WARNING: secure input is still enabled, possibly by another app", NSStringFromSelector(_cmd));
 	}
 }
 

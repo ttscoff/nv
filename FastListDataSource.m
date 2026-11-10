@@ -63,7 +63,7 @@
 			if (objIndex < count)
 				[objectsInIndexSet addObject:objects[objIndex]];
 			else
-				NSLog(@"objectsAtFilteredIndexes: index is %lu ( > %lu)", objIndex, count);
+				NVLogWarning(@"objectsAtFilteredIndexes: index is %lu ( > %lu)", objIndex, count);
 		}
 	}
 	

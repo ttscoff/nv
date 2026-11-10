@@ -70,7 +70,7 @@
 - (void)showAroundWindow:(NSWindow*)mainWindow resultDelegate:(id)aDelegate {
 	if (!newPassphraseWindow) {
 		if (![NSBundle loadNibNamed:@"PassphrasePicker" owner:self])  {
-			NSLog(@"Failed to load PassphrasePicker.nib");
+			NVLogError(@"Failed to load PassphrasePicker.nib");
 			NSBeep();
 			return;
 		}

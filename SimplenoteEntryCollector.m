@@ -39,7 +39,7 @@
 		entriesInError = [[NSMutableArray alloc] init];
 		
 		if (![simperiumToken length] || ![entriesToCollect count]) {
-			NSLog(@"%@: missing parameters", NSStringFromSelector(_cmd));
+			NVLogError(@"%@: missing parameters", NSStringFromSelector(_cmd));
 			return nil;
 		}
         return self;
@@ -145,7 +145,7 @@
 		rawObject = [NSDictionary dictionaryWithJSONString:bodyString];
 	}
 	@catch (NSException *e) {
-		NSLog(@"Exception while parsing Simplenote JSON note object: %@", [e reason]);
+		NVLogError(@"Exception while parsing Simplenote JSON note object: %@", [e reason]);
 	}
 	@finally {
 		if (!rawObject)
@@ -195,7 +195,7 @@
 - (void)syncResponseFetcher:(SyncResponseFetcher*)fetcher receivedData:(NSData*)data returningError:(NSString*)errString {
 	
 	if (errString) {
-		NSLog(@"%@: collector-%@ returned %@", NSStringFromSelector(_cmd), fetcher, errString);
+		NVLogInfo(@"%@: collector-%@ returned %@", NSStringFromSelector(_cmd), fetcher, errString);
 		id obj = [fetcher representedObject];
 		if (obj) {
 			[entriesInError addObject:[NSDictionary dictionaryWithObjectsAndKeys: obj, @"NoteObject", 
@@ -250,7 +250,7 @@
 		//set modification date when updating
 		//need to check for success when deleting
 		if (![self respondsToSelector:opSEL]) {
-			NSLog(@"%@ doesn't respond to %@", self, NSStringFromSelector(opSEL));
+			NVLogWarning(@"%@ doesn't respond to %@", self, NSStringFromSelector(opSEL));
 			return nil;
 		}
 		fetcherOpSEL = opSEL;
@@ -392,7 +392,7 @@
 		rawObject = [NSDictionary dictionaryWithJSONString:bodyString];
 	}
 	@catch (NSException *e) {
-		NSLog(@"Exception while parsing Simplenote JSON note object: %@", [e reason]);
+		NVLogError(@"Exception while parsing Simplenote JSON note object: %@", [e reason]);
 	}
 	
 	NSString *keyString = nil;
@@ -464,7 +464,7 @@
 				NSSet *localTags = [NSSet setWithArray:[(NoteObject *)aNote orderedLabelTitles]];
 				NSSet *remoteTags = [NSSet setWithArray:[rawObject objectForKey:@"tags"]];
 				if (![localTags isEqualToSet:remoteTags]) {
-					NSLog(@"Updating tags with remote values.");
+					NVLogInfo(@"Updating tags with remote values.");
 					NSString *newLabelString = [[remoteTags allObjects] componentsJoinedByString:@" "];
 					[(NoteObject *)aNote setLabelString:newLabelString];
 				}
@@ -479,11 +479,11 @@
 				[[[(NoteObject *)aNote delegate] delegate] contentsUpdatedForNote:aNote];
 			}
 		} else {
-			NSLog(@"%@ called with unknown opSEL: %@", NSStringFromSelector(_cmd),NSStringFromSelector(fetcherOpSEL));
+			NVLogError(@"%@ called with unknown opSEL: %@", NSStringFromSelector(_cmd),NSStringFromSelector(fetcherOpSEL));
 		}
 		
 	} else {
-		NSLog(@"Hmmm. Fetcher %@ doesn't have a represented object. op = %@", fetcher, NSStringFromSelector(fetcherOpSEL));
+		NVLogWarning(@"Hmmm. Fetcher %@ doesn't have a represented object. op = %@", fetcher, NSStringFromSelector(fetcherOpSEL));
 	}
 	[result setObject:keyString forKey:@"key"];
 	

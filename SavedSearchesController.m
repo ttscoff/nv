@@ -23,7 +23,7 @@ static NSString *SSSelectedNoteUUIDStringKey = @"NoteUUIDString";
 
 		uuidBytes = [[aDict objectForKey:SSSelectedNoteUUIDStringKey] uuidBytes];
 	} else {
-		NSLog(@"SavedSearch: Supplied dictionary: %@; couldn't init", aDict);
+		NVLogError(@"SavedSearch: Supplied dictionary: %@; couldn't init", aDict);
 		return nil;
 	}
 	return self;
@@ -273,7 +273,7 @@ static NSString *SSSelectedNoteUUIDStringKey = @"NoteUUIDString";
 			
 			isRestoringSearch = NO;
 		} else {
-			NSLog(@"reveal target %@ doesn't respond to %s!", revealTarget, revealAction);
+			NVLogWarning(@"reveal target %@ doesn't respond to %s!", revealTarget, revealAction);
 			return NO;
 		}
 		return YES;
@@ -504,7 +504,7 @@ static NSString *SSSelectedNoteUUIDStringKey = @"NoteUUIDString";
 - (void)showSearches:(id)sender {
 	if (!window) {
 		if (![NSBundle loadNibNamed:@"SavedSearches" owner:self])  {
-			NSLog(@"Failed to load SavedSearches.nib");
+			NVLogError(@"Failed to load SavedSearches.nib");
 			NSBeep();
 			return;
 		}
@@ -575,7 +575,7 @@ static NSString *SSSelectedNoteUUIDStringKey = @"NoteUUIDString";
 		[aDelegate respondsToSelector:@selector(selectedNoteObject)]) {
 		delegate = aDelegate;
 	} else {
-		NSLog(@"Delegate %@ doesn't respond to our selectors!", aDelegate);
+		NVLogWarning(@"Delegate %@ doesn't respond to our selectors!", aDelegate);
 	}
 }
 

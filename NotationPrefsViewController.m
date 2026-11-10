@@ -49,7 +49,7 @@ enum {VERIFY_NOT_ATTEMPTED, VERIFY_FAILED, VERIFY_IN_PROGRESS, VERIFY_SUCCESS};
 - (NSView*)view {
     if (!view) {
 		if (![NSBundle loadNibNamed:@"NotationPrefsView" owner:self])  {
-			NSLog(@"Failed to load NotationPrefsView.nib");
+			NVLogError(@"Failed to load NotationPrefsView.nib");
 			return nil;
 		}
     }
@@ -713,7 +713,7 @@ enum {VERIFY_NOT_ATTEMPTED, VERIFY_FAILED, VERIFY_IN_PROGRESS, VERIFY_SUCCESS};
 	}
 	if (httpFailed) {
 		NSString *errorCode = [self simplenoteErrorCodeInData:data];
-		NSLog(@"Simplenote rejected the login code (HTTP %ld%@).", (long)[fetcher statusCode], errorCode ? [@", " stringByAppendingString:errorCode] : @"");
+		NVLogWarning(@"Simplenote rejected the login code (HTTP %ld%@).", (long)[fetcher statusCode], errorCode ? [@", " stringByAppendingString:errorCode] : @"");
 		NSString *message = NSLocalizedString(@"That login code was not accepted.", @"Simplenote login status");
 		if ([errorCode isEqualToString:@"request-not-found"])
 			message = NSLocalizedString(@"That login code has expired. Email yourself a new one.", @"Simplenote login status");
@@ -860,7 +860,7 @@ enum {VERIFY_NOT_ATTEMPTED, VERIFY_FAILED, VERIFY_IN_PROGRESS, VERIFY_SUCCESS};
 		}
 		
 	} else {
-		NSLog(@"Not disabling encryption because it is already off.");
+		NVLogWarning(@"Not disabling encryption because it is already off.");
 	}
 }
 
