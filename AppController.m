@@ -1586,6 +1586,9 @@ static NSURL *NVHTTPURLFromImportString(NSString *entered) {
 	NSRange currentRange = [textView selectedRangeWasAutomatic:&wasAutomatic];
 	if (!wasAutomatic) [currentNote setSelectedRange:currentRange];
 	
+	//and the top line, unless the user was only looking around the matches of a search
+	[self rememberScrollPositionOfCurrentNote];
+	
 	//regenerate content cache before switching to new note
 	[currentNote updateContentCacheCStringIfNecessary];
 	
@@ -1596,6 +1599,25 @@ static NSURL *NVHTTPURLFromImportString(NSString *entered) {
 
 - (NoteObject*)selectedNoteObject {
 	return currentNote;
+}
+
+- (void)rememberScrollPositionOfCurrentNote {
+	//the line at the top of the view becomes the note's remembered position when the user moved it there;
+	//while a search is on, the note has to be claimed first (see -noteBodyWasClaimed:)
+	BOOL scrollWasAutomatic = NO;
+	NSUInteger topCharIndex = [textView firstVisibleCharIndexWasAutomatic:&scrollWasAutomatic];
+	if (!scrollGuarded && !scrollWasAutomatic)
+		[currentNote setFirstVisibleCharIndex:topCharIndex];
+}
+
+- (void)noteBodyWasClaimed:(LinkingEditor*)editor {
+	//a click or an edit in the body makes the current view the note's remembered position,
+	//and from here on the user's own scrolling keeps updating it
+	if (editor != textView || !currentNote)
+		return;
+	scrollGuarded = NO;
+	[currentNote setFirstVisibleCharIndex:NVFirstVisibleCharIndex(textView)];
+	[textView markScrollPositionAutomatic];
 }
 
 - (NSString*)fieldSearchString {
@@ -1630,17 +1652,31 @@ static NSURL *NVHTTPURLFromImportString(NSString *entered) {
 - (void)refreshVisibleSearchHighlights {
 	if (!textView)
 		return;
+	NSString *query = [self searchStringForHighlighting];
+	if (![query length]) {
+		[textView discardSearchHighlights];
+		//with no search on, scrolling counts again from wherever the view is now
+		if (currentNote) {
+			[textView markScrollPositionAutomatic];
+			scrollGuarded = NO;
+		}
+		return;
+	}
 	if (![prefsController highlightSearchTerms]) {
 		[textView discardSearchHighlights];
 		return;
 	}
-	NSString *query = [self searchStringForHighlighting];
-	if (![query length]) {
-		[textView discardSearchHighlights];
-		return;
-	}
 	[textView removeSearchTermHighlights];
-	[textView highlightTermsTemporarilyReturningFirstRange:query avoidHighlight:NO];
+	NSArray *ranges = [textView highlightTermsTemporarily:query avoidHighlight:NO];
+	if (!currentNote)
+		return;
+	//the search changed under the selected note: show the match nearest to the view, and treat the
+	//scrolling that follows as looking around until the user clicks or types in the note
+	if ([ranges count] && [notationController indexInFilteredListForNoteIdenticalTo:currentNote] != [notationController preferredSelectedNoteIndex]) {
+		NVScrollToShowNearestRange(textView, ranges);
+		[textView markScrollPositionAutomatic];
+		scrollGuarded = YES;
+	}
 }
 
 - (void)cacheTypedStringIfNecessary:(NSString*)aString {
@@ -1942,20 +1978,29 @@ static NSURL *NVHTTPURLFromImportString(NSString *entered) {
 		// Focusing the note body clears it.
 		[textView removeSearchTermHighlights];
 		NSString *highlightString = [self searchStringForHighlighting];
-		NSRange foundTermRange = NSMakeRange(NSNotFound, 0);
+		NSArray *foundRanges = nil;
 		if (highlightString)
-			foundTermRange = [textView highlightTermsTemporarilyReturningFirstRange:highlightString avoidHighlight:
-							  ![prefsController highlightSearchTerms]];
-		if (highlightString && (unsigned)noteIndex != [notationController preferredSelectedNoteIndex])
-			firstFoundTermRange = foundTermRange;
+			foundRanges = [textView highlightTermsTemporarily:highlightString avoidHighlight:![prefsController highlightSearchTerms]];
+		//matches in the body only count when the note was not reached by typing its title
+		if ([foundRanges count] && (unsigned)noteIndex != [notationController preferredSelectedNoteIndex])
+			firstFoundTermRange = [[foundRanges objectAtIndex:0] rangeValue];
+		else
+			foundRanges = nil;
 		
 		//if there was nothing selected, select the first found range
 		if (!noteSelectionRange.length && firstFoundTermRange.location != NSNotFound)
 			noteSelectionRange = firstFoundTermRange;
 		
-		//select and scroll
+		//select and scroll: the note comes back to the line it was left at (or to its selection when it has
+		//none), then, while a search is on, moves the least distance that shows the nearest match
 		[textView setAutomaticallySelectedRange:noteSelectionRange];
-		[textView scrollRangeToVisible:noteSelectionRange];
+		if (!NVScrollCharIndexToTop(textView, [note firstVisibleCharIndex]))
+			NVScrollRangeIntoView(textView, noteSelectionRange);
+		NVScrollToShowNearestRange(textView, foundRanges);
+		[textView markScrollPositionAutomatic];
+		//looking around the matches is not remembered until the user clicks or types in the note;
+		//a note reached by typing its title, or one with no match in its body, is not being looked around
+		scrollGuarded = foundRanges != nil;
 		[textView redisplayAfterNoteChange];
 		
 		//NSString *words = noteIndex != [notationController preferredSelectedNoteIndex] ? typedString : nil;
@@ -2127,6 +2172,9 @@ static NSURL *NVHTTPURLFromImportString(NSString *entered) {
 	NSUInteger idx = [self revealNote:[notationController noteForUUIDBytes:&bytes] options:NVDoNotChangeScrollPosition];
 	//scroll using saved scrollbar position
 	[notesTableView scrollRowToVisible:NSNotFound == idx ? 0 : idx withVerticalOffset:[prefsController scrollOffsetOfLastSelectedNote]];
+	//and put the note body back exactly where it was at quit; the note's own remembered position is not touched
+	if (idx != NSNotFound && currentNote && NVScrollCharIndexToTop(textView, [prefsController topCharIndexOfLastSelectedNote]))
+		[textView markScrollPositionAutomatic];
 }
 
 - (NSUInteger)revealNote:(NoteObject*)note options:(NSUInteger)opts {
@@ -2435,10 +2483,13 @@ static NSURL *NVHTTPURLFromImportString(NSString *entered) {
 		NSRange currentRange = [textView selectedRangeWasAutomatic:&wasAutomatic];
 		if (!wasAutomatic) [currentNote setSelectedRange:currentRange];
 		
+		[self rememberScrollPositionOfCurrentNote];
+		
 		[currentNote updateContentCacheCStringIfNecessary];
 		
 		[prefsController setLastSearchString:[self fieldSearchString] selectedNote:currentNote
 					scrollOffsetForTableView:notesTableView sender:self];
+		[prefsController setTopCharIndexOfLastSelectedNote:currentNote ? NVFirstVisibleCharIndex(textView) : NSNotFound];
 		
 		[prefsController saveCurrentBookmarksFromSender:self];
 	}

@@ -164,3 +164,139 @@ void NVLayOutEntireNote(NSTextView *textView) {
 	[scroll tile];
 	[scroll reflectScrolledClipView:[scroll contentView]];
 }
+
+/* Layout works in container coordinates, which start below the top inset.
+   The first line is the only one placed with its inset showing above it; any
+   other line goes right at the top edge, which is also where the text view's
+   own minimal scroll leaves a line. */
+
+static CGFloat NVScrollOffsetForLineTop(NSTextView *textView, CGFloat lineTop) {
+	return lineTop <= 0.0 ? 0.0 : lineTop + [textView textContainerOrigin].y;
+}
+
+NSUInteger NVFirstVisibleCharIndex(NSTextView *textView) {
+	NSLayoutManager *layout = [textView layoutManager];
+	NSTextContainer *container = [textView textContainer];
+	NSRect visible;
+	NSPoint point;
+	NSUInteger glyph;
+	NSRange lineGlyphs;
+	if (!textView || !layout || !container || ![[textView string] length])
+		return NSNotFound;
+	visible = [textView visibleRect];
+	if (NSIsEmptyRect(visible))
+		return NSNotFound;
+	/* One point below the edge, so a line starting exactly there is the one found. */
+	point = NSMakePoint(0, NSMinY(visible) - [textView textContainerOrigin].y + 1.0);
+	if (point.y < 0)
+		point.y = 0;
+	[layout ensureLayoutForBoundingRect:NSMakeRect(0, point.y, NSWidth(visible), 1.0) inTextContainer:container];
+	glyph = [layout glyphIndexForPoint:point inTextContainer:container];
+	if (glyph >= [layout numberOfGlyphs])
+		return NSNotFound;
+	if (NSIsEmptyRect([layout lineFragmentRectForGlyphAtIndex:glyph effectiveRange:&lineGlyphs]))
+		return NSNotFound;
+	return [layout characterIndexForGlyphAtIndex:lineGlyphs.location];
+}
+
+BOOL NVScrollCharIndexToTop(NSTextView *textView, NSUInteger charIndex) {
+	NSLayoutManager *layout = [textView layoutManager];
+	NSTextContainer *container = [textView textContainer];
+	NSScrollView *scroll = [textView enclosingScrollView];
+	NSClipView *clip = [scroll contentView];
+	NSUInteger glyph;
+	NSRect line, bounds;
+	if (!textView || !layout || !container || !clip)
+		return NO;
+	if (charIndex == NSNotFound || charIndex >= [[textView string] length])
+		return NO;
+	[layout ensureLayoutForCharacterRange:NSMakeRange(0, charIndex + 1)];
+	glyph = [layout glyphIndexForCharacterAtIndex:charIndex];
+	if (glyph >= [layout numberOfGlyphs])
+		return NO;
+	line = [layout lineFragmentRectForGlyphAtIndex:glyph effectiveRange:NULL];
+	if (NSIsEmptyRect(line))
+		return NO;
+	bounds = [clip bounds];
+	bounds.origin.y = NVScrollOffsetForLineTop(textView, NSMinY(line));
+	[clip scrollToPoint:[clip constrainBoundsRect:bounds].origin];
+	[scroll reflectScrolledClipView:clip];
+	return YES;
+}
+
+void NVScrollRangeIntoView(NSTextView *textView, NSRange range) {
+	NSLayoutManager *layout = [textView layoutManager];
+	NSTextContainer *container = [textView textContainer];
+	NSScrollView *scroll = [textView enclosingScrollView];
+	NSClipView *clip = [scroll contentView];
+	NSUInteger length = [[textView string] length];
+	NSUInteger charIndex, glyph;
+	NSRect line, bounds;
+	if (!textView || !layout || !container || !clip || !length || range.location == NSNotFound)
+		return;
+	charIndex = MIN(range.location, length - 1);
+	[layout ensureLayoutForCharacterRange:NSMakeRange(0, charIndex + 1)];
+	glyph = [layout glyphIndexForCharacterAtIndex:charIndex];
+	if (glyph >= [layout numberOfGlyphs])
+		return;
+	line = [layout lineFragmentRectForGlyphAtIndex:glyph effectiveRange:NULL];
+	/* A caret after a final line break sits on the empty line below it. */
+	if (range.location >= length && !NSIsEmptyRect([layout extraLineFragmentRect]))
+		line = [layout extraLineFragmentRect];
+	if (NSIsEmptyRect(line))
+		return;
+	bounds = [clip bounds];
+	if (NVScrollOffsetForLineTop(textView, NSMinY(line)) < NSMinY(bounds))
+		bounds.origin.y = NVScrollOffsetForLineTop(textView, NSMinY(line));
+	else if (NSMaxY(line) + [textView textContainerOrigin].y > NSMaxY(bounds))
+		bounds.origin.y = NSMaxY(line) + [textView textContainerOrigin].y - NSHeight(bounds);
+	else
+		return;
+	[clip scrollToPoint:[clip constrainBoundsRect:bounds].origin];
+	[scroll reflectScrolledClipView:clip];
+}
+
+void NVScrollToShowNearestRange(NSTextView *textView, NSArray *ranges) {
+	NSLayoutManager *layout = [textView layoutManager];
+	NSClipView *clip = [[textView enclosingScrollView] contentView];
+	NSUInteger length = [[textView string] length];
+	NSRect visible;
+	CGFloat originY, best = CGFLOAT_MAX;
+	NSRange nearest = NSMakeRange(NSNotFound, 0);
+	NSValue *value;
+	if (!textView || !layout || !clip || !length || ![ranges count])
+		return;
+	visible = [clip bounds];
+	originY = [textView textContainerOrigin].y;
+	for (value in ranges) {
+		NSRange range = [value rangeValue];
+		NSUInteger charIndex, glyph;
+		NSRect line;
+		CGFloat distance;
+		if (range.location == NSNotFound)
+			continue;
+		charIndex = MIN(range.location, length - 1);
+		[layout ensureLayoutForCharacterRange:NSMakeRange(0, charIndex + 1)];
+		glyph = [layout glyphIndexForCharacterAtIndex:charIndex];
+		if (glyph >= [layout numberOfGlyphs])
+			continue;
+		line = [layout lineFragmentRectForGlyphAtIndex:glyph effectiveRange:NULL];
+		if (NSIsEmptyRect(line))
+			continue;
+		line.origin.y += originY;
+		if (NSMinY(line) >= NSMinY(visible) && NSMaxY(line) <= NSMaxY(visible))
+			return;
+		if (NSMaxY(line) <= NSMinY(visible))
+			distance = NSMinY(visible) - NSMaxY(line);
+		else if (NSMinY(line) >= NSMaxY(visible))
+			distance = NSMinY(line) - NSMaxY(visible);
+		else
+			distance = 0.0;
+		if (distance < best) {
+			best = distance;
+			nearest = range;
+		}
+	}
+	if (nearest.location != NSNotFound)
+		NVScrollRangeIntoView(textView, nearest);
+}

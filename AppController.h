@@ -109,6 +109,7 @@
 //	SpaceSwitchingContext spaceSwitchCtx;
 	ViewLocationContext listUpdateViewCtx;
 	BOOL isFilteringFromTyping, typedStringIsCached;
+	BOOL scrollGuarded;
 	BOOL isCreatingANote;
 	NSString *typedString;
     BOOL isEditing;
@@ -180,6 +181,7 @@ void outletObjectAwoke(id sender);
 - (void)cacheTypedStringIfNecessary:(NSString*)aString;
 - (NSString*)typedString;
 - (NSString*)searchStringForHighlighting;
+- (void)noteBodyWasClaimed:(LinkingEditor*)editor;
 
 - (IBAction)showHelpDocument:(id)sender;
 - (IBAction)showPreferencesWindow:(id)sender;

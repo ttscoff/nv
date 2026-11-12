@@ -182,6 +182,8 @@ BOOL ColorsEqualWith8BitChannels(NSColor *c1, NSColor *c2);
 - (void)setLastSelectedPreferencesPane:(NSString*)pane sender:(id)sender;
 
 - (double)scrollOffsetOfLastSelectedNote;
+- (void)setTopCharIndexOfLastSelectedNote:(NSUInteger)charIndex;
+- (NSUInteger)topCharIndexOfLastSelectedNote;
 - (CFUUIDBytes)UUIDBytesOfLastSelectedNote;
 - (NSString*)lastSearchString;
 - (void)setLastSearchString:(NSString*)string selectedNote:(id<SynchronizedNote>)aNote scrollOffsetForTableView:(NotesTableView*)tv sender:(id)sender;

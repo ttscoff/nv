@@ -75,6 +75,8 @@ typedef struct {
 	
 	//more metadata
 	NSRange selectedRange;
+	//first character on the top line of the note body when it was last shown; NSNotFound until then
+	NSUInteger firstVisibleCharIndex;
 	
 	//each note has its own undo manager--isn't that nice?
 	NSUndoManager *undoManager;
@@ -229,6 +231,8 @@ NSInteger compareFileSize(id *a, id *b);
 - (void)setDateAdded:(CFAbsoluteTime)newTime;
 - (void)setSelectedRange:(NSRange)newRange;
 - (NSRange)lastSelectedRange;
+- (void)setFirstVisibleCharIndex:(NSUInteger)charIndex;
+- (NSUInteger)firstVisibleCharIndex;
 - (BOOL)contentsWere7Bit;
 - (void)addPrefixParentNote:(NoteObject*)aNote;
 - (void)removeAllPrefixParentNotes;
