@@ -115,6 +115,7 @@ static NSString * const NVPreviewUpdateInPlaceScript =
     "var mj=MathJax._&&MathJax._.mathjax&&MathJax._.mathjax.mathjax;"
     "if(mj&&mj.handleRetriesFor){mj.handleRetriesFor(function(){d.render();}).then(restore,function(){});}else{d.render();}}catch(x){}}"
     "if(window.mermaid&&mermaid.run){try{mermaid.run().then(restore,function(){});}catch(x){}}"
+    "if(window.nvHighlightCode){try{nvHighlightCode();}catch(x){}}"
     // Nothing above repaints, so one restore here sees the swapped content and
     // MathJax's synchronous pass. The renderers call it again when their
     // asynchronous work changes the page height, which also undoes a restore
@@ -612,16 +613,18 @@ static const NSUInteger NVMarkedShareMaxBodyBytes = 500000;
 
     BOOL needsMath = NO, needsMermaid = NO, needsWiki = NO;
     NSString *content = NVPreviewHTMLPreparingContent(processedString, &needsMath, &needsMermaid, &needsWiki) ?: @"";
+    BOOL needsHighlight = NVPreviewHTMLNeedsCodeHighlight(content);
     BOOL sameNote = (lastNote == [app selectedNoteObject]);
 
     // Editing the note that is already showing: swap the rendered note into the
     // existing page instead of reloading it, so nothing flashes and the scroll
     // position is untouched. A full load is still needed when the theme changed,
     // when a load is in flight, or when the note newly needs a renderer
-    // (MathJax, Mermaid) or the wiki linker that this page has not loaded.
+    // (MathJax, Mermaid, highlight.js) or the wiki linker that this page has not loaded.
 
     if (sameNote && !previewNeedsFullReload && ![preview isLoading]
         && (!needsMath || previewHasMathJax) && (!needsMermaid || previewHasMermaid) && (!needsWiki || previewHasWiki)
+        && (!needsHighlight || previewHasHighlight)
         && [self updatePreviewInPlaceWithContent:content title:noteTitle editLine:(editLine == NSNotFound ? 0 : editLine)]) {
         [self storeShareHTML:NVPreviewHTMLByReplacingShareContent(shareHTML, content, noteTitle)];
         [[self window] setTitle:noteTitle];
@@ -665,19 +668,22 @@ static const NSUInteger NVMarkedShareMaxBodyBytes = 500000;
     if (scrollState) {
         [previewString appendFormat:@"\n<script>%@</script>", [self javaScriptRestoringPreviewScrollState:scrollState]];
     }
-    NSString *rendererScripts = NVPreviewRendererScripts(previewAssets, needsMath, needsMermaid, needsWiki);
+    NSString *rendererScripts = NVPreviewRendererScripts(previewAssets, needsMath, needsMermaid, needsWiki, needsHighlight);
     if (rendererScripts) {
         [previewString appendString:rendererScripts];
     }
     previewHasMathJax = needsMath;
     previewHasMermaid = needsMermaid;
     previewHasWiki = needsWiki;
+    previewHasHighlight = needsHighlight;
     previewNeedsFullReload = NO;
+    NSString *highlightStyles = needsHighlight ? NVPreviewHighlightStyles(previewAssets) : nil;
 
     NSString *nvSupportPath = [[NSFileManager defaultManager] applicationSupportDirectory];
 
     NSString *themedDocument = [[self class] themedHTMLDocumentForTitle:noteTitle contentHTML:previewString];
     if (themedDocument) {
+        themedDocument = NVPreviewHTMLInsertingHighlightStyles(themedDocument, highlightStyles);
         [self storeShareHTML:themedDocument];
         [[preview mainFrame] loadHTMLString:themedDocument baseURL:nil];
         [[self window] setTitle:noteTitle];
@@ -697,6 +703,7 @@ static const NSUInteger NVMarkedShareMaxBodyBytes = 500000;
     [outputString replaceOccurrencesOfString:@"{%title%}" withString:noteTitle options:0 range:NSMakeRange(0, [outputString length])];
     [outputString replaceOccurrencesOfString:@"{%content%}" withString:bodyString options:0 range:NSMakeRange(0, [outputString length])];
     [outputString replaceOccurrencesOfString:@"{%style%}" withString:cssString options:0 range:NSMakeRange(0, [outputString length])];
+    outputString = [NSMutableString stringWithString:NVPreviewHTMLInsertingHighlightStyles(outputString, highlightStyles)];
 
     [self storeShareHTML:outputString];
     [[preview mainFrame] loadHTMLString:outputString baseURL:nil];

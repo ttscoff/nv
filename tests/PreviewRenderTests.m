@@ -26,6 +26,9 @@ int main(int argc, const char *argv[]) {
 	[fm removeItemAtPath:dir error:NULL];
 	[fm createDirectoryAtPath:[dir stringByAppendingPathComponent:@"mathjax/output/svg/fonts"] withIntermediateDirectories:YES attributes:nil error:NULL];
 	[fm createFileAtPath:[dir stringByAppendingPathComponent:@"mermaid.min.js"] contents:[NSData data] attributes:nil];
+	[fm createFileAtPath:[dir stringByAppendingPathComponent:@"highlight.min.js"] contents:[NSData data] attributes:nil];
+	[fm createFileAtPath:[dir stringByAppendingPathComponent:@"highlight-light.css"] contents:[@".hljs{color:#24292e}.hljs-keyword{color:#d73a49}" dataUsingEncoding:NSUTF8StringEncoding] attributes:nil];
+	[fm createFileAtPath:[dir stringByAppendingPathComponent:@"highlight-dark.css"] contents:[@".hljs{color:#c9d1d9}.hljs-keyword{color:#ff7b72}" dataUsingEncoding:NSUTF8StringEncoding] attributes:nil];
 	[fm createFileAtPath:[dir stringByAppendingPathComponent:@"wikilinks.js"] contents:[@"/* wiki-linker */" dataUsingEncoding:NSUTF8StringEncoding] attributes:nil];
 	[fm createFileAtPath:[dir stringByAppendingPathComponent:@"mathjax/tex-svg.js"] contents:[NSData data] attributes:nil];
 	[fm createDirectoryAtPath:[dir stringByAppendingPathComponent:@"mathjax/fonts"] withIntermediateDirectories:YES attributes:nil error:NULL];
@@ -34,6 +37,7 @@ int main(int argc, const char *argv[]) {
 	NSString *plainOut = NVPreviewHTMLForDisplay(plain, dir);
 	expectTrue([plainOut isEqualToString:plain], "plain html unchanged");
 	expectOmits(plainOut, @"wiki-linker", "plain html skips wiki links");
+	expectOmits(plainOut, @"highlight.min.js", "plain html skips highlight");
 
 	NSString *math = @"<p><span class=\"math inline\">\\(e=mc^2\\)</span></p>";
 	NSString *mathOut = NVPreviewHTMLForDisplay(math, dir);
@@ -53,6 +57,7 @@ int main(int argc, const char *argv[]) {
 	expectContains(fenceOut, @"mermaid.min.js", "loads mermaid");
 	expectContains(fenceOut, @"mermaid.initialize", "starts mermaid");
 	expectOmits(fenceOut, @"tex-svg.js", "diagram skips mathjax");
+	expectOmits(fenceOut, @"highlight.min.js", "diagram skips highlight");
 
 	NSString *named = @"<pre><code class=\"language-Mermaid\">flowchart LR\n</code></pre>";
 	expectContains(NVPreviewHTMLForDisplay(named, dir), @"<pre class=\"mermaid\">flowchart LR\n</pre>", "mermaid language is case insensitive");
@@ -69,8 +74,21 @@ int main(int argc, const char *argv[]) {
 	expectContains(NVPreviewHTMLForDisplay(langCase, dir), @"<pre class=\"mermaid\">graph TD\n</pre>", "lang attribute with other attributes");
 
 	NSString *ruby = @"<pre><code class=\"language-ruby\">puts 1</code></pre>";
-	expectContains(NVPreviewHTMLForDisplay(ruby, dir), @"language-ruby", "other languages stay code");
-	expectOmits(NVPreviewHTMLForDisplay(ruby, dir), @"mermaid.min.js", "ruby does not load mermaid");
+	NSString *rubyOut = NVPreviewHTMLForDisplay(ruby, dir);
+	expectContains(rubyOut, @"language-ruby", "other languages stay code");
+	expectOmits(rubyOut, @"mermaid.min.js", "ruby does not load mermaid");
+	expectContains(rubyOut, @"highlight.min.js", "code block loads highlight.js");
+	expectContains(rubyOut, @"nvHighlightCode", "code block chooses a highlight palette");
+	expectContains(rubyOut, @"0.55", "palette uses the same lightness cutoff as the app");
+	expectContains(rubyOut, @"id=\"nv-hl-light\"", "ships the GitHub light tokens");
+	expectContains(rubyOut, @"id=\"nv-hl-dark\"", "ships the GitHub dark tokens");
+	expectContains(rubyOut, @"media=\"not all\"", "both palettes wait until the background is known");
+	expectContains(rubyOut, @"#d73a49", "light palette colors keywords");
+	expectContains(rubyOut, @"#ff7b72", "dark palette colors keywords");
+	NSRange lightAt = [rubyOut rangeOfString:@"nv-hl-light"];
+	NSRange codeAt = [rubyOut rangeOfString:@"language-ruby"];
+	NSRange scriptAt = [rubyOut rangeOfString:@"highlight.min.js"];
+	expectTrue(lightAt.location < codeAt.location && codeAt.location < scriptAt.location, "highlight styles come before the code and the script follows it");
 
 	NSString *dollar = @"<pre><code class=\"language-mermaid\">A-->B[$]\n</code></pre>";
 	expectContains(NVPreviewHTMLForDisplay(dollar, dir), @"<pre class=\"mermaid\">A-->B[$]\n</pre>", "keeps dollars in diagrams");
@@ -116,6 +134,7 @@ int main(int argc, const char *argv[]) {
 	NSString *wikiCodeOut = NVPreviewHTMLForDisplay(wikiCode, dir);
 	expectContains(wikiCodeOut, @"wiki-linker", "wiki script still loads beside code");
 	expectContains(wikiCodeOut, @"<code>[[Not a note]]</code>", "code brackets stay in the html");
+	expectContains(wikiCodeOut, @"highlight.min.js", "a code block without a language is still highlighted");
 
 	NSString *missingWiki = NVPreviewHTMLForDisplay(wiki, noMermaidDir);
 	expectContains(missingWiki, @"[[Hello]]", "brackets stay when the script is missing");
@@ -135,16 +154,41 @@ int main(int argc, const char *argv[]) {
 	expectOmits(prepared, @"<script", "prepare: wiki markup adds no script");
 	expectTrue(NVPreviewHTMLPreparingContent(nil, &needsMath, &needsMermaid, &needsWiki) == nil && !needsMath && !needsMermaid && !needsWiki, "prepare: nil html clears the flags");
 	expectTrue(NVPreviewHTMLPreparingContent(plain, NULL, NULL, NULL) != nil, "prepare: flags are optional");
-	expectTrue(NVPreviewRendererScripts(dir, NO, NO, NO) == nil, "scripts: none when nothing is needed");
-	NSString *mathOnly = NVPreviewRendererScripts(dir, YES, NO, NO);
+	expectTrue(NVPreviewHTMLNeedsCodeHighlight(ruby), "a fenced code block needs highlight");
+	expectTrue(NVPreviewHTMLNeedsCodeHighlight(@"<pre><code>plain</code></pre>"), "a code block without a language needs highlight");
+	expectTrue(NVPreviewHTMLNeedsCodeHighlight(@"<PRE><CODE>plain</CODE></PRE>"), "code block tags are case insensitive");
+	expectTrue(!NVPreviewHTMLNeedsCodeHighlight(plain), "plain html needs no highlight");
+	expectTrue(!NVPreviewHTMLNeedsCodeHighlight(@"<p><code>inline</code></p>"), "inline code needs no highlight");
+	expectTrue(!NVPreviewHTMLNeedsCodeHighlight(NVPreviewHTMLPreparingContent(fence, NULL, NULL, NULL)), "a mermaid diagram needs no highlight");
+	expectTrue(!NVPreviewHTMLNeedsCodeHighlight(nil) && !NVPreviewHTMLNeedsCodeHighlight(@""), "empty html needs no highlight");
+
+	expectTrue(NVPreviewRendererScripts(dir, NO, NO, NO, NO) == nil, "scripts: none when nothing is needed");
+	NSString *mathOnly = NVPreviewRendererScripts(dir, YES, NO, NO, NO);
 	expectContains(mathOnly, @"tex-svg.js", "scripts: math loads mathjax");
 	expectOmits(mathOnly, @"mermaid.min.js", "scripts: math alone does not load mermaid");
 	expectOmits(mathOnly, @"wiki-linker", "scripts: math alone does not load the wiki linker");
-	expectTrue(NVPreviewRendererScripts(noMermaidDir, NO, YES, NO) == nil, "scripts: missing mermaid file gives none");
-	NSString *wikiScripts = NVPreviewRendererScripts(dir, NO, NO, YES);
+	expectOmits(mathOnly, @"highlight.min.js", "scripts: math alone does not load highlight");
+	expectTrue(NVPreviewRendererScripts(noMermaidDir, NO, YES, NO, NO) == nil, "scripts: missing mermaid file gives none");
+	NSString *wikiScripts = NVPreviewRendererScripts(dir, NO, NO, YES, NO);
 	expectContains(wikiScripts, @"wiki-linker", "scripts: wiki inlines the linker");
 	expectOmits(wikiScripts, @"wikilinks.js", "scripts: wiki linker is not a file url");
-	NSString *assembled = [NVPreviewHTMLPreparingContent(both, NULL, NULL, NULL) stringByAppendingString:NVPreviewRendererScripts(dir, YES, YES, NO)];
+	NSString *highlightScripts = NVPreviewRendererScripts(dir, NO, NO, NO, YES);
+	expectContains(highlightScripts, @"highlight.min.js", "scripts: highlight loads highlight.js");
+	expectContains(highlightScripts, @"nvHighlightCode", "scripts: highlight inlines the palette picker");
+	expectOmits(highlightScripts, @"mermaid.min.js", "scripts: highlight alone does not load mermaid");
+	expectTrue(NVPreviewRendererScripts(noMermaidDir, NO, NO, NO, YES) == nil, "scripts: missing highlight file gives none");
+	NSString *styles = NVPreviewHighlightStyles(dir);
+	expectContains(styles, @"id=\"nv-hl-light\"", "styles: light sheet is named");
+	expectContains(styles, @"id=\"nv-hl-dark\"", "styles: dark sheet is named");
+	expectContains(styles, @"#d73a49", "styles: light sheet is included");
+	expectContains(styles, @"#ff7b72", "styles: dark sheet is included");
+	expectTrue([styles rangeOfString:@"nv-hl-light"].location < [styles rangeOfString:@"nv-hl-dark"].location, "styles: light sheet comes first");
+	expectTrue(NVPreviewHighlightStyles(noMermaidDir) == nil, "styles: missing sheets give none");
+	NSString *wrapped = NVPreviewHTMLInsertingHighlightStyles(@"<head><style type=\"text/css\">body{color:#123456}</style></head>", styles);
+	expectTrue([wrapped rangeOfString:@"nv-hl-light"].location < [wrapped rangeOfString:@"body{color:#123456}"].location, "styles land before the theme sheet");
+	expectTrue([NVPreviewHTMLInsertingHighlightStyles(@"<p>Hi</p>", nil) isEqualToString:@"<p>Hi</p>"], "inserting no styles leaves the html");
+	expectTrue([NVPreviewHTMLInsertingHighlightStyles(@"<p>No style tag</p>", styles) hasPrefix:styles], "styles lead when the page has no sheet");
+	NSString *assembled = [NVPreviewHTMLPreparingContent(both, NULL, NULL, NULL) stringByAppendingString:NVPreviewRendererScripts(dir, YES, YES, NO, NO)];
 	expectTrue([NVPreviewHTMLForDisplay(both, dir) isEqualToString:assembled], "display output is prepared content plus scripts");
 
 	NSString *tasks = @"<ul>\n<li><input type=\"checkbox\" checked=\"\" disabled=\"\" /> done</li>\n<li><input type=\"checkbox\" disabled=\"\" /> open</li>\n</ul>";

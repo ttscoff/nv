@@ -36,6 +36,8 @@
 #import "NSData_transformations.h"
 #import "BufferUtils.h"
 #import "LinkingEditor.h"
+#import "NoteLayout.h"
+#import "MarkdownHighlight.h"
 #import "EmptyView.h"
 #import "DualField.h"
 #import "TitlebarButton.h"
@@ -1931,6 +1933,7 @@ static NSURL *NVHTTPURLFromImportString(NSString *entered) {
 		
 		//restore string
 		[[textView textStorage] setAttributedString:[note contentString]];
+		NVLayOutEntireNote(textView);
 		[self postTextUpdate];
 		[self updateWordCount:(![prefsController showWordCount])];
 		//[textView setAutomaticallySelectedRange:NSMakeRange(0,0)];
@@ -2326,6 +2329,7 @@ static NSURL *NVHTTPURLFromImportString(NSString *entered) {
 	if (aNoteObject == currentNote) {
 		NSArray *selRanges=[textView selectedRanges];
 		[[textView textStorage] setAttributedString:[aNoteObject contentString]];
+		NVLayOutEntireNote(textView);
 		[textView redisplayAfterNoteChange];
         if (![selRanges isEqualToArray:[textView selectedRanges]]) {
             NSRange testEnd=[[selRanges lastObject] rangeValue];
@@ -3622,7 +3626,13 @@ static void NVStretchFullBleedAncestors(NSView *view, CGFloat targetWidth) {
 #pragma mark control/opt key hold down to pop word count/preview window
     
     - (void)updateWordCount:(BOOL)doIt{
-        if (doIt) {            
+        if (doIt) {
+            /* -[NSTextStorage words] splits the whole note. A long note does this on every keystroke, including return. */
+            if (!NVMarkdownSyntaxHighlightEnabledForLength([[textView string] length])) {
+                [wordCounter setStringValue:@""];
+                [self updateWordCounterChrome];
+                return;
+            }
             NSUInteger theCount = [[[textView textStorage] words] count];
 
             if (theCount > 0) {

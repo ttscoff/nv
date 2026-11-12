@@ -28,6 +28,7 @@
 		F8B2D1EF1F0F000100000003 /* PreviewTruncation.m in Sources */ = {isa = PBXBuildFile; fileRef = F8B2D1EF1F0F000100000002 /* PreviewTruncation.m */; };
 		E6B2CC031F0D000100000003 /* LinkReferenceCompletion.m in Sources */ = {isa = PBXBuildFile; fileRef = E6B2CC021F0D000100000002 /* LinkReferenceCompletion.m */; };
 		C4E1AA031F0B000100000003 /* PreviewRender.m in Sources */ = {isa = PBXBuildFile; fileRef = C4E1AA021F0B000100000002 /* PreviewRender.m */; };
+		A8C3EE031F11000100000001 /* NoteLayout.m in Sources */ = {isa = PBXBuildFile; fileRef = A8C3EE021F11000100000001 /* NoteLayout.m */; };
 		C4E1AA051F0B000100000005 /* preview-js in Resources */ = {isa = PBXBuildFile; fileRef = C4E1AA041F0B000100000004 /* preview-js */; };
 		212C6952110E1940004DD82C /* TitlebarButton.m in Sources */ = {isa = PBXBuildFile; fileRef = 212C6951110E1940004DD82C /* TitlebarButton.m */; };
 		212C6A2A110E371B004DD82C /* TBSynchronizingWhite.png in Resources */ = {isa = PBXBuildFile; fileRef = 212C6A23110E371B004DD82C /* TBSynchronizingWhite.png */; };
@@ -351,6 +352,8 @@
 		E6B2CC021F0D000100000002 /* LinkReferenceCompletion.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = LinkReferenceCompletion.m; sourceTree = "<group>"; };
 		C4E1AA011F0B000100000001 /* PreviewRender.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PreviewRender.h; sourceTree = "<group>"; };
 		C4E1AA021F0B000100000002 /* PreviewRender.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PreviewRender.m; sourceTree = "<group>"; };
+		A8C3EE011F11000100000001 /* NoteLayout.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = NoteLayout.h; sourceTree = "<group>"; };
+		A8C3EE021F11000100000001 /* NoteLayout.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = NoteLayout.m; sourceTree = "<group>"; };
 		C4E1AA041F0B000100000004 /* preview-js */ = {isa = PBXFileReference; lastKnownFileType = folder; path = preview-js; sourceTree = "<group>"; };
 		212C6950110E1940004DD82C /* TitlebarButton.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TitlebarButton.h; sourceTree = "<group>"; };
 		212C6951110E1940004DD82C /* TitlebarButton.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TitlebarButton.m; sourceTree = "<group>"; };
@@ -942,6 +945,8 @@
 				E6B2CC021F0D000100000002 /* LinkReferenceCompletion.m */,
 				C4E1AA011F0B000100000001 /* PreviewRender.h */,
 				C4E1AA021F0B000100000002 /* PreviewRender.m */,
+				A8C3EE011F11000100000001 /* NoteLayout.h */,
+				A8C3EE021F11000100000001 /* NoteLayout.m */,
 				D3EEC9FF106F66C70023D7F8 /* NVPasswordGenerator.h */,
 				D3EEC9FE106F66C70023D7F8 /* NVPasswordGenerator.m */,
 				A7E100012F0A000100000001 /* NVTheme.h */,
@@ -1743,6 +1748,7 @@
 				F8B2D1EF1F0F000100000003 /* PreviewTruncation.m in Sources */,
 				E6B2CC031F0D000100000003 /* LinkReferenceCompletion.m in Sources */,
 				C4E1AA031F0B000100000003 /* PreviewRender.m in Sources */,
+				A8C3EE031F11000100000001 /* NoteLayout.m in Sources */,
 				21DC788F097894B600E59B09 /* NSCollection_utils.m in Sources */,
 				2155DEA6097B5F0300163A10 /* BufferUtils.c in Sources */,
 				2155DF44097C992800163A10 /* AttributedPlainText.m in Sources */,

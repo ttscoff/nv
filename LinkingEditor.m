@@ -11,6 +11,7 @@
 
 
 #import "LinkingEditor.h"
+#import "NoteLayout.h"
 #import "GlobalPrefs.h"
 #import "SearchHighlight.h"
 #import "AppController.h"
@@ -126,7 +127,11 @@ CGFloat _perceptualDarkness(NSColor*a);
 //}
 
 - (void)awakeFromNib {
-	
+	markdownHighlightDirty = NSMakeRange(NSNotFound, 0);
+	markdownHighlightCoversAll = YES;
+	markdownHighlightLimit = NSMakeRange(0, 0);
+	plainForegroundDirty = NSMakeRange(NSNotFound, 0);
+
     prefsController = [GlobalPrefs defaultPrefs];
 
     [prefsController registerWithTarget:self forChangesInSettings:
@@ -135,7 +140,14 @@ CGFloat _perceptualDarkness(NSColor*a);
 	 @selector(setSearchTermHighlightColor:sender:),
 	 @selector(setShouldHighlightSearchTerms:sender:), nil];
 	
-    self.managesTextWidth=[prefsController managesTextWidthInWindow];
+	self.managesTextWidth=[prefsController managesTextWidthInWindow];
+	/* The nib springs this view to the scroll view's height. A note is taller
+	   than the window on its own; the scroll view must not pin it back. */
+	[self setVerticallyResizable:YES];
+	[self setAutoresizingMask:([self autoresizingMask] & ~NSViewHeightSizable)];
+	[[self textContainer] setHeightTracksTextView:NO];
+	[[self layoutManager] setBackgroundLayoutEnabled:NO];
+	[self nv_matchVisibleMinHeight];
 	[self setUsesRuler:NO];
 	[self setUsesFontPanel:NO];
 	[self setDrawsBackground:YES];
@@ -188,6 +200,7 @@ CGFloat _perceptualDarkness(NSColor*a);
 if ([selectorString isEqualToString:SEL_STR(setNoteBodyFont:sender:)]) {
 
 		[self setTypingAttributes:[prefsController noteBodyAttributes]];
+		[self nv_applyThemeTypingColor];
 		//[textView setFont:[prefsController noteBodyFont]];
 	} else if ([selectorString isEqualToString:SEL_STR(setMakeURLsClickable:sender:)]) {
 		
@@ -208,6 +221,7 @@ if ([selectorString isEqualToString:SEL_STR(setNoteBodyFont:sender:)]) {
 		
 		if (![prefsController highlightSearchTerms])
 			[self removeHighlightedTerms];
+		markdownHighlightCoversAll = YES;
 		[self scheduleMarkdownHighlight];
 	}
 }
@@ -225,6 +239,7 @@ if ([selectorString isEqualToString:SEL_STR(setNoteBodyFont:sender:)]) {
 		}
 	}
 	[self setTypingAttributes:[prefsController noteBodyAttributes]];
+	[self nv_applyThemeTypingColor];
 //    NSLog(@"exist :>%@<",self.defaultParagraphStyle);
 //    [self.textStorage setAttributes:@{NSParagraphStyleAttributeName:[NSParagraphStyle defaultParagraphStyle]} range:NSMakeRange(0, self.string.length)];
 //    NSLog(@"exist :>%@<",self.defaultParagraphStyle);
@@ -280,8 +295,10 @@ if ([selectorString isEqualToString:SEL_STR(setNoteBodyFont:sender:)]) {
 		if (completionSelectionColored)
 			[self nv_applyCompletionSelectionColor];
 		[self setTypingAttributes:[prefsController noteBodyAttributes]];
+		[self nv_applyThemeTypingColor];
 		[[self enclosingScrollView] setNeedsDisplay:YES];
 		[self setNeedsDisplay:YES];
+		markdownHighlightCoversAll = YES;
 		[self highlightMarkdownSyntax];
 		if ([[self enclosingScrollView] respondsToSelector:@selector(nv_updateScrollerChrome)])
 			[(ETScrollView *)[self enclosingScrollView] nv_updateScrollerChrome];
@@ -313,9 +330,11 @@ if ([selectorString isEqualToString:SEL_STR(setNoteBodyFont:sender:)]) {
 	if (completionSelectionColored)
 		[self nv_applyCompletionSelectionColor];
 	[self setTypingAttributes:[prefsController noteBodyAttributes]];
+	[self nv_applyThemeTypingColor];
     [[self enclosingScrollView]setNeedsDisplay:YES];
 //    [[[self enclosingScrollView]contentView]setNeedsDisplay:YES];
     [self setNeedsDisplay:YES];
+	markdownHighlightCoversAll = YES;
 	[self scheduleMarkdownHighlight];
 	if ([[self enclosingScrollView] respondsToSelector:@selector(nv_updateScrollerChrome)])
 		[(ETScrollView *)[self enclosingScrollView] nv_updateScrollerChrome];
@@ -487,6 +506,9 @@ CGFloat _perceptualColorDifference(NSColor*a, NSColor*b) {
 - (void)redisplayAfterNoteChange {
 	/* AppKit invalidates glyphs that still exist. A shorter note, such as one
 	   opened from a link, leaves the previous note's tail on screen. */
+	markdownHighlightSuppressed = NO;
+	markdownHighlightCoversAll = YES;
+	markdownHighlightDirty = NSMakeRange(NSNotFound, 0);
 	NSLayoutManager *layout = [self layoutManager];
 	NSUInteger length = [[self string] length];
 	if (layout && length)
@@ -499,6 +521,9 @@ CGFloat _perceptualColorDifference(NSColor*a, NSColor*b) {
 }
 
 - (void)layoutManager:(NSLayoutManager *)aLayoutManager didCompleteLayoutForTextContainer:(NSTextContainer *)aTextContainer atEnd:(BOOL)flag {
+	/* A finished container is often only the window tall. Resizing here is
+	   what made the scrollbar vanish again on the way back to a note. */
+	(void)flag;
 	didRenderFully = YES;
 }
 
@@ -845,10 +870,18 @@ static BOOL NVSearchHighlightColorMatches(NSColor *applied, NSColor *searchColor
 }
 
 - (void)setFrameSize:(NSSize)newSize {
+	/* AppKit offers the window height while switching notes. Taking it hides
+	   the scrollbar for a note that is already taller than the window. */
+	newSize.height = NVNoteHeightForProposedHeight(self, newSize.height);
 	[super setFrameSize:newSize];
 	NVSearchHighlightOverlay *overlay = [self nv_searchHighlightOverlayCreating:NO];
 	if (overlay)
 		[overlay setFrame:[self bounds]];
+}
+
+- (void)setConstrainedFrameSize:(NSSize)size {
+	size.height = NVNoteHeightForProposedHeight(self, size.height);
+	[super setConstrainedFrameSize:size];
 }
 
 - (void)nv_fillSearchHighlightRange:(NSRange)slice color:(NSColor *)color inOverlay:(NSView *)overlay {
@@ -954,6 +987,8 @@ static BOOL NVSearchHighlightColorMatches(NSColor *applied, NSColor *searchColor
 		[layout removeTemporaryAttribute:NVSearchHighlightAttributeName forCharacterRange:all];
 	}
 	[self nv_displaySearchHighlights];
+	/* Background colors for the whole note were just removed. */
+	markdownHighlightCoversAll = YES;
 	[self scheduleMarkdownHighlight];
 }
 
@@ -1137,11 +1172,41 @@ static NSColor *NVBlendColors(NSColor *first, NSColor *second, CGFloat fraction,
 	[self performSelector:@selector(highlightMarkdownSyntax) withObject:nil afterDelay:0.03];
 }
 
-- (void)noteTextStorageDidProcessEditing:(NSNotification *)note {
-	if (![NSThread isMainThread]) {
-		[self performSelectorOnMainThread:@selector(scheduleMarkdownHighlight) withObject:nil waitUntilDone:NO];
+- (void)scheduleFullMarkdownHighlight {
+	markdownHighlightCoversAll = YES;
+	[self scheduleMarkdownHighlight];
+}
+
+- (void)noteMarkdownHighlightEdit:(NSRange)edited change:(NSInteger)change {
+	if (markdownHighlightCoversAll)
+		return;
+	NSUInteger length = [[self string] length];
+	if (edited.location != NSNotFound && edited.location == 0 && edited.length == length && length > 4096) {
+		markdownHighlightCoversAll = YES;
+		markdownHighlightDirty = NSMakeRange(NSNotFound, 0);
 		return;
 	}
+	markdownHighlightDirty = NVMarkdownHighlightUnionEdit(markdownHighlightDirty, edited, change, length);
+}
+
+- (void)noteTextStorageDidProcessEditing:(NSNotification *)note {
+	if (![NSThread isMainThread]) {
+		[self performSelectorOnMainThread:@selector(scheduleFullMarkdownHighlight) withObject:nil waitUntilDone:NO];
+		return;
+	}
+	NSTextStorage *storage = [note object];
+	/* The layout manager drops temporary attributes set inside this notification.
+	   Apply the theme color on the next turn, after the edit has settled, and
+	   do not schedule a highlight: that pass lays the whole note out. */
+	if (!NVMarkdownSyntaxHighlightEnabledForLength([storage length])) {
+		NSRange edited = [storage editedRange];
+		markdownHighlightSuppressed = YES;
+		if (edited.location == 0 && edited.length == [storage length])
+			plainForegroundDirty = NSMakeRange(NSNotFound, 0);
+		[self schedulePlainForegroundForRange:edited change:[storage changeInLength]];
+		return;
+	}
+	[self noteMarkdownHighlightEdit:[storage editedRange] change:[storage changeInLength]];
 	[self scheduleMarkdownHighlight];
 }
 
@@ -1153,7 +1218,18 @@ static NSColor *NVBlendColors(NSColor *first, NSColor *second, CGFloat fraction,
 		return;
 	haveCached = YES;
 	cached = enabled;
+	markdownHighlightCoversAll = YES;
 	[self scheduleMarkdownHighlight];
+}
+
+- (NSRange)activeMarkdownHighlightRange {
+	NSUInteger length = [[self string] length];
+	NSRange limit = markdownHighlightLimit;
+	if (limit.location > length)
+		return NSMakeRange(0, length);
+	if (NSMaxRange(limit) > length)
+		limit.length = length - limit.location;
+	return limit;
 }
 
 - (void)paintMarkdownRange:(NSRange)range color:(NSColor *)color strikethrough:(BOOL)strikethrough {
@@ -1180,7 +1256,7 @@ static NSColor *NVBlendColors(NSColor *first, NSColor *second, CGFloat fraction,
 - (void)paintMarkdownMatches:(NSRegularExpression *)regex string:(NSString *)string content:(NSColor *)content marker:(NSColor *)marker contentGroup:(NSInteger)contentGroup delimiterGroup:(NSInteger)delimiterGroup hasCloser:(BOOL)hasCloser strikethrough:(BOOL)strikethrough {
 	if (!regex)
 		return;
-	[regex enumerateMatchesInString:string options:0 range:NSMakeRange(0, [string length]) usingBlock:^(NSTextCheckingResult *result, NSMatchingFlags flags, BOOL *stop) {
+	[regex enumerateMatchesInString:string options:0 range:[self activeMarkdownHighlightRange] usingBlock:^(NSTextCheckingResult *result, NSMatchingFlags flags, BOOL *stop) {
 		NSRange whole = [result range];
 		[self paintMarkdownRange:whole color:marker strikethrough:NO];
 		if (contentGroup > 0 && (NSInteger)[result numberOfRanges] > contentGroup) {
@@ -1203,8 +1279,9 @@ static NSColor *NVBlendColors(NSColor *first, NSColor *second, CGFloat fraction,
 }
 
 - (void)highlightFencedCodeInString:(NSString *)string code:(NSColor *)code marker:(NSColor *)marker {
-	NSUInteger length = [string length];
-	NSUInteger index = 0;
+	NSRange limit = [self activeMarkdownHighlightRange];
+	NSUInteger length = NSMaxRange(limit);
+	NSUInteger index = limit.location;
 	while (index < length) {
 		NSRange lineRange = [string lineRangeForRange:NSMakeRange(index, 0)];
 		NSString *trimmed = [[string substringWithRange:lineRange] stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
@@ -1297,7 +1374,7 @@ static NSColor *NVBlendColors(NSColor *first, NSColor *second, CGFloat fraction,
 - (void)paintThemeMatches:(NSRegularExpression *)regex string:(NSString *)string content:(NVThemeStyle *)content marker:(NVThemeStyle *)marker baseFont:(NSFont *)baseFont contentGroup:(NSInteger)contentGroup delimiterGroup:(NSInteger)delimiterGroup hasCloser:(BOOL)hasCloser forceStrikethrough:(BOOL)forceStrikethrough {
 	if (!regex)
 		return;
-	[regex enumerateMatchesInString:string options:0 range:NSMakeRange(0, [string length]) usingBlock:^(NSTextCheckingResult *result, NSMatchingFlags flags, BOOL *stop) {
+	[regex enumerateMatchesInString:string options:0 range:[self activeMarkdownHighlightRange] usingBlock:^(NSTextCheckingResult *result, NSMatchingFlags flags, BOOL *stop) {
 		NSRange whole = [result range];
 		[self paintThemeRange:whole style:content baseFont:baseFont useBaseFont:NO forceStrikethrough:forceStrikethrough];
 		if (delimiterGroup > 0 && (NSInteger)[result numberOfRanges] > delimiterGroup) {
@@ -1320,8 +1397,9 @@ static NSColor *NVBlendColors(NSColor *first, NSColor *second, CGFloat fraction,
 }
 
 - (void)highlightThemedFencedCodeInString:(NSString *)string code:(NVThemeStyle *)code marker:(NVThemeStyle *)marker baseFont:(NSFont *)baseFont {
-	NSUInteger length = [string length];
-	NSUInteger index = 0;
+	NSRange limit = [self activeMarkdownHighlightRange];
+	NSUInteger length = NSMaxRange(limit);
+	NSUInteger index = limit.location;
 	while (index < length) {
 		NSRange lineRange = [string lineRangeForRange:NSMakeRange(index, 0)];
 		NSString *trimmed = [[string substringWithRange:lineRange] stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
@@ -1375,7 +1453,7 @@ static NSColor *NVBlendColors(NSColor *first, NSColor *second, CGFloat fraction,
 }
 
 - (void)highlightMarkedSpansInString:(NSString *)string style:(NVThemeStyle *)style marker:(NVThemeStyle *)marker baseFont:(NSFont *)baseFont {
-	NSArray *spans = NVMarkdownHighlightSpans(string);
+	NSArray *spans = NVMarkdownHighlightSpansInRange(string, [self activeMarkdownHighlightRange]);
 	NSUInteger index;
 	for (index = 0; index < [spans count]; index++) {
 		NSDictionary *span = [spans objectAtIndex:index];
@@ -1386,7 +1464,7 @@ static NSColor *NVBlendColors(NSColor *first, NSColor *second, CGFloat fraction,
 }
 
 - (void)highlightCriticMarkupInString:(NSString *)string addition:(NVThemeStyle *)addition deletion:(NVThemeStyle *)deletion highlight:(NVThemeStyle *)highlight comment:(NVThemeStyle *)comment substitutionMarker:(NVThemeStyle *)substitutionMarker marker:(NVThemeStyle *)marker baseFont:(NSFont *)baseFont {
-	NSArray *spans = NVCriticMarkupSpans(string);
+	NSArray *spans = NVCriticMarkupSpansInRange(string, [self activeMarkdownHighlightRange]);
 	NSLayoutManager *layout = [self layoutManager];
 	NSUInteger index;
 	for (index = 0; index < [spans count]; index++) {
@@ -1431,11 +1509,13 @@ static NSColor *NVBlendColors(NSColor *first, NSColor *second, CGFloat fraction,
 	NSLayoutManager *layout = [self layoutManager];
 	NSString *string = [self string];
 	NSRange fullRange = NSMakeRange(0, [string length]);
-	if (layout && fullRange.length) {
-		[layout removeTemporaryAttribute:NSForegroundColorAttributeName forCharacterRange:fullRange];
-		[layout removeTemporaryAttribute:NSBackgroundColorAttributeName forCharacterRange:fullRange];
-		[layout removeTemporaryAttribute:NSStrikethroughStyleAttributeName forCharacterRange:fullRange];
-		[layout removeTemporaryAttribute:NSFontAttributeName forCharacterRange:fullRange];
+	NSRange limit = [self activeMarkdownHighlightRange];
+	if (layout && limit.length) {
+		[layout removeTemporaryAttribute:NSForegroundColorAttributeName forCharacterRange:limit];
+		[layout removeTemporaryAttribute:NSBackgroundColorAttributeName forCharacterRange:limit];
+		[layout removeTemporaryAttribute:NSStrikethroughStyleAttributeName forCharacterRange:limit];
+		[layout removeTemporaryAttribute:NSUnderlineStyleAttributeName forCharacterRange:limit];
+		[layout removeTemporaryAttribute:NSFontAttributeName forCharacterRange:limit];
 	}
 	if (!layout || !fullRange.length || !prefsController) {
 		[self highlightWritingGremlins];
@@ -1456,7 +1536,7 @@ static NSColor *NVBlendColors(NSColor *first, NSColor *second, CGFloat fraction,
 	NVThemeStyle *strike = [theme styleForKey:@"criticDeletion"] ?: baseStyle;
 	NVThemeStyle *highlight = [NVThemeStyle highlightStyleFromThemeStyle:[theme styleForKey:@"highlight"]];
 
-	[self paintThemeRange:fullRange style:baseStyle baseFont:baseFont useBaseFont:NO forceStrikethrough:NO];
+	[self paintThemeRange:limit style:baseStyle baseFont:baseFont useBaseFont:NO forceStrikethrough:NO];
 
 	static NSRegularExpression *headingRegex;
 	static NSRegularExpression *quoteRegex;
@@ -1481,7 +1561,7 @@ static NSColor *NVBlendColors(NSColor *first, NSColor *second, CGFloat fraction,
 	});
 
 	[self paintThemeMatches:quoteRegex string:string content:quote marker:markup baseFont:baseFont contentGroup:2 delimiterGroup:1 hasCloser:NO forceStrikethrough:NO];
-	[headingRegex enumerateMatchesInString:string options:0 range:fullRange usingBlock:^(NSTextCheckingResult *result, NSMatchingFlags flags, BOOL *stop) {
+	[headingRegex enumerateMatchesInString:string options:0 range:limit usingBlock:^(NSTextCheckingResult *result, NSMatchingFlags flags, BOOL *stop) {
 		NSRange hashes = [result rangeAtIndex:1];
 		NSRange text = [result rangeAtIndex:2];
 		NSUInteger level = hashes.length;
@@ -1489,7 +1569,7 @@ static NSColor *NVBlendColors(NSColor *first, NSColor *second, CGFloat fraction,
 		[self paintThemeRange:text style:heading baseFont:baseFont useBaseFont:NO forceStrikethrough:NO];
 		[self paintThemeRange:hashes style:markup baseFont:baseFont useBaseFont:YES forceStrikethrough:NO];
 	}];
-	[emphasisRegex enumerateMatchesInString:string options:0 range:fullRange usingBlock:^(NSTextCheckingResult *result, NSMatchingFlags flags, BOOL *stop) {
+	[emphasisRegex enumerateMatchesInString:string options:0 range:limit usingBlock:^(NSTextCheckingResult *result, NSMatchingFlags flags, BOOL *stop) {
 		NSRange delimiter = [result rangeAtIndex:1];
 		NSRange text = [result rangeAtIndex:2];
 		NSString *markerText = delimiter.location == NSNotFound ? @"" : [string substringWithRange:delimiter];
@@ -1504,7 +1584,8 @@ static NSColor *NVBlendColors(NSColor *first, NSColor *second, CGFloat fraction,
 	[self paintThemeMatches:strikeRegex string:string content:strike marker:markup baseFont:baseFont contentGroup:1 delimiterGroup:0 hasCloser:NO forceStrikethrough:YES];
 	[self paintThemeMatches:linkRegex string:string content:link marker:markup baseFont:baseFont contentGroup:1 delimiterGroup:0 hasCloser:NO forceStrikethrough:NO];
 	[self paintThemeMatches:wikiRegex string:string content:link marker:markup baseFont:baseFont contentGroup:1 delimiterGroup:0 hasCloser:NO forceStrikethrough:NO];
-	[self highlightCompleteReferenceLinksInString:string style:link baseFont:baseFont];
+	if ([string rangeOfString:@"[" options:0 range:limit].location != NSNotFound)
+		[self highlightCompleteReferenceLinksInString:string style:link baseFont:baseFont];
 	[self paintThemeMatches:listRegex string:string content:markup marker:markup baseFont:baseFont contentGroup:0 delimiterGroup:0 hasCloser:NO forceStrikethrough:NO];
 	[self paintThemeMatches:ruleRegex string:string content:markup marker:markup baseFont:baseFont contentGroup:0 delimiterGroup:0 hasCloser:NO forceStrikethrough:NO];
 	[self highlightMarkedSpansInString:string style:highlight marker:markup baseFont:baseFont];
@@ -1523,25 +1604,131 @@ static NSColor *NVBlendColors(NSColor *first, NSColor *second, CGFloat fraction,
 	[self nv_reapplyCompletionColors];
 }
 
+- (void)clearMarkdownSyntaxHighlight {
+	NSLayoutManager *layout = [self layoutManager];
+	NSUInteger length = [[self string] length];
+	if (!layout || !length)
+		return;
+	NSRange fullRange = NSMakeRange(0, length);
+	[layout removeTemporaryAttribute:NSForegroundColorAttributeName forCharacterRange:fullRange];
+	[layout removeTemporaryAttribute:NSBackgroundColorAttributeName forCharacterRange:fullRange];
+	[layout removeTemporaryAttribute:NSStrikethroughStyleAttributeName forCharacterRange:fullRange];
+	[layout removeTemporaryAttribute:NSUnderlineStyleAttributeName forCharacterRange:fullRange];
+	[layout removeTemporaryAttribute:NSFontAttributeName forCharacterRange:fullRange];
+}
+
+- (NSColor *)plainEditorForegroundColor {
+	NVEditorTheme *theme = [[NVThemeManager sharedManager] currentEditorTheme];
+	NSColor *color = theme ? [theme editorForegroundColor] : nil;
+	if (!color)
+		color = [prefsController foregroundTextColor] ?: [(AppController *)[NSApp delegate] foregrndColor];
+	return color ?: [NSColor textColor];
+}
+
+/* Notes store black when no color is written down. A theme paints over that, and a long note
+   still needs the theme color after syntax coloring is skipped. One temporary run covers the
+   range: walking every attribute run builds an element per slice, and freeing those hangs. */
+- (void)applyPlainForegroundColorInRange:(NSRange)range {
+	NSColor *color = [self plainEditorForegroundColor];
+	NSString *string = [self string];
+	NSLayoutManager *layout = [self layoutManager];
+	NSTextStorage *storage = [self textStorage];
+	NSUInteger length = [string length];
+	if (!color || !layout || !storage || !length || !range.length || range.location == NSNotFound || range.location >= length)
+		return;
+	if (NSMaxRange(range) > length)
+		range.length = length - range.location;
+	if (range.length > 1024 || ![storage attribute:NSLinkAttributeName existsInRange:range]) {
+		[layout addTemporaryAttribute:NSForegroundColorAttributeName value:color forCharacterRange:range];
+		return;
+	}
+	NSUInteger index = range.location;
+	NSUInteger end = NSMaxRange(range);
+	while (index < end) {
+		NSRange effective = NSMakeRange(0, 0);
+		id link = [storage attribute:NSLinkAttributeName atIndex:index longestEffectiveRange:&effective inRange:NSMakeRange(0, length)];
+		NSRange slice = NSIntersectionRange(range, effective);
+		if (slice.length && !link)
+			[layout addTemporaryAttribute:NSForegroundColorAttributeName value:color forCharacterRange:slice];
+		if (NSMaxRange(effective) <= index)
+			break;
+		index = NSMaxRange(effective);
+	}
+}
+
+- (void)schedulePlainForegroundForRange:(NSRange)edited change:(NSInteger)change {
+	NSUInteger length = [[self string] length];
+	plainForegroundDirty = NVMarkdownHighlightUnionEdit(plainForegroundDirty, edited, change, length);
+	[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(applyDeferredPlainForeground) object:nil];
+	[self performSelector:@selector(applyDeferredPlainForeground) withObject:nil afterDelay:0];
+}
+
+- (void)applyDeferredPlainForeground {
+	NSRange range = plainForegroundDirty;
+	plainForegroundDirty = NSMakeRange(NSNotFound, 0);
+	if (!NVMarkdownSyntaxHighlightEnabledForLength([[self string] length]))
+		[self applyPlainForegroundColorInRange:range];
+}
+
+- (void)prepareMarkdownHighlightLimit {
+	NSString *string = [self string];
+	NSUInteger length = [string length];
+	markdownHighlightLimit = NSMakeRange(0, length);
+	if (!NVMarkdownSyntaxHighlightEnabledForLength(length))
+		return;
+	if (markdownHighlightSuppressed)
+		markdownHighlightCoversAll = YES;
+	BOOL full = markdownHighlightCoversAll || markdownHighlightDirty.location == NSNotFound;
+	NSRange dirty = markdownHighlightDirty;
+	markdownHighlightCoversAll = NO;
+	markdownHighlightDirty = NSMakeRange(NSNotFound, 0);
+	if (!full && length)
+		markdownHighlightLimit = NVMarkdownHighlightRangeForEdit(string, dirty);
+}
+
 - (void)highlightMarkdownSyntax {
+	[self prepareMarkdownHighlightLimit];
+	NSUInteger length = [[self string] length];
+	if (!NVMarkdownSyntaxHighlightEnabledForLength(length)) {
+		/* A long note must not clear attributes, scan every character, or lay out
+		   the whole file on a keystroke. That path builds a text-storage element
+		   per run and freeing them is quadratic, which is the hang at the end of
+		   the note. The theme color is one attribute run, applied again only to
+		   the characters just typed. */
+		BOOL refreshAll = !markdownHighlightSuppressed || markdownHighlightCoversAll;
+		NSRange dirty = markdownHighlightDirty;
+		markdownHighlightCoversAll = NO;
+		markdownHighlightDirty = NSMakeRange(NSNotFound, 0);
+		markdownHighlightSuppressed = YES;
+		if (refreshAll)
+			[self applyPlainForegroundColorInRange:NSMakeRange(0, length)];
+		else if (dirty.location != NSNotFound)
+			[self applyPlainForegroundColorInRange:dirty];
+		return;
+	}
+	markdownHighlightSuppressed = NO;
 	NVEditorTheme *editorTheme = [[NVThemeManager sharedManager] currentEditorTheme];
 	if (editorTheme) {
 		[self highlightMarkdownSyntaxWithTheme:editorTheme];
+		NVLayOutEntireNote(self);
 		return;
 	}
 	NSLayoutManager *layout = [self layoutManager];
 	NSString *string = [self string];
 	NSRange fullRange = NSMakeRange(0, [string length]);
-	if (layout && fullRange.length) {
-		[layout removeTemporaryAttribute:NSForegroundColorAttributeName forCharacterRange:fullRange];
-		[layout removeTemporaryAttribute:NSStrikethroughStyleAttributeName forCharacterRange:fullRange];
-		[layout removeTemporaryAttribute:NSFontAttributeName forCharacterRange:fullRange];
-		[layout removeTemporaryAttribute:NSBackgroundColorAttributeName forCharacterRange:fullRange];
+	NSRange limit = [self activeMarkdownHighlightRange];
+	if (layout && limit.length) {
+		[layout removeTemporaryAttribute:NSForegroundColorAttributeName forCharacterRange:limit];
+		[layout removeTemporaryAttribute:NSStrikethroughStyleAttributeName forCharacterRange:limit];
+		[layout removeTemporaryAttribute:NSUnderlineStyleAttributeName forCharacterRange:limit];
+		[layout removeTemporaryAttribute:NSFontAttributeName forCharacterRange:limit];
+		[layout removeTemporaryAttribute:NSBackgroundColorAttributeName forCharacterRange:limit];
 	}
 	if (![self markdownCompletionsEnabled] || !layout || !fullRange.length || !prefsController) {
 		[self highlightWritingGremlins];
 		[self reapplySearchHighlights];
 		[self nv_reapplyCompletionColors];
+		NVLayOutEntireNote(self);
 		return;
 	}
 
@@ -1581,7 +1768,8 @@ static NSColor *NVBlendColors(NSColor *first, NSColor *second, CGFloat fraction,
 	[self paintMarkdownMatches:strikeRegex string:string content:foreground marker:marker contentGroup:1 delimiterGroup:0 hasCloser:NO strikethrough:YES];
 	[self paintMarkdownMatches:linkRegex string:string content:link marker:marker contentGroup:1 delimiterGroup:0 hasCloser:NO strikethrough:NO];
 	[self paintMarkdownMatches:wikiRegex string:string content:link marker:marker contentGroup:1 delimiterGroup:0 hasCloser:NO strikethrough:NO];
-	[self highlightCompleteReferenceLinksInString:string color:link];
+	if ([string rangeOfString:@"[" options:0 range:limit].location != NSNotFound)
+		[self highlightCompleteReferenceLinksInString:string color:link];
 	[self paintMarkdownMatches:listRegex string:string content:marker marker:marker contentGroup:0 delimiterGroup:0 hasCloser:NO strikethrough:NO];
 	[self paintMarkdownMatches:ruleRegex string:string content:marker marker:marker contentGroup:0 delimiterGroup:0 hasCloser:NO strikethrough:NO];
 	NSFont *criticFont = [prefsController noteBodyFont] ?: [NSFont userFontOfSize:14.0];
@@ -1599,6 +1787,7 @@ static NSColor *NVBlendColors(NSColor *first, NSColor *second, CGFloat fraction,
 	[self highlightWritingGremlins];
 	[self reapplySearchHighlights];
 	[self nv_reapplyCompletionColors];
+	NVLayOutEntireNote(self);
 }
 
 - (BOOL)performKeyEquivalent:(NSEvent *)anEvent {
@@ -2242,6 +2431,15 @@ static NSColor *NVBlendColors(NSColor *first, NSColor *second, CGFloat fraction,
 - (void)completeSuggestedLinks {
 	if (isAutocompleting || wasDeleting)
 		return;
+	/* Completing a link copies the current line. A line that is the whole note is not worth scanning. */
+	if (!NVMarkdownSyntaxHighlightEnabledForLength([[self string] length])) {
+		NSRange selected = [self selectedRange];
+		if (selected.location <= [[self string] length]) {
+			NSRange line = [[self string] lineRangeForRange:NSMakeRange(selected.location == [[self string] length] && selected.location ? selected.location - 1 : selected.location, 0)];
+			if (line.length > 8192)
+				return;
+		}
+	}
 	if ([[self undoManager] isUndoing] || [[self undoManager] isRedoing])
 		return;
 	if (![prefsController linksAutoSuggested] && ![self linkReferenceCompletionIsOpen])
@@ -2480,12 +2678,15 @@ static BOOL NVIsLinkBracket(unichar character) {
 		changedRange = NSMakeRange(changedRange.location, MIN(changedRange.length, stringLength - changedRange.location));
 
 
-	//-removeAttribute:range: seems slow for some reason; try checking with -attributesAtIndex:effectiveRange: first
-	if ([[self textStorage] attribute:NSLinkAttributeName existsInRange:changedRange])
-		[[self textStorage] removeAttribute:NSLinkAttributeName range:changedRange];
-	[[self textStorage] addLinkAttributesForRange:changedRange];
-	
-	[[self textStorage] addStrikethroughNearDoneTagsForRange:changedRange];
+	/* A data detector over a multi-megabyte line is the return-key hang at the end of a long note. */
+	if (NVMarkdownSyntaxHighlightEnabledForLength(stringLength) || changedRange.length <= 8192) {
+		//-removeAttribute:range: seems slow for some reason; try checking with -attributesAtIndex:effectiveRange: first
+		if ([[self textStorage] attribute:NSLinkAttributeName existsInRange:changedRange])
+			[[self textStorage] removeAttribute:NSLinkAttributeName range:changedRange];
+		[[self textStorage] addLinkAttributesForRange:changedRange];
+		
+		[[self textStorage] addStrikethroughNearDoneTagsForRange:changedRange];
+	}
 	
 	[self completeSuggestedLinks];
 	
@@ -2542,7 +2743,22 @@ static long (*GetGetScriptManagerVariablePointer())(short) {
 }
 #endif
 
+- (void)nv_applyThemeTypingColor {
+	NSColor *color = [self plainEditorForegroundColor];
+	if (!color)
+		return;
+	NSDictionary *typing = [self typingAttributes];
+	NSColor *current = [typing objectForKey:NSForegroundColorAttributeName];
+	if (current && ColorsEqualWith8BitChannels(current, color))
+		return;
+	NSMutableDictionary *updated = typing ? [typing mutableCopy] : [[NSMutableDictionary alloc] init];
+	[updated setObject:color forKey:NSForegroundColorAttributeName];
+	[self setTypingAttributes:updated];
+	[updated release];
+}
+
 - (void)fixTypingAttributesForSubstitutedFonts {
+	[self nv_applyThemeTypingColor];
 	//fixes a problem with fonts substituted by non-system input languages that Apple should have fixed themselves
 	
 	//if the user has chosen a default font that does not support the current input script, and then changes back to a language input that _does_
@@ -2643,7 +2859,7 @@ static long (*GetGetScriptManagerVariablePointer())(short) {
 		return NO;
 
 	NSRange lineRange = [string lineRangeForRange:NSMakeRange(selected.location, 0)];
-	if (lineRange.length == 0)
+	if (lineRange.length == 0 || lineRange.length > 8192)
 		return NO;
 	NSString *line = [string substringWithRange:lineRange];
 	NSUInteger contentLength = [line length];
@@ -2688,6 +2904,7 @@ static long (*GetGetScriptManagerVariablePointer())(short) {
 - (void)insertNewline:(id)sender {
 	//reset custom styles after each line
 	[self setTypingAttributes:[prefsController noteBodyAttributes]];
+	[self nv_applyThemeTypingColor];
 
 	if ([self replaceEmptyListMarkerWithLineBreak])
 		return;
@@ -2699,7 +2916,13 @@ static long (*GetGetScriptManagerVariablePointer())(short) {
 	if ([prefsController autoIndentsNewLines]) {
 		// If we should indent automatically, check the previous line and scan all the whitespace at the beginning of the line into a string and insert that string into the new line
 		NSString *previousLineWhitespaceString = nil;
-		NSRange previousLineRange = [[self string] lineRangeForRange:NSMakeRange([self selectedRange].location - 1, 0)];
+		NSUInteger caret = [self selectedRange].location;
+		if (!caret)
+			return;
+		NSRange previousLineRange = [[self string] lineRangeForRange:NSMakeRange(caret - 1, 0)];
+		/* Copying the whole note as the "previous line" is what stalls return at the end of a long paragraph. */
+		if (previousLineRange.length > 8192)
+			return;
 		NSScanner *previousLineScanner = [[NSScanner alloc] initWithString:[[self string] substringWithRange:previousLineRange]];
 		[previousLineScanner setCharactersToBeSkipped:nil];
 		
@@ -3305,6 +3528,8 @@ static BOOL NVBulletMarker(NSString *line, NSUInteger contentLength, NSUInteger 
 - (void)scheduleNumberedListRenumber {
 	if (renumberingNumberedLists || ![prefsController autoFormatsListBullets])
 		return;
+	if (!NVMarkdownSyntaxHighlightEnabledForLength([[self string] length]))
+		return;
 	if ([[self undoManager] isUndoing] || [[self undoManager] isRedoing])
 		return;
 	[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(renumberNumberedLists) object:nil];
@@ -3313,6 +3538,8 @@ static BOOL NVBulletMarker(NSString *line, NSUInteger contentLength, NSUInteger 
 
 - (void)renumberNumberedLists {
 	if (renumberingNumberedLists || ![prefsController autoFormatsListBullets])
+		return;
+	if (!NVMarkdownSyntaxHighlightEnabledForLength([[self string] length]))
 		return;
 	if ([[self undoManager] isUndoing] || [[self undoManager] isRedoing])
 		return;
@@ -3929,8 +4156,30 @@ static BOOL NVBulletMarker(NSString *line, NSUInteger contentLength, NSUInteger 
 }
 
 
+- (void)nv_matchVisibleMinHeight {
+	NSScrollView *scroll;
+	CGFloat visible;
+	NSSize min;
+	if (matchingMinHeight)
+		return;
+	scroll = [self enclosingScrollView];
+	if (!scroll)
+		return;
+	visible = [scroll contentSize].height;
+	if (visible < 1.0)
+		return;
+	min = [self minSize];
+	if (fabs(min.height - visible) < 0.5)
+		return;
+	matchingMinHeight = YES;
+	[self setMinSize:NSMakeSize(min.width, visible)];
+	matchingMinHeight = NO;
+}
+
 - (void)setFrame:(NSRect)frameRect{
+    [self nv_matchVisibleMinHeight];
     [self updateInsetForFrame:frameRect andForceLayout:NO];
+    frameRect.size.height = NVNoteHeightForProposedHeight(self, frameRect.size.height);
     [super setFrame:frameRect];
 }
 
@@ -4569,12 +4818,13 @@ static NSString *NVCoreOfLine(NSString *line) {
 - (void)highlightWritingGremlins {
 	NSLayoutManager *layout = [self layoutManager];
 	NSString *text = [self string];
-	if (!layout || ![text length])
+	NSRange limit = [self activeMarkdownHighlightRange];
+	if (!layout || ![text length] || !limit.length)
 		return;
 	NSColor *invisible = [NSColor colorWithCalibratedRed:0.82 green:0.22 blue:0.22 alpha:0.7];
 	NSColor *space = [NSColor colorWithCalibratedRed:0.92 green:0.45 blue:0.28 alpha:0.35];
 	NSUInteger index;
-	for (index = 0; index < [text length]; index++) {
+	for (index = limit.location; index < NSMaxRange(limit); index++) {
 		unichar character = [text characterAtIndex:index];
 		BOOL hidden = (character < 0x20 && character != '\t' && character != '\n' && character != '\r') || character == 0x7F || (character >= 0x80 && character <= 0x9F) || character == 0xAD || character == 0x200B || character == 0x200C || character == 0x200D || character == 0x2060 || character == 0xFEFF;
 		BOOL unusualSpace = character == 0x00A0 || character == 0x202F || character == 0x205F || character == 0x3000 || (character >= 0x2000 && character <= 0x200A);
@@ -4655,6 +4905,9 @@ static NSString *NVCoreOfLine(NSString *line) {
 
 - (BOOL)insertMarkdownStructureNewline {
 	NSString *text = [self string];
+	/* Closing a fence counts every earlier fence. On a long note that walk is the return-key hang. */
+	if (!NVMarkdownSyntaxHighlightEnabledForLength([text length]))
+		return NO;
 	NSRange selection = [self selectedRange];
 	if (selection.location > [text length])
 		return NO;

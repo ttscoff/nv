@@ -30,6 +30,11 @@
 	
 	GlobalPrefs *prefsController;
 	BOOL didRenderFully;
+	BOOL markdownHighlightSuppressed;
+	BOOL markdownHighlightCoversAll;
+	NSRange markdownHighlightDirty;
+	NSRange markdownHighlightLimit;
+	NSRange plainForegroundDirty;
 	
 	BOOL didChangeIntoAutomaticRange;
 	BOOL renumberingNumberedLists;
@@ -51,7 +56,8 @@
 	
 	IMP defaultIBeamCursorIMP, whiteIBeamCursorIMP;
     
-    BOOL managesTextWidth;
+	BOOL managesTextWidth;
+	BOOL matchingMinHeight;
 	NSString *beforeString;
 	NSString *afterString;
     NSString *activeParagraph;

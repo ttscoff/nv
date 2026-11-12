@@ -30,7 +30,18 @@
     }
     if (NSMaxX(column) < NSMaxX(bounds) - 0.5) {
         NSRect right = NSMakeRect(NSMaxX(column), NSMinY(bounds), NSMaxX(bounds) - NSMaxX(column), NSHeight(bounds));
-        NSRectFillUsingOperation(NSIntersectionRect(right, dirtyRect), NSCompositingOperationSourceOver);
+        /* The vertical scroller lives in this strip. Filling it paints the
+           window color over the bar a moment after the bar appears. */
+        NSScroller *scroller = [scrollView verticalScroller];
+        if (scroller && ![scroller isHidden] && NSWidth([scroller frame]) > 1.0) {
+            NSRect scrollerRect = [self convertRect:[scroller frame] fromView:scrollView];
+            if (NSMinX(scrollerRect) > NSMinX(right) + 0.5)
+                right.size.width = NSMinX(scrollerRect) - NSMinX(right);
+            else
+                right = NSZeroRect;
+        }
+        if (!NSIsEmptyRect(right))
+            NSRectFillUsingOperation(NSIntersectionRect(right, dirtyRect), NSCompositingOperationSourceOver);
     }
 }
 
@@ -97,8 +108,12 @@
         [nvChromeMargin setAutoresizingMask:NSViewWidthSizable | NSViewHeightSizable];
     }
     [nvChromeMargin setFrame:[self bounds]];
-    [self addSubview:nvChromeMargin positioned:NSWindowBelow relativeTo:[self contentView]];
+    /* Below the clip view still ends up above the scroller, so the gutter
+       fill covers the bar. Keep the margin behind the scroller. */
+    NSView *below = [self verticalScroller] ?: [self contentView];
+    [self addSubview:nvChromeMargin positioned:NSWindowBelow relativeTo:below];
     [nvChromeMargin setNeedsDisplay:YES];
+    [[self verticalScroller] setNeedsDisplay:YES];
     installingChromeMargin = NO;
 }
 

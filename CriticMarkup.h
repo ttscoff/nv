@@ -53,20 +53,25 @@ static inline NSString *NVCriticOpenKind(NSString *string, NSUInteger index, NSU
 	return nil;
 }
 
-static inline NSArray *NVCriticMarkupSpans(NSString *string) {
+static inline NSArray *NVCriticMarkupSpansInRange(NSString *string, NSRange range) {
 	NSUInteger length = [string length];
-	if (!length)
+	if (range.location > length)
+		return [NSArray array];
+	if (NSMaxRange(range) > length)
+		range.length = length - range.location;
+	if (!range.length)
 		return [NSArray array];
 	NSMutableArray *spans = [NSMutableArray array];
 	NVCriticCodeState state = {NO, NO, NO};
-	NSUInteger index = 0;
-	while (index < length) {
+	NSUInteger index = range.location;
+	NSUInteger end = NSMaxRange(range);
+	while (index < end) {
 		NVCriticUpdateCodeState(string, index, length, &state);
 		BOOL inCode = state.inCodeBlock || state.inInlineCode || state.inIndentedCode;
 		NSString *closerToken = nil;
 		NSString *kind = inCode ? nil : NVCriticOpenKind(string, index, length, &closerToken);
-		if (kind && index + 3 < length) {
-			NSRange search = NSMakeRange(index + 3, length - (index + 3));
+		if (kind && index + 3 < end) {
+			NSRange search = NSMakeRange(index + 3, end - (index + 3));
 			NSRange found = [string rangeOfString:closerToken options:0 range:search];
 			if (found.location != NSNotFound && found.length == 3) {
 				NSRange content = NSMakeRange(index + 3, found.location - (index + 3));
@@ -90,10 +95,10 @@ static inline NSArray *NVCriticMarkupSpans(NSString *string) {
 				if (separator.location != NSNotFound)
 					[span setObject:[NSValue valueWithRange:separator] forKey:@"separator"];
 				[spans addObject:span];
-				NSUInteger end = NSMaxRange(found);
+				NSUInteger spanEnd = NSMaxRange(found);
 				NSUInteger cursor = index + 1;
-				index = end;
-				while (cursor < end) {
+				index = spanEnd;
+				while (cursor < spanEnd) {
 					NVCriticUpdateCodeState(string, cursor, length, &state);
 					cursor++;
 				}
@@ -103,6 +108,10 @@ static inline NSArray *NVCriticMarkupSpans(NSString *string) {
 		index++;
 	}
 	return spans;
+}
+
+static inline NSArray *NVCriticMarkupSpans(NSString *string) {
+	return NVCriticMarkupSpansInRange(string, NSMakeRange(0, [string length]));
 }
 
 static inline BOOL NVCriticKindStrikethrough(NSString *type) {

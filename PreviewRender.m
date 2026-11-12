@@ -91,8 +91,77 @@ NSString *NVPreviewHTMLPreparingContent(NSString *html, BOOL *needsMath, BOOL *n
 	return result;
 }
 
-NSString *NVPreviewRendererScripts(NSString *assetDirectory, BOOL needsMath, BOOL needsMermaid, BOOL needsWiki) {
-	if (!needsMath && !needsMermaid && !needsWiki)
+BOOL NVPreviewHTMLNeedsCodeHighlight(NSString *html) {
+	if (![html length])
+		return NO;
+	NSRegularExpression *expression = [NSRegularExpression regularExpressionWithPattern:@"<pre\\b[^>]*>\\s*<code\\b" options:NSRegularExpressionCaseInsensitive error:NULL];
+	if (!expression)
+		return NO;
+	return [expression numberOfMatchesInString:html options:0 range:NSMakeRange(0, [html length])] > 0;
+}
+
+/* Both sheets start disabled. The inline script enables one after it has read
+   the computed background of the code block, walking up through transparent
+   parents. 0.55 is NVThemeColorIsLight's cutoff. Token backgrounds, such as a
+   diff line, stay; the code block's own background stays with the preview theme. */
+static NSString * const NVPreviewHighlightBootstrap =
+	@"<script>\n"
+	"(function(){"
+	"function opaque(node){var probe=node;while(probe&&probe.nodeType===1){"
+	"var color=(window.getComputedStyle(probe).backgroundColor||'');"
+	"var match=color.match(/rgba?\\(\\s*([0-9.]+)[,\\s]+([0-9.]+)[,\\s]+([0-9.]+)(?:[,\\s\\/]+([0-9.]+))?\\s*\\)/);"
+	"if(match){var alpha=match[4]===undefined?1:parseFloat(match[4]);"
+	"if(alpha>0.05)return [parseFloat(match[1]),parseFloat(match[2]),parseFloat(match[3])];}"
+	"probe=probe.parentNode;}return [255,255,255];}"
+	"function isLight(rgb){return (0.299*rgb[0]+0.587*rgb[1]+0.114*rgb[2])/255>=0.55;}"
+	"function nvHighlightCode(){"
+	"var blocks=document.querySelectorAll('pre code');if(!blocks.length)return;"
+	"var pre=blocks[0];while(pre&&(!pre.tagName||pre.tagName.toLowerCase()!=='pre'))pre=pre.parentNode;"
+	"var light=isLight(opaque(pre||blocks[0]));"
+	"var day=document.getElementById('nv-hl-light');var night=document.getElementById('nv-hl-dark');"
+	"if(day)day.media=light?'all':'not all';if(night)night.media=light?'not all':'all';"
+	"if(window.hljs){if(hljs.configure)hljs.configure({ignoreUnescapedHTML:true});if(hljs.highlightAll)hljs.highlightAll();}}"
+	"window.nvHighlightCode=nvHighlightCode;nvHighlightCode();"
+	"})();\n"
+	@"</script>";
+
+static NSString *NVPreviewStylesheet(NSString *path) {
+	NSString *css = [NSString stringWithContentsOfFile:path encoding:NSUTF8StringEncoding error:NULL];
+	if (![css length])
+		return nil;
+	NSMutableString *safe = [NSMutableString stringWithString:css];
+	[safe replaceOccurrencesOfString:@"</style" withString:@"<\\/style" options:NSCaseInsensitiveSearch range:NSMakeRange(0, [safe length])];
+	return safe;
+}
+
+NSString *NVPreviewHighlightStyles(NSString *assetDirectory) {
+	NSString *light = NVPreviewStylesheet([assetDirectory stringByAppendingPathComponent:@"highlight-light.css"]);
+	NSString *dark = NVPreviewStylesheet([assetDirectory stringByAppendingPathComponent:@"highlight-dark.css"]);
+	if (!light || !dark)
+		return nil;
+	return [NSString stringWithFormat:@"<style id=\"nv-hl-light\" media=\"not all\">%@</style><style id=\"nv-hl-dark\" media=\"not all\">%@</style>", light, dark];
+}
+
+NSString *NVPreviewHTMLInsertingHighlightStyles(NSString *html, NSString *styles) {
+	if (![html length] || ![styles length])
+		return html;
+	NSMutableString *result = [NSMutableString stringWithString:html];
+	NSRange style = [result rangeOfString:@"<style" options:NSCaseInsensitiveSearch];
+	if (style.location != NSNotFound) {
+		[result insertString:styles atIndex:style.location];
+		return result;
+	}
+	NSRange head = [result rangeOfString:@"</head>" options:NSCaseInsensitiveSearch];
+	if (head.location != NSNotFound) {
+		[result insertString:styles atIndex:head.location];
+		return result;
+	}
+	[result insertString:styles atIndex:0];
+	return result;
+}
+
+NSString *NVPreviewRendererScripts(NSString *assetDirectory, BOOL needsMath, BOOL needsMermaid, BOOL needsWiki, BOOL needsHighlight) {
+	if (!needsMath && !needsMermaid && !needsWiki && !needsHighlight)
 		return nil;
 
 	NSMutableString *scripts = [NSMutableString string];
@@ -123,6 +192,15 @@ NSString *NVPreviewRendererScripts(NSString *assetDirectory, BOOL needsMath, BOO
 			[scripts appendString:@"\n"];
 		}
 	}
+	if (needsHighlight) {
+		NSString *tag = NVScriptTagForFile([assetDirectory stringByAppendingPathComponent:@"highlight.min.js"]);
+		if (tag) {
+			[scripts appendString:tag];
+			[scripts appendString:@"\n"];
+			[scripts appendString:NVPreviewHighlightBootstrap];
+			[scripts appendString:@"\n"];
+		}
+	}
 	return [scripts length] ? scripts : nil;
 }
 
@@ -144,15 +222,17 @@ NSString *NVPreviewHTMLForDisplay(NSString *html, NSString *assetDirectory) {
 	NSString *prepared = NVPreviewHTMLPreparingContent(html, &needsMath, &needsMermaid, &needsWiki);
 	if (!prepared)
 		return nil;
-	NSString *scripts = NVPreviewRendererScripts(assetDirectory, needsMath, needsMermaid, needsWiki);
-	if (!scripts)
-		return prepared;
-
-	NSMutableString *result = [NSMutableString stringWithString:prepared];
-	NSRange body = [result rangeOfString:@"</body>" options:NSCaseInsensitiveSearch | NSBackwardsSearch];
-	if (body.location != NSNotFound)
-		[result insertString:scripts atIndex:body.location];
-	else
-		[result appendString:scripts];
-	return result;
+	BOOL needsHighlight = NVPreviewHTMLNeedsCodeHighlight(prepared);
+	NSString *scripts = NVPreviewRendererScripts(assetDirectory, needsMath, needsMermaid, needsWiki, needsHighlight);
+	NSString *body = prepared;
+	if (scripts) {
+		NSMutableString *result = [NSMutableString stringWithString:prepared];
+		NSRange close = [result rangeOfString:@"</body>" options:NSCaseInsensitiveSearch | NSBackwardsSearch];
+		if (close.location != NSNotFound)
+			[result insertString:scripts atIndex:close.location];
+		else
+			[result appendString:scripts];
+		body = result;
+	}
+	return NVPreviewHTMLInsertingHighlightStyles(body, needsHighlight ? NVPreviewHighlightStyles(assetDirectory) : nil);
 }

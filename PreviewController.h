@@ -51,6 +51,7 @@
 	BOOL previewHasMathJax;
 	BOOL previewHasMermaid;
 	BOOL previewHasWiki;
+	BOOL previewHasHighlight;
 	BOOL previewNeedsFullReload;
 }
 

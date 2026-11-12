@@ -73,6 +73,72 @@ int main(int argc, const char *argv[]) {
 	expectCount(@"==no==+", 0, "a plus after the mark is left alone");
 	expectCount(@"plain", 0, "plain text has no mark");
 
+	if (NVMarkdownSyntaxHighlightEnabledForLength(0) != YES ||
+		NVMarkdownSyntaxHighlightEnabledForLength(NVMarkdownSyntaxHighlightLimit) != YES ||
+		NVMarkdownSyntaxHighlightEnabledForLength(NVMarkdownSyntaxHighlightLimit + 1) != NO) {
+		fprintf(stderr, "FAIL syntax coloring stays on through 300KB and turns off past it\n");
+		gFailures++;
+	}
+
+	{
+		NSString *note = @"alpha\nbeta\ngamma";
+		NSRange beta = NVMarkdownHighlightRangeForEdit(note, NSMakeRange(6, 1));
+		NSRange gamma = NVMarkdownHighlightRangeForEdit(note, NSMakeRange(11, 0));
+		if (beta.location != 6 || beta.length != 5 || gamma.location != 11 || gamma.length != 5) {
+			fprintf(stderr, "FAIL an edit stays on its own line\n");
+			gFailures++;
+		}
+		NSString *fenced = @"before\n```\ncode\n```\nafter";
+		NSRange inside = NVMarkdownHighlightRangeForEdit(fenced, NSMakeRange(11, 1));
+		NSRange before = NVMarkdownHighlightRangeForEdit(fenced, NSMakeRange(0, 1));
+		NSRange after = NVMarkdownHighlightRangeForEdit(fenced, NSMakeRange(20, 1));
+		if (inside.location != 7 || inside.length != 13 || before.location != 0 || before.length != 7 || after.location != 20 || after.length != 5) {
+			fprintf(stderr, "FAIL a fenced block is colored with the edit, and the lines outside it are not\n  inside %lu,%lu before %lu,%lu after %lu,%lu\n",
+				(unsigned long)inside.location, (unsigned long)inside.length,
+				(unsigned long)before.location, (unsigned long)before.length,
+				(unsigned long)after.location, (unsigned long)after.length);
+			gFailures++;
+		}
+		NSString *openFence = @"```\ncode\nmore";
+		NSRange unclosed = NVMarkdownHighlightRangeForEdit(openFence, NSMakeRange(9, 1));
+		if (unclosed.location != 0 || unclosed.length != [openFence length]) {
+			fprintf(stderr, "FAIL an unclosed fence runs to the end of the note\n");
+			gFailures++;
+		}
+		NSString *critic = @"keep\n{++\nadded\n++}\nend";
+		NSRange marked = NVMarkdownHighlightRangeForEdit(critic, NSMakeRange(9, 1));
+		if (marked.location != 5 || marked.length != 14) {
+			fprintf(stderr, "FAIL a critic span is colored with the edit\n  got %lu,%lu\n", (unsigned long)marked.location, (unsigned long)marked.length);
+			gFailures++;
+		}
+		NSString *defined = @"hello\n[id]: http://x\nthere";
+		NSRange definition = NVMarkdownHighlightRangeForEdit(defined, NSMakeRange(6, 1));
+		NSRange plain = NVMarkdownHighlightRangeForEdit(defined, NSMakeRange(0, 1));
+		if (definition.location != 0 || definition.length != [defined length] || plain.location != 0 || plain.length != 6) {
+			fprintf(stderr, "FAIL a link definition recolors the note, and a plain line does not\n");
+			gFailures++;
+		}
+		NSRange typed = NVMarkdownHighlightUnionEdit(NSMakeRange(NSNotFound, 0), NSMakeRange(10, 1), 1, 100);
+		NSRange shifted = NVMarkdownHighlightUnionEdit(NSMakeRange(100, 5), NSMakeRange(50, 1), 1, 200);
+		NSRange insideEdit = NVMarkdownHighlightUnionEdit(NSMakeRange(100, 5), NSMakeRange(102, 1), 1, 200);
+		NSRange adjacent = NVMarkdownHighlightUnionEdit(NSMakeRange(100, 1), NSMakeRange(101, 1), 1, 200);
+		if (typed.location != 10 || typed.length != 1 || shifted.location != 50 || shifted.length != 56 ||
+			insideEdit.location != 100 || insideEdit.length != 6 || adjacent.location != 100 || adjacent.length != 2) {
+			fprintf(stderr, "FAIL edits combine into one coloring range\n  typed %lu,%lu shifted %lu,%lu inside %lu,%lu adjacent %lu,%lu\n",
+				(unsigned long)typed.location, (unsigned long)typed.length,
+				(unsigned long)shifted.location, (unsigned long)shifted.length,
+				(unsigned long)insideEdit.location, (unsigned long)insideEdit.length,
+				(unsigned long)adjacent.location, (unsigned long)adjacent.length);
+			gFailures++;
+		}
+		NSArray *onlySecond = NVMarkdownHighlightSpansInRange(@"==no==\n==yes==", NSMakeRange(7, 7));
+		NSString *second = [onlySecond count] ? [@"==no==\n==yes==" substringWithRange:[[[onlySecond objectAtIndex:0] objectForKey:@"content"] rangeValue]] : nil;
+		if ([onlySecond count] != 1 || ![second isEqualToString:@"yes"]) {
+			fprintf(stderr, "FAIL a ranged mark scan stays inside the range\n");
+			gFailures++;
+		}
+	}
+
 	expectColors([NVThemeStyle highlightStyleFromThemeStyle:nil], 0, 0, 0, 1, 1, 0, "a theme with no highlight uses black on yellow");
 
 	NVThemeStyle *backgroundOnly = [NVThemeStyle styleWithDictionary:[NSDictionary dictionaryWithObject:@"#00ff00" forKey:@"backgroundColor"]];
