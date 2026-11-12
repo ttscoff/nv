@@ -1,3 +1,25 @@
+nvALT 3.0.38 (144)
+-------------------------
+
+#### CHANGED
+
+- **Syntax highlighting** turns off past about 300KB so a long note stays responsive while you type
+- Notes past 300KB skip **list renumbering** and code-fence closing, and the word count stays blank
+
+#### NEW
+
+- **Code blocks** in the preview are syntax colored with a light or dark GitHub palette chosen from the background
+
+#### IMPROVED
+
+- **Syntax highlighting** below that size updates the lines you edit instead of the whole note
+
+#### FIXED
+
+- A long note keeps the **theme text color** when highlighting is off, including characters you type
+- Pressing **return** at the end of a long note no longer hangs
+- A long note's **scrollbar** stays available instead of being hidden or painted over
+
 nvALT 3.0.37 (144)
 -------------------------
 
