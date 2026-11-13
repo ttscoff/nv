@@ -1,3 +1,22 @@
+nvALT 3.0.40 (144)
+-------------------------
+
+#### CHANGED
+
+- **Export** is Option-Command-E, and Command-E uses the selection for Find
+
+#### IMPROVED
+
+- The **preview** of a note over 300KB waits for a pause and shows the section around the cursor
+
+#### FIXED
+
+- Arrowing through the **note list** no longer leaves a body blank. Fixes [#607](https://github.com/ttscoff/nv/issues/607)
+- Outdenting a nested **bullet** continues the numbered list it lands on
+- Outdenting a **number** onto a bullet list uses that bullet
+- A resized **note list** keeps its height after a relaunch. Fixes [#608](https://github.com/ttscoff/nv/issues/608)
+- **Tab** at the end of a note indents the blank line, not the list or quote above it. Fixes [#609](https://github.com/ttscoff/nv/issues/609)
+
 nvALT 3.0.39 (144)
 -------------------------
 
