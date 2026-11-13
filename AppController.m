@@ -37,6 +37,7 @@
 #import "BufferUtils.h"
 #import "LinkingEditor.h"
 #import "NoteLayout.h"
+#import "ListSplit.h"
 #import "MarkdownHighlight.h"
 #import "EmptyView.h"
 #import "DualField.h"
@@ -298,8 +299,11 @@ static BOOL nvApplyingWindowChrome;
 	if (!awakenedViews) {
 		//NSLog(@"all (hopefully relevant) views awakend!");
 		[self _configureDividerForCurrentLayout];
-		[splitView restoreState:YES];
-		if ([notesSubview dimension]<200.0) {
+		BOOL restoredSplit = [splitView restoreState:YES];
+		/* A saved height under 200 is still a real list. Replacing it made a
+		   100 or 150 point list come back as the default, about 125 points
+		   in a shorter window, while 225 was left alone. */
+		if (NVShouldApplyDefaultListDimension(restoredSplit, [notesSubview dimension])) {
 			if ([splitView isVertical]) {   ///vertical means "Horiz layout"/notes list is to the left of the note body
 				if (([splitView frame].size.width < 600.0) && ([splitView frame].size.width - 400 > [notesSubview dimension])) {
 					[notesSubview setDimension:[splitView frame].size.width-400.0];
