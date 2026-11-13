@@ -1,3 +1,10 @@
+nvALT 3.0.39 (144)
+-------------------------
+
+#### CHANGED
+
+- The **search field** keeps the text you typed when you select a note
+
 nvALT 3.0.38 (144)
 -------------------------
 
