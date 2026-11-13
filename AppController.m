@@ -1802,15 +1802,17 @@ static NSURL *NVHTTPURLFromImportString(NSString *entered) {
 				if (!isFilteringFromTyping) {
                     //	if ([toolbar isVisible]) {
                     if ([self dualFieldIsVisible]) {
+						//the field keeps the text the user typed to find this note, so the search they were
+						//running stays in view; after an auto-completion that means the typed prefix, not
+						//the completed title. The note's title shows in the list.
+						NSString *typed = typedString ? typedString : @"";
 						if (fieldEditor) {
-							//the field editor has focus--select text, too
-							[fieldEditor setString:titleOfNote(currentNote)];
-							NSUInteger strLen = [titleOfNote(currentNote) length];
-							if (strLen != [fieldEditor selectedRange].length)
-								[fieldEditor setSelectedRange:NSMakeRange(0, strLen)];
-						} else {
-							//this could be faster
-							[field setStringValue:titleOfNote(currentNote)];
+							if (![[fieldEditor string] isEqualToString:typed]) {
+								[fieldEditor setString:typed];
+								[fieldEditor setSelectedRange:NSMakeRange([typed length], 0)];
+							}
+						} else if (![[field stringValue] isEqualToString:typed]) {
+							[field setStringValue:typed];
 						}
 					} else {
 						[window setTitle:titleOfNote(currentNote)];
@@ -2317,7 +2319,9 @@ static NSURL *NVHTTPURLFromImportString(NSString *entered) {
     if (aNoteObject == currentNote) {
         //	if ([toolbar isVisible]) {
         if ([self dualFieldIsVisible]) {
-			[field setStringValue:titleOfNote(currentNote)];
+			//only replace a title that was auto-completed into the field, never the text the user typed
+			if (!typedStringIsCached || ![[field stringValue] isEqualToString:typedString])
+				[field setStringValue:titleOfNote(currentNote)];
 		} else {
 			[window setTitle:titleOfNote(currentNote)];
 		}
