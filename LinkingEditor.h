@@ -43,6 +43,7 @@
 	NSUInteger markdownSelectionAnchor;
 	NSRange lastAutomaticallySelectedRange;
 	NSUInteger automaticFirstVisibleCharIndex;
+	BOOL selectionScrollSuppressed;
 	NSRange changedRange;
 	BOOL isAutocompleting, wasDeleting, completionSelectionColored;
 	NSRange completionColoredRange;

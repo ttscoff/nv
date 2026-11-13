@@ -113,6 +113,10 @@ static NSString * const NVSearchHighlightAttributeName = @"NVSearchHighlight";
 
 @end
 
+@interface LinkingEditor (NVSelectionScroll)
+- (void)nv_allowSelectionScroll;
+@end
+
 @implementation LinkingEditor
 
 @synthesize beforeString;
@@ -230,6 +234,7 @@ if ([selectorString isEqualToString:SEL_STR(setNoteBodyFont:sender:)]) {
 }
 
 - (BOOL)becomeFirstResponder {
+	[self nv_allowSelectionScroll];
 	[self discardSearchHighlights];
 	[notesTableView setShouldUseSecondaryHighlightColor:YES];
 
@@ -1153,9 +1158,34 @@ static BOOL NVSearchHighlightColorMatches(NSColor *applied, NSColor *searchColor
 }
 
 - (void)setAutomaticallySelectedRange:(NSRange)newRange {
+	/* The selection a note is shown with must not move the view: the saved
+	   scroll position is applied around it. The text view scrolls to a new
+	   caret on its own, sometimes on a later layout pass, so a scroll that
+	   happens now is put back at once and one that comes later is ignored
+	   until the user does something or the next pass of the run loop. */
+	NSScrollView *scroll = [self enclosingScrollView];
+	NSClipView *clip = [scroll contentView];
+	NSPoint origin = [clip bounds].origin;
 	lastAutomaticallySelectedRange = newRange;
 	didChangeIntoAutomaticRange = NO;
+	selectionScrollSuppressed = YES;
+	[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(nv_allowSelectionScroll) object:nil];
 	[self setSelectedRange:newRange];
+	if (clip && !NSEqualPoints([clip bounds].origin, origin)) {
+		[clip scrollToPoint:origin];
+		[scroll reflectScrolledClipView:clip];
+	}
+	[self performSelector:@selector(nv_allowSelectionScroll) withObject:nil afterDelay:0.0];
+}
+
+- (void)nv_allowSelectionScroll {
+	selectionScrollSuppressed = NO;
+}
+
+- (void)scrollRangeToVisible:(NSRange)range {
+	if (selectionScrollSuppressed)
+		return;
+	[super scrollRangeToVisible:range];
 }
 
 - (NSUInteger)firstVisibleCharIndexWasAutomatic:(BOOL*)automatic {
@@ -1897,6 +1927,7 @@ static NSColor *NVBlendColors(NSColor *first, NSColor *second, CGFloat fraction,
 }
 
 - (void)keyDown:(NSEvent*)anEvent {	
+	[self nv_allowSelectionScroll];
     //    [[NSNotificationCenter defaultCenter] postNotificationName:@"ModTimersShouldReset" object:nil];
 	unichar keyChar = [anEvent firstCharacterIgnoringModifiers];
     
@@ -2227,6 +2258,7 @@ static NSColor *NVBlendColors(NSColor *first, NSColor *second, CGFloat fraction,
 }
 
 - (void)mouseDown:(NSEvent *)event {
+	[self nv_allowSelectionScroll];
 	[self nv_noteBodyClaimed];
 	if ([self nv_toggleTaskCheckboxForEvent:event])
 		return;
@@ -2708,6 +2740,7 @@ static BOOL NVIsLinkBracket(unichar character) {
 	else
 		changedRange = NSMakeRange(changedRange.location, MIN(changedRange.length, stringLength - changedRange.location));
 
+	[self nv_allowSelectionScroll];
 	[self nv_noteBodyClaimed];
 
 
@@ -4852,6 +4885,8 @@ static NSString *NVCoreOfLine(NSString *line) {
 }
 
 - (void)setSelectedRange:(NSRange)charRange affinity:(NSSelectionAffinity)affinity stillSelecting:(BOOL)stillSelectingFlag {
+	if (!NSEqualRanges(charRange, lastAutomaticallySelectedRange))
+		[self nv_allowSelectionScroll];
 	if (!markdownAdjustingSelection)
 		markdownSelectionLevel = 0;
 	[super setSelectedRange:charRange affinity:affinity stillSelecting:stillSelectingFlag];

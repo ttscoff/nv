@@ -2008,13 +2008,14 @@ static NSURL *NVHTTPURLFromImportString(NSString *entered) {
 	if (!noteSelectionRange.length && firstFoundTermRange.location != NSNotFound)
 		noteSelectionRange = firstFoundTermRange;
 	
-	//select and scroll: the note comes back to the line it was left at (or to its selection when it has
-	//none), then, while a search is on, moves the least distance that shows the nearest match
-	[textView setAutomaticallySelectedRange:noteSelectionRange];
+	//scroll, then select: the note comes back to the line it was left at (or to its selection when it has
+	//none), then, while a search is on, moves the least distance that shows the nearest match. The selection
+	//is set last and without moving the view, so the saved position is what stays on screen.
 	if (!NVScrollCharIndexToTop(textView, [note firstVisibleCharIndex]))
 		NVScrollRangeIntoView(textView, noteSelectionRange);
 	NVScrollToShowNearestRange(textView, foundRanges);
 	NVRevealNoteTextIfScrolledPastIt(textView);
+	[textView setAutomaticallySelectedRange:noteSelectionRange];
 	[textView markScrollPositionAutomatic];
 	//looking around the matches is not remembered until the user clicks or types in the note;
 	//a note reached by typing its title, or one with no match in its body, is not being looked around
