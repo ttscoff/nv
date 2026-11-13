@@ -156,7 +156,29 @@ int main(void) {
 	[editor setString:@"Short\n"];
 	NVLayOutEntireNote(editor);
 	expectTrue([[scroll verticalScroller] isHidden], "a short note still hides the scrollbar after that");
+
 	[editor release];
+
+	/* The view can stay as tall as an older note while the new text is at the
+	   top. Background layout will not scroll back on its own. */
+	NSTextView *parked = textViewInScrollView(scroll);
+	[[parked layoutManager] setBackgroundLayoutEnabled:NO];
+	[parked setVerticallyResizable:NO];
+	[parked setString:@"Short note that must stay visible.\n"];
+	NVLayOutEntireNote(parked);
+	CGFloat tail = clipHeight * 8.0;
+	[parked setFrameSize:NSMakeSize(NSWidth([parked frame]), tail)];
+	[parked scrollPoint:NSMakePoint(0, tail - clipHeight)];
+	expectTrue(NSHeight([parked frame]) > clipHeight * 2.0, "the text view is still taller than the window");
+	expectTrue([parked visibleRect].origin.y > clipHeight, "the clip is in the empty tail");
+	NVRevealNoteTextIfScrolledPastIt(parked);
+	{
+		NSRect used = [[parked layoutManager] usedRectForTextContainer:[parked textContainer]];
+		used.origin.x += [parked textContainerOrigin].x;
+		used.origin.y += [parked textContainerOrigin].y;
+		expectTrue(NSIntersectsRect([parked visibleRect], used), "a note scrolled past its text is brought back");
+	}
+	[parked release];
 	[scroll release];
 	[window release];
 	[pool drain];

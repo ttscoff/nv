@@ -31,6 +31,8 @@
 #import "ClickBelowText.h"
 #import "SelectionRedraw.h"
 #import "TaskList.h"
+#import "ListOutdent.h"
+#import "ListIndent.h"
 #import "ETScrollView.h"
 #import "ETClipView.h"
 //#import "NSTextFinder.h"
@@ -3708,11 +3710,14 @@ static BOOL NVBulletMarker(NSString *line, NSUInteger contentLength, NSUInteger 
 	NSRange selection = [self selectedRange];
 	if (![text length] || selection.location > [text length])
 		return NO;
-	NSUInteger endLocation = selection.length ? NSMaxRange(selection) - 1 : selection.location;
-	if (endLocation >= [text length])
-		endLocation = [text length] - 1;
-	NSRange firstLine = [text lineRangeForRange:NSMakeRange(MIN(selection.location, [text length] - 1), 0)];
-	NSRange lastLine = [text lineRangeForRange:NSMakeRange(endLocation, 0)];
+	NSUInteger start = MIN(selection.location, [text length]);
+	NSUInteger endLocation = selection.length ? NSMaxRange(selection) : selection.location;
+	if (endLocation > [text length])
+		endLocation = [text length];
+	if (selection.length && endLocation)
+		endLocation -= 1;
+	NSRange firstLine = NVLineRangeForCaret(text, start);
+	NSRange lastLine = NVLineRangeForCaret(text, endLocation);
 	NSUInteger tabWidth = [self listTabWidth];
 	NSMutableArray *lines = [NSMutableArray array];
 	NSUInteger scan = firstLine.location;
@@ -3766,14 +3771,20 @@ static BOOL NVBulletMarker(NSString *line, NSUInteger contentLength, NSUInteger 
 		if (![self shouldChangeTextInRange:edited replacementString:changeString])
 			continue;
 		[self replaceCharactersInRange:edited withString:changeString];
-		NSInteger delta = (NSInteger)[changeString length] - (NSInteger)edited.length;
-		if (NSMaxRange(edited) <= selection.location) {
-			selection.location += delta;
-		} else 		if (edited.location < NSMaxRange(selection)) {
-			if (edited.location <= selection.location)
-				selection.location = edited.location + [changeString length];
-			NSInteger newLength = (NSInteger)selection.length + delta;
-			selection.length = newLength > 0 ? (NSUInteger)newLength : 0;
+		[self adjustSelection:&selection forEditAt:edited replacementLength:[changeString length]];
+		/* The indent is gone. A bullet that lands on a numbered list becomes the next number there, and a number that lands on a bullet becomes that bullet. */
+		if (outdent && lineRange.location <= [[self string] length]) {
+			NSString *fresh = [self string];
+			NSRange freshLine = [fresh lineRangeForRange:NSMakeRange(lineRange.location, 0)];
+			NSRange markerInLine = NSMakeRange(NSNotFound, 0);
+			NSString *marker = NVListMarkerAfterOutdent(fresh, freshLine, tabWidth, &markerInLine);
+			if ([marker length] && markerInLine.location != NSNotFound) {
+				NSRange documentMarker = NSMakeRange(freshLine.location + markerInLine.location, markerInLine.length);
+				if (NSMaxRange(documentMarker) <= [fresh length] && [self shouldChangeTextInRange:documentMarker replacementString:marker]) {
+					[self replaceCharactersInRange:documentMarker withString:marker];
+					[self adjustSelection:&selection forEditAt:documentMarker replacementLength:[marker length]];
+				}
+			}
 		}
 	}
 	NSUInteger editedLength = [[self string] length];
@@ -4998,11 +5009,14 @@ static NSString *NVCoreOfLine(NSString *line) {
 	NSRange selection = [self selectedRange];
 	if (![text length] || selection.location > [text length])
 		return NO;
-	NSUInteger endLocation = selection.length ? NSMaxRange(selection) - 1 : selection.location;
-	if (endLocation >= [text length])
-		endLocation = [text length] - 1;
-	NSRange firstLine = [text lineRangeForRange:NSMakeRange(MIN(selection.location, [text length] - 1), 0)];
-	NSRange lastLine = [text lineRangeForRange:NSMakeRange(endLocation, 0)];
+	NSUInteger start = MIN(selection.location, [text length]);
+	NSUInteger endLocation = selection.length ? NSMaxRange(selection) : selection.location;
+	if (endLocation > [text length])
+		endLocation = [text length];
+	if (selection.length && endLocation)
+		endLocation -= 1;
+	NSRange firstLine = NVLineRangeForCaret(text, start);
+	NSRange lastLine = NVLineRangeForCaret(text, endLocation);
 	NSMutableArray *lines = [NSMutableArray array];
 	NSUInteger scan = firstLine.location;
 	BOOL found = NO;

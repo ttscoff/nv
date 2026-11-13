@@ -73,6 +73,7 @@ Tab		Move insertion point between text areas\
 \f1 \uc0\u8984 
 \f0  P		Print the selected note(s)\
 
+\f1 \uc0\u8997 
 \f1 \uc0\u8984 
 \f0  E		Export the selected note(s) to other formats\
 \
@@ -177,7 +178,6 @@ Finding and notes:\
 \f1 \uc0\u8984 
 \f0  F		Find and replace\
 
-\f1 \uc0\u8997 
 \f1 \uc0\u8984 
 \f0  E		Use the selection for Find\
 
