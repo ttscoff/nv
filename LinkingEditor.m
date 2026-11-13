@@ -32,6 +32,7 @@
 #import "SelectionRedraw.h"
 #import "TaskList.h"
 #import "ListOutdent.h"
+#import "ListIndent.h"
 #import "ETScrollView.h"
 #import "ETClipView.h"
 //#import "NSTextFinder.h"
@@ -3678,11 +3679,14 @@ static BOOL NVBulletMarker(NSString *line, NSUInteger contentLength, NSUInteger 
 	NSRange selection = [self selectedRange];
 	if (![text length] || selection.location > [text length])
 		return NO;
-	NSUInteger endLocation = selection.length ? NSMaxRange(selection) - 1 : selection.location;
-	if (endLocation >= [text length])
-		endLocation = [text length] - 1;
-	NSRange firstLine = [text lineRangeForRange:NSMakeRange(MIN(selection.location, [text length] - 1), 0)];
-	NSRange lastLine = [text lineRangeForRange:NSMakeRange(endLocation, 0)];
+	NSUInteger start = MIN(selection.location, [text length]);
+	NSUInteger endLocation = selection.length ? NSMaxRange(selection) : selection.location;
+	if (endLocation > [text length])
+		endLocation = [text length];
+	if (selection.length && endLocation)
+		endLocation -= 1;
+	NSRange firstLine = NVLineRangeForCaret(text, start);
+	NSRange lastLine = NVLineRangeForCaret(text, endLocation);
 	NSUInteger tabWidth = [self listTabWidth];
 	NSMutableArray *lines = [NSMutableArray array];
 	NSUInteger scan = firstLine.location;
@@ -4974,11 +4978,14 @@ static NSString *NVCoreOfLine(NSString *line) {
 	NSRange selection = [self selectedRange];
 	if (![text length] || selection.location > [text length])
 		return NO;
-	NSUInteger endLocation = selection.length ? NSMaxRange(selection) - 1 : selection.location;
-	if (endLocation >= [text length])
-		endLocation = [text length] - 1;
-	NSRange firstLine = [text lineRangeForRange:NSMakeRange(MIN(selection.location, [text length] - 1), 0)];
-	NSRange lastLine = [text lineRangeForRange:NSMakeRange(endLocation, 0)];
+	NSUInteger start = MIN(selection.location, [text length]);
+	NSUInteger endLocation = selection.length ? NSMaxRange(selection) : selection.location;
+	if (endLocation > [text length])
+		endLocation = [text length];
+	if (selection.length && endLocation)
+		endLocation -= 1;
+	NSRange firstLine = NVLineRangeForCaret(text, start);
+	NSRange lastLine = NVLineRangeForCaret(text, endLocation);
 	NSMutableArray *lines = [NSMutableArray array];
 	NSUInteger scan = firstLine.location;
 	BOOL found = NO;
