@@ -27,8 +27,10 @@ void NVScrollRangeIntoView(NSTextView *textView, NSRange range);
 
 /* When none of the ranges (NSValues) has its line on screen, scrolls the least
    distance that shows the one nearest the view. Nothing moves when one is
-   already showing or the array is empty. */
-void NVScrollToShowNearestRange(NSTextView *textView, NSArray *ranges);
+   already showing or the array is empty. Returns the range that is on screen
+   afterwards, the first one already showing or the one scrolled to, or a
+   range at NSNotFound when there is none. */
+NSRange NVScrollToShowNearestRange(NSTextView *textView, NSArray *ranges);
 
 /* The text view keeps the height of the tallest note it has shown, and
    background layout is off. A shorter note can be left above the clip.

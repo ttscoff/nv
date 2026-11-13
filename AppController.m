@@ -1965,7 +1965,6 @@ static NSURL *NVHTTPURLFromImportString(NSString *entered) {
 	//actually load the new note
 	[self _setCurrentNote:note];
 	
-	NSRange firstFoundTermRange = NSMakeRange(NSNotFound,0);
 	NSRange noteSelectionRange = [currentNote lastSelectedRange];
 	
 	if (noteSelectionRange.location == NSNotFound ||
@@ -1999,21 +1998,18 @@ static NSURL *NVHTTPURLFromImportString(NSString *entered) {
 	if (highlightString)
 		foundRanges = [textView highlightTermsTemporarily:highlightString avoidHighlight:![prefsController highlightSearchTerms]];
 	//matches in the body only count when the note was not reached by typing its title
-	if ([foundRanges count] && (unsigned)noteIndex != [notationController preferredSelectedNoteIndex])
-		firstFoundTermRange = [[foundRanges objectAtIndex:0] rangeValue];
-	else
+	if (![foundRanges count] || (unsigned)noteIndex == [notationController preferredSelectedNoteIndex])
 		foundRanges = nil;
 	
-	//if there was nothing selected, select the first found range
-	if (!noteSelectionRange.length && firstFoundTermRange.location != NSNotFound)
-		noteSelectionRange = firstFoundTermRange;
-	
 	//scroll, then select: the note comes back to the line it was left at (or to its selection when it has
-	//none), then, while a search is on, moves the least distance that shows the nearest match. The selection
-	//is set last and without moving the view, so the saved position is what stays on screen.
+	//none), then, while a search is on, moves the least distance that shows the nearest match. A bare caret
+	//goes on that match, the one on screen. The selection is set last and without moving the view, so the
+	//saved position is what stays on screen.
 	if (!NVScrollCharIndexToTop(textView, [note firstVisibleCharIndex]))
 		NVScrollRangeIntoView(textView, noteSelectionRange);
-	NVScrollToShowNearestRange(textView, foundRanges);
+	NSRange shownMatch = NVScrollToShowNearestRange(textView, foundRanges);
+	if (!noteSelectionRange.length && shownMatch.location != NSNotFound)
+		noteSelectionRange = shownMatch;
 	NVRevealNoteTextIfScrolledPastIt(textView);
 	[textView setAutomaticallySelectedRange:noteSelectionRange];
 	[textView markScrollPositionAutomatic];

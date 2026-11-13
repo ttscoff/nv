@@ -289,7 +289,7 @@ void NVScrollRangeIntoView(NSTextView *textView, NSRange range) {
 	[scroll reflectScrolledClipView:clip];
 }
 
-void NVScrollToShowNearestRange(NSTextView *textView, NSArray *ranges) {
+NSRange NVScrollToShowNearestRange(NSTextView *textView, NSArray *ranges) {
 	NSLayoutManager *layout = [textView layoutManager];
 	NSClipView *clip = [[textView enclosingScrollView] contentView];
 	NSUInteger length = [[textView string] length];
@@ -298,7 +298,7 @@ void NVScrollToShowNearestRange(NSTextView *textView, NSArray *ranges) {
 	NSRange nearest = NSMakeRange(NSNotFound, 0);
 	NSValue *value;
 	if (!textView || !layout || !clip || !length || ![ranges count])
-		return;
+		return nearest;
 	visible = [clip bounds];
 	originY = [textView textContainerOrigin].y;
 	for (value in ranges) {
@@ -318,7 +318,7 @@ void NVScrollToShowNearestRange(NSTextView *textView, NSArray *ranges) {
 			continue;
 		line.origin.y += originY;
 		if (NSMinY(line) >= NSMinY(visible) && NSMaxY(line) <= NSMaxY(visible))
-			return;
+			return range;
 		if (NSMaxY(line) <= NSMinY(visible))
 			distance = NSMinY(visible) - NSMaxY(line);
 		else if (NSMinY(line) >= NSMaxY(visible))
@@ -332,4 +332,5 @@ void NVScrollToShowNearestRange(NSTextView *textView, NSArray *ranges) {
 	}
 	if (nearest.location != NSNotFound)
 		NVScrollRangeIntoView(textView, nearest);
+	return nearest;
 }
