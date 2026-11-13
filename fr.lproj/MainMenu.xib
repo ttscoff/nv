@@ -131,6 +131,7 @@ CA
                                 </connections>
                             </menuItem>
                             <menuItem title="Exporter…" tag="94" keyEquivalent="e" id="396">
+                                <modifierMask key="keyEquivalentModifierMask" option="YES" command="YES"/>
                                 <connections>
                                     <action selector="exportNote:" target="213" id="988"/>
                                 </connections>
@@ -248,7 +249,7 @@ CA
                                             </connections>
                                         </menuItem>
                                         <menuItem title="Chercher à partir de la sélection" tag="7" keyEquivalent="e" id="161">
-                                            <modifierMask key="keyEquivalentModifierMask" option="YES" command="YES"/>
+                                            <modifierMask key="keyEquivalentModifierMask" command="YES"/>
                                             <connections>
                                                 <action selector="performFindPanelAction:" target="1261" id="1341"/>
                                             </connections>

@@ -132,6 +132,7 @@ CA
                                 </connections>
                             </menuItem>
                             <menuItem title="导出…" tag="94" keyEquivalent="e" id="396">
+                                <modifierMask key="keyEquivalentModifierMask" option="YES" command="YES"/>
                                 <connections>
                                     <action selector="exportNote:" target="213" id="988"/>
                                 </connections>
@@ -249,7 +250,7 @@ CA
                                             </connections>
                                         </menuItem>
                                         <menuItem title="查找所选内容" tag="7" keyEquivalent="e" id="161">
-                                            <modifierMask key="keyEquivalentModifierMask" option="YES" command="YES"/>
+                                            <modifierMask key="keyEquivalentModifierMask" command="YES"/>
                                             <connections>
                                                 <action selector="performFindPanelAction:" target="1017" id="1236"/>
                                             </connections>

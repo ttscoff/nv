@@ -19,6 +19,7 @@
 #import "NVThemeManager.h"
 #import "PreviewRender.h"
 #import "PreviewSync.h"
+#import "PreviewSlice.h"
 #import <Security/Security.h>
 
 #define kDefaultMarkupPreviewVisible @"markupPreviewVisible"
@@ -343,9 +344,16 @@ static const NSUInteger NVMarkedShareMaxBodyBytes = 500000;
     if (frame != [sender mainFrame])
         return;
     if ([self previewScrollsToEdit] && !self.isPreviewSticky) {
+        AppController *app = (AppController *)[NSApp delegate];
+        NSString *rawString = [app noteContent];
+        NSUInteger caret = [app noteCaretIndex];
+        NVPreviewSlice slice = NVPreviewSliceForCaret(rawString, caret, NVMarkdownSyntaxHighlightLimit, NVPreviewAroundCaretCharacters, NVPreviewFenceLookbackCharacters);
         [pendingScrollState release];
         pendingScrollState = nil;
-        [self scrollPreviewToSourceLine:[self previewEditLine]];
+        if (slice.omittedBefore || slice.omittedAfter)
+            [self scrollPreviewToSourceLine:NVPreviewCaretLine([rawString substringWithRange:slice.range], caret, slice.range)];
+        else
+            [self scrollPreviewToSourceLine:[self previewEditLine]];
         return;
     }
     if (pendingScrollState) {
@@ -399,7 +407,7 @@ static const NSUInteger NVMarkedShareMaxBodyBytes = 500000;
 
     [NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(preview:) object:app];
 
-    [self performSelector:@selector(preview:) withObject:app afterDelay:0.05];
+    [self performSelector:@selector(preview:) withObject:app afterDelay:NVPreviewUpdateDelayForLength([rawString length])];
 }
 
 - (BOOL)previewIsVisible{
@@ -574,7 +582,14 @@ static const NSUInteger NVMarkedShareMaxBodyBytes = 500000;
 
 - (void)scrollPreviewToEditIfSynced
 {
+    AppController *app;
     if (![self previewScrollsToEdit] || self.isPreviewSticky || ![[self window] isVisible])
+        return;
+    /* A long note's preview is only the section around the caret, rebuilt after
+       a pause. Scrolling on every arrow would search the whole note for a line
+       number the section does not use. */
+    app = (AppController *)[NSApp delegate];
+    if (!NVMarkdownSyntaxHighlightEnabledForLength([[app noteContent] length]))
         return;
     [self scrollPreviewToSourceLine:[self previewEditLine]];
 }
@@ -601,18 +616,28 @@ static const NSUInteger NVMarkedShareMaxBodyBytes = 500000;
     }
     AppController *app = object;
     NSString *rawString = [app noteContent];
+    NSUInteger caret = [app noteCaretIndex];
+    NVPreviewSlice slice = NVPreviewSliceForCaret(rawString, caret, NVMarkdownSyntaxHighlightLimit, NVPreviewAroundCaretCharacters, NVPreviewFenceLookbackCharacters);
+    BOOL sliced = slice.omittedBefore || slice.omittedAfter;
+    NSString *markdown = sliced ? [rawString substringWithRange:slice.range] : rawString;
 
     SEL mode = [self markupProcessorSelector:[app currentPreviewMode]];
     BOOL followEdit = [self previewScrollsToEdit];
-    NSUInteger editLine = followEdit ? [self previewEditLine] : 0;
+    NSUInteger editLine = 0;
+    if (followEdit && sliced)
+        editLine = NVPreviewCaretLine(markdown, caret, slice.range);
+    else if (followEdit) {
+        editLine = [self previewEditLine];
+    }
     NSString *processedString = (followEdit && mode == @selector(stringWithProcessedMultiMarkdown:))
-        ? [NSString stringWithProcessedMultiMarkdown:rawString includingSourcePositions:YES]
-        : [NSString performSelector:mode withObject:rawString];
+        ? [NSString stringWithProcessedMultiMarkdown:markdown includingSourcePositions:YES]
+        : [NSString performSelector:mode withObject:markdown];
     NSString *noteTitle =  ([app selectedNoteObject]) ? [NSString stringWithFormat:@"%@",titleOfNote([app selectedNoteObject])] : @"";
     NSString *previewAssets = [[[NSBundle mainBundle] resourcePath] stringByAppendingPathComponent:@"preview-js"];
 
     BOOL needsMath = NO, needsMermaid = NO, needsWiki = NO;
     NSString *content = NVPreviewHTMLPreparingContent(processedString, &needsMath, &needsMermaid, &needsWiki) ?: @"";
+    content = NVPreviewHTMLMarkingOmittedEdges(content, slice.omittedBefore, slice.omittedAfter);
     BOOL needsHighlight = NVPreviewHTMLNeedsCodeHighlight(content);
     BOOL sameNote = (lastNote == [app selectedNoteObject]);
 
@@ -631,8 +656,9 @@ static const NSUInteger NVMarkedShareMaxBodyBytes = 500000;
         [sourceView replaceCharactersInRange:NSMakeRange(0, [[sourceView string] length]) withString:processedString];
         self.isPreviewOutdated = NO;
         [self updateOpenInMarkedButton];
-        if (followEdit) {
+        if (followEdit && !sliced) {
             // The swap can anchor the old viewport after this script returns.
+            // A sliced preview already scrolled to the caret inside the section.
             [NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(scrollPreviewToEditIfSynced) object:nil];
             [self performSelector:@selector(scrollPreviewToEditIfSynced) withObject:nil afterDelay:0];
         }

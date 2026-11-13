@@ -31,6 +31,7 @@
 #import "ClickBelowText.h"
 #import "SelectionRedraw.h"
 #import "TaskList.h"
+#import "ListOutdent.h"
 #import "ETScrollView.h"
 #import "ETClipView.h"
 //#import "NSTextFinder.h"
@@ -3735,14 +3736,20 @@ static BOOL NVBulletMarker(NSString *line, NSUInteger contentLength, NSUInteger 
 		if (![self shouldChangeTextInRange:edited replacementString:changeString])
 			continue;
 		[self replaceCharactersInRange:edited withString:changeString];
-		NSInteger delta = (NSInteger)[changeString length] - (NSInteger)edited.length;
-		if (NSMaxRange(edited) <= selection.location) {
-			selection.location += delta;
-		} else 		if (edited.location < NSMaxRange(selection)) {
-			if (edited.location <= selection.location)
-				selection.location = edited.location + [changeString length];
-			NSInteger newLength = (NSInteger)selection.length + delta;
-			selection.length = newLength > 0 ? (NSUInteger)newLength : 0;
+		[self adjustSelection:&selection forEditAt:edited replacementLength:[changeString length]];
+		/* The indent is gone. A bullet that lands on a numbered list becomes the next number there, and a number that lands on a bullet becomes that bullet. */
+		if (outdent && lineRange.location <= [[self string] length]) {
+			NSString *fresh = [self string];
+			NSRange freshLine = [fresh lineRangeForRange:NSMakeRange(lineRange.location, 0)];
+			NSRange markerInLine = NSMakeRange(NSNotFound, 0);
+			NSString *marker = NVListMarkerAfterOutdent(fresh, freshLine, tabWidth, &markerInLine);
+			if ([marker length] && markerInLine.location != NSNotFound) {
+				NSRange documentMarker = NSMakeRange(freshLine.location + markerInLine.location, markerInLine.length);
+				if (NSMaxRange(documentMarker) <= [fresh length] && [self shouldChangeTextInRange:documentMarker replacementString:marker]) {
+					[self replaceCharactersInRange:documentMarker withString:marker];
+					[self adjustSelection:&selection forEditAt:documentMarker replacementLength:[marker length]];
+				}
+			}
 		}
 	}
 	NSUInteger editedLength = [[self string] length];
