@@ -75,6 +75,7 @@ static NSString *AppActivationModifiersKey = @"AppActivationModifiers";
 static NSString *HorizontalLayoutKey = @"HorizontalLayout";
 static NSString *BookmarksKey = @"Bookmarks";
 static NSString *LastScrollOffsetKey = @"LastScrollOffset";
+static NSString *LastNoteTopCharIndexKey = @"LastNoteTopCharIndex";
 static NSString *LastSearchStringKey = @"LastSearchString";
 static NSString *LastSelectedNoteUUIDBytesKey = @"LastSelectedNoteUUIDBytes";
 static NSString *LastSelectedPreferencesPaneKey = @"LastSelectedPrefsPane";
@@ -1135,6 +1136,19 @@ BOOL ColorsEqualWith8BitChannels(NSColor *c1, NSColor *c2) {
 
 - (double)scrollOffsetOfLastSelectedNote {
 	return [defaults doubleForKey:LastScrollOffsetKey];
+}
+
+- (void)setTopCharIndexOfLastSelectedNote:(NSUInteger)charIndex {
+	//the first character on the top line of the note body at quit, so the view comes back exactly
+	if (charIndex == NSNotFound)
+		[defaults removeObjectForKey:LastNoteTopCharIndexKey];
+	else
+		[defaults setObject:[NSNumber numberWithUnsignedLongLong:charIndex] forKey:LastNoteTopCharIndexKey];
+}
+
+- (NSUInteger)topCharIndexOfLastSelectedNote {
+	NSNumber *number = [defaults objectForKey:LastNoteTopCharIndexKey];
+	return [number isKindOfClass:[NSNumber class]] ? (NSUInteger)[number unsignedLongLongValue] : NSNotFound;
 }
 
 - (void)saveCurrentBookmarksFromSender:(id)sender {

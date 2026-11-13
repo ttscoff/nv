@@ -70,6 +70,7 @@ static void setCatalogNodeID(NoteObject *note, UInt32 cnid);
 		currentFormatID = SingleDatabaseFormat;
 		fileEncoding = NSUTF8StringEncoding;
 		selectedRange = NSMakeRange(NSNotFound, 0);
+		firstVisibleCharIndex = NSNotFound;
 		
 		//other instance variables initialized on demand
         return self;
@@ -337,6 +338,9 @@ force_inline id unifiedCellForNote(NotesTableView *tv, NoteObject *note, NSInteg
 			createdDate = [decoder decodeDoubleForKey:VAR_STR(createdDate)];
 			selectedRange.location = [decoder decodeInt32ForKey:@"selectionRangeLocation"];
 			selectedRange.length = [decoder decodeInt32ForKey:@"selectionRangeLength"];
+			//notes written before the scroll position was kept have no key here and stay at NSNotFound
+			if ([decoder containsValueForKey:VAR_STR(firstVisibleCharIndex)])
+				firstVisibleCharIndex = (NSUInteger)[decoder decodeInt64ForKey:VAR_STR(firstVisibleCharIndex)];
 			contentsWere7Bit = [decoder decodeBoolForKey:VAR_STR(contentsWere7Bit)];
 			
 			logSequenceNumber = [decoder decodeInt32ForKey:VAR_STR(logSequenceNumber)];
@@ -446,6 +450,8 @@ force_inline id unifiedCellForNote(NotesTableView *tv, NoteObject *note, NSInteg
 		[coder encodeDouble:createdDate forKey:VAR_STR(createdDate)];
 		[coder encodeInt32:(unsigned int)selectedRange.location forKey:@"selectionRangeLocation"];
 		[coder encodeInt32:(unsigned int)selectedRange.length forKey:@"selectionRangeLength"];
+		if (firstVisibleCharIndex != NSNotFound)
+			[coder encodeInt64:(int64_t)firstVisibleCharIndex forKey:VAR_STR(firstVisibleCharIndex)];
 		[coder encodeBool:contentsWere7Bit forKey:VAR_STR(contentsWere7Bit)];
 		
 		[coder encodeInt32:logSequenceNumber forKey:VAR_STR(logSequenceNumber)];
@@ -905,6 +911,18 @@ force_inline id unifiedCellForNote(NotesTableView *tv, NoteObject *note, NSInteg
 
 - (NSRange)lastSelectedRange {
 	return selectedRange;
+}
+
+- (void)setFirstVisibleCharIndex:(NSUInteger)charIndex {
+	//where the note was scrolled to when last shown; NSNotFound means nothing is known and keeps the old value
+	if (charIndex != NSNotFound && charIndex != firstVisibleCharIndex) {
+		firstVisibleCharIndex = charIndex;
+		[self makeNoteDirtyUpdateTime:NO updateFile:NO];
+	}
+}
+
+- (NSUInteger)firstVisibleCharIndex {
+	return firstVisibleCharIndex;
 }
 
 //these two methods let us get the actual label objects in use by other notes

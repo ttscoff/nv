@@ -113,6 +113,10 @@ static NSString * const NVSearchHighlightAttributeName = @"NVSearchHighlight";
 
 @end
 
+@interface LinkingEditor (NVSelectionScroll)
+- (void)nv_allowSelectionScroll;
+@end
+
 @implementation LinkingEditor
 
 @synthesize beforeString;
@@ -164,6 +168,7 @@ CGFloat _perceptualDarkness(NSColor*a);
 	}
 	
 	didRenderFully = NO;
+	automaticFirstVisibleCharIndex = NSNotFound;
 	[[self layoutManager] setDelegate:self];
 	[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(noteTextStorageDidProcessEditing:) name:NSTextStorageDidProcessEditingNotification object:[self textStorage]];
 	[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(markdownCompletionPreferenceChanged:) name:NSUserDefaultsDidChangeNotification object:nil];
@@ -229,6 +234,7 @@ if ([selectorString isEqualToString:SEL_STR(setNoteBodyFont:sender:)]) {
 }
 
 - (BOOL)becomeFirstResponder {
+	[self nv_allowSelectionScroll];
 	[self discardSearchHighlights];
 	[notesTableView setShouldUseSecondaryHighlightColor:YES];
 
@@ -1013,53 +1019,60 @@ static BOOL NVSearchHighlightColorMatches(NSColor *applied, NSColor *searchColor
 	[self nv_displaySearchHighlights];
 }
 
-- (NSRange)highlightTermsTemporarilyReturningFirstRange:(NSString*)typedString avoidHighlight:(BOOL)noHighlight {
-	
-	//if lengths of respective UTF8-string equivalents for contentString are the same, we should revert to cstring-based algorithm
-	
+- (NSArray*)rangesOfSearchTerms:(NSString*)typedString {
+	//every place a term of the search appears in the body, in order of position; quoted searches are one term
+	NSMutableArray *result = [NSMutableArray array];
 	CFStringRef quoteStr = CFSTR("\"");
-	NSRange firstRange = NSMakeRange(NSNotFound,0);
 	CFRange quoteRange = CFStringFind((CFStringRef)typedString, quoteStr, 0);
 	CFArrayRef terms = CFStringCreateArrayBySeparatingStrings(NULL, (CFStringRef)typedString, 
 															  quoteRange.location == kCFNotFound ? CFSTR(" ") : quoteStr);
 	if (terms) {
 		CFIndex termIndex, rangeIndex;
 		CFStringRef bodyString = (CFStringRef)[self string];
-		NSDictionary *highlightDict = [self nv_searchHighlightAttributes];
+		CFIndex bodyLength = CFStringGetLength(bodyString);
 		
 		for (termIndex = 0; termIndex < CFArrayGetCount(terms); termIndex++) {
 			CFStringRef term = CFArrayGetValueAtIndex(terms, termIndex);
 			NSString *trimmedTerm = NVStringByTrimmingHighlightTerm((NSString *)term);
 			if ([trimmedTerm length] > 0) {
-				term = (CFStringRef)trimmedTerm;
-				CFArrayRef ranges = CFStringCreateArrayWithFindResults(NULL, bodyString, term, CFRangeMake(0, CFStringGetLength(bodyString)),
+				CFArrayRef ranges = CFStringCreateArrayWithFindResults(NULL, bodyString, (CFStringRef)trimmedTerm, CFRangeMake(0, bodyLength),
 																	   kCFCompareCaseInsensitive);
 				if (!ranges)
 					continue;
 				for (rangeIndex = 0; rangeIndex < CFArrayGetCount(ranges); rangeIndex++) {
 					CFRange *range = (CFRange *)CFArrayGetValueAtIndex(ranges, rangeIndex);
-					
-					if (range && range->length > 0 && range->location + range->length <= CFStringGetLength(bodyString)) {
-						if (firstRange.location > (NSUInteger)range->location) {
-							firstRange = *(NSRange*)range;
-							if (noHighlight) {
-								CFRelease(ranges);
-								goto returnEarly;
-							}
-						}
-						[[self layoutManager] addTemporaryAttributes:highlightDict forCharacterRange:*(NSRange*)range];
-					} else {
-						NVLogWarning(@"highlightTermsTemporarily: Invalid range (%@)", range ? NSStringFromRange(*(NSRange*)range) : @"?");
-					}
+					if (range && range->length > 0 && range->location + range->length <= bodyLength)
+						[result addObject:[NSValue valueWithRange:NSMakeRange((NSUInteger)range->location, (NSUInteger)range->length)]];
+					else
+						NVLogWarning(@"rangesOfSearchTerms: Invalid range (%@)", range ? NSStringFromRange(*(NSRange*)range) : @"?");
 				}
 				CFRelease(ranges);
 			}
 		}
-	returnEarly:
 		CFRelease(terms);
 	}
+	[result sortUsingComparator:^NSComparisonResult(NSValue *a, NSValue *b) {
+		NSUInteger la = [a rangeValue].location, lb = [b rangeValue].location;
+		return la < lb ? NSOrderedAscending : (la > lb ? NSOrderedDescending : NSOrderedSame);
+	}];
+	return result;
+}
+
+- (NSArray*)highlightTermsTemporarily:(NSString*)typedString avoidHighlight:(BOOL)noHighlight {
+	NSArray *ranges = [self rangesOfSearchTerms:typedString];
+	if (!noHighlight) {
+		NSDictionary *highlightDict = [self nv_searchHighlightAttributes];
+		NSValue *value;
+		for (value in ranges)
+			[[self layoutManager] addTemporaryAttributes:highlightDict forCharacterRange:[value rangeValue]];
+	}
 	[self nv_displaySearchHighlights];
-	return (firstRange);
+	return ranges;
+}
+
+- (NSRange)highlightTermsTemporarilyReturningFirstRange:(NSString*)typedString avoidHighlight:(BOOL)noHighlight {
+	NSArray *ranges = [self highlightTermsTemporarily:typedString avoidHighlight:noHighlight];
+	return [ranges count] ? [[ranges objectAtIndex:0] rangeValue] : NSMakeRange(NSNotFound, 0);
 }
 
 - (NSRange)selectionRangeForProposedRange:(NSRange)proposedSelRange granularity:(NSSelectionGranularity)granularity {
@@ -1145,9 +1158,47 @@ static BOOL NVSearchHighlightColorMatches(NSColor *applied, NSColor *searchColor
 }
 
 - (void)setAutomaticallySelectedRange:(NSRange)newRange {
+	/* The selection a note is shown with must not move the view: the saved
+	   scroll position is applied around it. The text view scrolls to a new
+	   caret on its own, sometimes on a later layout pass, so a scroll that
+	   happens now is put back at once and one that comes later is ignored
+	   until the user does something or the next pass of the run loop. */
+	NSScrollView *scroll = [self enclosingScrollView];
+	NSClipView *clip = [scroll contentView];
+	NSPoint origin = [clip bounds].origin;
 	lastAutomaticallySelectedRange = newRange;
 	didChangeIntoAutomaticRange = NO;
+	selectionScrollSuppressed = YES;
+	[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(nv_allowSelectionScroll) object:nil];
 	[self setSelectedRange:newRange];
+	if (clip && !NSEqualPoints([clip bounds].origin, origin)) {
+		[clip scrollToPoint:origin];
+		[scroll reflectScrolledClipView:clip];
+	}
+	[self performSelector:@selector(nv_allowSelectionScroll) withObject:nil afterDelay:0.0];
+}
+
+- (void)nv_allowSelectionScroll {
+	selectionScrollSuppressed = NO;
+}
+
+- (void)scrollRangeToVisible:(NSRange)range {
+	if (selectionScrollSuppressed)
+		return;
+	[super scrollRangeToVisible:range];
+}
+
+- (NSUInteger)firstVisibleCharIndexWasAutomatic:(BOOL*)automatic {
+	//the top line on screen, and whether it is still where the note was put when shown rather than where the user scrolled
+	NSUInteger charIndex = NVFirstVisibleCharIndex(self);
+	if (automatic) {
+		*automatic = charIndex == automaticFirstVisibleCharIndex;
+	}
+	return charIndex;
+}
+
+- (void)markScrollPositionAutomatic {
+	automaticFirstVisibleCharIndex = NVFirstVisibleCharIndex(self);
 }
 
 static NSRegularExpression *NVMarkdownRegex(NSString *pattern) {
@@ -1876,6 +1927,7 @@ static NSColor *NVBlendColors(NSColor *first, NSColor *second, CGFloat fraction,
 }
 
 - (void)keyDown:(NSEvent*)anEvent {	
+	[self nv_allowSelectionScroll];
     //    [[NSNotificationCenter defaultCenter] postNotificationName:@"ModTimersShouldReset" object:nil];
 	unichar keyChar = [anEvent firstCharacterIgnoringModifiers];
     
@@ -2198,7 +2250,16 @@ static NSColor *NVBlendColors(NSColor *first, NSColor *second, CGFloat fraction,
 	[self setSelectedRange:NSMakeRange(start, (anchor > index) ? anchor - index : index - anchor) affinity:affinity stillSelecting:stillSelecting];
 }
 
+- (void)nv_noteBodyClaimed {
+	//a click or an edit in the body: the delegate treats the current view as where the user wants this note kept
+	id delegate = [self delegate];
+	if ([delegate respondsToSelector:@selector(noteBodyWasClaimed:)])
+		[delegate noteBodyWasClaimed:self];
+}
+
 - (void)mouseDown:(NSEvent *)event {
+	[self nv_allowSelectionScroll];
+	[self nv_noteBodyClaimed];
 	if ([self nv_toggleTaskCheckboxForEvent:event])
 		return;
 	NSUInteger flags = [event modifierFlags] & NSDeviceIndependentModifierFlagsMask;
@@ -2678,6 +2739,9 @@ static BOOL NVIsLinkBracket(unichar character) {
 		changedRange = NSMakeRange(stringLength, 0);
 	else
 		changedRange = NSMakeRange(changedRange.location, MIN(changedRange.length, stringLength - changedRange.location));
+
+	[self nv_allowSelectionScroll];
+	[self nv_noteBodyClaimed];
 
 
 	/* A data detector over a multi-megabyte line is the return-key hang at the end of a long note. */
@@ -4821,6 +4885,8 @@ static NSString *NVCoreOfLine(NSString *line) {
 }
 
 - (void)setSelectedRange:(NSRange)charRange affinity:(NSSelectionAffinity)affinity stillSelecting:(BOOL)stillSelectingFlag {
+	if (!NSEqualRanges(charRange, lastAutomaticallySelectedRange))
+		[self nv_allowSelectionScroll];
 	if (!markdownAdjustingSelection)
 		markdownSelectionLevel = 0;
 	[super setSelectedRange:charRange affinity:affinity stillSelecting:stillSelectingFlag];

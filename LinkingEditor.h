@@ -42,6 +42,8 @@
 	NSInteger markdownSelectionLevel;
 	NSUInteger markdownSelectionAnchor;
 	NSRange lastAutomaticallySelectedRange;
+	NSUInteger automaticFirstVisibleCharIndex;
+	BOOL selectionScrollSuppressed;
 	NSRange changedRange;
 	BOOL isAutocompleting, wasDeleting, completionSelectionColored;
 	NSRange completionColoredRange;
@@ -81,11 +83,15 @@
 - (NSDictionary*)preferredLinkAttributes;
 - (NSRange)selectedRangeWasAutomatic:(BOOL*)automatic;
 - (void)setAutomaticallySelectedRange:(NSRange)newRange;
+- (NSUInteger)firstVisibleCharIndexWasAutomatic:(BOOL*)automatic;
+- (void)markScrollPositionAutomatic;
 - (void)removeHighlightedTerms;
 - (void)removeSearchTermHighlights;
 - (void)discardSearchHighlights;
 - (void)highlightRangesTemporarily:(CFArrayRef)ranges;
 - (NSRange)highlightTermsTemporarilyReturningFirstRange:(NSString*)typedString avoidHighlight:(BOOL)noHighlight;
+- (NSArray*)highlightTermsTemporarily:(NSString*)typedString avoidHighlight:(BOOL)noHighlight;
+- (NSArray*)rangesOfSearchTerms:(NSString*)typedString;
 - (void)defaultStyle:(id)sender;
 - (void)strikethroughNV:(id)sender;
 - (void)bold:(id)sender;
