@@ -44,6 +44,15 @@ int main(int argc, const char *argv[]) {
 	expectEqual(NVSearchHighlightQuery(NO, YES, YES, YES, none, @"nvalt task", @"", title),
 				nil, "clearing the field leaves nothing to highlight");
 
+	if (!NVSearchHighlightOverlayWanted(YES, @"nvalt task"))
+		fprintf(stderr, "FAIL a search keeps the highlight overlay\n"), gFailures++;
+	if (NVSearchHighlightOverlayWanted(YES, nil))
+		fprintf(stderr, "FAIL the note body takes the highlight overlay down\n"), gFailures++;
+	if (NVSearchHighlightOverlayWanted(YES, @""))
+		fprintf(stderr, "FAIL an empty search takes the highlight overlay down\n"), gFailures++;
+	if (NVSearchHighlightOverlayWanted(NO, @"nvalt task"))
+		fprintf(stderr, "FAIL turning highlights off takes the overlay down\n"), gFailures++;
+
 	CGFloat red, green, blue;
 	BOOL whiteInk = YES;
 	NVSearchHighlightPaint(0.945, 0.702, 0.702, 1.0, 0.231, 0.259, 0.325, &red, &green, &blue, &whiteInk);

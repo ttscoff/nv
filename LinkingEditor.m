@@ -856,7 +856,12 @@ static BOOL NVSearchHighlightColorMatches(NSColor *applied, NSColor *searchColor
 	return overlay;
 }
 
-- (void)nv_displaySearchHighlights {
+- (void)nv_setSearchHighlightOverlayVisible:(BOOL)visible {
+	if (!visible) {
+		NVSearchHighlightOverlay *overlay = [self nv_searchHighlightOverlayCreating:NO];
+		[overlay removeFromSuperview];
+		return;
+	}
 	NVSearchHighlightOverlay *overlay = [self nv_searchHighlightOverlayCreating:YES];
 	[overlay setNeedsDisplay:YES];
 }
@@ -965,8 +970,10 @@ static BOOL NVSearchHighlightColorMatches(NSColor *applied, NSColor *searchColor
 	NSColor *searchColor = [[prefsController searchTermHighlightAttributes] objectForKey:NSBackgroundColorAttributeName];
 	NSLayoutManager *layout = [self layoutManager];
 	NSUInteger length = [[self string] length];
-	if (!searchColor || !layout || !length)
+	if (!searchColor || !layout || !length) {
+		[self nv_setSearchHighlightOverlayVisible:NO];
 		return;
+	}
 	NSUInteger index = 0;
 	while (index < length) {
 		NSRange effective = NSMakeRange(0, 0);
@@ -983,7 +990,7 @@ static BOOL NVSearchHighlightColorMatches(NSColor *applied, NSColor *searchColor
 			break;
 		index = next;
 	}
-	[self nv_displaySearchHighlights];
+	[self nv_setSearchHighlightOverlayVisible:NO];
 }
 
 - (void)discardSearchHighlights {
@@ -994,7 +1001,7 @@ static BOOL NVSearchHighlightColorMatches(NSColor *applied, NSColor *searchColor
 		[layout removeTemporaryAttribute:NSBackgroundColorAttributeName forCharacterRange:all];
 		[layout removeTemporaryAttribute:NVSearchHighlightAttributeName forCharacterRange:all];
 	}
-	[self nv_displaySearchHighlights];
+	[self nv_setSearchHighlightOverlayVisible:NO];
 	/* Background colors for the whole note were just removed. */
 	markdownHighlightCoversAll = YES;
 	[self scheduleMarkdownHighlight];
@@ -1005,6 +1012,7 @@ static BOOL NVSearchHighlightColorMatches(NSColor *applied, NSColor *searchColor
 - (void)highlightRangesTemporarily:(CFArrayRef)ranges {
 	CFIndex rangeIndex;
 	long bodyLength = (long)[[self string] length];
+	BOOL painted = NO;
 	NSDictionary *highlightDict = [self nv_searchHighlightAttributes];
 	
 	for (rangeIndex = 0; rangeIndex < CFArrayGetCount(ranges); rangeIndex++) {
@@ -1012,11 +1020,12 @@ static BOOL NVSearchHighlightColorMatches(NSColor *applied, NSColor *searchColor
 		
 		if (range && range->length > 0 && range->location + range->length <= bodyLength) {
 			[[self layoutManager] addTemporaryAttributes:highlightDict forCharacterRange:*(NSRange*)range];
+			painted = YES;
 		} else {
 			NVLogWarning(@"highlightRangesTemporarily: Invalid range (%@)", range ? NSStringFromRange(*(NSRange*)range) : @"null");
 		}
 	}
-	[self nv_displaySearchHighlights];
+	[self nv_setSearchHighlightOverlayVisible:painted];
 }
 
 - (NSArray*)rangesOfSearchTerms:(NSString*)typedString {
@@ -1061,12 +1070,16 @@ static BOOL NVSearchHighlightColorMatches(NSColor *applied, NSColor *searchColor
 - (NSArray*)highlightTermsTemporarily:(NSString*)typedString avoidHighlight:(BOOL)noHighlight {
 	NSArray *ranges = [self rangesOfSearchTerms:typedString];
 	if (!noHighlight) {
-		NSDictionary *highlightDict = [self nv_searchHighlightAttributes];
-		NSValue *value;
-		for (value in ranges)
-			[[self layoutManager] addTemporaryAttributes:highlightDict forCharacterRange:[value rangeValue]];
+		if ([ranges count]) {
+			NSDictionary *highlightDict = [self nv_searchHighlightAttributes];
+			NSValue *value;
+			for (value in ranges)
+				[[self layoutManager] addTemporaryAttributes:highlightDict forCharacterRange:[value rangeValue]];
+			[self nv_setSearchHighlightOverlayVisible:YES];
+		} else {
+			[self nv_setSearchHighlightOverlayVisible:NO];
+		}
 	}
-	[self nv_displaySearchHighlights];
 	return ranges;
 }
 
@@ -1370,11 +1383,10 @@ static NSColor *NVBlendColors(NSColor *first, NSColor *second, CGFloat fraction,
 }
 
 - (void)reapplySearchHighlights {
-	if (![prefsController highlightSearchTerms])
-		return;
-	NSString *typed = [(AppController *)[NSApp delegate] searchStringForHighlighting];
+	BOOL enabled = [prefsController highlightSearchTerms];
+	NSString *typed = enabled ? [(AppController *)[NSApp delegate] searchStringForHighlighting] : nil;
 	[self removeSearchTermHighlights];
-	if ([typed length])
+	if (NVSearchHighlightOverlayWanted(enabled, typed))
 		[self highlightTermsTemporarilyReturningFirstRange:typed avoidHighlight:NO];
 }
 

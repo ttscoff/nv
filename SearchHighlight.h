@@ -42,6 +42,13 @@ static inline NSString *NVSearchHighlightQuery(BOOL bodyIsFirstResponder,
 	return [fieldString length] ? fieldString : nil;
 }
 
+/* The overlay covers the whole note, so it exists only while a search is marked.
+   Focusing the note and clearing the search take it down. Leaving it up redraws
+   the note on every keystroke and in time with the caret. */
+static inline BOOL NVSearchHighlightOverlayWanted(BOOL highlightTermsEnabled, NSString *query) {
+	return highlightTermsEnabled && [query length] > 0;
+}
+
 static inline CGFloat NVSearchHighlightLuminance(CGFloat red, CGFloat green, CGFloat blue) {
 	return (0.2126 * red) + (0.7152 * green) + (0.0722 * blue);
 }
