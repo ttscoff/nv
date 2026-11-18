@@ -1578,6 +1578,15 @@ force_inline id unifiedCellForNote(NotesTableView *tv, NoteObject *note, NSInteg
 		NVLogError(@"Couldn't make string out of data for note %@ with format %ld", titleString, (long)fmt);
 		return NO;
     }
+
+	/* The notes folder is scanned again after our own save. The file matches
+	   what is already in memory. Replacing it would drop undo. */
+	if (contentString && [[attributedStringFromData string] isEqualToString:[contentString string]]) {
+		[attributedStringFromData release];
+		if (contentCacheNeedsUpdate)
+			[self updateContentCacheCStringIfNecessary];
+		return YES;
+	}
     
 	[contentString release];
 	contentString = [attributedStringFromData retain];

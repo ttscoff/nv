@@ -1570,6 +1570,24 @@ static NSColor *NVBlendColors(NSColor *first, NSColor *second, CGFloat fraction,
 	}
 }
 
+- (void)paintEmphasisInString:(NSString *)string strong:(NVThemeStyle *)strong emphasis:(NVThemeStyle *)emphasis marker:(NVThemeStyle *)marker baseFont:(NSFont *)baseFont {
+	NSArray *spans = NVMarkdownEmphasisSpansInRange(string, [self activeMarkdownHighlightRange]);
+	NVThemeStyle *both = [emphasis styleByOverlayingStyle:strong];
+	NSUInteger index;
+	for (index = 0; index < [spans count]; index++) {
+		NSDictionary *span = [spans objectAtIndex:index];
+		BOOL isStrong = [[span objectForKey:@"strong"] boolValue];
+		BOOL isEmphasis = [[span objectForKey:@"emphasis"] boolValue];
+		NVThemeStyle *style = (isStrong && isEmphasis) ? both : (isStrong ? strong : emphasis);
+		[self paintThemeRange:[[span objectForKey:@"content"] rangeValue] style:style baseFont:baseFont useBaseFont:NO forceStrikethrough:NO];
+	}
+	for (index = 0; index < [spans count]; index++) {
+		NSDictionary *span = [spans objectAtIndex:index];
+		[self paintThemeRange:[[span objectForKey:@"opener"] rangeValue] style:marker baseFont:baseFont useBaseFont:YES forceStrikethrough:NO];
+		[self paintThemeRange:[[span objectForKey:@"closer"] rangeValue] style:marker baseFont:baseFont useBaseFont:YES forceStrikethrough:NO];
+	}
+}
+
 - (void)highlightMarkdownSyntaxWithTheme:(NVEditorTheme *)theme {
 	NSLayoutManager *layout = [self layoutManager];
 	NSString *string = [self string];
@@ -1606,7 +1624,6 @@ static NSColor *NVBlendColors(NSColor *first, NSColor *second, CGFloat fraction,
 	static NSRegularExpression *headingRegex;
 	static NSRegularExpression *quoteRegex;
 	static NSRegularExpression *listRegex;
-	static NSRegularExpression *emphasisRegex;
 	static NSRegularExpression *strikeRegex;
 	static NSRegularExpression *linkRegex;
 	static NSRegularExpression *wikiRegex;
@@ -1617,7 +1634,6 @@ static NSColor *NVBlendColors(NSColor *first, NSColor *second, CGFloat fraction,
 		headingRegex = [NVMarkdownRegex(@"^(#{1,6})[ \\t]+(.+)$") retain];
 		quoteRegex = [NVMarkdownRegex(@"^([ \\t]{0,3}>)(.*)$") retain];
 		listRegex = [NVMarkdownRegex(@"^[ \\t]*(?:[-+*]|\\d+[.)])(?=[ \\t])") retain];
-		emphasisRegex = [NVMarkdownRegex(@"(?<![A-Za-z0-9])(\\*\\*|__|\\*|_)(?!\\s)([^\\n]+?)(?<!\\s)\\1(?![A-Za-z0-9])") retain];
 		strikeRegex = [NVMarkdownRegex(@"~~(?!\\s)([^\\n]+?)(?<!\\s)~~") retain];
 		linkRegex = [NVMarkdownRegex(@"!?\\[([^\\]\\n]*)\\]\\([^\\)\\n]*\\)") retain];
 		wikiRegex = [NVMarkdownRegex(@"\\[\\[([^\\]\\n]+)\\]\\]") retain];
@@ -1634,18 +1650,7 @@ static NSColor *NVBlendColors(NSColor *first, NSColor *second, CGFloat fraction,
 		[self paintThemeRange:text style:heading baseFont:baseFont useBaseFont:NO forceStrikethrough:NO];
 		[self paintThemeRange:hashes style:markup baseFont:baseFont useBaseFont:YES forceStrikethrough:NO];
 	}];
-	[emphasisRegex enumerateMatchesInString:string options:0 range:limit usingBlock:^(NSTextCheckingResult *result, NSMatchingFlags flags, BOOL *stop) {
-		NSRange delimiter = [result rangeAtIndex:1];
-		NSRange text = [result rangeAtIndex:2];
-		NSString *markerText = delimiter.location == NSNotFound ? @"" : [string substringWithRange:delimiter];
-		BOOL isStrong = [markerText length] > 1;
-		[self paintThemeRange:text style:(isStrong ? strong : emphasis) baseFont:baseFont useBaseFont:NO forceStrikethrough:NO];
-		[self paintThemeRange:delimiter style:markup baseFont:baseFont useBaseFont:YES forceStrikethrough:NO];
-		if (delimiter.length && [result range].length >= delimiter.length * 2) {
-			NSRange closer = NSMakeRange(NSMaxRange([result range]) - delimiter.length, delimiter.length);
-			[self paintThemeRange:closer style:markup baseFont:baseFont useBaseFont:YES forceStrikethrough:NO];
-		}
-	}];
+	[self paintEmphasisInString:string strong:strong emphasis:emphasis marker:markup baseFont:baseFont];
 	[self paintThemeMatches:strikeRegex string:string content:strike marker:markup baseFont:baseFont contentGroup:1 delimiterGroup:0 hasCloser:NO forceStrikethrough:YES];
 	[self paintThemeMatches:linkRegex string:string content:link marker:markup baseFont:baseFont contentGroup:1 delimiterGroup:0 hasCloser:NO forceStrikethrough:NO];
 	[self paintThemeMatches:wikiRegex string:string content:link marker:markup baseFont:baseFont contentGroup:1 delimiterGroup:0 hasCloser:NO forceStrikethrough:NO];
@@ -1808,7 +1813,6 @@ static NSColor *NVBlendColors(NSColor *first, NSColor *second, CGFloat fraction,
 	static NSRegularExpression *headingRegex;
 	static NSRegularExpression *quoteRegex;
 	static NSRegularExpression *listRegex;
-	static NSRegularExpression *emphasisRegex;
 	static NSRegularExpression *strikeRegex;
 	static NSRegularExpression *linkRegex;
 	static NSRegularExpression *wikiRegex;
@@ -1819,7 +1823,6 @@ static NSColor *NVBlendColors(NSColor *first, NSColor *second, CGFloat fraction,
 		headingRegex = [NVMarkdownRegex(@"^(#{1,6})[ \\t]+(.+)$") retain];
 		quoteRegex = [NVMarkdownRegex(@"^([ \\t]{0,3}>)(.*)$") retain];
 		listRegex = [NVMarkdownRegex(@"^[ \\t]*(?:[-+*]|\\d+[.)])(?=[ \\t])") retain];
-		emphasisRegex = [NVMarkdownRegex(@"(?<![A-Za-z0-9])(\\*\\*|__|\\*|_)(?!\\s)([^\\n]+?)(?<!\\s)\\1(?![A-Za-z0-9])") retain];
 		strikeRegex = [NVMarkdownRegex(@"~~(?!\\s)([^\\n]+?)(?<!\\s)~~") retain];
 		linkRegex = [NVMarkdownRegex(@"!?\\[([^\\]\\n]*)\\]\\([^\\)\\n]*\\)") retain];
 		wikiRegex = [NVMarkdownRegex(@"\\[\\[([^\\]\\n]+)\\]\\]") retain];
@@ -1829,7 +1832,7 @@ static NSColor *NVBlendColors(NSColor *first, NSColor *second, CGFloat fraction,
 
 	[self paintMarkdownMatches:quoteRegex string:string content:quote marker:marker contentGroup:2 delimiterGroup:1 hasCloser:NO strikethrough:NO];
 	[self paintMarkdownMatches:headingRegex string:string content:heading marker:marker contentGroup:2 delimiterGroup:1 hasCloser:NO strikethrough:NO];
-	[self paintMarkdownMatches:emphasisRegex string:string content:foreground marker:marker contentGroup:2 delimiterGroup:1 hasCloser:YES strikethrough:NO];
+	[self paintEmphasisInString:string strong:[NVThemeStyle styleWithForegroundColor:foreground] emphasis:[NVThemeStyle styleWithForegroundColor:foreground] marker:[NVThemeStyle styleWithForegroundColor:marker] baseFont:[prefsController noteBodyFont]];
 	[self paintMarkdownMatches:strikeRegex string:string content:foreground marker:marker contentGroup:1 delimiterGroup:0 hasCloser:NO strikethrough:YES];
 	[self paintMarkdownMatches:linkRegex string:string content:link marker:marker contentGroup:1 delimiterGroup:0 hasCloser:NO strikethrough:NO];
 	[self paintMarkdownMatches:wikiRegex string:string content:link marker:marker contentGroup:1 delimiterGroup:0 hasCloser:NO strikethrough:NO];

@@ -8,6 +8,12 @@ NSInteger NVPairedCharacterCode(unichar character, NSString **matchString) {
 		case '`':
 			*matchString = @"`";
 			return 1;
+		case '*':
+			*matchString = @"*";
+			return 1;
+		case '_':
+			*matchString = @"_";
+			return 1;
 		case '(':
 			*matchString = @")";
 			return 2;
@@ -46,8 +52,8 @@ NSString *NVAutoPairSelectionAffix(NSString *insertString) {
 }
 
 BOOL NVCharactersFormEmptyPair(unichar left, unichar right) {
-	static const unichar openers[] = { '(', '[', '{', '"', '\'', '`' };
-	static const unichar closers[] = { ')', ']', '}', '"', '\'', '`' };
+	static const unichar openers[] = { '(', '[', '{', '"', '\'', '`', '*', '_' };
+	static const unichar closers[] = { ')', ']', '}', '"', '\'', '`', '*', '_' };
 	NSUInteger index;
 	for (index = 0; index < sizeof(openers) / sizeof(unichar); index++) {
 		if (openers[index] == left)
@@ -95,9 +101,9 @@ NVAutoPairAction NVAutoPairActionForInsert(NSString *insertString, NSString *opp
 			if ([insertString isEqualToString:@"`"] && selectionLength > 0) {
 				autoPair = 1;
 			} else if (!advance && autoPair == 0) {
-				// Typing ` after ` extends a run instead of wrapping another pair, so ``` is three characters.
-				BOOL backtickRun = [insertString isEqualToString:@"`"] && [before hasSuffix:@"`"];
-				if (!backtickRun) {
+				// Typing the same mark after itself extends a run, so ``` and *** stay single characters.
+				BOOL markerRun = [before hasSuffix:insertString] && ([insertString isEqualToString:@"`"] || [insertString isEqualToString:@"*"] || [insertString isEqualToString:@"_"]);
+				if (!markerRun) {
 					NSUInteger afterCount = ([[after componentsSeparatedByString:insertString] count] % 2);
 					NSUInteger beforeCount = ([[before componentsSeparatedByString:insertString] count] % 2);
 					if (beforeCount == afterCount)

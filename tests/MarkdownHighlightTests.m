@@ -150,6 +150,40 @@ int main(int argc, const char *argv[]) {
 	NVThemeStyle *both = [NVThemeStyle styleWithDictionary:[NSDictionary dictionaryWithObjectsAndKeys:@"#ff0000", @"foregroundColor", @"#0000ff", @"backgroundColor", nil]];
 	expectColors([NVThemeStyle highlightStyleFromThemeStyle:both], 1, 0, 0, 0, 0, 1, "a theme highlight replaces both colors");
 
+	{
+		NSString *tripleSource = @"***bold italics***";
+		NSString *scoreSource = @"___bold italics___";
+		NSString *mixedSource = @"**_bold italics_**";
+		NSString *flippedSource = @"_**bold italics**_";
+		NSString *plainSource = @"**bold** and *italic*";
+		NSArray *triple = NVMarkdownEmphasisSpansInRange(tripleSource, NSMakeRange(0, [tripleSource length]));
+		NSArray *underscores = NVMarkdownEmphasisSpansInRange(scoreSource, NSMakeRange(0, [scoreSource length]));
+		NSArray *mixed = NVMarkdownEmphasisSpansInRange(mixedSource, NSMakeRange(0, [mixedSource length]));
+		NSArray *flipped = NVMarkdownEmphasisSpansInRange(flippedSource, NSMakeRange(0, [flippedSource length]));
+		NSArray *plain = NVMarkdownEmphasisSpansInRange(plainSource, NSMakeRange(0, [plainSource length]));
+		NSDictionary *tripleSpan = [triple count] ? [triple objectAtIndex:0] : nil;
+		NSDictionary *scoreSpan = [underscores count] ? [underscores objectAtIndex:0] : nil;
+		NSDictionary *mixedInner = [mixed count] > 1 ? [mixed objectAtIndex:1] : nil;
+		NSDictionary *flippedInner = [flipped count] > 1 ? [flipped objectAtIndex:1] : nil;
+		NSString *tripleText = tripleSpan ? [@"***bold italics***" substringWithRange:[[tripleSpan objectForKey:@"content"] rangeValue]] : nil;
+		NSString *mixedText = mixedInner ? [@"**_bold italics_**" substringWithRange:[[mixedInner objectForKey:@"content"] rangeValue]] : nil;
+		NSString *flippedText = flippedInner ? [@"_**bold italics**_" substringWithRange:[[flippedInner objectForKey:@"content"] rangeValue]] : nil;
+		BOOL tripleBoth = [[tripleSpan objectForKey:@"strong"] boolValue] && [[tripleSpan objectForKey:@"emphasis"] boolValue];
+		BOOL scoreBoth = [[scoreSpan objectForKey:@"strong"] boolValue] && [[scoreSpan objectForKey:@"emphasis"] boolValue];
+		NSRange scoreOpener = [[scoreSpan objectForKey:@"opener"] rangeValue];
+		BOOL mixedBoth = [[mixedInner objectForKey:@"strong"] boolValue] && [[mixedInner objectForKey:@"emphasis"] boolValue];
+		BOOL flippedBoth = [[flippedInner objectForKey:@"strong"] boolValue] && [[flippedInner objectForKey:@"emphasis"] boolValue];
+		NSRange tripleOpener = [[tripleSpan objectForKey:@"opener"] rangeValue];
+		if ([triple count] != 1 || !tripleBoth || tripleOpener.length != 3 || ![tripleText isEqualToString:@"bold italics"] ||
+			[underscores count] != 1 || !scoreBoth || scoreOpener.length != 3 || ![plain count] || [plain count] != 2 ||
+			[mixed count] != 2 || !mixedBoth || ![mixedText isEqualToString:@"bold italics"] ||
+			[flipped count] != 2 || !flippedBoth || ![flippedText isEqualToString:@"bold italics"]) {
+			fprintf(stderr, "FAIL bold italics use three markers or a nested pair\n  triple %lu mixed %lu flipped %lu plain %lu\n",
+				(unsigned long)[triple count], (unsigned long)[mixed count], (unsigned long)[flipped count], (unsigned long)[plain count]);
+			gFailures++;
+		}
+	}
+
 	[pool drain];
 	if (gFailures) {
 		fprintf(stderr, "%d failed\n", gFailures);

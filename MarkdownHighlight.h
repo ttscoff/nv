@@ -289,6 +289,72 @@ static inline NSRange NVMarkdownHighlightRangeForEdit(NSString *string, NSRange 
 	return lines;
 }
 
+/* * and _ runs. One marker is italic, two is bold, three is both.
+   A pair of the other kind inside keeps both styles on the inner words.
+   Each span has opener, closer, and content ranges, plus strong and emphasis
+   flags for that content. An inner pair is its own span. */
+
+static inline NSRegularExpression *NVMarkdownEmphasisRegex(void) {
+	static NSRegularExpression *regex;
+	static dispatch_once_t once;
+	dispatch_once(&once, ^{
+		regex = [[NSRegularExpression regularExpressionWithPattern:@"(?<![A-Za-z0-9])(\\*{1,3}|_{1,3})(?!\\s)([^\\n]+?)(?<!\\s)\\1(?![A-Za-z0-9])" options:NSRegularExpressionAnchorsMatchLines error:NULL] retain];
+	});
+	return regex;
+}
+
+static inline BOOL NVMarkdownEmphasisIsStrong(NSUInteger markerLength) {
+	return markerLength >= 2;
+}
+
+static inline BOOL NVMarkdownEmphasisIsEmphasis(NSUInteger markerLength) {
+	return markerLength == 1 || markerLength == 3;
+}
+
+static inline NSDictionary *NVMarkdownEmphasisSpan(NSRange opener, NSRange closer, NSRange content, BOOL strong, BOOL emphasis) {
+	return [NSDictionary dictionaryWithObjectsAndKeys:
+		[NSValue valueWithRange:opener], @"opener",
+		[NSValue valueWithRange:closer], @"closer",
+		[NSValue valueWithRange:content], @"content",
+		[NSNumber numberWithBool:strong], @"strong",
+		[NSNumber numberWithBool:emphasis], @"emphasis",
+		nil];
+}
+
+static inline void NVMarkdownEmphasisCollect(NSMutableArray *spans, NSString *string, NSRange range, BOOL outerStrong, BOOL outerEmphasis) {
+	NSRegularExpression *regex = NVMarkdownEmphasisRegex();
+	if (!regex || !range.length)
+		return;
+	NSArray *matches = [regex matchesInString:string options:0 range:range];
+	NSUInteger index;
+	for (index = 0; index < [matches count]; index++) {
+		NSTextCheckingResult *match = [matches objectAtIndex:index];
+		NSRange opener = [match rangeAtIndex:1];
+		NSRange content = [match rangeAtIndex:2];
+		NSRange closer = NSMakeRange(NSMaxRange([match range]) - opener.length, opener.length);
+		if (content.location == NSNotFound || !content.length || closer.location < NSMaxRange(opener))
+			continue;
+		BOOL strong = outerStrong || NVMarkdownEmphasisIsStrong(opener.length);
+		BOOL emphasis = outerEmphasis || NVMarkdownEmphasisIsEmphasis(opener.length);
+		[spans addObject:NVMarkdownEmphasisSpan(opener, closer, content, strong, emphasis)];
+		if (!outerStrong && !outerEmphasis)
+			NVMarkdownEmphasisCollect(spans, string, content, strong, emphasis);
+	}
+}
+
+static inline NSArray *NVMarkdownEmphasisSpansInRange(NSString *string, NSRange range) {
+	if (!string)
+		return [NSArray array];
+	NSUInteger length = [string length];
+	if (range.location > length)
+		return [NSArray array];
+	if (NSMaxRange(range) > length)
+		range.length = length - range.location;
+	NSMutableArray *spans = [NSMutableArray array];
+	NVMarkdownEmphasisCollect(spans, string, range, NO, NO);
+	return spans;
+}
+
 /* Fold a new text change into the range waiting to be colored. `change` is the storage's changeInLength. */
 static inline NSRange NVMarkdownHighlightUnionEdit(NSRange dirty, NSRange edited, NSInteger change, NSUInteger length) {
 	if (edited.location == NSNotFound || edited.location > length)

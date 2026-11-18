@@ -2389,6 +2389,13 @@ static NSURL *NVHTTPURLFromImportString(NSString *entered) {
 
 - (void)contentsUpdatedForNote:(NoteObject*)aNoteObject {
 	if (aNoteObject == currentNote) {
+		NSString *shown = [textView string];
+		NSString *stored = [[aNoteObject contentString] string];
+		/* A save is scanned back from the notes folder a few seconds after
+		   typing stops. Pushing the same text into the editor clears the
+		   spell-check marks and flashes the note. */
+		if (shown && stored && [shown isEqualToString:stored])
+			return;
 		NSArray *selRanges=[textView selectedRanges];
 		[[textView textStorage] setAttributedString:[aNoteObject contentString]];
 		NVLayOutEntireNote(textView);

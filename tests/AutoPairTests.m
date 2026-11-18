@@ -91,6 +91,8 @@ int main(int argc, const char *argv[]) {
 	expectTrue(NVCharactersFormEmptyPair('{', '}') == YES, "empty brace pair");
 	expectTrue(NVCharactersFormEmptyPair('"', '"') == YES, "empty quote pair");
 	expectTrue(NVCharactersFormEmptyPair('\'', '\'') == YES, "empty apostrophe pair");
+	expectTrue(NVCharactersFormEmptyPair('*', '*') == YES, "empty asterisk pair");
+	expectTrue(NVCharactersFormEmptyPair('_', '_') == YES, "empty underscore pair");
 	expectTrue(NVCharactersFormEmptyPair('`', 'a') == NO, "backtick does not close on a letter");
 	expectTrue(NVCharactersFormEmptyPair('(', ']') == NO, "mismatched pair");
 
@@ -156,6 +158,18 @@ int main(int argc, const char *argv[]) {
 	expectTrue(NVAutoPairActionForInsert(@"(", @")", 2, @"", @")", 0) == NVAutoPairAsTyped, "paren does not pair into an unmatched closer");
 	expectTrue(NVAutoPairActionForInsert(@"(", @")", 2, @"", @"hello", 0) == NVAutoPairAsTyped, "paren skips a following word");
 
+	expectTrue(NVPairedCharacterCode('*', &match) == 1, "asterisk is a symmetric pair");
+	expectEqual(match, @"*", "asterisk matches itself");
+	expectTrue(NVPairedCharacterCode('_', &match) == 1, "underscore is a symmetric pair");
+	expectEqual(match, @"_", "underscore matches itself");
+	expectTrue(NVAutoPairActionForInsert(@"*", @"*", 1, @"", @"", 0) == NVAutoPairWrapOrInsert, "asterisk pairs");
+	expectTrue(NVAutoPairActionForInsert(@"*", @"*", 1, @"*", @"*", 0) == NVAutoPairTypeOver, "asterisk types over the closer");
+	expectTrue(NVAutoPairActionForInsert(@"*", @"*", 1, @"*hello", @"*", 0) == NVAutoPairTypeOver, "asterisk types over after a word");
+	expectTrue(NVAutoPairActionForInsert(@"*", @"*", 1, @"", @"hello", 0) == NVAutoPairAsTyped, "asterisk skips a following word");
+	expectTrue(NVAutoPairActionForInsert(@"_", @"_", 1, @"", @"", 0) == NVAutoPairWrapOrInsert, "underscore pairs");
+	expectTrue(NVAutoPairActionForInsert(@"_", @"_", 1, @"_", @"_", 0) == NVAutoPairTypeOver, "underscore types over the closer");
+	expectTrue(NVAutoPairActionForInsert(@"_", @"_", 1, @"hello_", @"world", 0) == NVAutoPairAsTyped, "underscore inside a word stays single");
+
 	expectTrue(NVPairedCharacterCode('=', &match) == 3, "equals wraps a selection only");
 	expectEqual(match, @"=", "equals matches itself");
 	expectTrue(NVPairedCharacterCode('~', &match) == 3, "tilde wraps a selection only");
@@ -188,6 +202,34 @@ int main(int argc, const char *argv[]) {
 	selection = 5;
 	typeInto(struck, &cursor, &selection, @"~");
 	expectEqual(struck, @"say ~~hello~~ there", "a selection is wrapped in strike marks");
+
+	NSMutableString *italic = [NSMutableString string];
+	cursor = 0;
+	selection = 0;
+	typeInto(italic, &cursor, &selection, @"*");
+	expectEqual(italic, @"**", "an asterisk inserts a pair");
+	expectTrue(cursor == 1, "caret sits inside the asterisk pair");
+	typeInto(italic, &cursor, &selection, @"a");
+	typeInto(italic, &cursor, &selection, @"*");
+	expectEqual(italic, @"*a*", "the closing asterisk types over");
+	expectTrue(cursor == 3, "caret leaves the italic word");
+
+	NSMutableString *emphasis = [NSMutableString string];
+	cursor = 0;
+	selection = 0;
+	typeInto(emphasis, &cursor, &selection, @"_");
+	typeInto(emphasis, &cursor, &selection, @"a");
+	typeInto(emphasis, &cursor, &selection, @"_");
+	expectEqual(emphasis, @"_a_", "an underscore pairs and then types over");
+
+	NSMutableString *stars = [NSMutableString string];
+	cursor = 0;
+	selection = 0;
+	typeInto(stars, &cursor, &selection, @"*");
+	typeInto(stars, &cursor, &selection, @"*");
+	expectEqual(stars, @"**", "a second asterisk types over instead of nesting");
+	typeInto(stars, &cursor, &selection, @"*");
+	expectEqual(stars, @"***", "a third asterisk extends the run");
 
 	NSMutableString *oneTilde = [NSMutableString stringWithString:@"hello"];
 	cursor = 2;
