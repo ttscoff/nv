@@ -1,3 +1,19 @@
+nvALT 3.0.41 (144)
+-------------------------
+
+#### CHANGED
+
+- A **search** opens the note at its saved place, shifts only far enough to show the nearest match, and leaves that place unchanged until you click or type in the note
+
+#### NEW
+
+- Each **note** reopens on the line you left it, including after a restart
+
+#### FIXED
+
+- The **caret** stays on the match on screen, so typing no longer jumps to a match above
+- A **note** no longer blinks while you type with a search in the field, and matches stay marked until the note takes focus
+
 nvALT 3.0.40 (144)
 -------------------------
 
