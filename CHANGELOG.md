@@ -1,3 +1,12 @@
+nvALT 3.0.42 (144)
+-------------------------
+
+#### FIXED
+
+- A **note** no longer flashes a few seconds after you stop typing, and spell-check marks stay
+- **Asterisks and underscores** now pair and type over, and backspace clears an empty pair
+- **Bold italics** highlight for three matching markers, or when one pair is nested inside the other
+
 nvALT 3.0.41 (144)
 -------------------------
 
