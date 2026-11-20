@@ -1,3 +1,10 @@
+nvALT 3.0.43 (144)
+-------------------------
+
+#### FIXED
+
+- **Automatically format lists** is back in Editing settings, and turning it off leaves a hand-numbered list alone
+
 nvALT 3.0.42 (144)
 -------------------------
 
