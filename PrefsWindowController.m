@@ -508,6 +508,43 @@
 	[button release];
 }
 
+- (void)addAutoFormatListsControl {
+	if (!editingView || [editingView viewWithTag:7331])
+		return;
+	CGFloat extra = 28.0;
+	NSArray *subviews = [[editingView subviews] copy];
+	NSMutableArray *savedMasks = [[NSMutableArray alloc] initWithCapacity:[subviews count]];
+	for (NSView *subview in subviews) {
+		[savedMasks addObject:[NSNumber numberWithUnsignedInteger:[subview autoresizingMask]]];
+		[subview setAutoresizingMask:NSViewNotSizable];
+	}
+	for (NSView *subview in subviews) {
+		NSRect frame = [subview frame];
+		frame.origin.y += extra;
+		[subview setFrame:frame];
+	}
+	NSRect viewFrame = [editingView frame];
+	viewFrame.size.height += extra;
+	[editingView setFrame:viewFrame];
+	NSUInteger maskIndex = 0;
+	for (NSView *subview in subviews)
+		[subview setAutoresizingMask:[[savedMasks objectAtIndex:maskIndex++] unsignedIntegerValue]];
+	[savedMasks release];
+	[subviews release];
+
+	NSButton *button = [[NSButton alloc] initWithFrame:NSMakeRect(18, 6, 360, 18)];
+	[button setButtonType:NSButtonTypeSwitch];
+	[button setTitle:NSLocalizedString(@"Automatically format lists", @"Editing settings checkbox")];
+	[button setFont:[NSFont systemFontOfSize:[NSFont systemFontSize]]];
+	[button setTag:7331];
+	[button setTarget:self];
+	[button setAction:@selector(changedAutoFormatsListBullets:)];
+	[button setState:[prefsController autoFormatsListBullets]];
+	[button setAutoresizingMask:NSViewMaxYMargin | NSViewMaxXMargin];
+	[editingView addSubview:button];
+	[button release];
+}
+
 /* The Debug pane: what the app writes to the system log, and a way to look at it.
    Built here like the other added controls, so the six localized nibs stay as they are. */
 - (NSView *)debugView {
@@ -588,6 +625,10 @@
 
 - (IBAction)changedEnterInListRenamesNote:(id)sender {
 	[prefsController setEnterInListRenamesNote:[sender state] sender:self];
+}
+
+- (IBAction)changedAutoFormatsListBullets:(id)sender {
+	[prefsController setAutoFormatsListBullets:[sender state] sender:self];
 }
 
 - (IBAction)changedMarkdownMarker:(id)sender {
@@ -907,6 +948,7 @@
     [self addThemeControls];
     [self addMarkdownMarkerControls];
     [self addEnterInListControl];
+    [self addAutoFormatListsControl];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(themesDidChange:) name:NVThemesDidChangeNotification object:nil];
     [self previewNoteBodyFont];
 	[appShortcutField setStringValue:[[prefsController appActivationKeyCombo] description]];
