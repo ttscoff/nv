@@ -2432,6 +2432,8 @@ static NSURL *NVHTTPURLFromImportString(NSString *entered) {
 	} else {
 		[titleBarButton setStatusIconType: [[NSUserDefaults standardUserDefaults] boolForKey:@"ShowSyncMenu"] ? DownArrowIcon : NoIcon ];
 	}
+	/* Showing or hiding the icon changes how wide the search field can be. */
+	[self alignSearchFieldWithEditor];
 }
 
 
@@ -2730,6 +2732,25 @@ static void NVStretchFullBleedAncestors(NSView *view, CGFloat targetWidth) {
 	NVRetargetWidthConstraints(button, NSWidth(frame));
 }
 
+- (void)placeSyncStatusButtonInTitlebar:(NSView *)titlebar frameInWindow:(NSRect)desired {
+	if (!titleBarButton || !titlebar)
+		return;
+	[titleBarButton retain];
+	[titleBarButton removeFromSuperview];
+	[titlebar addSubview:titleBarButton];
+	[titleBarButton release];
+	NVRemoveSuperviewConstraintsOnView(titleBarButton);
+	[titleBarButton setTranslatesAutoresizingMaskIntoConstraints:YES];
+	NSRect frame = [titlebar convertRect:desired fromView:nil];
+	frame.origin.x = round(frame.origin.x);
+	frame.origin.y = round(frame.origin.y);
+	frame.size.width = round(NSWidth(frame));
+	frame.size.height = round(NSHeight(frame));
+	[titleBarButton setFrame:frame];
+	/* Keep the icon against the share button as the titlebar grows. */
+	[titleBarButton setAutoresizingMask:NSViewMinXMargin | NSViewMinYMargin];
+}
+
 - (IBAction)shareEditorNote:(id)sender {
 	NSString *item = NVEditorShareText(textView ? [textView string] : @"",
 									   textView ? [textView selectedRange] : NSMakeRange(0, 0));
@@ -2806,6 +2827,10 @@ static void NVStretchFullBleedAncestors(NSView *view, CGFloat targetWidth) {
 	right -= NVEditorShareButtonEdge;
 	CGFloat shareButtonRight = right;
 	right -= NVEditorShareButtonWidth + NVEditorShareButtonGap;
+	/* The sync icon used to be pinned from the close button, which now lands
+	   it on the search field's clear button. Park it in the gap instead. */
+	BOOL syncStatusVisible = titleBarButton && [titleBarButton isEnabled] && [titleBarButton window] == window;
+	right -= NVSearchFieldSyncStatusInset(syncStatusVisible);
 	CGFloat left = leftLimit;
 	NSButton *zoomButton = [window standardWindowButton:NSWindowZoomButton];
 	if (zoomButton && [zoomButton superview]) {
@@ -2841,19 +2866,26 @@ static void NVStretchFullBleedAncestors(NSView *view, CGFloat targetWidth) {
 	y = round(y);
 
 	NSRect shareDesired = NSMakeRect(shareButtonRight - NVEditorShareButtonWidth, y, NVEditorShareButtonWidth, fieldHeight);
+	NSRect syncDesired = syncStatusVisible ? NVSyncStatusButtonFrame(right, y, fieldHeight) : NSZeroRect;
 	NSRect containerInWindow = [container convertRect:[container bounds] toView:nil];
 	NSRect shareInWindow = editorShareButton ? [editorShareButton convertRect:[editorShareButton bounds] toView:nil] : NSZeroRect;
 	BOOL sharePinned = editorShareButton && [editorShareButton superview] == titlebar
 		&& fabs(NSMinX(shareInWindow) - NSMinX(shareDesired)) <= 0.5
 		&& fabs(NSMaxX(shareInWindow) - NSMaxX(shareDesired)) <= 0.5
 		&& fabs(NSMinY(shareInWindow) - y) <= 0.5;
+	NSRect syncInWindow = (syncStatusVisible && [titleBarButton superview]) ? [titleBarButton convertRect:[titleBarButton bounds] toView:nil] : NSZeroRect;
+	BOOL syncPinned = !syncStatusVisible
+		|| (fabs(NSMinX(syncInWindow) - NSMinX(syncDesired)) <= 0.5
+			&& fabs(NSMinY(syncInWindow) - NSMinY(syncDesired)) <= 0.5
+			&& fabs(NSWidth(syncInWindow) - NSWidth(syncDesired)) <= 0.5);
 	BOOL alreadyPinned = [container superview] == titlebar
 		&& fabs(NSMinX(containerInWindow) - left) <= 0.5
 		&& fabs(NSMaxX(containerInWindow) - right) <= 0.5
 		&& fabs(NSMinY(containerInWindow) - y) <= 0.5
 		&& fabs(NSMinX([field frame])) <= 0.5
 		&& fabs(NSWidth([field frame]) - NSWidth([container bounds])) <= 0.5
-		&& sharePinned;
+		&& sharePinned
+		&& syncPinned;
 	if (alreadyPinned)
 		return;
 
@@ -2901,6 +2933,8 @@ static void NVStretchFullBleedAncestors(NSView *view, CGFloat targetWidth) {
 	if ([editor isKindOfClass:[NSTextView class]] && [searchCell respondsToSelector:@selector(textAreaForBounds:)])
 		[editor setFrame:[(id)searchCell textAreaForBounds:[field bounds]]];
 	[self placeEditorShareButtonInView:titlebar frameInWindow:shareDesired];
+	if (syncStatusVisible)
+		[self placeSyncStatusButtonInTitlebar:titlebar frameInWindow:syncDesired];
 	nvSearchFieldAligning = NO;
 }
 

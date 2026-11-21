@@ -47,6 +47,17 @@ int main(void) {
 	expectWidth(40.0, 100.0, 1100.0, 100.0, "a view that is not full bleed stays put");
 	expectWidth(0.0, 1200.0, 1100.0, 1200.0, "a bar wider than the target is not shrunk");
 
+	if (NVSearchFieldSyncStatusInset(NO) != 0.0 || NVSearchFieldSyncStatusInset(YES) != 23.0) {
+		fprintf(stderr, "FAIL the sync icon takes a gap only while it is showing\n");
+		gFailures++;
+	}
+	NSRect syncFrame = NVSyncStatusButtonFrame(100.0, 10.0, 24.0);
+	if (syncFrame.origin.x != 106.0 || syncFrame.origin.y != 13.5 || syncFrame.size.width != 17.0 || syncFrame.size.height != 17.0) {
+		fprintf(stderr, "FAIL the sync icon sits in the gap after the search field\n  got %.1f,%.1f %.1fx%.1f\n",
+			syncFrame.origin.x, syncFrame.origin.y, syncFrame.size.width, syncFrame.size.height);
+		gFailures++;
+	}
+
 	[pool drain];
 	if (!gFailures)
 		fprintf(stderr, "test-ok\n");
