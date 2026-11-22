@@ -156,6 +156,10 @@
         "backgroundColor" : "#04395e",
         "foregroundColor" : "#dab785"
     },
+    "frontMatter" : {
+        "backgroundColor" : "#04395e",
+        "foregroundColor" : "#dab785"
+    },
     "definitionAbbreviation" : {
         "foregroundColor" : "#d5896f"
     },

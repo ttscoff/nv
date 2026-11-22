@@ -40,6 +40,38 @@ int main(int argc, const char *argv[]) {
 		expectEqual([@"a😀b" truncatedPreviewStringOfLength:2], @"a😀", "cut inside a pair extends to its end");
 		expectEqual([@"éx" truncatedPreviewStringOfLength:1], @"é", "combining mark stays with its base");
 
+		expectEqual([@"Title: Hello\nAuthor: Me\n\nThe note" truncatedPreviewStringOfLength:100], @"The note", "MultiMarkdown front matter is left out of the summary");
+		expectEqual([@"Title: Hello\nThe note" truncatedPreviewStringOfLength:100], @"Title: Hello The note", "a key line without a blank line stays in the summary");
+		expectEqual([@"https://example.com\n\nBody" truncatedPreviewStringOfLength:100], @"https://example.com  Body", "a URL at the top is not front matter");
+		expectEqual([@"---\ntitle: Hello\nauthor: Me\n---\n\nThe note" truncatedPreviewStringOfLength:100], @"The note", "YAML front matter is left out of the summary");
+		expectEqual([@"---\ntags:\n  - one\n  - two\n---\n\nThe note" truncatedPreviewStringOfLength:100], @"The note", "YAML lists inside the borders are left out of the summary");
+		expectEqual([@"---\ntitle: Hello\n---\nThe note" truncatedPreviewStringOfLength:100], @"The note", "YAML body starts on the line after the closing border");
+		expectEqual([@"---\ntitle: Hello\n...\n\nThe note" truncatedPreviewStringOfLength:100], @"The note", "a YAML block can close with dots");
+		expectEqual([@"---\nThe note" truncatedPreviewStringOfLength:100], @"--- The note", "a horizontal rule without a closing border stays in the summary");
+		expectEqual([@"\n---\ntitle: Hello\n---\n\nThe note" truncatedPreviewStringOfLength:100], @" --- title: Hello ---  The note", "YAML has to start on the first line");
+
+		NSRange yaml = NVFrontMatterRange(@"---\ntitle: Hello\n---\n\nBody");
+		NSRange want = NSMakeRange(0, [@"---\ntitle: Hello\n---\n\n" length]);
+		if (!NSEqualRanges(yaml, want)) {
+			fprintf(stderr, "FAIL YAML range\n  got: %lu,%lu\n  want: %lu,%lu\n",
+				(unsigned long)yaml.location, (unsigned long)yaml.length,
+				(unsigned long)want.location, (unsigned long)want.length);
+			gFailures++;
+		}
+		NSRange mmd = NVFrontMatterRange(@"Title: Hello\n\nBody");
+		NSRange mmdWant = NSMakeRange(0, [@"Title: Hello\n\n" length]);
+		if (!NSEqualRanges(mmd, mmdWant)) {
+			fprintf(stderr, "FAIL MultiMarkdown range\n  got: %lu,%lu\n  want: %lu,%lu\n",
+				(unsigned long)mmd.location, (unsigned long)mmd.length,
+				(unsigned long)mmdWant.location, (unsigned long)mmdWant.length);
+			gFailures++;
+		}
+		NSRange none = NVFrontMatterRange(@"Hello world");
+		if (none.location != NSNotFound) {
+			fprintf(stderr, "FAIL plain note reported front matter\n");
+			gFailures++;
+		}
+
 		if (gFailures) {
 			fprintf(stderr, "%d preview truncation test(s) failed\n", gFailures);
 			return 1;

@@ -193,10 +193,86 @@
 	}
 }
 
+- (NSTextField *)listTextSizeLabel {
+	if (!generalView || !tableTextMenuButton)
+		return nil;
+	for (NSView *subview in [generalView subviews]) {
+		if (![subview isKindOfClass:[NSTextField class]] || [[(NSTextField *)subview cell] isEditable])
+			continue;
+		if (fabs(NSMidY([subview frame]) - NSMidY([tableTextMenuButton frame])) < 16.0 &&
+			NSMaxX([subview frame]) <= NSMinX([tableTextMenuButton frame]) + 8.0)
+			return (NSTextField *)subview;
+	}
+	return nil;
+}
+
+- (void)moveListTextSizeControlsBelowPreview:(NSRect)previewFrame labelRight:(CGFloat)labelRight {
+	if (!tableTextMenuButton || [tableTextMenuButton superview] != generalView)
+		return;
+	NSTextField *sizeLabel = [self listTextSizeLabel];
+	CGFloat oldHeight = NSHeight([generalView frame]);
+	CGFloat oldMaxY = 0;
+	CGFloat remainingMaxY = 0;
+	for (NSView *subview in [generalView subviews]) {
+		CGFloat maxY = NSMaxY([subview frame]);
+		if (maxY > oldMaxY)
+			oldMaxY = maxY;
+		if (subview == tableTextMenuButton || subview == tableTextSizeField || subview == sizeLabel)
+			continue;
+		if (maxY > remainingMaxY)
+			remainingMaxY = maxY;
+	}
+
+	NSRect popupFrame = [tableTextMenuButton frame];
+	popupFrame.origin.x = NSMinX(previewFrame);
+	popupFrame.origin.y = NSMidY(previewFrame) - 40.0 - NSHeight(popupFrame) / 2.0;
+	[tableTextMenuButton removeFromSuperview];
+	[tableTextMenuButton setFrame:popupFrame];
+	[tableTextMenuButton setAutoresizingMask:NSViewMaxYMargin | NSViewMaxXMargin];
+	[fontsColorsView addSubview:tableTextMenuButton];
+
+	if (tableTextSizeField) {
+		NSRect sizeFrame = [tableTextSizeField frame];
+		sizeFrame.origin.x = NSMaxX(popupFrame) + 8.0;
+		sizeFrame.origin.y = NSMidY(popupFrame) - NSHeight(sizeFrame) / 2.0;
+		[tableTextSizeField removeFromSuperview];
+		[tableTextSizeField setFrame:sizeFrame];
+		[tableTextSizeField setAutoresizingMask:NSViewMaxYMargin | NSViewMaxXMargin];
+		[fontsColorsView addSubview:tableTextSizeField];
+	}
+	if (sizeLabel) {
+		NSRect labelFrame = [sizeLabel frame];
+		CGFloat width = NSWidth(labelFrame);
+		BOOL narrowed = labelRight - width < 4.0;
+		if (narrowed)
+			width = MAX(40.0, labelRight - 4.0);
+		labelFrame.size.width = width;
+		labelFrame.origin.x = labelRight - width;
+		if (narrowed) {
+			[[sizeLabel cell] setWraps:YES];
+			[[sizeLabel cell] setLineBreakMode:NSLineBreakByWordWrapping];
+			if (NSHeight(labelFrame) < 32.0)
+				labelFrame.size.height = 32.0;
+		}
+		labelFrame.origin.y = NSMidY(popupFrame) - NSHeight(labelFrame) / 2.0;
+		[sizeLabel removeFromSuperview];
+		[sizeLabel setFrame:labelFrame];
+		[sizeLabel setAutoresizingMask:NSViewMaxYMargin | NSViewMaxXMargin];
+		[fontsColorsView addSubview:sizeLabel];
+	}
+
+	if (remainingMaxY > 0.0 && oldMaxY > remainingMaxY) {
+		NSRect generalFrame = [generalView frame];
+		generalFrame.size.height = remainingMaxY + (oldHeight - oldMaxY);
+		[generalView setFrame:generalFrame];
+	}
+}
+
 - (void)addListFontControls {
 	if (!fontsColorsView || !bodyTextFontField || [fontsColorsView viewWithTag:7303])
 		return;
-	CGFloat shift = 34.0;
+	CGFloat listRow = 34.0;
+	CGFloat shift = listRow + 40.0;
 	NSButton *bodyButton = nil;
 	NSTextField *bodyLabel = nil;
 	NSRect bodyFrame = [bodyTextFontField frame];
@@ -232,7 +308,7 @@
 
 	bodyFrame = [bodyTextFontField frame];
 	NSRect previewFrame = bodyFrame;
-	previewFrame.origin.y -= shift;
+	previewFrame.origin.y -= listRow;
 	NSTextField *preview = [[NSTextField alloc] initWithFrame:previewFrame];
 	[preview setEditable:NO];
 	[preview setSelectable:NO];
@@ -245,9 +321,10 @@
 	listTextFontField = preview;
 	[preview release];
 
+	CGFloat labelRight = NSMinX(previewFrame);
 	if (bodyLabel) {
 		NSRect labelFrame = [bodyLabel frame];
-		labelFrame.origin.y -= shift;
+		labelFrame.origin.y -= listRow;
 		NSTextField *label = [[NSTextField alloc] initWithFrame:labelFrame];
 		[label setEditable:NO];
 		[label setSelectable:NO];
@@ -258,11 +335,12 @@
 		[label setStringValue:NSLocalizedString(@"List Font:", @"Fonts settings label")];
 		[label setAutoresizingMask:[bodyLabel autoresizingMask]];
 		[fontsColorsView addSubview:label];
+		labelRight = NSMaxX(labelFrame);
 		[label release];
 	}
 	if (bodyButton) {
 		NSRect buttonFrame = [bodyButton frame];
-		buttonFrame.origin.y -= shift;
+		buttonFrame.origin.y -= listRow;
 		NSButton *button = [[NSButton alloc] initWithFrame:buttonFrame];
 		[button setButtonType:NSButtonTypeMomentaryPushIn];
 		[button setBezelStyle:[bodyButton bezelStyle]];
@@ -274,6 +352,7 @@
 		[fontsColorsView addSubview:button];
 		[button release];
 	}
+	[self moveListTextSizeControlsBelowPreview:previewFrame labelRight:labelRight];
 }
 
 - (NSTextField *)themeLabelWithFrame:(NSRect)frame title:(NSString *)title {

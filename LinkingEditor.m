@@ -29,6 +29,7 @@
 #import "TagSearch.h"
 #import "LinkReferenceCompletion.h"
 #import "ClickBelowText.h"
+#import "PreviewTruncation.h"
 #import "SelectionRedraw.h"
 #import "TaskList.h"
 #import "ListOutdent.h"
@@ -83,6 +84,11 @@ static NSString * const NVSearchHighlightAttributeName = @"NVSearchHighlight";
 
 @interface LinkingEditor (NVSearchHighlightOverlay)
 - (void)nv_drawSearchHighlightsInOverlay:(NSView *)overlay dirtyRect:(NSRect)dirtyRect;
+@end
+
+@interface LinkingEditor (NVLinkOpening)
+- (void)nv_openLinkFromMenu:(id)sender;
+- (void)nv_clickedOnLink:(id)aLink atIndex:(NSUInteger)charIndex fromMenu:(BOOL)fromMenu;
 @end
 
 /* The note draws search ink in a surface that sits above -drawRect:, so a chip
@@ -441,9 +447,6 @@ CGFloat _perceptualColorDifference(NSColor*a, NSColor*b) {
 }
 
 - (NSDictionary*)preferredLinkAttributes {
-	if (![prefsController URLsAreClickable])
-		return [NSDictionary dictionary];
-	
 	NSColor *fgColor = [(AppController *)[NSApp delegate] foregrndColor];
 	NSColor *bgColor = [(AppController *)[NSApp delegate] backgrndColor];
 	NVEditorTheme *editorTheme = [[NVThemeManager sharedManager] currentEditorTheme];
@@ -455,11 +458,19 @@ CGFloat _perceptualColorDifference(NSColor*a, NSColor*b) {
 	}
 	if (!linkColor)
 		linkColor = [self _linkColorForForegroundColor:fgColor backgroundColor:bgColor];
-	return [NSDictionary dictionaryWithObjectsAndKeys:
-			[NSCursor pointingHandCursor], NSCursorAttributeName,
-			[NSNumber numberWithInt:NSUnderlineStyleSingle], NSUnderlineStyleAttributeName,
-			linkColor,
-			NSForegroundColorAttributeName, nil];
+	if (!linkColor)
+		return [NSDictionary dictionary];
+
+	/* Detected URLs keep their link attribute when they are not clickable.
+	   Theme painting skips those ranges, so the stored black shows through
+	   unless the link color is still applied. Underline and the hand cursor
+	   stay off, since those are the clickable affordance. */
+	NSMutableDictionary *attributes = [NSMutableDictionary dictionaryWithObject:linkColor forKey:NSForegroundColorAttributeName];
+	if ([prefsController URLsAreClickable]) {
+		[attributes setObject:[NSCursor pointingHandCursor] forKey:NSCursorAttributeName];
+		[attributes setObject:[NSNumber numberWithInt:NSUnderlineStyleSingle] forKey:NSUnderlineStyleAttributeName];
+	}
+	return [NSDictionary dictionaryWithDictionary:attributes];
 	
 	/*
 	 return [NSDictionary dictionaryWithObjectsAndKeys:
@@ -1588,6 +1599,27 @@ static NSColor *NVBlendColors(NSColor *first, NSColor *second, CGFloat fraction,
 	}
 }
 
+- (void)highlightFrontMatterInString:(NSString *)string theme:(NVEditorTheme *)theme color:(NSColor *)color baseFont:(NSFont *)baseFont {
+	NSRange range = NVFrontMatterRange(string);
+	if (range.location != 0 || !range.length)
+		return;
+	NSRange paint = NSIntersectionRange(range, [self activeMarkdownHighlightRange]);
+	if (!paint.length)
+		return;
+	NVThemeStyle *style = nil;
+	if (theme) {
+		style = [theme styleForKey:@"frontMatter"];
+		if (!style)
+			style = [theme styleForKey:@"metadata"];
+		if (!style && color)
+			style = [NVThemeStyle styleWithForegroundColor:color];
+		if (style)
+			[self paintThemeRange:paint style:style baseFont:baseFont useBaseFont:NO forceStrikethrough:NO];
+	} else if (color) {
+		[self paintMarkdownRange:paint color:color strikethrough:NO];
+	}
+}
+
 - (void)highlightMarkdownSyntaxWithTheme:(NVEditorTheme *)theme {
 	NSLayoutManager *layout = [self layoutManager];
 	NSString *string = [self string];
@@ -1669,6 +1701,8 @@ static NSColor *NVBlendColors(NSColor *first, NSColor *second, CGFloat fraction,
 		baseFont:baseFont];
 	[self paintThemeMatches:codeRegex string:string content:code marker:markup baseFont:baseFont contentGroup:2 delimiterGroup:1 hasCloser:YES forceStrikethrough:NO];
 	[self highlightThemedFencedCodeInString:string code:codeBlock marker:markup baseFont:baseFont];
+	NSColor *frontBackground = [theme editorBackgroundColor] ?: [self backgroundColor] ?: [NSColor textBackgroundColor];
+	[self highlightFrontMatterInString:string theme:theme color:NVBlendColors(foreground, frontBackground, 0.35, foreground) baseFont:baseFont];
 	[self highlightWritingGremlins];
 	[self reapplySearchHighlights];
 	[self nv_reapplyCompletionColors];
@@ -1754,6 +1788,11 @@ static NSColor *NVBlendColors(NSColor *first, NSColor *second, CGFloat fraction,
 	markdownHighlightDirty = NSMakeRange(NSNotFound, 0);
 	if (!full && length)
 		markdownHighlightLimit = NVMarkdownHighlightRangeForEdit(string, dirty);
+	if (length && markdownHighlightLimit.length) {
+		NSUInteger prefix = NVFrontMatterHighlightPrefix(string);
+		if (prefix && markdownHighlightLimit.location < prefix)
+			markdownHighlightLimit = NSUnionRange(markdownHighlightLimit, NSMakeRange(0, prefix));
+	}
 }
 
 - (void)highlightMarkdownSyntax {
@@ -1852,6 +1891,8 @@ static NSColor *NVBlendColors(NSColor *first, NSColor *second, CGFloat fraction,
 		baseFont:criticFont];
 	[self paintMarkdownMatches:codeRegex string:string content:code marker:marker contentGroup:2 delimiterGroup:1 hasCloser:YES strikethrough:NO];
 	[self highlightFencedCodeInString:string code:code marker:marker];
+	NSColor *frontMatter = NVBlendColors(foreground, background, 0.35, foreground);
+	[self highlightFrontMatterInString:string theme:nil color:frontMatter baseFont:[prefsController noteBodyFont]];
 	[self highlightWritingGremlins];
 	[self reapplySearchHighlights];
 	[self nv_reapplyCompletionColors];
@@ -2422,7 +2463,9 @@ static NSColor *NVBlendColors(NSColor *first, NSColor *second, CGFloat fraction,
         if ([self clipboardHasLink])
             return YES;
         return NO;
-    }
+    }else if (action==@selector(nv_openLinkFromMenu:)) {
+		return YES;
+	}
 	
 	return [super validateMenuItem:menuItem];
 }
@@ -2467,22 +2510,44 @@ static NSColor *NVBlendColors(NSColor *first, NSColor *second, CGFloat fraction,
 	return aLink;
 }
 
+- (void)nv_openLinkFromMenu:(id)sender {
+	if (![sender isKindOfClass:[NSMenuItem class]])
+		return;
+	id represented = [(NSMenuItem *)sender representedObject];
+	if (![represented isKindOfClass:[NSNumber class]])
+		return;
+	NSUInteger charIndex = [(NSNumber *)represented unsignedIntegerValue];
+	NSUInteger length = [[self string] length];
+	if (!length || charIndex >= length)
+		return;
+	id link = [[self textStorage] attribute:NSLinkAttributeName atIndex:charIndex effectiveRange:NULL];
+	if (!link)
+		return;
+	[self nv_clickedOnLink:link atIndex:charIndex fromMenu:YES];
+}
+
 - (void)clickedOnLink:(id)aLink atIndex:(NSUInteger)charIndex {
+	[self nv_clickedOnLink:aLink atIndex:charIndex fromMenu:NO];
+}
+
+- (void)nv_clickedOnLink:(id)aLink atIndex:(NSUInteger)charIndex fromMenu:(BOOL)fromMenu {
 	NSEvent *currentEvent = [[self window] currentEvent];
 //    NSLog(@"clicked:%@",[currentEvent description]);
-	
-	if (![prefsController URLsAreClickable] && [currentEvent modifierFlags] & NSCommandKeyMask) {
+
+	/* A plain click is ignored while URLs are not clickable. The contextual
+	   Open Link item is an explicit request, so it still opens. */
+	if (!fromMenu && ![prefsController URLsAreClickable] && [currentEvent modifierFlags] & NSCommandKeyMask) {
 		
 		[self highlightLinkAtIndex:charIndex];
 		
-	} else if (![prefsController URLsAreClickable]) {
+	} else if (!fromMenu && ![prefsController URLsAreClickable]) {
 		//pass normal mousedown?
 		[self setSelectedRange:NSMakeRange(charIndex, 0)];
 		return;
 	}
 	
 	if ([aLink isKindOfClass:[NSURL class]] && [[aLink scheme] isEqualToString:@"nvalt"]) {
-        NSUInteger flags=[currentEvent modifierFlags];
+        NSUInteger flags = fromMenu ? 0 : [currentEvent modifierFlags];
         if (((flags&NSDeviceIndependentModifierFlagsMask)==(flags&NSCommandKeyMask))&&((flags&NSDeviceIndependentModifierFlagsMask)>0)) {
             NSString *newURLString=[[aLink lastPathComponent]stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding];
             NSString *txtString=[[NSString stringWithFormat:@"[[%@]]",[aLink lastPathComponent]] stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding];

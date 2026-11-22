@@ -2098,6 +2098,15 @@ static NSURL *NVHTTPURLFromImportString(NSString *entered) {
 		[menu removeItemAtIndex:idx];
 	if ((idx = [menu indexOfItemWithTarget:nil andAction:@selector(orderFrontLinkPanel:)]) > -1)
 		[menu removeItemAtIndex:idx];
+	/* AppKit's Open Link item calls clickedOnLink:, which does nothing while
+	   URLs are not clickable. Point it at an action that always opens. */
+	if (charIndex != NSNotFound && [view respondsToSelector:@selector(nv_openLinkFromMenu:)] &&
+		(idx = [menu indexOfItemWithTarget:nil andAction:@selector(_openLinkFromMenu:)]) > -1) {
+		NSMenuItem *openItem = [menu itemAtIndex:idx];
+		[openItem setTarget:view];
+		[openItem setAction:@selector(nv_openLinkFromMenu:)];
+		[openItem setRepresentedObject:[NSNumber numberWithUnsignedInteger:charIndex]];
+	}
 	return menu;
 }
 
