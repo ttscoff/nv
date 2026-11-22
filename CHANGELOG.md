@@ -1,3 +1,20 @@
+nvALT 3.0.45 (144)
+-------------------------
+
+#### CHANGED
+
+- **List Text Size** now sits under List Font on Fonts & Colors
+- The notes list **summary** skips YAML and MultiMarkdown front matter
+
+#### NEW
+
+- **Front matter** is dimmed in the editor, and themes can style it with a frontMatter key
+
+#### FIXED
+
+- **URLs** keep the theme link color when Make URLs clickable links is off
+- **Open Link** in the contextual menu opens the address when clickable links are off
+
 nvALT 3.0.44 (144)
 -------------------------
 
