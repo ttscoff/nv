@@ -1,3 +1,10 @@
+nvALT 3.0.46 (144)
+-------------------------
+
+#### FIXED
+
+- In vertical layout, themed **note previews** stay lighter than the title
+
 nvALT 3.0.45 (144)
 -------------------------
 
