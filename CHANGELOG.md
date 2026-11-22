@@ -1,3 +1,10 @@
+nvALT 3.0.44 (144)
+-------------------------
+
+#### FIXED
+
+- The **sync icon** no longer covers the search field's clear button while Simplenote is syncing
+
 nvALT 3.0.43 (144)
 -------------------------
 
