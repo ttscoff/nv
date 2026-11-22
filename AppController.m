@@ -3131,6 +3131,29 @@ static void NVStretchFullBleedAncestors(NSView *view, CGFloat targetWidth) {
 
 #pragma mark nvALT methods
 
+/* The stacked list breaks the title and summary with a newline. The side-by-side
+   list keeps them on one line and marks the summary with a color. A theme has to
+   dim that same span, or the summary is drawn in the title color. */
+static NSUInteger NVListPreviewStart(NSAttributedString *text) {
+	NSUInteger length = [text length];
+	if (!length)
+		return NSNotFound;
+	NSRange lineBreak = [[text string] rangeOfString:@"\n"];
+	if (lineBreak.location != NSNotFound && lineBreak.location > 0 && lineBreak.location < length)
+		return lineBreak.location;
+	NSUInteger index = 0;
+	while (index < length) {
+		NSRange effective = NSMakeRange(0, 0);
+		id color = [text attribute:NSForegroundColorAttributeName atIndex:index longestEffectiveRange:&effective inRange:NSMakeRange(0, length)];
+		if (color && effective.location > 0)
+			return effective.location;
+		if (NSMaxRange(effective) <= index)
+			break;
+		index = NSMaxRange(effective);
+	}
+	return NSNotFound;
+}
+
 - (void)tableView:(NSTableView *)aTableView willDisplayCell:(id)aCell forTableColumn:(NSTableColumn *)aTableColumn row:(NSInteger)rowIndex {
     if (aTableView==notesTableView) {
         NVEditorTheme *listTheme = [[NVThemeManager sharedManager] currentEditorTheme];
@@ -3160,17 +3183,18 @@ static void NVStretchFullBleedAncestors(NSView *view, CGFloat targetWidth) {
         }
         if (!rowColor)
             rowColor = foregrndColor;
-        [aCell setTextColor:rowColor];
+        /* Read the summary color before setTextColor can fill the title in. */
         NSAttributedString *shown = [aCell attributedStringValue];
+        [aCell setTextColor:rowColor];
         if (listTheme && rowColor && [shown length]) {
             NSMutableAttributedString *colored = [shown mutableCopy];
-            NSRange titleRange = [[colored string] rangeOfString:@"\n"];
-            if (rowIsSelected || titleRange.location == NSNotFound) {
+            NSUInteger previewStart = rowIsSelected ? NSNotFound : NVListPreviewStart(colored);
+            if (previewStart == NSNotFound || previewStart >= [colored length]) {
                 [colored addAttribute:NSForegroundColorAttributeName value:rowColor range:NSMakeRange(0, [colored length])];
             } else {
-                [colored addAttribute:NSForegroundColorAttributeName value:rowColor range:NSMakeRange(0, titleRange.location)];
+                [colored addAttribute:NSForegroundColorAttributeName value:rowColor range:NSMakeRange(0, previewStart)];
                 NSColor *previewColor = [[listTheme listBackgroundColor] blendedColorWithFraction:0.45 ofColor:rowColor] ?: rowColor;
-                [colored addAttribute:NSForegroundColorAttributeName value:previewColor range:NSMakeRange(titleRange.location, [colored length] - titleRange.location)];
+                [colored addAttribute:NSForegroundColorAttributeName value:previewColor range:NSMakeRange(previewStart, [colored length] - previewStart)];
             }
             [aCell setAttributedStringValue:colored];
             [colored release];
