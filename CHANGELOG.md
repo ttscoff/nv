@@ -1,3 +1,14 @@
+nvALT 3.0.47 (144)
+-------------------------
+
+#### NEW
+
+- Optional **list title** from a title: key or a leading H1, otherwise the note title
+
+#### FIXED
+
+- **Find and replace** fields show dark text instead of white on white
+
 nvALT 3.0.46 (144)
 -------------------------
 
