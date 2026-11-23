@@ -1236,7 +1236,7 @@ static NSURL *NVHTTPURLFromImportString(NSString *entered) {
 			[self updateColorScheme];
 		}
 		
-	} else if ([selectorString isEqualToString:SEL_STR(setTableFontSize:sender:)] || [selectorString isEqualToString:SEL_STR(setTableFont:sender:)] || [selectorString isEqualToString:SEL_STR(setTableColumnsShowPreview:sender:)]) {
+	} else if ([selectorString isEqualToString:SEL_STR(setTableFontSize:sender:)] || [selectorString isEqualToString:SEL_STR(setTableFont:sender:)] || [selectorString isEqualToString:SEL_STR(setTableColumnsShowPreview:sender:)] || [selectorString isEqualToString:SEL_STR(setListTitleFromHeading:sender:)]) {
 		
 		ResetFontRelatedTableAttributes();
 		[notesTableView updateTitleDereferencorState];

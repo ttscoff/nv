@@ -152,6 +152,9 @@ BOOL ColorsEqualWith8BitChannels(NSColor *c1, NSColor *c2);
 - (void)setMakeURLsClickable:(BOOL)value sender:(id)sender;
 - (BOOL)URLsAreClickable;
 
+- (void)setListTitleFromHeading:(BOOL)value sender:(id)sender;
+- (BOOL)listTitleFromHeading;
+
 - (void)setShouldHighlightSearchTerms:(BOOL)shouldHighlight sender:(id)sender;
 - (BOOL)highlightSearchTerms;
 - (void)setSearchTermHighlightColor:(NSColor*)color sender:(id)sender;

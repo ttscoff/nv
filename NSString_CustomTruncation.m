@@ -19,10 +19,24 @@
 #import "NSString_CustomTruncation.h"
 #import "NSString_NV.h"
 #import "GlobalPrefs.h"
+#import "PreviewTruncation.h"
 
 @implementation NSString (CustomTruncation)
 
 static NSMutableParagraphStyle *LineBreakingStyle();
+
+/* When the list title was taken from a leading heading, the summary starts
+   after that heading so the same words are not shown twice. */
+static NSString *NVListPreviewBody(NSString *body) {
+	if (!body)
+		return @"";
+	if ([[GlobalPrefs defaultPrefs] listTitleFromHeading]) {
+		NSUInteger skip = NVListTitleHeadingSkip(body);
+		if (skip > 0 && skip <= [body length])
+			return [body substringFromIndex:skip];
+	}
+	return body;
+}
 static NSDictionary *GrayTextAttributes();
 static NSDictionary *LineTruncAttributes();
 static size_t EstimatedCharCountForWidth(float upToWidth);
@@ -105,7 +119,7 @@ static size_t EstimatedCharCountForWidth(float upToWidth) {
 	
 	NSMutableString *unattributedPreview = [[NSMutableString alloc] initWithCapacity:bodyCharCount + [self length] + 2];
 	
-	NSString *truncatedBodyString = [[bodyText string] truncatedPreviewStringOfLength:bodyCharCount];
+	NSString *truncatedBodyString = [NVListPreviewBody([bodyText string]) truncatedPreviewStringOfLength:bodyCharCount];
 	if (!truncatedBodyString){
         [unattributedPreview release];
         return nil;
@@ -155,7 +169,7 @@ static size_t EstimatedCharCountForWidth(float upToWidth) {
 	size_t bodyCharCount = EstimatedCharCountForWidth(upToWidth) - [self length];
 	bodyCharCount = MIN(bodyCharCount, [bodyText length]);
 	
-	NSString *truncatedBodyString = [[bodyText string] truncatedPreviewStringOfLength:bodyCharCount];
+	NSString *truncatedBodyString = [NVListPreviewBody([bodyText string]) truncatedPreviewStringOfLength:bodyCharCount];
 	if (!truncatedBodyString) return nil;
 	
 	NSMutableString *unattributedPreview = [self mutableCopy];

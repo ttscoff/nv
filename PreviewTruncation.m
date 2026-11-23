@@ -221,6 +221,150 @@ NSUInteger NVFrontMatterHighlightPrefix(NSString *text) {
 	return cap;
 }
 
+static NSString *NVTrimmedTitleValue(NSString *value) {
+	NSCharacterSet *space = [NSCharacterSet whitespaceCharacterSet];
+	NSString *trimmed = [value stringByTrimmingCharactersInSet:space];
+	NSUInteger length = [trimmed length];
+	if (length >= 2) {
+		unichar open = [trimmed characterAtIndex:0];
+		unichar close = [trimmed characterAtIndex:length - 1];
+		if ((open == '"' && close == '"') || (open == '\'' && close == '\''))
+			trimmed = [[trimmed substringWithRange:NSMakeRange(1, length - 2)] stringByTrimmingCharactersInSet:space];
+	}
+	return [trimmed length] ? trimmed : nil;
+}
+
+/* title: inside a front matter line. The key is matched without case, and a
+   space before the colon is allowed. An empty value is not a title. */
+static NSString *NVTitleValueOnLine(NSString *text, NSUInteger loc, NSUInteger len) {
+	NSUInteger colon = NSNotFound;
+	NSUInteger i;
+	if (!len || [text characterAtIndex:loc] == ' ' || [text characterAtIndex:loc] == '\t')
+		return nil;
+	for (i = 0; i < len; i++) {
+		if ([text characterAtIndex:loc + i] == ':') {
+			colon = i;
+			break;
+		}
+	}
+	if (colon == NSNotFound || colon + 1 >= len)
+		return nil;
+	unichar after = [text characterAtIndex:loc + colon + 1];
+	if (after != ' ' && after != '\t')
+		return nil;
+
+	NSUInteger keyEnd = colon;
+	while (keyEnd > 0) {
+		unichar c = [text characterAtIndex:loc + keyEnd - 1];
+		if (c != ' ' && c != '\t')
+			break;
+		keyEnd--;
+	}
+	if (!keyEnd)
+		return nil;
+	NSString *key = [text substringWithRange:NSMakeRange(loc, keyEnd)];
+	if ([key caseInsensitiveCompare:@"title"] != NSOrderedSame)
+		return nil;
+	return NVTrimmedTitleValue([text substringWithRange:NSMakeRange(loc + colon + 1, len - (colon + 1))]);
+}
+
+/* A single leading #, then space, then text. ## is a section, and a heading
+   later in the note is not the list title. A closing # is removed only when
+   a space separates it from the text, so "C#" stays intact. */
+static NSString *NVHeadingText(NSString *text, NSUInteger loc, NSUInteger len) {
+	NSCharacterSet *space = [NSCharacterSet whitespaceCharacterSet];
+	if (len < 2 || [text characterAtIndex:loc] != '#')
+		return nil;
+	unichar second = [text characterAtIndex:loc + 1];
+	if (second == '#' || (second != ' ' && second != '\t'))
+		return nil;
+	NSString *rest = [[text substringWithRange:NSMakeRange(loc + 1, len - 1)] stringByTrimmingCharactersInSet:space];
+	NSUInteger end = [rest length];
+	NSUInteger hashes = end;
+	while (hashes > 0 && [rest characterAtIndex:hashes - 1] == '#')
+		hashes--;
+	if (hashes < end && hashes > 0) {
+		unichar before = [rest characterAtIndex:hashes - 1];
+		if (before == ' ' || before == '\t')
+			rest = [[rest substringToIndex:hashes] stringByTrimmingCharactersInSet:space];
+	}
+	return [rest length] ? rest : nil;
+}
+
+typedef struct {
+	NSString *title;
+	NSUInteger headingSkip;
+} NVListTitleScan;
+
+static NVListTitleScan NVScanListTitle(NSString *text) {
+	NVListTitleScan result = { nil, 0 };
+	NSUInteger length = [text length];
+	if (!length)
+		return result;
+
+	NSRange front = NVFrontMatterRange(text);
+	NSUInteger bodyStart = 0;
+	if (front.location == 0 && front.length && NSMaxRange(front) <= length) {
+		bodyStart = NSMaxRange(front);
+		NSUInteger scan = 0;
+		while (scan < bodyStart) {
+			NSRange line = [text lineRangeForRange:NSMakeRange(scan, 0)];
+			BOOL blank = NO;
+			NSUInteger contentEnd = NVFrontMatterLineContentEnd(text, line, &blank);
+			if (!blank) {
+				NSString *value = NVTitleValueOnLine(text, line.location, contentEnd - line.location);
+				if (value) {
+					result.title = value;
+					return result;
+				}
+			}
+			NSUInteger lineEnd = NSMaxRange(line);
+			if (lineEnd <= scan)
+				break;
+			scan = lineEnd;
+		}
+	}
+
+	NSUInteger index = bodyStart;
+	if (index < length && [text characterAtIndex:index] == 0xFEFF)
+		index++;
+	while (index < length) {
+		NSRange line = [text lineRangeForRange:NSMakeRange(index, 0)];
+		BOOL blank = NO;
+		NSUInteger contentEnd = NVFrontMatterLineContentEnd(text, line, &blank);
+		if (blank) {
+			NSUInteger lineEnd = NSMaxRange(line);
+			if (lineEnd <= index)
+				break;
+			index = lineEnd;
+			continue;
+		}
+		NSString *heading = NVHeadingText(text, line.location, contentEnd - line.location);
+		if (!heading)
+			return result;
+		result.title = heading;
+		NSUInteger end = NSMaxRange(line);
+		if (end < length) {
+			NSRange next = [text lineRangeForRange:NSMakeRange(end, 0)];
+			BOOL nextBlank = NO;
+			NVFrontMatterLineContentEnd(text, next, &nextBlank);
+			if (nextBlank)
+				end = NSMaxRange(next);
+		}
+		result.headingSkip = end;
+		return result;
+	}
+	return result;
+}
+
+NSString *NVListDisplayTitleFromBody(NSString *text) {
+	return NVScanListTitle(text).title;
+}
+
+NSUInteger NVListTitleHeadingSkip(NSString *text) {
+	return NVScanListTitle(text).headingSkip;
+}
+
 /* What the list has always flattened: tab, newline, carriage return, form feed,
    end-of-text (U+0003), and the Unicode line and paragraph separators. */
 static NSCharacterSet *NVPreviewBreakCharacters(void) {

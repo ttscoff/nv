@@ -72,6 +72,31 @@ int main(int argc, const char *argv[]) {
 			gFailures++;
 		}
 
+		expectEqual(NVListDisplayTitleFromBody(@"---\ntitle: Hello\n---\n\n# Other\n\nBody"), @"Hello", "YAML title: wins over a heading");
+		expectEqual(NVListDisplayTitleFromBody(@"---\ntitle: \"Hello\"\n---\n\nBody"), @"Hello", "quoted YAML title");
+		expectEqual(NVListDisplayTitleFromBody(@"Title: Hello: World\nAuthor: Me\n\nBody"), @"Hello: World", "MultiMarkdown title: value keeps its colon");
+		expectEqual(NVListDisplayTitleFromBody(@"TITLE: Hello\n\nBody"), @"Hello", "title key ignores case");
+		expectEqual(NVListDisplayTitleFromBody(@"---\nauthor: Me\n---\n\n# Hello\n\nBody"), @"Hello", "heading after front matter with no title key");
+		expectEqual(NVListDisplayTitleFromBody(@"# Hello #\n\nBody"), @"Hello", "a closing hash is not part of the heading");
+		expectEqual(NVListDisplayTitleFromBody(@"# C#\n\nBody"), @"C#", "a hash inside the heading stays");
+		expectEqual(NVListDisplayTitleFromBody(@"## Section\n\nBody"), nil, "a second-level heading is not the list title");
+		expectEqual(NVListDisplayTitleFromBody(@"#Hello\n\nBody"), nil, "a heading needs a space after the hash");
+		expectEqual(NVListDisplayTitleFromBody(@"Intro\n\n# Hello"), nil, "a heading after a paragraph is not the list title");
+		expectEqual(NVListDisplayTitleFromBody(@"Hello world"), nil, "a plain note keeps its own title");
+		expectEqual(NVListDisplayTitleFromBody(@"---\ntitle:\n---\n\n# Fallback\n\nBody"), @"Fallback", "an empty title: falls through to the heading");
+
+		NSString *headingNote = @"# Hello\n\nThe note";
+		if (NVListTitleHeadingSkip(headingNote) != [@"# Hello\n\n" length]) {
+			fprintf(stderr, "FAIL heading skip %lu\n", (unsigned long)NVListTitleHeadingSkip(headingNote));
+			gFailures++;
+		}
+		if (NVListTitleHeadingSkip(@"---\ntitle: Hello\n---\n\n# Other\n\nBody") != 0) {
+			fprintf(stderr, "FAIL title: should not skip the heading\n");
+			gFailures++;
+		}
+		NSString *afterHeading = [headingNote substringFromIndex:NVListTitleHeadingSkip(headingNote)];
+		expectEqual([afterHeading truncatedPreviewStringOfLength:100], @"The note", "the summary starts after the heading used as the title");
+
 		if (gFailures) {
 			fprintf(stderr, "%d preview truncation test(s) failed\n", gFailures);
 			return 1;

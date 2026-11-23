@@ -624,6 +624,51 @@
 	[button release];
 }
 
+- (void)addListTitleFromHeadingControl {
+	if (!editingView || [editingView viewWithTag:7332])
+		return;
+	CGFloat extra = 28.0;
+	NSArray *subviews = [[editingView subviews] copy];
+	NSMutableArray *savedMasks = [[NSMutableArray alloc] initWithCapacity:[subviews count]];
+	for (NSView *subview in subviews) {
+		[savedMasks addObject:[NSNumber numberWithUnsignedInteger:[subview autoresizingMask]]];
+		[subview setAutoresizingMask:NSViewNotSizable];
+	}
+	for (NSView *subview in subviews) {
+		NSRect frame = [subview frame];
+		frame.origin.y += extra;
+		[subview setFrame:frame];
+	}
+	NSRect viewFrame = [editingView frame];
+	viewFrame.size.height += extra;
+	[editingView setFrame:viewFrame];
+	NSUInteger maskIndex = 0;
+	for (NSView *subview in subviews)
+		[subview setAutoresizingMask:[[savedMasks objectAtIndex:maskIndex++] unsignedIntegerValue]];
+	[savedMasks release];
+	[subviews release];
+
+	NSButton *button = [[NSButton alloc] initWithFrame:NSMakeRect(18, 6, 330, 18)];
+	[button setButtonType:NSButtonTypeSwitch];
+	[button setTitle:NSLocalizedString(@"Use title: or an H1 as the list title", @"Editing settings checkbox")];
+	[button setFont:[NSFont systemFontOfSize:[NSFont systemFontSize]]];
+	[button sizeToFit];
+	NSRect fitted = [button frame];
+	fitted.origin = NSMakePoint(18, 6);
+	fitted.size.height = 18;
+	CGFloat maxWidth = NSWidth([editingView frame]) - 28;
+	if (fitted.size.width > maxWidth)
+		fitted.size.width = maxWidth;
+	[button setFrame:fitted];
+	[button setTag:7332];
+	[button setTarget:self];
+	[button setAction:@selector(changedListTitleFromHeading:)];
+	[button setState:[prefsController listTitleFromHeading]];
+	[button setAutoresizingMask:NSViewMaxYMargin | NSViewMaxXMargin];
+	[editingView addSubview:button];
+	[button release];
+}
+
 /* The Debug pane: what the app writes to the system log, and a way to look at it.
    Built here like the other added controls, so the six localized nibs stay as they are. */
 - (NSView *)debugView {
@@ -708,6 +753,10 @@
 
 - (IBAction)changedAutoFormatsListBullets:(id)sender {
 	[prefsController setAutoFormatsListBullets:[sender state] sender:self];
+}
+
+- (IBAction)changedListTitleFromHeading:(id)sender {
+	[prefsController setListTitleFromHeading:[sender state] sender:self];
 }
 
 - (IBAction)changedMarkdownMarker:(id)sender {
@@ -1028,6 +1077,7 @@
     [self addMarkdownMarkerControls];
     [self addEnterInListControl];
     [self addAutoFormatListsControl];
+    [self addListTitleFromHeadingControl];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(themesDidChange:) name:NVThemesDidChangeNotification object:nil];
     [self previewNoteBodyFont];
 	[appShortcutField setStringValue:[[prefsController appActivationKeyCombo] description]];

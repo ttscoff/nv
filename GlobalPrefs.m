@@ -70,6 +70,7 @@ static NSString *BackgroundTextColorKey = @"BackgroundTextColor";
 static NSString *UseSoftTabsKey = @"UseSoftTabs";
 static NSString *NumberOfSpacesInTabKey = @"NumberOfSpacesInTab";
 static NSString *MakeURLsClickableKey = @"MakeURLsClickable";
+static NSString *ListTitleFromHeadingKey = @"ListTitleFromHeading";
 static NSString *AppActivationKeyCodeKey = @"AppActivationKeyCode";
 static NSString *AppActivationModifiersKey = @"AppActivationModifiers";
 static NSString *HorizontalLayoutKey = @"HorizontalLayout";
@@ -157,6 +158,7 @@ static void sendCallbacksForGlobalPrefs(GlobalPrefs* self, SEL selector, id orig
 			[NSNumber numberWithBool:NO], TriedToImportBlorKey,
 			[NSNumber numberWithBool:NO], HorizontalLayoutKey,
 			[NSNumber numberWithBool:YES], MakeURLsClickableKey,
+			[NSNumber numberWithBool:NO], ListTitleFromHeadingKey,
 			[NSNumber numberWithBool:YES], HighlightSearchTermsKey, 
 			[NSNumber numberWithBool:YES], TableColumnsHaveBodyPreviewKey, 
 			[NSNumber numberWithDouble:0.0], LastScrollOffsetKey,
@@ -519,6 +521,15 @@ static void sendCallbacksForGlobalPrefs(GlobalPrefs* self, SEL selector, id orig
 }
 - (BOOL)URLsAreClickable {
 	return [defaults boolForKey:MakeURLsClickableKey];
+}
+
+- (void)setListTitleFromHeading:(BOOL)value sender:(id)sender {
+	[defaults setBool:value forKey:ListTitleFromHeadingKey];
+
+	SEND_CALLBACKS();
+}
+- (BOOL)listTitleFromHeading {
+	return [defaults boolForKey:ListTitleFromHeadingKey];
 }
 
 - (void)setRTL:(BOOL)value sender:(id)sender {

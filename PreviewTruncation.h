@@ -9,6 +9,16 @@ NSRange NVFrontMatterRange(NSString *text);
    matter block that grows or disappears does not leave stale coloring. */
 NSUInteger NVFrontMatterHighlightPrefix(NSString *text);
 
+/* List label from a title: key in the opening front matter, or from a leading
+   # heading after that block. Nil when the note has neither. Does not look
+   past the first line of the note itself. */
+NSString *NVListDisplayTitleFromBody(NSString *text);
+
+/* Where a leading # heading used as the list label ends, including one blank
+   line after it, so the summary does not repeat that heading. Zero when the
+   label came from title: or there is no heading to skip. */
+NSUInteger NVListTitleHeadingSkip(NSString *text);
+
 /* The opening of a note body as the notes list shows it: the first characters,
    with line breaks and other layout characters turned into spaces. */
 @interface NSString (PreviewTruncation)

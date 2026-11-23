@@ -30,6 +30,7 @@
 #import "NotationPrefs.h"
 #import "AttributedPlainText.h"
 #import "NSString_CustomTruncation.h"
+#import "PreviewTruncation.h"
 #import "NSFileManager_NV.h"
 #include "BufferUtils.h"
 #import "NotationFileManager.h"
@@ -53,6 +54,10 @@ typedef struct NSRange32 {
 #else
 typedef NSRange NSRange32;
 #endif
+
+@interface NoteObject (NVListTitle)
+- (NSString *)nv_listDisplayTitle;
+@end
 
 @implementation NoteObject
 
@@ -264,7 +269,12 @@ DefModelAttrAccessor(fileEncodingOfNote, fileEncoding)
 DefModelAttrAccessor(prefixParentsOfNote, prefixParentNotes)
 
 //DefColAttrAccessor(wordCountOfNote, wordCountString)
-DefColAttrAccessor(titleOfNote2, titleString)
+
+id titleOfNote2(NotesTableView *tv, NoteObject *note, NSInteger row) {
+	(void)tv;
+	(void)row;
+	return [note nv_listDisplayTitle];
+}
 DefColAttrAccessor(dateCreatedStringOfNote, dateCreatedString)
 DefColAttrAccessor(dateModifiedStringOfNote, dateModifiedString)
 
@@ -725,24 +735,32 @@ force_inline id unifiedCellForNote(NotesTableView *tv, NoteObject *note, NSInteg
 	return largeAttributedTitleString;
 }
 
+- (NSString *)nv_listDisplayTitle {
+	if (![[GlobalPrefs defaultPrefs] listTitleFromHeading])
+		return titleString;
+	NSString *detected = NVListDisplayTitleFromBody([contentString string]);
+	return [detected length] ? detected : titleString;
+}
+
 - (void)updateTablePreviewString {
 	//delegate required for this method
 	[tableTitleString release];
 	GlobalPrefs *prefs = [GlobalPrefs defaultPrefs];
+	NSString *listTitle = [self nv_listDisplayTitle];
 
 	if ([prefs tableColumnsShowPreview]) {
 		if ([prefs horizontalLayout]) {
 			//is called for visible notes at launch and resize only, generation of images for invisible notes is delayed until after launch
 			
 			NSSize labelBlockSize = ColumnIsSet(NoteLabelsColumn, [prefs tableColumnsBitmap]) ? [self sizeOfLabelBlocks] : NSZeroSize;
-			tableTitleString = [[titleString attributedMultiLinePreviewFromBodyText:contentString upToWidth:[delegate titleColumnWidth] 
+			tableTitleString = [[listTitle attributedMultiLinePreviewFromBodyText:contentString upToWidth:[delegate titleColumnWidth] 
 																	 intrusionWidth:labelBlockSize.width] retain];
 		} else {
-			tableTitleString = [[titleString attributedSingleLinePreviewFromBodyText:contentString upToWidth:[delegate titleColumnWidth]] retain];
+			tableTitleString = [[listTitle attributedSingleLinePreviewFromBodyText:contentString upToWidth:[delegate titleColumnWidth]] retain];
 		}
 	} else {
 		if ([prefs horizontalLayout]) {
-			tableTitleString = [[titleString attributedSingleLineTitle] retain];
+			tableTitleString = [[listTitle attributedSingleLineTitle] retain];
 		} else {
 			tableTitleString = nil;
 		}
