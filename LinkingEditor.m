@@ -316,6 +316,7 @@ if ([selectorString isEqualToString:SEL_STR(setNoteBodyFont:sender:)]) {
 		[self highlightMarkdownSyntax];
 		if ([[self enclosingScrollView] respondsToSelector:@selector(nv_updateScrollerChrome)])
 			[(ETScrollView *)[self enclosingScrollView] nv_updateScrollerChrome];
+		[self nv_noteFindBarNeedsStyle];
 		return;
 	}
 	NSColor *fgColor = [(AppController *)[NSApp delegate] foregrndColor];
@@ -352,6 +353,7 @@ if ([selectorString isEqualToString:SEL_STR(setNoteBodyFont:sender:)]) {
 	[self scheduleMarkdownHighlight];
 	if ([[self enclosingScrollView] respondsToSelector:@selector(nv_updateScrollerChrome)])
 		[(ETScrollView *)[self enclosingScrollView] nv_updateScrollerChrome];
+	[self nv_noteFindBarNeedsStyle];
 }
 
 #define _CM(__ch) ((__ch) * 255.0)
@@ -4522,6 +4524,57 @@ static BOOL NVBulletMarker(NSString *line, NSUInteger contentLength, NSUInteger 
     return beforeString;
 }
 
+/* The find bar keeps a light field. A dark window, or the note's light text
+   color, otherwise draws the search string white on white. */
+static void NVStyleFindBarControl(NSView *view, NSColor *textColor, NSAppearance *aqua) {
+	NSAppearance *current = [view appearance];
+	if (!current || ![[current name] isEqualToString:NSAppearanceNameAqua])
+		[view setAppearance:aqua];
+	if ([view isKindOfClass:[NSTextField class]]) {
+		NSTextField *field = (NSTextField *)view;
+		[field setTextColor:textColor];
+		[[field cell] setTextColor:textColor];
+		NSText *editor = [field currentEditor];
+		if ([editor isKindOfClass:[NSTextView class]])
+			NVStyleFindBarControl(editor, textColor, aqua);
+	} else if ([view isKindOfClass:[NSTextView class]]) {
+		NSTextView *editor = (NSTextView *)view;
+		[editor setUsesAdaptiveColorMappingForDarkAppearance:NO];
+		[editor setTextColor:textColor];
+		[editor setInsertionPointColor:textColor];
+		NSTextStorage *storage = [editor textStorage];
+		if ([storage length]) {
+			[storage beginEditing];
+			[storage addAttribute:NSForegroundColorAttributeName value:textColor range:NSMakeRange(0, [storage length])];
+			[storage endEditing];
+		}
+		NSMutableDictionary *typing = [[editor typingAttributes] mutableCopy];
+		if (!typing)
+			typing = [[NSMutableDictionary alloc] init];
+		[typing setObject:textColor forKey:NSForegroundColorAttributeName];
+		[editor setTypingAttributes:typing];
+		[typing release];
+	}
+	for (NSView *subview in [view subviews])
+		NVStyleFindBarControl(subview, textColor, aqua);
+}
+
+- (void)nv_styleFindBar {
+	NSScrollView *scroll = [self enclosingScrollView];
+	if (![scroll respondsToSelector:@selector(findBarView)])
+		return;
+	NSView *bar = [scroll findBarView];
+	if (!bar)
+		return;
+	NSColor *textColor = [NSColor colorWithSRGBRed:0.10 green:0.10 blue:0.12 alpha:1.0];
+	NVStyleFindBarControl(bar, textColor, [NSAppearance appearanceNamed:NSAppearanceNameAqua]);
+}
+
+- (void)nv_noteFindBarNeedsStyle {
+	[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(nv_styleFindBar) object:nil];
+	[self performSelector:@selector(nv_styleFindBar) withObject:nil afterDelay:0];
+}
+
 #pragma mark - ElasticThreads Lion Find... implementation
 - (void)prepareTextFinder{        
 #if MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_7
@@ -4685,6 +4738,7 @@ static BOOL NVBulletMarker(NSString *line, NSUInteger contentLength, NSUInteger 
             NVLogError(@"find action was invalid");
         }
         [newSender release];
+        [self nv_noteFindBarNeedsStyle];
         return;
     }
 #endif

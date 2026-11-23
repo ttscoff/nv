@@ -3985,7 +3985,26 @@ static NSUInteger NVListPreviewStart(NSAttributedString *text) {
         [self postTextUpdate];
     }
     
+static BOOL NVViewIsInFindBar(NSView *view) {
+        while (view) {
+            NSString *name = [view className];
+            if ([name rangeOfString:@"FindBar"].location != NSNotFound ||
+                [name rangeOfString:@"FindPattern"].location != NSNotFound ||
+                [name rangeOfString:@"NSTextFinder"].location != NSNotFound)
+                return YES;
+            view = [view superview];
+        }
+        return NO;
+    }
+
     - (id)windowWillReturnFieldEditor:(NSWindow *)sender toObject:(id)client{
+        /* The shared field editor carries the note color. Find and replace
+           need their own editor, or the typed text stays white on the white bar. */
+        if ([client isKindOfClass:[NSView class]] && NVViewIsInFindBar((NSView *)client)) {
+            if ([textView respondsToSelector:@selector(nv_noteFindBarNeedsStyle)])
+                [textView performSelector:@selector(nv_noteFindBarNeedsStyle) withObject:nil afterDelay:0];
+            return nil;
+        }
         
         if (self.isEditing) {
             
