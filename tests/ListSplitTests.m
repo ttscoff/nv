@@ -32,6 +32,12 @@ int main(void) {
 			   "below the list minimum rises to 80");
 	expectTrue(NVClampedListDimension(700.0, 2000.0, 120.0) <= 600.0,
 			   "above the list maximum falls to 600");
+	expectTrue(NVShouldKeepSelectionForEmptyListClick(-1, YES),
+			   "empty area with a selection keeps it");
+	expectTrue(!NVShouldKeepSelectionForEmptyListClick(0, YES),
+			   "a real row is not intercepted");
+	expectTrue(!NVShouldKeepSelectionForEmptyListClick(-1, NO),
+			   "empty area with no selection is not intercepted");
 	if (gFailures) {
 		fprintf(stderr, "%d list split tests failed\n", gFailures);
 		return 1;

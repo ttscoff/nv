@@ -26,3 +26,9 @@ static inline CGFloat NVClampedListDimension(CGFloat savedDimension, CGFloat spl
 		result = NVListMinimumDimension;
 	return result;
 }
+
+/* A click below the last row would clear the selection. Keep the current note
+   when that empty area is hit and something is already selected. */
+static inline BOOL NVShouldKeepSelectionForEmptyListClick(NSInteger row, BOOL hasSelection) {
+	return row < 0 && hasSelection;
+}
