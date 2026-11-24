@@ -101,6 +101,12 @@ BOOL ColorsEqualWith8BitChannels(NSColor *c1, NSColor *c2);
 - (NSDictionary*)noteBodyAttributes;
 - (NSParagraphStyle*)noteBodyParagraphStyle;
 - (BOOL)_bodyFontIsMonospace;
+/* Stored pref: 0 = Follow Theme. Explicit values are clamped to 0.5…3.0. */
+- (CGFloat)noteBodyLineHeight;
+- (void)setNoteBodyLineHeight:(CGFloat)lineHeight sender:(id)sender;
+/* Effective lineHeightMultiple after resolving Follow Theme against the current editor theme. */
+- (CGFloat)effectiveNoteBodyLineHeight;
+- (void)invalidateNoteBodyParagraphStyle;
 
 - (void)setForegroundTextColor:(NSColor*)aColor sender:(id)sender;
 - (NSColor*)foregroundTextColor;

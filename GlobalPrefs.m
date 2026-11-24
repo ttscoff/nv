@@ -35,6 +35,8 @@
 #import "AppController.h"
 #import "SearchHighlight.h"
 #import "NVThemeManager.h"
+#import "NoteLineHeight.h"
+#import "NVTheme.h"
 
 #define SEND_CALLBACKS() sendCallbacksForGlobalPrefs(self, _cmd, sender)
 
@@ -49,6 +51,7 @@ static NSString *TableSortColumnKey = @"TableSortColumn";
 static NSString *TableIsReverseSortedKey = @"TableIsReverseSorted";
 static NSString *TableColumnsHaveBodyPreviewKey = @"TableColumnsHaveBodyPreview";
 static NSString *NoteBodyFontKey = @"NoteBodyFont";
+static NSString *NoteBodyLineHeightKey = @"NoteBodyLineHeight";
 static NSString *NoteListFontKey = @"NoteListFont";
 static NSString *ConfirmNoteDeletionKey = @"ConfirmNoteDeletion";
 static NSString *LogErrorsAndWarningsKey = @"LogErrorsAndWarnings";
@@ -827,6 +830,36 @@ BOOL ColorsEqualWith8BitChannels(NSColor *c1, NSColor *c2) {
 	}
 }
 
+- (void)invalidateNoteBodyParagraphStyle {
+	[noteBodyParagraphStyle release];
+	noteBodyParagraphStyle = nil;
+	[noteBodyAttributes release];
+	noteBodyAttributes = nil;
+}
+
+- (CGFloat)noteBodyLineHeight {
+	if (![defaults objectForKey:NoteBodyLineHeightKey])
+		return NVNoteLineHeightFollowTheme;
+	return [defaults floatForKey:NoteBodyLineHeightKey];
+}
+
+- (void)setNoteBodyLineHeight:(CGFloat)lineHeight sender:(id)sender {
+	CGFloat stored = NVNoteLineHeightIsFollowTheme(lineHeight) ? NVNoteLineHeightFollowTheme : NVClampNoteLineHeight(lineHeight);
+	if (fabs([self noteBodyLineHeight] - stored) < 0.0001)
+		return;
+	[defaults setFloat:stored forKey:NoteBodyLineHeightKey];
+	[self invalidateNoteBodyParagraphStyle];
+	SEND_CALLBACKS();
+}
+
+- (CGFloat)effectiveNoteBodyLineHeight {
+	CGFloat themeHeight = 0;
+	NVEditorTheme *theme = [[NVThemeManager sharedManager] currentEditorTheme];
+	if (theme)
+		themeHeight = [theme editorLineHeight];
+	return NVResolvedNoteLineHeight([self noteBodyLineHeight], themeHeight);
+}
+
 - (NSFont*)noteBodyFont {
 	BOOL triedOnce = NO;
 	
@@ -857,37 +890,18 @@ BOOL ColorsEqualWith8BitChannels(NSColor *c1, NSColor *c2) {
 - (NSDictionary*)noteBodyAttributes {
 	NSFont *bodyFont = [self noteBodyFont];
 	if (!noteBodyAttributes && bodyFont) {
-		//NSLog(@"notebody att2");
-		
 		NSMutableDictionary *attrs = [[NSMutableDictionary dictionaryWithObjectsAndKeys:bodyFont, NSFontAttributeName, nil] retain];
-		
-		//not storing the foreground color in each note will make the database smaller, and black is assumed when drawing text
+		/* Not storing the foreground color in each note keeps the database
+		   smaller; black is assumed when drawing text unless overridden. */
 		NSColor *fgColor = [(AppController *)[NSApp delegate] foregrndColor];
-		
-		if (!ColorsEqualWith8BitChannels([NSColor blackColor], fgColor)) {
+		if (!ColorsEqualWith8BitChannels([NSColor blackColor], fgColor))
 			[attrs setObject:fgColor forKey:NSForegroundColorAttributeName];
-		}
-		// background text color is handled directly by the NSTextView subclass and so does not need to be stored here
-		if ([self _bodyFontIsMonospace]) {			
-//			NSLog(@"notebody att3");
-			NSParagraphStyle *pStyle = [self noteBodyParagraphStyle];
-			if (pStyle)
-				[attrs setObject:pStyle forKey:NSParagraphStyleAttributeName];
-		}
-	   /*NSTextWritingDirectionEmbedding*/
-		//[NSArray arrayWithObjects:[NSNumber numberWithInt:0], [NSNumber numberWithInt:0], nil], @"NSWritingDirection", //for auto-LTR-RTL text
+		/* Paragraph style carries tab stops for mono and line height for all fonts. */
+		NSParagraphStyle *pStyle = [self noteBodyParagraphStyle];
+		if (pStyle)
+			[attrs setObject:pStyle forKey:NSParagraphStyleAttributeName];
 		noteBodyAttributes = attrs;
-	}else {
-		//NSLog(@"notebody att4");
-		NSMutableDictionary *attrs = [[NSMutableDictionary dictionaryWithObjectsAndKeys:bodyFont, NSFontAttributeName, nil] retain];
-		NSColor *fgColor = [(AppController *)[NSApp delegate] foregrndColor];
-		
-		//	if (!ColorsEqualWith8BitChannels([NSColor blackColor], fgColor)) {
-		[attrs setObject:fgColor forKey:NSForegroundColorAttributeName];
-		noteBodyAttributes = attrs;
-		//	}
 	}
-
 	return noteBodyAttributes;
 }
 
@@ -919,6 +933,7 @@ BOOL ColorsEqualWith8BitChannels(NSColor *c1, NSColor *c2) {
 		//[paragraphStyle setHeadIndent:sizeOfTab]; //for soft-indents, this would probably have to be applied contextually, and heaven help us for soft tabs
 
 		[noteBodyParagraphStyle setDefaultTabInterval:sizeOfTab];
+		[noteBodyParagraphStyle setLineHeightMultiple:[self effectiveNoteBodyLineHeight]];
 	}
 	
 	return noteBodyParagraphStyle;

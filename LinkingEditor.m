@@ -148,6 +148,7 @@ CGFloat _perceptualDarkness(NSColor*a);
 
     [prefsController registerWithTarget:self forChangesInSettings:
 	 @selector(setNoteBodyFont:sender:),
+	 @selector(setNoteBodyLineHeight:sender:),
 	 @selector(setMakeURLsClickable:sender:),
 	 @selector(setSearchTermHighlightColor:sender:),
 	 @selector(setShouldHighlightSearchTerms:sender:), nil];
@@ -210,7 +211,8 @@ CGFloat _perceptualDarkness(NSColor*a);
 ////			[self setAutomaticTextReplacementEnabled:[prefsController useTextReplacement]];
 //		}
 //    } else
-if ([selectorString isEqualToString:SEL_STR(setNoteBodyFont:sender:)]) {
+if ([selectorString isEqualToString:SEL_STR(setNoteBodyFont:sender:)] ||
+	[selectorString isEqualToString:SEL_STR(setNoteBodyLineHeight:sender:)]) {
 
 		[self setTypingAttributes:[prefsController noteBodyAttributes]];
 		[self nv_applyThemeTypingColor];

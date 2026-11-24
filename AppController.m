@@ -544,6 +544,7 @@ void outletObjectAwoke(id sender) {
 	 @selector(setAliasDataForDefaultDirectory:sender:),  //when someone wants to load a new database
 	 @selector(setSortedTableColumnKey:reversed:sender:),  //when sorting prefs changed
 	 @selector(setNoteBodyFont:sender:),  //when to tell notationcontroller to restyle its notes
+	 @selector(setNoteBodyLineHeight:sender:),
 	 @selector(setForegroundTextColor:sender:),  //ditto
 	 @selector(setBackgroundTextColor:sender:),  //ditto
 	 @selector(setTableFontSize:sender:),  //when to tell notationcontroller to regenerate the (now potentially too-short) note-body previews
@@ -568,6 +569,14 @@ terminateApp:
 
 - (void)themesDidChange:(NSNotification *)note {
 	[self updateColorScheme];
+	/* Follow Theme line height must pick up the new theme's textView.lineHeight. */
+	[[GlobalPrefs defaultPrefs] invalidateNoteBodyParagraphStyle];
+	if (notationController)
+		[notationController restyleAllNotes];
+	if (currentNote)
+		[self contentsUpdatedForNote:currentNote];
+	if (textView)
+		[textView setTypingAttributes:[[GlobalPrefs defaultPrefs] noteBodyAttributes]];
 	if (previewController)
 		[previewController themesDidChange:note];
 }
@@ -1221,7 +1230,8 @@ static NSURL *NVHTTPURLFromImportString(NSString *entered) {
 		
 		if (changedColumns) [notesTableView setViewingLocation:ctx];
 		
-	} else if ([selectorString isEqualToString:SEL_STR(setNoteBodyFont:sender:)]) {
+	} else if ([selectorString isEqualToString:SEL_STR(setNoteBodyFont:sender:)] ||
+			   [selectorString isEqualToString:SEL_STR(setNoteBodyLineHeight:sender:)]) {
 		
 		[notationController restyleAllNotes];
 		if (currentNote) {
