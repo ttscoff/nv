@@ -53,6 +53,10 @@ int main(int argc, const char *argv[]) {
 	if (NVSearchHighlightOverlayWanted(NO, @"nvalt task"))
 		fprintf(stderr, "FAIL turning highlights off takes the overlay down\n"), gFailures++;
 
+	NSRange avoided = NVSearchHighlightOverlayAvoidedSelection(NSMakeRange(12, 5));
+	if (avoided.location != NSNotFound || avoided.length != 0)
+		fprintf(stderr, "FAIL preview still paints the selected search match\n"), gFailures++;
+
 	CGFloat red, green, blue;
 	BOOL whiteInk = YES;
 	NVSearchHighlightPaint(0.945, 0.702, 0.702, 1.0, 0.231, 0.259, 0.325, &red, &green, &blue, &whiteInk);
@@ -69,8 +73,20 @@ int main(int argc, const char *argv[]) {
 		fprintf(stderr, "FAIL yellow highlight stays yellow on a dark note (%.3f %.3f %.3f)\n", red, green, blue), gFailures++;
 
 	NVSearchHighlightPaint(0.945, 0.702, 0.702, 0.40, 0.965, 0.948, 0.949, &red, &green, &blue, &whiteInk);
-	if (red < 0.94 || green < 0.80)
-		fprintf(stderr, "FAIL a light note still gets a tint of the highlight (%.3f %.3f %.3f)\n", red, green, blue), gFailures++;
+	if (NVSearchHighlightSaturation(red, green, blue) < 0.20 || whiteInk)
+		fprintf(stderr, "FAIL a light note still gets a tint of the highlight (%.3f %.3f %.3f sat=%.3f)\n",
+				red, green, blue, NVSearchHighlightSaturation(red, green, blue)), gFailures++;
+
+	/* Translucent pink on window gray used to flatten to a gray bar with black
+	   ink. Keep the highlighter color so the chip stays readable. */
+	NVSearchHighlightPaint(0.945, 0.702, 0.702, 0.35, 0.93, 0.93, 0.93, &red, &green, &blue, &whiteInk);
+	if (NVSearchHighlightSaturation(red, green, blue) < 0.20 || whiteInk)
+		fprintf(stderr, "FAIL translucent highlight stays colored on a light gray note (%.3f %.3f %.3f sat=%.3f)\n",
+				red, green, blue, NVSearchHighlightSaturation(red, green, blue)), gFailures++;
+
+	NVSearchHighlightPaint(0.871, 0.930, 0.110, 0.45, 0.93, 0.93, 0.93, &red, &green, &blue, &whiteInk);
+	if (NVSearchHighlightSaturation(red, green, blue) < 0.30 || green < red || whiteInk)
+		fprintf(stderr, "FAIL yellow highlight stays yellow on a light gray note (%.3f %.3f %.3f)\n", red, green, blue), gFailures++;
 
 	NVSearchHighlightPaint(0.15, 0.12, 0.25, 1.0, 1, 1, 1, &red, &green, &blue, &whiteInk);
 	if (!whiteInk)

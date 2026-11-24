@@ -82,8 +82,15 @@ static long (*GetGetScriptManagerVariablePointer())(short);
 
 static NSString * const NVSearchHighlightAttributeName = @"NVSearchHighlight";
 
+/* The note draws search ink in a surface that sits above -drawRect:, so a chip
+   painted there never appears behind the letters. This view is flipped like the
+   text view and stays above that surface. */
+@interface NVSearchHighlightOverlay : NSView
+@end
+
 @interface LinkingEditor (NVSearchHighlightOverlay)
 - (void)nv_drawSearchHighlightsInOverlay:(NSView *)overlay dirtyRect:(NSRect)dirtyRect;
+- (NVSearchHighlightOverlay *)nv_searchHighlightOverlayCreating:(BOOL)create;
 @end
 
 @interface LinkingEditor (NVLinkOpening)
@@ -93,12 +100,6 @@ static NSString * const NVSearchHighlightAttributeName = @"NVSearchHighlight";
 
 @interface LinkingEditor (NVBodyParagraphStyle)
 - (void)nv_applyBodyParagraphStyle;
-@end
-
-/* The note draws search ink in a surface that sits above -drawRect:, so a chip
-   painted there never appears behind the letters. This view is flipped like the
-   text view and stays above that surface. */
-@interface NVSearchHighlightOverlay : NSView
 @end
 
 @implementation NVSearchHighlightOverlay
@@ -603,13 +604,19 @@ static NSColor *NVSearchHighlightInkColor(NSColor *highlight) {
 		return modified;
 	}
 	/* Ink is chosen only while drawing. Storing it would replace the theme color,
-	   and taking it away when the letters stop matching leaves the default black. */
+	   and taking it away when the letters stop matching leaves the default black.
+	   When the overlay is up it paints the chip behind the letters; letting
+	   AppKit also draw the temporary background puts a gray bar over the glyphs. */
 	if ([attrs objectForKey:NVSearchHighlightAttributeName]) {
-		NSColor *ink = NVSearchHighlightInkColor([attrs objectForKey:NSBackgroundColorAttributeName]);
-		if (!ink)
-			return attrs;
-		NSMutableDictionary *modified = [[attrs mutableCopy] autorelease];
-		[modified setObject:ink forKey:NSForegroundColorAttributeName];
+		NSColor *background = [attrs objectForKey:NSBackgroundColorAttributeName];
+		if (!background)
+			background = [[prefsController searchTermHighlightAttributes] objectForKey:NSBackgroundColorAttributeName];
+		NSColor *ink = NVSearchHighlightInkColor(background);
+		NSMutableDictionary *modified = attrs ? [[attrs mutableCopy] autorelease] : [NSMutableDictionary dictionary];
+		if (ink)
+			[modified setObject:ink forKey:NSForegroundColorAttributeName];
+		if ([self nv_searchHighlightOverlayCreating:NO])
+			[modified removeObjectForKey:NSBackgroundColorAttributeName];
 		return modified;
 	}
 	return attrs;
@@ -988,7 +995,9 @@ static BOOL NVSearchHighlightColorMatches(NSColor *applied, NSColor *searchColor
 	if (!glyphs.length)
 		return;
 	NSRange chars = [layout characterRangeForGlyphRange:glyphs actualGlyphRange:NULL];
-	NSRange selected = [self selectedRange];
+	/* Preview mode selects the nearest hit for scrolling. Still paint that hit
+	   with the search chip or it looks faded next to the other matches. */
+	NSRange selected = NVSearchHighlightOverlayAvoidedSelection([self selectedRange]);
 	NSUInteger index = chars.location;
 	NSUInteger end = NSMaxRange(chars);
 	while (index < end) {
@@ -1656,6 +1665,7 @@ static NSColor *NVBlendColors(NSColor *first, NSColor *second, CGFloat fraction,
 	if (layout && limit.length) {
 		[layout removeTemporaryAttribute:NSForegroundColorAttributeName forCharacterRange:limit];
 		[layout removeTemporaryAttribute:NSBackgroundColorAttributeName forCharacterRange:limit];
+		[layout removeTemporaryAttribute:NVSearchHighlightAttributeName forCharacterRange:limit];
 		[layout removeTemporaryAttribute:NSStrikethroughStyleAttributeName forCharacterRange:limit];
 		[layout removeTemporaryAttribute:NSUnderlineStyleAttributeName forCharacterRange:limit];
 		[layout removeTemporaryAttribute:NSFontAttributeName forCharacterRange:limit];
@@ -1744,6 +1754,7 @@ static NSColor *NVBlendColors(NSColor *first, NSColor *second, CGFloat fraction,
 	NSRange fullRange = NSMakeRange(0, length);
 	[layout removeTemporaryAttribute:NSForegroundColorAttributeName forCharacterRange:fullRange];
 	[layout removeTemporaryAttribute:NSBackgroundColorAttributeName forCharacterRange:fullRange];
+	[layout removeTemporaryAttribute:NVSearchHighlightAttributeName forCharacterRange:fullRange];
 	[layout removeTemporaryAttribute:NSStrikethroughStyleAttributeName forCharacterRange:fullRange];
 	[layout removeTemporaryAttribute:NSUnderlineStyleAttributeName forCharacterRange:fullRange];
 	[layout removeTemporaryAttribute:NSFontAttributeName forCharacterRange:fullRange];
@@ -1860,6 +1871,7 @@ static NSColor *NVBlendColors(NSColor *first, NSColor *second, CGFloat fraction,
 		[layout removeTemporaryAttribute:NSUnderlineStyleAttributeName forCharacterRange:limit];
 		[layout removeTemporaryAttribute:NSFontAttributeName forCharacterRange:limit];
 		[layout removeTemporaryAttribute:NSBackgroundColorAttributeName forCharacterRange:limit];
+		[layout removeTemporaryAttribute:NVSearchHighlightAttributeName forCharacterRange:limit];
 	}
 	if (![self markdownCompletionsEnabled] || !layout || !fullRange.length || !prefsController) {
 		[self highlightWritingGremlins];

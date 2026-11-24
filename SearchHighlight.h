@@ -49,6 +49,14 @@ static inline BOOL NVSearchHighlightOverlayWanted(BOOL highlightTermsEnabled, NS
 	return highlightTermsEnabled && [query length] > 0;
 }
 
+/* While browsing search hits, the nearest match is selected so it stays on screen.
+   That is not an edit selection. Skipping it in the overlay left one faded
+   system-selection chip among bright search marks. Always paint every match. */
+static inline NSRange NVSearchHighlightOverlayAvoidedSelection(NSRange selectedRange) {
+	(void)selectedRange;
+	return NSMakeRange(NSNotFound, 0);
+}
+
 static inline CGFloat NVSearchHighlightLuminance(CGFloat red, CGFloat green, CGFloat blue) {
 	return (0.2126 * red) + (0.7152 * green) + (0.0722 * blue);
 }
@@ -77,13 +85,22 @@ static inline void NVSearchHighlightPaint(CGFloat highlightRed, CGFloat highligh
 		highlightAlpha = 0;
 	if (highlightAlpha > 1)
 		highlightAlpha = 1;
-	CGFloat red = (highlightRed * highlightAlpha) + (backgroundRed * (1.0 - highlightAlpha));
-	CGFloat green = (highlightGreen * highlightAlpha) + (backgroundGreen * (1.0 - highlightAlpha));
-	CGFloat blue = (highlightBlue * highlightAlpha) + (backgroundBlue * (1.0 - highlightAlpha));
-	CGFloat backdrop = NVSearchHighlightLuminance(backgroundRed, backgroundGreen, backgroundBlue);
-	if (highlightAlpha < 0.999 && backdrop < 0.45 &&
+	/* A faint highlighter on window gray washes to a gray chip; black ink on that
+	   chip is what "black on gray" looks like in the default theme. Keep enough of
+	   the chosen color that the mark stays obviously tinted. */
+	CGFloat mix = highlightAlpha;
+	if (mix < 0.999 && mix < 0.55 &&
+		NVSearchHighlightSaturation(highlightRed, highlightGreen, highlightBlue) > 0.15)
+		mix = 0.55;
+	CGFloat red = (highlightRed * mix) + (backgroundRed * (1.0 - mix));
+	CGFloat green = (highlightGreen * mix) + (backgroundGreen * (1.0 - mix));
+	CGFloat blue = (highlightBlue * mix) + (backgroundBlue * (1.0 - mix));
+	/* Flattening a translucent highlighter onto gray or cream washes it out.
+	   Keep the chosen color whenever the mix loses its chroma, on light notes
+	   as well as dark ones. */
+	if (mix < 0.999 &&
 		NVSearchHighlightSaturation(highlightRed, highlightGreen, highlightBlue) > 0.15 &&
-		NVSearchHighlightSaturation(red, green, blue) < 0.18) {
+		NVSearchHighlightSaturation(red, green, blue) < 0.25) {
 		red = highlightRed;
 		green = highlightGreen;
 		blue = highlightBlue;
