@@ -35,6 +35,7 @@
 #import "LinkingEditor.h"
 #import "AppController.h"
 #import "TagEditingManager.h"
+#import "ListSplit.h"
 
 @interface NotesTableView () {
 	NSTokenField *nvTokenField;
@@ -892,7 +893,12 @@ static void _CopyItemWithSelectorFromMenu(NSMenu *destMenu, NSMenu *sourceMenu, 
 			NSBeep();
 		}
     }
-	
+
+	NSPoint clickPoint = [self convertPoint:[event locationInWindow] fromView:nil];
+	NSInteger clickedRow = [self rowAtPoint:clickPoint];
+	if (NVShouldKeepSelectionForEmptyListClick(clickedRow, [self numberOfSelectedRows] > 0))
+		return;
+
 	[super mouseDown:event];
 }
 
