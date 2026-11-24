@@ -76,6 +76,8 @@
 - (IBAction)changedRTL:(id)sender;
 - (void)previewNoteBodyFont;
 - (IBAction)changeListFont:(id)sender;
+- (IBAction)changedNoteBodyLineHeight:(id)sender;
+- (void)syncNoteBodyLineHeightControls;
 - (IBAction)changedNoteDeletion:(id)sender;
 - (IBAction)changedNotesFolderLocation:(id)sender;
 - (IBAction)changedQuitBehavior:(id)sender;

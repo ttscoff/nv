@@ -23,6 +23,7 @@
 #import "GlobalPrefs.h"
 #import "BufferUtils.h"
 #import "NVThemeManager.h"
+#import "NoteLineHeight.h"
 
 @interface PrefsWindowController () <NSTableViewDataSource, NSTableViewDelegate>
 {
@@ -47,6 +48,7 @@
 		 @selector(resolveNoteBodyFontFromNotationPrefsFromSender:), 
 //		 @selector(setCheckSpellingAsYouType:sender:), 
 		 @selector(setConfirmNoteDeletion:sender:),
+		 @selector(setNoteBodyLineHeight:sender:),
 		 @selector(setLogsErrorsAndWarnings:sender:),
 		 @selector(setLogsAllDiagnosticMessages:sender:), nil];
     }
@@ -399,6 +401,135 @@
 
 - (void)themesDidChange:(NSNotification *)note {
 	[self performSelector:@selector(reloadThemePopups) withObject:nil afterDelay:0];
+	[self performSelector:@selector(syncNoteBodyLineHeightControls) withObject:nil afterDelay:0];
+}
+
+- (NSInteger)noteBodyLineHeightMenuIndex {
+	CGFloat pref = [prefsController noteBodyLineHeight];
+	if (NVNoteLineHeightIsFollowTheme(pref))
+		return 0;
+	if (fabs(pref - NVNoteLineHeightSmall) < 0.001)
+		return 1;
+	if (fabs(pref - NVNoteLineHeightRegular) < 0.001)
+		return 2;
+	if (fabs(pref - NVNoteLineHeightLarge) < 0.001)
+		return 3;
+	return 4;
+}
+
+- (void)syncNoteBodyLineHeightControls {
+	NSPopUpButton *popup = (NSPopUpButton *)[fontsColorsView viewWithTag:7320];
+	NSTextField *field = (NSTextField *)[fontsColorsView viewWithTag:7321];
+	if (![popup isKindOfClass:[NSPopUpButton class]] || ![field isKindOfClass:[NSTextField class]])
+		return;
+	NSInteger index = [self noteBodyLineHeightMenuIndex];
+	[popup selectItemAtIndex:index];
+	[field setFloatValue:[prefsController effectiveNoteBodyLineHeight]];
+	[field setEnabled:YES];
+}
+
+- (IBAction)changedNoteBodyLineHeight:(id)sender {
+	NSPopUpButton *popup = (NSPopUpButton *)[fontsColorsView viewWithTag:7320];
+	NSTextField *field = (NSTextField *)[fontsColorsView viewWithTag:7321];
+	if (sender == popup) {
+		switch ([popup indexOfSelectedItem]) {
+			case 0:
+				[prefsController setNoteBodyLineHeight:NVNoteLineHeightFollowTheme sender:self];
+				break;
+			case 1:
+				[prefsController setNoteBodyLineHeight:NVNoteLineHeightSmall sender:self];
+				break;
+			case 2:
+				[prefsController setNoteBodyLineHeight:NVNoteLineHeightRegular sender:self];
+				break;
+			case 3:
+				[prefsController setNoteBodyLineHeight:NVNoteLineHeightLarge sender:self];
+				break;
+			default:
+				[prefsController setNoteBodyLineHeight:[field floatValue] sender:self];
+				break;
+		}
+		[self syncNoteBodyLineHeightControls];
+		return;
+	}
+	if (sender == field || [sender isKindOfClass:[NSNotification class]]) {
+		[prefsController setNoteBodyLineHeight:[field floatValue] sender:self];
+		[self syncNoteBodyLineHeightControls];
+	}
+}
+
+- (void)addLineHeightControls {
+	if (!fontsColorsView || !bodyTextFontField || [fontsColorsView viewWithTag:7320])
+		return;
+	NSView *anchor = bodyTextFontField;
+	if (tableTextMenuButton && [tableTextMenuButton superview] == fontsColorsView)
+		anchor = tableTextMenuButton;
+	else if (listTextFontField)
+		anchor = listTextFontField;
+	NSRect anchorFrame = [anchor frame];
+	CGFloat rowHeight = 34.0;
+	CGFloat rowY = NSMinY(anchorFrame) - rowHeight - 4.0;
+	NSArray *subviews = [[fontsColorsView subviews] copy];
+	NSMutableArray *savedMasks = [[NSMutableArray alloc] initWithCapacity:[subviews count]];
+	for (NSView *subview in subviews) {
+		[savedMasks addObject:[NSNumber numberWithUnsignedInteger:[subview autoresizingMask]]];
+		[subview setAutoresizingMask:NSViewNotSizable];
+	}
+	for (NSView *subview in subviews) {
+		NSRect frame = [subview frame];
+		if (NSMaxY(frame) <= rowY + rowHeight)
+			frame.origin.y -= rowHeight;
+		[subview setFrame:frame];
+	}
+	NSRect viewFrame = [fontsColorsView frame];
+	viewFrame.size.height += rowHeight;
+	[fontsColorsView setFrame:viewFrame];
+	NSUInteger maskIndex = 0;
+	for (NSView *subview in subviews)
+		[subview setAutoresizingMask:[[savedMasks objectAtIndex:maskIndex++] unsignedIntegerValue]];
+	[savedMasks release];
+	[subviews release];
+
+	anchorFrame = [anchor frame];
+	rowY = NSMinY(anchorFrame) - rowHeight - 4.0;
+	CGFloat labelRight = NSMinX(anchorFrame);
+	NSTextField *label = [self themeLabelWithFrame:NSMakeRect(labelRight - 112.0, rowY + 4.0, 108.0, 17.0)
+											 title:NSLocalizedString(@"Line Height:", @"Fonts settings line height label")];
+	[fontsColorsView addSubview:label];
+	[label release];
+
+	NSPopUpButton *popup = [[NSPopUpButton alloc] initWithFrame:NSMakeRect(NSMinX(anchorFrame), rowY, 160.0, 26.0) pullsDown:NO];
+	[popup setTag:7320];
+	[popup addItemWithTitle:NSLocalizedString(@"Follow Theme", @"line height follows editor theme")];
+	[popup addItemWithTitle:NSLocalizedString(@"Small", @"line height preset")];
+	[popup addItemWithTitle:NSLocalizedString(@"Regular", @"line height preset")];
+	[popup addItemWithTitle:NSLocalizedString(@"Large", @"line height preset")];
+	[popup addItemWithTitle:NSLocalizedString(@"Custom", @"line height custom value")];
+	[popup setTarget:self];
+	[popup setAction:@selector(changedNoteBodyLineHeight:)];
+	[popup setAutoresizingMask:NSViewMaxYMargin | NSViewMaxXMargin];
+	NSRect popupFrame = [popup frame];
+	[fontsColorsView addSubview:popup];
+	[popup release];
+
+	NSTextField *field = [[NSTextField alloc] initWithFrame:NSMakeRect(NSMaxX(popupFrame) + 8.0, rowY + 2.0, 56.0, 22.0)];
+	[field setTag:7321];
+	[field setAlignment:NSTextAlignmentRight];
+	NSNumberFormatter *formatter = [[NSNumberFormatter alloc] init];
+	[formatter setNumberStyle:NSNumberFormatterDecimalStyle];
+	[formatter setMinimum:[NSNumber numberWithDouble:NVNoteLineHeightMinimum]];
+	[formatter setMaximum:[NSNumber numberWithDouble:NVNoteLineHeightMaximum]];
+	[formatter setMinimumFractionDigits:1];
+	[formatter setMaximumFractionDigits:2];
+	[field setFormatter:formatter];
+	[formatter release];
+	[field setAutoresizingMask:NSViewMaxYMargin | NSViewMaxXMargin];
+	[fontsColorsView addSubview:field];
+	[field release];
+
+	[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(changedNoteBodyLineHeight:)
+												 name:NSControlTextDidEndEditingNotification object:field];
+	[self syncNoteBodyLineHeightControls];
 }
 
 - (void)addThemeControls {
@@ -887,6 +1018,8 @@
 //		[checkSpellingButton setState:[prefsController checkSpellingAsYouType]];
 	} else if ([selectorString isEqualToString:SEL_STR(setConfirmNoteDeletion:sender:)]) {
 		[confirmDeletionButton setState:[prefsController confirmNoteDeletion]];
+	} else if ([selectorString isEqualToString:SEL_STR(setNoteBodyLineHeight:sender:)]) {
+		[self syncNoteBodyLineHeightControls];
 	} else if ([selectorString isEqualToString:SEL_STR(setLogsErrorsAndWarnings:sender:)] ||
 			   [selectorString isEqualToString:SEL_STR(setLogsAllDiagnosticMessages:sender:)]) {
 		[self updateDebugControls];
@@ -1073,6 +1206,7 @@
 	[makeURLsClickable setState:[prefsController URLsAreClickable]];
     [rtlButton setState:[prefsController rtl]];
     [self addListFontControls];
+    [self addLineHeightControls];
     [self addThemeControls];
     [self addMarkdownMarkerControls];
     [self addEnterInListControl];
