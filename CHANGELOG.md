@@ -1,3 +1,15 @@
+nvALT 3.0.48 (144)
+-------------------------
+
+#### FIXED
+
+- A **maxed notes list** no longer crushes the note body on restore
+- Clicking empty space below the **notes list** no longer clears the selected note
+- Restoring or resizing a tall **notes list** leaves room for the note body
+- Clicking the blank area under the **notes list** keeps the current note selected
+- Clearing **search** no longer jumps the notes list to the oldest end
+- Development builds no longer fail when embedding the **Safari extension**
+
 nvALT 3.0.47 (144)
 -------------------------
 
