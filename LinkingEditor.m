@@ -91,6 +91,10 @@ static NSString * const NVSearchHighlightAttributeName = @"NVSearchHighlight";
 - (void)nv_clickedOnLink:(id)aLink atIndex:(NSUInteger)charIndex fromMenu:(BOOL)fromMenu;
 @end
 
+@interface LinkingEditor (NVBodyParagraphStyle)
+- (void)nv_applyBodyParagraphStyle;
+@end
+
 /* The note draws search ink in a surface that sits above -drawRect:, so a chip
    painted there never appears behind the letters. This view is flipped like the
    text view and stays above that surface. */
@@ -216,6 +220,10 @@ if ([selectorString isEqualToString:SEL_STR(setNoteBodyFont:sender:)] ||
 
 		[self setTypingAttributes:[prefsController noteBodyAttributes]];
 		[self nv_applyThemeTypingColor];
+		/* contentsUpdatedForNote: skips when the plain text is unchanged, so
+		   line height would not show until the user switches notes. */
+		if ([selectorString isEqualToString:SEL_STR(setNoteBodyLineHeight:sender:)])
+			[self nv_applyBodyParagraphStyle];
 		//[textView setFont:[prefsController noteBodyFont]];
 	} else if ([selectorString isEqualToString:SEL_STR(setMakeURLsClickable:sender:)]) {
 		
@@ -541,6 +549,22 @@ CGFloat _perceptualColorDifference(NSColor*a, NSColor*b) {
 		visible = [self bounds];
 	[self setNeedsDisplayInRect:visible avoidAdditionalLayout:NO];
 	[[[self enclosingScrollView] contentView] setNeedsDisplay:YES];
+}
+
+- (void)nv_applyBodyParagraphStyle {
+	NSParagraphStyle *style = [prefsController noteBodyParagraphStyle];
+	if (!style)
+		return;
+	[self setDefaultParagraphStyle:style];
+	NSTextStorage *storage = [self textStorage];
+	NSUInteger length = [storage length];
+	if (length) {
+		[storage beginEditing];
+		[storage addAttribute:NSParagraphStyleAttributeName value:style range:NSMakeRange(0, length)];
+		[storage endEditing];
+	}
+	NVLayOutEntireNote(self);
+	[self redisplayAfterNoteChange];
 }
 
 - (void)layoutManager:(NSLayoutManager *)aLayoutManager didCompleteLayoutForTextContainer:(NSTextContainer *)aTextContainer atEnd:(BOOL)flag {
