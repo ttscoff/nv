@@ -1,3 +1,19 @@
+nvALT 3.0.49 (144)
+-------------------------
+
+#### NEW
+
+- Editor themes can set **line height** under textView
+- **Line height** follows the theme by default, with Small, Regular, Large, or a custom multiple
+- Fonts and Colors includes a **Line Height** popup with Follow Theme, Small, Regular, Large, and Custom
+
+#### FIXED
+
+- Body **paragraph style** applies to all fonts, not only monospace
+- Changing **line height** in Fonts and Colors updates the open note immediately
+- **Search highlights** stay tinted on light notes instead of washing out to a gray bar with black text
+- Every **matching word** uses the same bright search chip while browsing notes from the search field
+
 nvALT 3.0.48 (144)
 -------------------------
 
