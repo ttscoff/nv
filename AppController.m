@@ -1449,6 +1449,9 @@ static NSURL *NVHTTPURLFromImportString(NSString *entered) {
 		
 		[notesTableView deselectAll:sender];//thiss
 		[notationController filterNotesFromString:@""];
+		/* Refilter can restore a viewing location from the short filtered
+		   list into the oldest end of the full list. Land at the top. */
+		[notesTableView scrollRowToVisible:0];
 		//was here
         [self setDualFieldIsVisible:YES];
         //		[self _expandToolbar];

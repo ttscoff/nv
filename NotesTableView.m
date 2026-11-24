@@ -36,6 +36,7 @@
 #import "AppController.h"
 #import "TagEditingManager.h"
 #import "ListSplit.h"
+#import "ListPivot.h"
 
 @interface NotesTableView () {
 	NSTokenField *nvTokenField;
@@ -394,14 +395,22 @@ static BOOL NVAppearanceIsDark(NSAppearance *appearance) {
 
 - (ViewLocationContext)viewingLocation {
 	ViewLocationContext ctx;
-	
-	NSUInteger pivotRow = [[self selectedRowIndexes] firstIndex];
-	
+	NSIndexSet *selected = [self selectedRowIndexes];
+
+	ctx.pivotRowWasEdge = NO;
+	ctx.nonRetainedPivotObject = nil;
+	ctx.verticalDistanceToPivotRow = 0;
+
+	/* Clearing search deselects first. A pivot from the short filtered list
+	   then edge-snaps into the oldest end of the full list. */
+	if (!NVShouldRecordListPivot([selected count]))
+		return ctx;
+
+	NSUInteger pivotRow = [selected firstIndex];
 	NSUInteger nRows = (NSUInteger)[self numberOfRows];
-	
 	NSRect visibleRect = [self visibleRect];
 	NSRange range = [self rowsInRect:visibleRect];
-	
+
 	if (!NSLocationInRange(pivotRow, range)) {
 		if (NSLocationInRange(nRows - 1, range)) {
 			pivotRow = nRows - 1;
@@ -409,12 +418,9 @@ static BOOL NVAppearanceIsDark(NSAppearance *appearance) {
 			pivotRow = [self rowAtPoint:NSMakePoint(1, visibleRect.origin.y + [self rowHeight])];
 		}
 	}
-	
+
 	ctx.pivotRowWasEdge = (pivotRow == 0 || pivotRow == nRows - 1);
-	
-	ctx.nonRetainedPivotObject = nil;
-	ctx.verticalDistanceToPivotRow = 0;
-	
+
 	if (pivotRow < nRows) {
 		if ((ctx.nonRetainedPivotObject = [(FastListDataSource*)[self dataSource] immutableObjects][pivotRow])) {
 			ctx.verticalDistanceToPivotRow = [self distanceFromRow:pivotRow forVisibleArea:visibleRect];
