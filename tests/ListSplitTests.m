@@ -22,6 +22,16 @@ int main(void) {
 	expectTrue(NVShouldApplyDefaultListDimension(NO, 160.0), "a placeholder pane under 200 gets the default");
 	expectTrue(!NVShouldApplyDefaultListDimension(NO, 200.0), "a first launch already at 200 is left alone");
 	expectTrue(!NVShouldApplyDefaultListDimension(NO, 225.0), "a first launch over 200 is left alone");
+	expectTrue(fabs(NVClampedListDimension(600.0, 716.0, 120.0) - 596.0) < 0.01,
+			   "a maxed list in a 716pt split leaves 120 for the body");
+	expectTrue(fabs(NVClampedListDimension(150.0, 800.0, 120.0) - 150.0) < 0.01,
+			   "a safe saved height is left alone");
+	expectTrue(fabs(NVClampedListDimension(600.0, 500.0, 120.0) - 380.0) < 0.01,
+			   "a short split clamps the list to split minus body min");
+	expectTrue(NVClampedListDimension(50.0, 800.0, 120.0) >= 80.0,
+			   "below the list minimum rises to 80");
+	expectTrue(NVClampedListDimension(700.0, 2000.0, 120.0) <= 600.0,
+			   "above the list maximum falls to 600");
 	if (gFailures) {
 		fprintf(stderr, "%d list split tests failed\n", gFailures);
 		return 1;
