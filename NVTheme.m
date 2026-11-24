@@ -316,6 +316,13 @@ static BOOL NVThemeValueIsPresent(id value) {
 	if (!theme->caretColor)
 		theme->caretColor = [NVColorFromThemeValue([root objectForKey:@"caretColor"]) retain];
 	theme->selectionBackgroundColor = [NVColorFromThemeValue([root objectForKey:@"selectionBackgroundColor"]) retain];
+	theme->editorLineHeight = 0;
+	id lineHeightValue = [textView objectForKey:@"lineHeight"];
+	if ([lineHeightValue respondsToSelector:@selector(doubleValue)]) {
+		CGFloat lineHeight = [lineHeightValue doubleValue];
+		if (lineHeight > 0.0)
+			theme->editorLineHeight = lineHeight;
+	}
 	NSMutableDictionary *parsed = [NSMutableDictionary dictionary];
 	for (NSString *key in root) {
 		id value = [root objectForKey:key];
@@ -386,6 +393,10 @@ static BOOL NVThemeValueIsPresent(id value) {
 
 - (NSColor *)editorSelectionColor {
 	return selectionBackgroundColor;
+}
+
+- (CGFloat)editorLineHeight {
+	return editorLineHeight;
 }
 
 BOOL NVThemeColorIsLight(NSColor *color) {

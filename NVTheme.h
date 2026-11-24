@@ -56,6 +56,7 @@ enum {
 	NSColor *windowForegroundColor;
 	NSColor *caretColor;
 	NSColor *selectionBackgroundColor;
+	CGFloat editorLineHeight;
 	NSDictionary *styles;
 }
 
@@ -70,6 +71,8 @@ enum {
 - (NSColor *)editorForegroundColor;
 - (NSColor *)editorCaretColor;
 - (NSColor *)editorSelectionColor;
+/* textView.lineHeight from the theme, or 0 when unset. */
+- (CGFloat)editorLineHeight;
 - (NSColor *)listBackgroundColor;
 - (NSColor *)listForegroundColor;
 - (NSColor *)listSelectionColor;
