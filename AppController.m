@@ -318,6 +318,12 @@ static BOOL nvApplyingWindowChrome;
 				}
 			}
 		}
+		{
+			CGFloat splitSize = [splitView isVertical] ? NSWidth([splitView frame]) : NSHeight([splitView frame]);
+			CGFloat clamped = NVClampedListDimension([notesSubview dimension], splitSize, NVListBodyMinimumDimension);
+			if (fabs(clamped - [notesSubview dimension]) > 0.5)
+				[notesSubview setDimension:clamped];
+		}
 		[splitView adjustSubviews];
 		[splitSubview addSubview:editorStatusView positioned:NSWindowAbove relativeTo:splitSubview];
 		[editorStatusView setFrame:[textScrollView frame]];
@@ -2982,6 +2988,12 @@ static void NVStretchFullBleedAncestors(NSView *view, CGFloat targetWidth) {
 - (void)splitView:(RBSplitView*)sender wasResizedFrom:(CGFloat)oldDimension to:(CGFloat)newDimension {
 	if (sender == splitView) {
 		[sender adjustSubviewsExcepting:notesSubview];
+		CGFloat splitSize = [sender isVertical] ? NSWidth([sender frame]) : NSHeight([sender frame]);
+		CGFloat clamped = NVClampedListDimension([notesSubview dimension], splitSize, NVListBodyMinimumDimension);
+		if (fabs(clamped - [notesSubview dimension]) > 0.5) {
+			[notesSubview setDimension:clamped];
+			[sender adjustSubviews];
+		}
 	}
 }
 
